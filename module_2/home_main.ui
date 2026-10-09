@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1920</width>
+    <height>1080</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>AI Vision Pro</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../module_3/assert/icon/artificial-intelligence.ico</normaloff>../module_3/assert/icon/artificial-intelligence.ico</iconset>
+  </property>
+  <property name="windowOpacity">
+   <double>10.000000000000000</double>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QGraphicsView" name="graphicsView"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1920</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuOpen">
+    <property name="title">
+     <string>Dashborad</string>
+    </property>
+    <addaction name="actiondevice_configuration_settings"/>
+   </widget>
+   <widget class="QMenu" name="menuOperator">
+    <property name="title">
+     <string>Operator</string>
+    </property>
+    <addaction name="actionDevice_Name"/>
+   </widget>
+   <widget class="QMenu" name="menuSetting">
+    <property name="title">
+     <string>Systems</string>
+    </property>
+    <addaction name="separator"/>
+    <addaction name="actionAuto_Configuration"/>
+    <addaction name="action_Reset_Application"/>
+    <addaction name="actionClose_Application"/>
+   </widget>
+   <widget class="QMenu" name="menuAdministrator">
+    <property name="title">
+     <string>Administrator</string>
+    </property>
+    <addaction name="actionConfigure_settings"/>
+    <addaction name="actionCreate_User"/>
+    <addaction name="actionRemove_User"/>
+    <addaction name="actionHardware_Key"/>
+   </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionScripts"/>
+    <addaction name="actionData_Export"/>
+    <addaction name="actionData_Import"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionDocumentation"/>
+    <addaction name="actionUser_Manual"/>
+    <addaction name="actionAbout"/>
+   </widget>
+   <addaction name="menuOpen"/>
+   <addaction name="menuAdministrator"/>
+   <addaction name="menuOperator"/>
+   <addaction name="menuSetting"/>
+   <addaction name="menuTools"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actiondevice_configuration_settings">
+   <property name="icon">
+    <iconset>
+     <normaloff>../module_3/assert/icon/maintenance.png</normaloff>../module_3/assert/icon/maintenance.png</iconset>
+   </property>
+   <property name="text">
+    <string>Device Setup</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Microsoft Tai Le</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionDevice_Name">
+   <property name="icon">
+    <iconset>
+     <normaloff>../module_3/assert/icon/responsive.png</normaloff>../module_3/assert/icon/responsive.png</iconset>
+   </property>
+   <property name="text">
+    <string>Device Launching</string>
+   </property>
+  </action>
+  <action name="actionAuto_Configuration">
+   <property name="icon">
+    <iconset>
+     <normaloff>../module_3/assert/icon/settings.png</normaloff>../module_3/assert/icon/settings.png</iconset>
+   </property>
+   <property name="text">
+    <string>Auto Configuration</string>
+   </property>
+  </action>
+  <action name="action_Reset_Application">
+   <property name="icon">
+    <iconset>
+     <normaloff>../module_3/assert/icon/circular-arrows.png</normaloff>../module_3/assert/icon/circular-arrows.png</iconset>
+   </property>
+   <property name="text">
+    <string>Reset Application</string>
+   </property>
+  </action>
+  <action name="actionClose_Application">
+   <property name="icon">
+    <iconset>
+     <normaloff>../module_3/assert/icon/close-window.png</normaloff>../module_3/assert/icon/close-window.png</iconset>
+   </property>
+   <property name="text">
+    <string>Close Application</string>
+   </property>
+  </action>
+  <action name="actionConfigure_settings">
+   <property name="icon">
+    <iconset>
+     <normaloff>../module_3/assert/icon/gear.png</normaloff>../module_3/assert/icon/gear.png</iconset>
+   </property>
+   <property name="text">
+    <string>Configure settings</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Microsoft Tai Le</family>
+    </font>
+   </property>
+  </action>
+  <action name="actionCreate_User">
+   <property name="icon">
+    <iconset>
+     <normaloff>../module_3/assert/icon/add-user (1).png</normaloff>../module_3/assert/icon/add-user (1).png</iconset>
+   </property>
+   <property name="text">
+    <string>Create User</string>
+   </property>
+  </action>
+  <action name="actionRemove_User">
+   <property name="icon">
+    <iconset>
+     <normaloff>../module_3/assert/icon/remove-user.png</normaloff>../module_3/assert/icon/remove-user.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remove User</string>
+   </property>
+  </action>
+  <action name="actionHardware_Key">
+   <property name="icon">
+    <iconset>
+     <normaloff>../module_3/assert/icon/flash-drive.png</normaloff>../module_3/assert/icon/flash-drive.png</iconset>
+   </property>
+   <property name="text">
+    <string>Hardware Key USB</string>
+   </property>
+  </action>
+  <action name="actionScripts">
+   <property name="icon">
+    <iconset>
+     <normaloff>../module_3/assert/icon/source-code (1).png</normaloff>../module_3/assert/icon/source-code (1).png</iconset>
+   </property>
+   <property name="text">
+    <string>Scripts</string>
+   </property>
+  </action>
+  <action name="actionDocumentation">
+   <property name="icon">
+    <iconset>
+     <normaloff>../module_3/assert/icon/research.png</normaloff>../module_3/assert/icon/research.png</iconset>
+   </property>
+   <property name="text">
+    <string>Documentation</string>
+   </property>
+  </action>
+  <action name="actionUser_Manual">
+   <property name="icon">
+    <iconset>
+     <normaloff>../module_3/assert/icon/guidebook.png</normaloff>../module_3/assert/icon/guidebook.png</iconset>
+   </property>
+   <property name="text">
+    <string>User Manual</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="icon">
+    <iconset>
+     <normaloff>../module_3/assert/icon/info.png</normaloff>../module_3/assert/icon/info.png</iconset>
+   </property>
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actionData_Export">
+   <property name="icon">
+    <iconset>
+     <normaloff>../module_3/assert/icon/export.png</normaloff>../module_3/assert/icon/export.png</iconset>
+   </property>
+   <property name="text">
+    <string>Data Export</string>
+   </property>
+  </action>
+  <action name="actionData_Import">
+   <property name="icon">
+    <iconset>
+     <normaloff>../module_3/assert/icon/import.png</normaloff>../module_3/assert/icon/import.png</iconset>
+   </property>
+   <property name="text">
+    <string>Data Import</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,0 +1,3095 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1680</width>
+    <height>940</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <family>Segoe UI</family>
+    <pointsize>9</pointsize>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Camera Tab Settings</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QMainWindow { background-color: #FFFFF0;}</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout_centralwidget">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>10</number>
+    </property>
+    <property name="topMargin">
+     <number>10</number>
+    </property>
+    <property name="rightMargin">
+     <number>10</number>
+    </property>
+    <property name="bottomMargin">
+     <number>10</number>
+    </property>
+    <item>
+     <widget class="QSplitter" name="splitter">
+      <property name="font">
+       <font>
+        <family>Segoe UI</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="childrenCollapsible">
+       <bool>false</bool>
+      </property>
+      <widget class="QFrame" name="frame_2">
+       <property name="maximumSize">
+        <size>
+         <width>1000</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <layout class="QVBoxLayout" name="vlayout_frame2">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>6</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QSplitter" name="splitter_2">
+          <property name="font">
+           <font>
+            <family>Segoe UI</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="childrenCollapsible">
+           <bool>false</bool>
+          </property>
+          <widget class="QScrollArea" name="scrollArea">
+           <property name="minimumSize">
+            <size>
+             <width>325</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>400</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>Segoe UI</family>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="widgetResizable">
+            <bool>true</bool>
+           </property>
+           <widget class="QWidget" name="scrollAreaWidgetContents_4">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>308</width>
+              <height>928</height>
+             </rect>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout">
+             <property name="spacing">
+              <number>10</number>
+             </property>
+             <property name="leftMargin">
+              <number>4</number>
+             </property>
+             <property name="topMargin">
+              <number>4</number>
+             </property>
+             <property name="rightMargin">
+              <number>6</number>
+             </property>
+             <property name="bottomMargin">
+              <number>8</number>
+             </property>
+             <item>
+              <widget class="QGroupBox" name="groupBox_initialize_device">
+               <property name="font">
+                <font>
+                 <family>Segoe UI</family>
+                 <pointsize>-1</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">/* Khung chính của GroupBox */
+QGroupBox {
+    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
+    border: 1px solid #c6c6c6; /* Viền xám mảnh để định hình khối */
+    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
+    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
+    font-size: 14px;           /* Kích thước chữ tiêu đề */
+    font-weight: bold;         /* Làm đậm chữ tiêu đề */
+    color: #333333;            /* Màu chữ tiêu đề */
+}
+
+/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */
+    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */
+    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */
+}
+</string>
+               </property>
+               <property name="title">
+                <string>Initialize Device</string>
+               </property>
+               <layout class="QVBoxLayout" name="vlayout_init_device">
+                <property name="spacing">
+                 <number>8</number>
+                </property>
+                <property name="leftMargin">
+                 <number>12</number>
+                </property>
+                <property name="topMargin">
+                 <number>16</number>
+                </property>
+                <property name="rightMargin">
+                 <number>12</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>12</number>
+                </property>
+                <item>
+                 <widget class="QComboBox" name="comboBox_device_list">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>35</height>
+                   </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <family>Segoe UI</family>
+                    <pointsize>10</pointsize>
+                   </font>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_find_device">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>35</height>
+                   </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <family>Segoe UI</family>
+                    <pointsize>10</pointsize>
+                    <weight>75</weight>
+                    <bold>true</bold>
+                   </font>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QPushButton { background-color:#0067c0; color:white; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#005ba1; }</string>
+                  </property>
+                  <property name="text">
+                   <string>Find Device</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_connect_btns">
+                  <property name="spacing">
+                   <number>8</number>
+                  </property>
+                  <item>
+                   <widget class="QPushButton" name="pushButton_Connect_Device">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton { background-color:#0067c0; color:white; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#005ba1; }</string>
+                    </property>
+                    <property name="text">
+                     <string>Connect</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="pushButton_disconnect_dev">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton { 
+    background-color: rgb(255,102,102); /* Màu đỏ hiện đại, tươi sáng */
+    border: 1px solid #d32f2f;          /* Viền đỏ đậm hơn một chút để sắc nét */
+    border-radius: 4px;                 /* Giữ nguyên bo tròn 4px */
+    color: white;                       /* Ép chữ sang màu trắng để nổi bật trên nền đỏ */
+    font-weight: bold;                  /* Làm đậm chữ để dễ đọc hơn (Tùy chọn) */
+}
+
+/* Hiệu ứng khi di chuột qua nút (Đổi sang đỏ đậm hơn) */
+QPushButton:hover { 
+    background-color: rgb(230, 45, 35); 
+}
+
+/* Hiệu ứng khi ấn giữ nút (Tùy chọn để tăng trải nghiệm) */
+QPushButton:pressed {
+    background-color: rgb(195, 30, 22);
+}
+</string>
+                    </property>
+                    <property name="text">
+                     <string>Disconnect</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QGroupBox" name="groupBox_device_information">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Segoe UI</family>
+                 <pointsize>-1</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">/* Khung chính của GroupBox */
+QGroupBox {
+    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
+    border: 1px solid #c6c6c6; /* Viền xám mảnh để định hình khối */
+    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
+    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
+    font-size: 14px;           /* Kích thước chữ tiêu đề */
+    font-weight: bold;         /* Làm đậm chữ tiêu đề */
+    color: #333333;            /* Màu chữ tiêu đề */
+}
+
+/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */
+    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */
+    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */
+}
+</string>
+               </property>
+               <property name="title">
+                <string>Device Information</string>
+               </property>
+               <layout class="QVBoxLayout" name="vlayout_devinfo">
+                <property name="spacing">
+                 <number>6</number>
+                </property>
+                <property name="leftMargin">
+                 <number>12</number>
+                </property>
+                <property name="topMargin">
+                 <number>16</number>
+                </property>
+                <property name="rightMargin">
+                 <number>12</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>12</number>
+                </property>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_devname">
+                  <item>
+                   <widget class="QLabel" name="label_3">
+                    <property name="minimumSize">
+                     <size>
+                      <width>90</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Device Name:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_dev_name">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>#N/A</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_partno">
+                  <item>
+                   <widget class="QLabel" name="label_4">
+                    <property name="minimumSize">
+                     <size>
+                      <width>90</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Part No:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_PartNo">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>#N/A</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_ip">
+                  <item>
+                   <widget class="QLabel" name="label_5">
+                    <property name="minimumSize">
+                     <size>
+                      <width>90</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>I/P:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_IP">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>#N/A</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_serial">
+                  <item>
+                   <widget class="QLabel" name="label_6">
+                    <property name="minimumSize">
+                     <size>
+                      <width>90</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Serial No:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_SerialNo">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>#N/A</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_port">
+                  <item>
+                   <widget class="QLabel" name="label_40">
+                    <property name="minimumSize">
+                     <size>
+                      <width>90</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Port:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_Port">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>#N/A</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QGroupBox" name="groupBox_throught">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Segoe UI</family>
+                 <pointsize>-1</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">/* Khung chính của GroupBox */
+QGroupBox {
+    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
+    border: 1px solid #c6c6c6; /* Viền xám mảnh để định hình khối */
+    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
+    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
+    font-size: 14px;           /* Kích thước chữ tiêu đề */
+    font-weight: bold;         /* Làm đậm chữ tiêu đề */
+    color: #333333;            /* Màu chữ tiêu đề */
+}
+
+/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */
+    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */
+    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */
+}
+</string>
+               </property>
+               <property name="title">
+                <string>Throughput</string>
+               </property>
+               <layout class="QVBoxLayout" name="vlayout_through">
+                <property name="spacing">
+                 <number>8</number>
+                </property>
+                <property name="leftMargin">
+                 <number>12</number>
+                </property>
+                <property name="topMargin">
+                 <number>16</number>
+                </property>
+                <property name="rightMargin">
+                 <number>12</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>12</number>
+                </property>
+                <item>
+                 <widget class="QRadioButton" name="radioButton_check_continous">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>35</height>
+                   </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <family>Segoe UI</family>
+                    <pointsize>10</pointsize>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>Continuous</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_stream_btns">
+                  <property name="spacing">
+                   <number>8</number>
+                  </property>
+                  <item>
+                   <widget class="QPushButton" name="pushButton_start_stream">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton { background-color:#0067c0; color:white; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#005ba1; }</string>
+                    </property>
+                    <property name="text">
+                     <string>Start Grab</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="pushButton_stop_stream">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton { 
+    background-color: rgb(255,102,102); /* Màu đỏ hiện đại, tươi sáng */
+    border: 1px solid #d32f2f;          /* Viền đỏ đậm hơn một chút để sắc nét */
+    border-radius: 4px;                 /* Giữ nguyên bo tròn 4px */
+    color: white;                       /* Ép chữ sang màu trắng để nổi bật trên nền đỏ */
+    font-weight: bold;                  /* Làm đậm chữ để dễ đọc hơn (Tùy chọn) */
+}
+
+/* Hiệu ứng khi di chuột qua nút (Đổi sang đỏ đậm hơn) */
+QPushButton:hover { 
+    background-color: rgb(230, 45, 35); 
+}
+
+/* Hiệu ứng khi ấn giữ nút (Tùy chọn để tăng trải nghiệm) */
+QPushButton:pressed {
+    background-color: rgb(195, 30, 22);
+}
+</string>
+                    </property>
+                    <property name="text">
+                     <string>Stop</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QGroupBox" name="groupBox_grab_image">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Segoe UI</family>
+                 <pointsize>10</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">QGroupBox { font-weight:600; border:1px solid #d0d0d0; border-radius:6px; margin-top:10px; background-color:#fbfbfb;}QGroupBox::title { subcontrol-origin: margin; left:10px; padding:0 4px; color:#1b1b1b; }</string>
+               </property>
+               <property name="title">
+                <string>Trigger Source</string>
+               </property>
+               <layout class="QVBoxLayout" name="vlayout_grab">
+                <property name="spacing">
+                 <number>8</number>
+                </property>
+                <property name="leftMargin">
+                 <number>12</number>
+                </property>
+                <property name="topMargin">
+                 <number>16</number>
+                </property>
+                <property name="rightMargin">
+                 <number>12</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>12</number>
+                </property>
+                <item>
+                 <widget class="QRadioButton" name="radioButton_triggermode">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>35</height>
+                   </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <family>Segoe UI</family>
+                    <pointsize>10</pointsize>
+                   </font>
+                  </property>
+                  <property name="styleSheet">
+                   <string>/* Khung chính của GroupBox */
+QGroupBox {
+    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
+    border: 1px solid #c6c6c6; /* Viền xám mảnh để định hình khối */
+    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
+    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
+    font-size: 14px;           /* Kích thước chữ tiêu đề */
+    font-weight: bold;         /* Làm đậm chữ tiêu đề */
+    color: #333333;            /* Màu chữ tiêu đề */
+}
+
+/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */
+    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */
+    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */
+}
+</string>
+                  </property>
+                  <property name="text">
+                   <string>Trigger Mode</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_grab_btns">
+                  <property name="spacing">
+                   <number>8</number>
+                  </property>
+                  <item>
+                   <widget class="QPushButton" name="pushButton_start_grab">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton { background-color:#0067c0; color:white; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#005ba1; }</string>
+                    </property>
+                    <property name="text">
+                     <string>Start Grab</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="pushButton_stop_grab">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton { 
+    background-color: rgb(255,102,102); /* Màu đỏ hiện đại, tươi sáng */
+    border: 1px solid #d32f2f;          /* Viền đỏ đậm hơn một chút để sắc nét */
+    border-radius: 4px;                 /* Giữ nguyên bo tròn 4px */
+    color: white;                       /* Ép chữ sang màu trắng để nổi bật trên nền đỏ */
+    font-weight: bold;                  /* Làm đậm chữ để dễ đọc hơn (Tùy chọn) */
+}
+
+/* Hiệu ứng khi di chuột qua nút (Đổi sang đỏ đậm hơn) */
+QPushButton:hover { 
+    background-color: rgb(230, 45, 35); 
+}
+
+/* Hiệu ứng khi ấn giữ nút (Tùy chọn để tăng trải nghiệm) */
+QPushButton:pressed {
+    background-color: rgb(195, 30, 22);
+}
+</string>
+                    </property>
+                    <property name="text">
+                     <string>Stop</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_soft_btns">
+                  <property name="spacing">
+                   <number>8</number>
+                  </property>
+                  <item>
+                   <widget class="QPushButton" name="pushButton_trigger_software">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }</string>
+                    </property>
+                    <property name="text">
+                     <string>Software</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="pushButton_save_img">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }</string>
+                    </property>
+                    <property name="text">
+                     <string>Save Image</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QGroupBox" name="groupBox_TriggerSourceOff">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Segoe UI</family>
+                 <pointsize>-1</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">/* Khung chính của GroupBox */
+QGroupBox {
+    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
+    border: 1px solid #c6c6c6; /* Viền xám mảnh để định hình khối */
+    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
+    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
+    font-size: 14px;           /* Kích thước chữ tiêu đề */
+    font-weight: bold;         /* Làm đậm chữ tiêu đề */
+    color: #333333;            /* Màu chữ tiêu đề */
+}
+
+/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */
+    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */
+    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */
+}
+</string>
+               </property>
+               <property name="title">
+                <string>Take Image Array Buffer</string>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_5">
+                <property name="spacing">
+                 <number>8</number>
+                </property>
+                <property name="leftMargin">
+                 <number>12</number>
+                </property>
+                <property name="topMargin">
+                 <number>16</number>
+                </property>
+                <property name="rightMargin">
+                 <number>12</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>12</number>
+                </property>
+                <item>
+                 <widget class="QRadioButton" name="radioButton_free_run">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>35</height>
+                   </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <family>Segoe UI</family>
+                    <pointsize>10</pointsize>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>Free Run</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="checkBox_display_img">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>35</height>
+                   </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <family>Segoe UI</family>
+                    <pointsize>10</pointsize>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>Display Image</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_trigger_get_img_buffer">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>35</height>
+                   </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <family>Segoe UI</family>
+                    <pointsize>10</pointsize>
+                    <weight>75</weight>
+                    <bold>true</bold>
+                   </font>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QPushButton { background-color:#0067c0; color:white; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#005ba1; }</string>
+                  </property>
+                  <property name="text">
+                   <string>Trigger</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <spacer name="verticalSpacer">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </widget>
+          <widget class="QScrollArea" name="scrollArea_2">
+           <property name="minimumSize">
+            <size>
+             <width>325</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>Segoe UI</family>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="widgetResizable">
+            <bool>true</bool>
+           </property>
+           <widget class="QWidget" name="scrollAreaWidgetContents_5">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>308</width>
+              <height>974</height>
+             </rect>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_2">
+             <property name="spacing">
+              <number>10</number>
+             </property>
+             <property name="leftMargin">
+              <number>4</number>
+             </property>
+             <property name="topMargin">
+              <number>4</number>
+             </property>
+             <property name="rightMargin">
+              <number>6</number>
+             </property>
+             <property name="bottomMargin">
+              <number>8</number>
+             </property>
+             <item>
+              <widget class="QGroupBox" name="groupBox_user_set_control">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Segoe UI</family>
+                 <pointsize>-1</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">/* Khung chính của GroupBox */
+QGroupBox {
+    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
+    border: 1px solid #c6c6c6; /* Viền xám mảnh để định hình khối */
+    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
+    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
+    font-size: 14px;           /* Kích thước chữ tiêu đề */
+    font-weight: bold;         /* Làm đậm chữ tiêu đề */
+    color: #333333;            /* Màu chữ tiêu đề */
+}
+
+/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */
+    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */
+    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */
+}
+</string>
+               </property>
+               <property name="title">
+                <string>User Set Control</string>
+               </property>
+               <layout class="QVBoxLayout" name="vlayout_userset">
+                <property name="spacing">
+                 <number>8</number>
+                </property>
+                <property name="leftMargin">
+                 <number>12</number>
+                </property>
+                <property name="topMargin">
+                 <number>16</number>
+                </property>
+                <property name="rightMargin">
+                 <number>12</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>12</number>
+                </property>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_camid">
+                  <item>
+                   <widget class="QLabel" name="label_7">
+                    <property name="minimumSize">
+                     <size>
+                      <width>100</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Camera ID:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBox_camera_id">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_usercur">
+                  <item>
+                   <widget class="QLabel" name="label_2">
+                    <property name="minimumSize">
+                     <size>
+                      <width>100</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>User Current:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="spinBox_current_user">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_userselector">
+                  <item>
+                   <widget class="QLabel" name="label_11">
+                    <property name="minimumSize">
+                     <size>
+                      <width>100</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>User Selector:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBox_user_selector">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <item>
+                     <property name="text">
+                      <string>Default</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>User Set 1</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>User Set 2</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>User Set 3</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_setload">
+                  <item>
+                   <widget class="QLabel" name="label_13">
+                    <property name="minimumSize">
+                     <size>
+                      <width>100</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Set Load:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="pushButton_set_load">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton { background-color:#0067c0; color:white; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#005ba1; }</string>
+                    </property>
+                    <property name="text">
+                     <string>Execute</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_setsave">
+                  <item>
+                   <widget class="QLabel" name="label_12">
+                    <property name="minimumSize">
+                     <size>
+                      <width>100</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Set Save:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="pushButton_set_save">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton { background-color:#0067c0; color:white; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#005ba1; }</string>
+                    </property>
+                    <property name="text">
+                     <string>Execute</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_userdef">
+                  <item>
+                   <widget class="QLabel" name="label_14">
+                    <property name="minimumSize">
+                     <size>
+                      <width>100</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>User Default:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBox_default_user">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <item>
+                     <property name="text">
+                      <string>Default</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>User Set 1</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>User Set 2</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>User Set 3</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>35</height>
+                   </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <family>Segoe UI</family>
+                    <pointsize>10</pointsize>
+                    <weight>75</weight>
+                    <bold>true</bold>
+                   </font>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QPushButton { background-color:#0067c0; color:white; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#005ba1; }</string>
+                  </property>
+                  <property name="text">
+                   <string>Save Configuration</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QGroupBox" name="groupBox_Image_format_control">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Segoe UI</family>
+                 <pointsize>-1</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">/* Khung chính của GroupBox */
+QGroupBox {
+    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
+    border: 1px solid #c6c6c6; /* Viền xám mảnh để định hình khối */
+    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
+    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
+    font-size: 14px;           /* Kích thước chữ tiêu đề */
+    font-weight: bold;         /* Làm đậm chữ tiêu đề */
+    color: #333333;            /* Màu chữ tiêu đề */
+}
+
+/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */
+    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */
+    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */
+}
+</string>
+               </property>
+               <property name="title">
+                <string>Image Format Control</string>
+               </property>
+               <layout class="QVBoxLayout" name="vlayout_format">
+                <property name="spacing">
+                 <number>6</number>
+                </property>
+                <property name="leftMargin">
+                 <number>12</number>
+                </property>
+                <property name="topMargin">
+                 <number>16</number>
+                </property>
+                <property name="rightMargin">
+                 <number>12</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>12</number>
+                </property>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_wmax">
+                  <item>
+                   <widget class="QLabel" name="label_default_width">
+                    <property name="minimumSize">
+                     <size>
+                      <width>110</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Width Max:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="spinBox_default_width">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="maximum">
+                     <number>10000</number>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_hmax">
+                  <item>
+                   <widget class="QLabel" name="label_16">
+                    <property name="minimumSize">
+                     <size>
+                      <width>110</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Height Max:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="spinBox_default_height">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="maximum">
+                     <number>10000</number>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_wsel">
+                  <item>
+                   <widget class="QLabel" name="label_17">
+                    <property name="minimumSize">
+                     <size>
+                      <width>110</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Width Selector:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="spinBox_width_selector">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="maximum">
+                     <number>10000</number>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_hsel">
+                  <item>
+                   <widget class="QLabel" name="label_18">
+                    <property name="minimumSize">
+                     <size>
+                      <width>110</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Height Selector:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="spinBox_height_selector">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="maximum">
+                     <number>10000</number>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_offx">
+                  <item>
+                   <widget class="QLabel" name="label_19">
+                    <property name="minimumSize">
+                     <size>
+                      <width>110</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Offset X:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="spinBox_offset_x">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="maximum">
+                     <number>10000</number>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_offy">
+                  <item>
+                   <widget class="QLabel" name="label_20">
+                    <property name="minimumSize">
+                     <size>
+                      <width>110</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Offset Y:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="spinBox_offset_y">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="maximum">
+                     <number>10000</number>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_revx">
+                  <item>
+                   <widget class="QLabel" name="label_21">
+                    <property name="minimumSize">
+                     <size>
+                      <width>110</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Reverse X:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="pushButton_set_reverse_x">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }</string>
+                    </property>
+                    <property name="text">
+                     <string>Set</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_revy">
+                  <item>
+                   <widget class="QLabel" name="label_22">
+                    <property name="minimumSize">
+                     <size>
+                      <width>110</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Reverse Y:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="pushButton_set_reverser_y">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }</string>
+                    </property>
+                    <property name="text">
+                     <string>Set</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_pixfmt">
+                  <item>
+                   <widget class="QLabel" name="label_23">
+                    <property name="minimumSize">
+                     <size>
+                      <width>110</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Pixel Format:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBox_4">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <item>
+                     <property name="text">
+                      <string>Bayer RG 8</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_pixsize">
+                  <item>
+                   <widget class="QLabel" name="label_24">
+                    <property name="minimumSize">
+                     <size>
+                      <width>110</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Pixel Size:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBox_5">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <item>
+                     <property name="text">
+                      <string>8 bits/Pixel</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_bin">
+                  <item>
+                   <widget class="QLabel" name="label_25">
+                    <property name="minimumSize">
+                     <size>
+                      <width>110</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Binning:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBox_6">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <item>
+                     <property name="text">
+                      <string>1</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>2</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>3</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_binh">
+                  <item>
+                   <widget class="QLabel" name="label_26">
+                    <property name="minimumSize">
+                     <size>
+                      <width>110</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Binning Horizontal:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBox_7">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <item>
+                     <property name="text">
+                      <string>1</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>2</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>3</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_testpat">
+                  <item>
+                   <widget class="QLabel" name="label_27">
+                    <property name="minimumSize">
+                     <size>
+                      <width>110</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Test Pattern:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBox_8">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <item>
+                     <property name="text">
+                      <string>1</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>2</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>3</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <spacer name="verticalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </widget>
+          <widget class="QScrollArea" name="scrollArea_3">
+           <property name="minimumSize">
+            <size>
+             <width>325</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>Segoe UI</family>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="widgetResizable">
+            <bool>true</bool>
+           </property>
+           <widget class="QWidget" name="scrollAreaWidgetContents_6">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>334</width>
+              <height>900</height>
+             </rect>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_3">
+             <property name="spacing">
+              <number>10</number>
+             </property>
+             <property name="leftMargin">
+              <number>4</number>
+             </property>
+             <property name="topMargin">
+              <number>4</number>
+             </property>
+             <property name="rightMargin">
+              <number>6</number>
+             </property>
+             <property name="bottomMargin">
+              <number>8</number>
+             </property>
+             <item>
+              <widget class="QGroupBox" name="groupBox_analog_control">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Segoe UI</family>
+                 <pointsize>-1</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">/* Khung chính của GroupBox */
+QGroupBox {
+    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
+    border: 1px solid #c6c6c6; /* Viền xám mảnh để định hình khối */
+    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
+    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
+    font-size: 14px;           /* Kích thước chữ tiêu đề */
+    font-weight: bold;         /* Làm đậm chữ tiêu đề */
+    color: #333333;            /* Màu chữ tiêu đề */
+}
+
+/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */
+    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */
+    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */
+}
+</string>
+               </property>
+               <property name="title">
+                <string>Analog Control</string>
+               </property>
+               <layout class="QVBoxLayout" name="vlayout_analog">
+                <property name="spacing">
+                 <number>6</number>
+                </property>
+                <property name="leftMargin">
+                 <number>12</number>
+                </property>
+                <property name="topMargin">
+                 <number>16</number>
+                </property>
+                <property name="rightMargin">
+                 <number>12</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>12</number>
+                </property>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_exptime">
+                  <item>
+                   <widget class="QLabel" name="label_36">
+                    <property name="minimumSize">
+                     <size>
+                      <width>130</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Exposure Time:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QDoubleSpinBox" name="doubleSpinBox_Exposure_Time">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="maximum">
+                     <double>1000000.000000000000000</double>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_gain">
+                  <item>
+                   <widget class="QLabel" name="label_37">
+                    <property name="minimumSize">
+                     <size>
+                      <width>130</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Gain:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QDoubleSpinBox" name="doubleSpinBox_Gain">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="maximum">
+                     <double>1000000.000000000000000</double>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_gammaen">
+                  <item>
+                   <widget class="QLabel" name="label_43">
+                    <property name="minimumSize">
+                     <size>
+                      <width>130</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Gamma Enable:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBox_16">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <item>
+                     <property name="text">
+                      <string>On</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>Off</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_gamma">
+                  <item>
+                   <widget class="QLabel" name="label_38">
+                    <property name="minimumSize">
+                     <size>
+                      <width>130</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Gamma:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QDoubleSpinBox" name="doubleSpinBox_Gamma">
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="maximum">
+                     <double>1000000.000000000000000</double>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_balauto">
+                  <item>
+                   <widget class="QLabel" name="label_42">
+                    <property name="minimumSize">
+                     <size>
+                      <width>130</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Balance White Auto:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBox_15">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <item>
+                     <property name="text">
+                      <string>On</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>Off</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_balratio">
+                  <item>
+                   <widget class="QLabel" name="label_39">
+                    <property name="minimumSize">
+                     <size>
+                      <width>130</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Balance Ratio:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="spinBox_balance_ratio">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="maximum">
+                     <number>10000</number>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QGroupBox" name="groupBox_acquisition_control">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Segoe UI</family>
+                 <pointsize>-1</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">/* Khung chính của GroupBox */
+QGroupBox {
+    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
+    border: 1px solid #c6c6c6; /* Viền xám mảnh để định hình khối */
+    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
+    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
+    font-size: 14px;           /* Kích thước chữ tiêu đề */
+    font-weight: bold;         /* Làm đậm chữ tiêu đề */
+    color: #333333;            /* Màu chữ tiêu đề */
+}
+
+/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */
+    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */
+    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */
+}
+</string>
+               </property>
+               <property name="title">
+                <string>Acquisition Control</string>
+               </property>
+               <layout class="QVBoxLayout" name="vlayout_acq">
+                <property name="spacing">
+                 <number>6</number>
+                </property>
+                <property name="leftMargin">
+                 <number>12</number>
+                </property>
+                <property name="topMargin">
+                 <number>16</number>
+                </property>
+                <property name="rightMargin">
+                 <number>12</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>12</number>
+                </property>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_acqmode">
+                  <item>
+                   <widget class="QLabel" name="label_28">
+                    <property name="minimumSize">
+                     <size>
+                      <width>120</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Acquisition Mode:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBox_9">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <item>
+                     <property name="text">
+                      <string>Continuous</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>SingleFrame</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_acqstop">
+                  <item>
+                   <widget class="QLabel" name="label_29">
+                    <property name="minimumSize">
+                     <size>
+                      <width>120</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Acquisition Stop:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="pushButton_12">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }</string>
+                    </property>
+                    <property name="text">
+                     <string>Execute</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_fps">
+                  <item>
+                   <widget class="QLabel" name="label_30">
+                    <property name="minimumSize">
+                     <size>
+                      <width>120</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Frame Rate:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QDoubleSpinBox" name="doubleSpinBox_FrameRate">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="maximum">
+                     <double>1000000.000000000000000</double>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_trgsel">
+                  <item>
+                   <widget class="QLabel" name="label_31">
+                    <property name="minimumSize">
+                     <size>
+                      <width>120</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Trigger Selector:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBox_10">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <item>
+                     <property name="text">
+                      <string>Frame Burst Start</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_trgsrc">
+                  <item>
+                   <widget class="QLabel" name="label_32">
+                    <property name="minimumSize">
+                     <size>
+                      <width>120</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Trigger Source:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBox_11">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <item>
+                     <property name="text">
+                      <string>Line 0</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_trgmode">
+                  <item>
+                   <widget class="QLabel" name="label_33">
+                    <property name="minimumSize">
+                     <size>
+                      <width>120</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Trigger Mode:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBox_12">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <item>
+                     <property name="text">
+                      <string>On</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>Off</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_expauto">
+                  <item>
+                   <widget class="QLabel" name="label_34">
+                    <property name="minimumSize">
+                     <size>
+                      <width>120</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Exposure Auto:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBox_exposure_auto">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <item>
+                     <property name="text">
+                      <string>On</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>Off</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hlayout_gainauto">
+                  <item>
+                   <widget class="QLabel" name="label_35">
+                    <property name="minimumSize">
+                     <size>
+                      <width>120</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Gain Auto:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBox_gain_auto">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>35</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <item>
+                     <property name="text">
+                      <string>On</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>Off</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <spacer name="verticalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QFrame" name="frame">
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <property name="spacing">
+         <number>8</number>
+        </property>
+        <property name="leftMargin">
+         <number>6</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QSplitter" name="splitter_4">
+          <property name="font">
+           <font>
+            <family>Segoe UI</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <widget class="QFrame" name="frame_4">
+           <property name="font">
+            <font>
+             <family>Segoe UI</family>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QSplitter" name="splitter_3">
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <widget class="QLabel" name="label_display_image">
+               <property name="minimumSize">
+                <size>
+                 <width>200</width>
+                 <height>200</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Segoe UI</family>
+                 <pointsize>10</pointsize>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string>background-color: rgb(0, 0, 0); color: rgb(255, 255, 255); border-radius:4px;</string>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::Box</enum>
+               </property>
+               <property name="text">
+                <string>IMAGE PREVIEW</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+              <widget class="QLabel" name="label_resize_image">
+               <property name="font">
+                <font>
+                 <family>Segoe UI</family>
+                 <pointsize>10</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>⇔</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QLabel" name="label">
+           <property name="font">
+            <font>
+             <family>Segoe UI</family>
+             <pointsize>10</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>⇳</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignHCenter|Qt::AlignTop</set>
+           </property>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

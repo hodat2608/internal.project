@@ -1,0 +1,53 @@
+def Get_all_parameter(self):
+        if not self.b_open_device:
+            return -1
+
+        self.camera_params = {}
+
+        # --- FLOAT PARAMS ---
+        float_params = ["AcquisitionFrameRate", "ExposureTime", "Gain", "Gamma", "BalanceRatio"]
+        for name in float_params:
+            stVal = MVCC_FLOATVALUE()
+            memset(byref(stVal), 0, sizeof(MVCC_FLOATVALUE))
+            ret = self.obj_cam.MV_CC_GetFloatValue(name, stVal)
+            if ret == 0:
+                self.camera_params[name] = stVal.fCurValue
+            else:
+                self.camera_params[name] = None
+
+        # --- BOOL PARAMS ---
+        bool_params = ["GammaEnable"]
+        for name in bool_params:
+            stVal = c_bool(False)
+            ret = self.obj_cam.MV_CC_GetBoolValue(name, stVal)
+            if ret == 0:
+                self.camera_params[name] = stVal.value
+            else:
+                self.camera_params[name] = None
+
+        # --- ENUM PARAMS ---
+        enum_params = [
+            "BalanceWhiteAuto", "PixelFormat", "AcquisitionMode", "TriggerMode",
+            "TriggerSource", "ExposureAuto", "GainAuto", "BinningSelector", "TestPattern"
+        ]
+        for name in enum_params:
+            stVal = MVCC_ENUMVALUE()
+            memset(byref(stVal), 0, sizeof(MVCC_ENUMVALUE))
+            ret = self.obj_cam.MV_CC_GetEnumValue(name, stVal)
+            if ret == 0:
+                self.camera_params[name] = stVal.nCurValue
+            else:
+                self.camera_params[name] = None
+
+        # --- INT PARAMS ---
+        int_params = ["BinningHorizontal", "BinningVertical", "OffsetX", "OffsetY", "Width", "Height"]
+        for name in int_params:
+            stVal = MVCC_INTVALUE()
+            memset(byref(stVal), 0, sizeof(MVCC_INTVALUE))
+            ret = self.obj_cam.MV_CC_GetIntValue(name, stVal)
+            if ret == 0:
+                self.camera_params[name] = stVal.nCurValue
+            else:
+                self.camera_params[name] = None
+
+        return MV_OK

@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>751</width>
+    <height>365</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>480</width>
+    <height>300</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Cấu hình Camera</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+QMainWindow {
+    background-color: #f5f6f8;
+}
+QGroupBox {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2c3e50;
+    border: 1px solid #d0d5dd;
+    border-radius: 8px;
+    margin-top: 12px;
+    padding-top: 16px;
+    background-color: #ffffff;
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 14px;
+    padding: 0 6px;
+    background-color: #ffffff;
+}
+QLabel {
+    font-size: 13px;
+    color: #34495e;
+}
+QComboBox, QLineEdit, QSpinBox {
+    font-size: 13px;
+    min-height: 28px;
+    padding: 2px 8px;
+    border: 1px solid #c8cdd5;
+    border-radius: 5px;
+    background-color: #ffffff;
+    selection-background-color: #3498db;
+}
+QComboBox:hover, QLineEdit:hover, QSpinBox:hover {
+    border-color: #3498db;
+}
+QComboBox:focus, QLineEdit:focus, QSpinBox:focus {
+    border: 1px solid #2980b9;
+}
+QComboBox::drop-down {
+    border: none;
+    width: 24px;
+}
+QSpinBox::up-button, QSpinBox::down-button {
+    width: 18px;
+}
+</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="mainLayout">
+    <property name="spacing">
+     <number>16</number>
+    </property>
+    <property name="leftMargin">
+     <number>20</number>
+    </property>
+    <property name="topMargin">
+     <number>16</number>
+    </property>
+    <property name="rightMargin">
+     <number>20</number>
+    </property>
+    <property name="bottomMargin">
+     <number>16</number>
+    </property>
+    <item>
+     <widget class="QGroupBox" name="groupBoxConfig">
+      <property name="title">
+       <string>Camera Infomation</string>
+      </property>
+      <layout class="QFormLayout" name="formLayout">
+       <property name="labelAlignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="horizontalSpacing">
+        <number>18</number>
+       </property>
+       <property name="verticalSpacing">
+        <number>14</number>
+       </property>
+       <property name="leftMargin">
+        <number>16</number>
+       </property>
+       <property name="topMargin">
+        <number>20</number>
+       </property>
+       <property name="rightMargin">
+        <number>16</number>
+       </property>
+       <property name="bottomMargin">
+        <number>16</number>
+       </property>
+       <item row="0" column="0">
+        <widget class="QLabel" name="labelCameraType">
+         <property name="text">
+          <string>Camera Brand</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QComboBox" name="comboCameraType">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>34</height>
+          </size>
+         </property>
+         <item>
+          <property name="text">
+           <string>Basler - Pypylon</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>HIK - MVS</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>STC - Stviewer</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>IDS</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="labelSerial">
+         <property name="text">
+          <string>Seria Nol:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="lineEditSerial">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>34</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>N/A</string>
+         </property>
+         <property name="placeholderText">
+          <string>Nhập số serial...</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="labelIP">
+         <property name="text">
+          <string>IP Address:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <layout class="QHBoxLayout" name="ipLayout">
+         <property name="spacing">
+          <number>4</number>
+         </property>
+         <item>
+          <widget class="QLineEdit" name="lineEditIP1">
+           <property name="minimumSize">
+            <size>
+             <width>52</width>
+             <height>34</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>60</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="maxLength">
+            <number>3</number>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+           <property name="placeholderText">
+            <string>192</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="dot1">
+           <property name="text">
+            <string>.</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEditIP2">
+           <property name="minimumSize">
+            <size>
+             <width>52</width>
+             <height>34</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>60</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="maxLength">
+            <number>3</number>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+           <property name="placeholderText">
+            <string>168</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="dot2">
+           <property name="text">
+            <string>.</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEditIP3">
+           <property name="minimumSize">
+            <size>
+             <width>52</width>
+             <height>34</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>60</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="maxLength">
+            <number>3</number>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+           <property name="placeholderText">
+            <string>0</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="dot3">
+           <property name="text">
+            <string>.</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEditIP4">
+           <property name="minimumSize">
+            <size>
+             <width>52</width>
+             <height>34</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>60</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="maxLength">
+            <number>3</number>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+           <property name="placeholderText">
+            <string>1</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="ipSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="labelPort">
+         <property name="text">
+          <string>Connection ports:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QComboBox" name="comboPort">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>34</height>
+          </size>
+         </property>
+         <item>
+          <property name="text">
+           <string>GigE</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>USB</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Camera Link</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>CoaXPress</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="labelModelCount">
+         <property name="text">
+          <string>Number of Models</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QSpinBox" name="spinBoxModelCount">
+         <property name="minimumSize">
+          <size>
+           <width>120</width>
+           <height>34</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>140</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="minimum">
+          <number>0</number>
+         </property>
+         <property name="maximum">
+          <number>99</number>
+         </property>
+         <property name="value">
+          <number>0</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>10</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,0 +1,3 @@
+Couldn't get an interface pointer to ms_neugevfilter. ret 0x1
+Uninstallation failed, ret 0x1
+Component installed successfully.

@@ -1,0 +1,567 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>780</width>
+    <height>420</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>680</width>
+    <height>360</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>MySQL Connector</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+/* ========== GLOBAL ========== */
+QMainWindow, QWidget {
+    background-color: #f5f7fa;
+    font-family: &quot;Segoe UI&quot;, &quot;Arial&quot;, sans-serif;
+    font-size: 13px;
+    color: #2c3e50;
+}
+
+/* ========== LOGO PANEL ========== */
+QFrame#frameLogo {
+    background-color: #ffffff;
+    border: 1px solid #e1e5eb;
+    border-radius: 10px;
+}
+QLabel#labelLogoTitle {
+    font-size: 28px;
+    font-weight: 700;
+    color: #00758f;
+    letter-spacing: 1px;
+}
+QLabel#labelLogoSub {
+    font-size: 12px;
+    color: #7f8c8d;
+}
+
+/* ========== FORM PANEL ========== */
+QFrame#frameForm {
+    background-color: #ffffff;
+    border: 1px solid #e1e5eb;
+    border-radius: 10px;
+}
+QLabel {
+    color: #34495e;
+}
+QLabel#labelDesc {
+    color: #95a5a6;
+    font-size: 11px;
+    font-style: italic;
+}
+
+/* ========== INPUTS ========== */
+QLineEdit, QSpinBox {
+    min-height: 30px;
+    padding: 3px 10px;
+    border: 1px solid #cdd3db;
+    border-radius: 6px;
+    background-color: #ffffff;
+    selection-background-color: #3498db;
+}
+QLineEdit:hover, QSpinBox:hover {
+    border-color: #3498db;
+}
+QLineEdit:focus, QSpinBox:focus {
+    border: 1.5px solid #2980b9;
+}
+QLineEdit#lineEditPassword {
+    /* password echo mode set in properties */
+}
+
+/* ========== BUTTONS ========== */
+QPushButton {
+    min-height: 32px;
+    min-width: 110px;
+    padding: 5px 16px;
+    border: 1px solid #cdd3db;
+    border-radius: 6px;
+    background-color: #f8f9fb;
+    color: #2c3e50;
+    font-weight: 500;
+}
+QPushButton:hover {
+    background-color: #e8f0fe;
+    border-color: #3498db;
+    color: #1a73e8;
+}
+QPushButton:pressed {
+    background-color: #d2e3fc;
+}
+QPushButton#btnOK {
+    background-color: #00758f;
+    color: white;
+    border: none;
+    font-weight: 600;
+}
+QPushButton#btnOK:hover {
+    background-color: #00a3c4;
+}
+QPushButton#btnTest {
+    background-color: #2980b9;
+    color: white;
+    border: none;
+    font-weight: 600;
+}
+QPushButton#btnTest:hover {
+    background-color: #3498db;
+}
+
+/* ========== CHECKBOX ========== */
+QCheckBox {
+    spacing: 8px;
+    color: #34495e;
+}
+QCheckBox::indicator {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    border: 1px solid #b0b8c1;
+}
+QCheckBox::indicator:checked {
+    background-color: #00758f;
+    border-color: #00758f;
+}
+</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="mainLayout">
+    <property name="spacing">
+     <number>16</number>
+    </property>
+    <property name="leftMargin">
+     <number>18</number>
+    </property>
+    <property name="topMargin">
+     <number>18</number>
+    </property>
+    <property name="rightMargin">
+     <number>18</number>
+    </property>
+    <property name="bottomMargin">
+     <number>18</number>
+    </property>
+    <item>
+     <widget class="QFrame" name="frameLogo">
+      <property name="minimumSize">
+       <size>
+        <width>240</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>280</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <layout class="QVBoxLayout" name="layoutLogo">
+       <property name="spacing">
+        <number>10</number>
+       </property>
+       <property name="leftMargin">
+        <number>20</number>
+       </property>
+       <property name="topMargin">
+        <number>24</number>
+       </property>
+       <property name="rightMargin">
+        <number>20</number>
+       </property>
+       <property name="bottomMargin">
+        <number>24</number>
+       </property>
+       <item>
+        <spacer name="logoTopSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelLogoIcon">
+         <property name="styleSheet">
+          <string notr="true">font-size: 64px;</string>
+         </property>
+         <property name="text">
+          <string>🐬</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelLogoTitle">
+         <property name="text">
+          <string>MySQL</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelLogoSub">
+         <property name="text">
+          <string>Database Connector</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="logoBottomSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QFrame" name="frameForm">
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <layout class="QVBoxLayout" name="layoutForm">
+       <property name="spacing">
+        <number>18</number>
+       </property>
+       <property name="leftMargin">
+        <number>28</number>
+       </property>
+       <property name="topMargin">
+        <number>28</number>
+       </property>
+       <property name="rightMargin">
+        <number>28</number>
+       </property>
+       <property name="bottomMargin">
+        <number>24</number>
+       </property>
+       <item>
+        <layout class="QHBoxLayout" name="rowHostPort">
+         <property name="spacing">
+          <number>12</number>
+         </property>
+         <item>
+          <layout class="QVBoxLayout" name="colHostname">
+           <property name="spacing">
+            <number>4</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="labelHostname">
+             <property name="text">
+              <string>Hostname:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_hostname">
+             <property name="text">
+              <string>127.0.0.1</string>
+             </property>
+             <property name="placeholderText">
+              <string>127.0.0.1</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="colPort">
+           <property name="spacing">
+            <number>4</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="labelPort">
+             <property name="text">
+              <string>Port:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_port"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="colHostDesc">
+           <property name="spacing">
+            <number>4</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="labelHostDescSpacer">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>18</height>
+              </size>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="labelHostDesc">
+             <property name="text">
+              <string>Name or IP address of the Server host.</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="rowUsername">
+         <property name="spacing">
+          <number>12</number>
+         </property>
+         <item>
+          <layout class="QVBoxLayout" name="colUsername">
+           <property name="spacing">
+            <number>4</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="labelUsername">
+             <property name="text">
+              <string>Username:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_username">
+             <property name="minimumSize">
+              <size>
+               <width>220</width>
+               <height>38</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>root</string>
+             </property>
+             <property name="placeholderText">
+              <string>root</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="colUserDesc">
+           <property name="spacing">
+            <number>4</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="labelUserDescSpacer">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>18</height>
+              </size>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="labelUserDesc">
+             <property name="text">
+              <string>Name of the user to connect with.</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="rowPassword">
+         <property name="spacing">
+          <number>12</number>
+         </property>
+         <item>
+          <layout class="QVBoxLayout" name="colPassword">
+           <property name="spacing">
+            <number>4</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="labelPassword">
+             <property name="text">
+              <string>Password:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_password">
+             <property name="minimumSize">
+              <size>
+               <width>220</width>
+               <height>38</height>
+              </size>
+             </property>
+             <property name="echoMode">
+              <enum>QLineEdit::Password</enum>
+             </property>
+             <property name="placeholderText">
+              <string>Enter password...</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="colPassDesc">
+           <property name="spacing">
+            <number>4</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="labelPassDescSpacer">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>18</height>
+              </size>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="labelPassDesc">
+             <property name="text">
+              <string>The user's password.</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="formSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>8</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="rowButtons">
+         <property name="spacing">
+          <number>12</number>
+         </property>
+         <item>
+          <widget class="QPushButton" name="pushButton_ok">
+           <property name="minimumSize">
+            <size>
+             <width>142</width>
+             <height>42</height>
+            </size>
+           </property>
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
+           <property name="text">
+            <string>OK</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_cancel">
+           <property name="minimumSize">
+            <size>
+             <width>142</width>
+             <height>42</height>
+            </size>
+           </property>
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
+           <property name="text">
+            <string>Test Connection</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="checkBox_save_infor_login">
+           <property name="text">
+            <string>Lưu thông tin đăng nhập?</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="btnSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

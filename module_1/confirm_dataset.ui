@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>779</width>
+    <height>572</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>560</width>
+    <height>400</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Thông tin máy</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+/* ========== GLOBAL ========== */
+QMainWindow, QWidget {
+    background-color: #f4f6f9;
+    font-family: &quot;Segoe UI&quot;, &quot;Arial&quot;, sans-serif;
+    font-size: 13px;
+    color: #2c3e50;
+}
+
+/* ========== TITLE ========== */
+QLabel#labelTitle {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a252f;
+    letter-spacing: 0.5px;
+}
+
+/* ========== TAB WIDGET ========== */
+QTabWidget::pane {
+    border: 1px solid #d0d7de;
+    border-radius: 0 0 8px 8px;
+    background-color: #ffffff;
+    top: -1px;
+}
+QTabBar::tab {
+    background-color: #e8eaed;
+    color: #5a6a7a;
+    border: 1px solid #d0d7de;
+    border-bottom: none;
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
+    min-width: 90px;
+    padding: 9px 22px;
+    margin-right: 3px;
+    font-weight: 500;
+    font-size: 13px;
+}
+QTabBar::tab:selected {
+    background-color: #ffffff;
+    color: #1a1a2e;
+    font-weight: 600;
+    border-bottom: 2px solid #3498db;
+}
+QTabBar::tab:hover:!selected {
+    background-color: #f0f4f8;
+    color: #2c3e50;
+}
+
+/* ========== BUTTONS ========== */
+QPushButton {
+    min-height: 32px;
+    min-width: 100px;
+    padding: 5px 18px;
+    border: 1px solid #c5cdd6;
+    border-radius: 6px;
+    background-color: #f8f9fb;
+    color: #2c3e50;
+    font-weight: 500;
+    font-size: 13px;
+}
+QPushButton:hover {
+    background-color: #e8f0fe;
+    border-color: #3498db;
+    color: #1a73e8;
+}
+QPushButton:pressed {
+    background-color: #d2e3fc;
+}
+QPushButton#btnConfirm {
+    background-color: #2980b9;
+    color: white;
+    border: none;
+    font-weight: 600;
+}
+QPushButton#btnConfirm:hover {
+    background-color: #3498db;
+}
+QPushButton#btnCancel {
+    background-color: #ecf0f1;
+    border: 1px solid #bdc3c7;
+    color: #2c3e50;
+}
+QPushButton#btnCancel:hover {
+    background-color: #d5dbdb;
+}
+</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="mainLayout">
+    <property name="spacing">
+     <number>14</number>
+    </property>
+    <property name="leftMargin">
+     <number>20</number>
+    </property>
+    <property name="topMargin">
+     <number>18</number>
+    </property>
+    <property name="rightMargin">
+     <number>20</number>
+    </property>
+    <property name="bottomMargin">
+     <number>16</number>
+    </property>
+    <item>
+     <widget class="QLabel" name="labelTitle">
+      <property name="text">
+       <string>THÔNG TIN MÁY:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QTabWidget" name="tab_certain">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <property name="documentMode">
+       <bool>false</bool>
+      </property>
+      <property name="tabsClosable">
+       <bool>false</bool>
+      </property>
+      <property name="movable">
+       <bool>false</bool>
+      </property>
+      <widget class="QWidget" name="tab1">
+       <attribute name="title">
+        <string>Tab 1</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="layoutTab1">
+        <property name="spacing">
+         <number>12</number>
+        </property>
+        <property name="leftMargin">
+         <number>16</number>
+        </property>
+        <property name="topMargin">
+         <number>16</number>
+        </property>
+        <property name="rightMargin">
+         <number>16</number>
+        </property>
+        <property name="bottomMargin">
+         <number>16</number>
+        </property>
+        <item>
+         <spacer name="spacerTab1">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab2">
+       <attribute name="title">
+        <string>Tab 2</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="layoutTab2">
+        <property name="spacing">
+         <number>12</number>
+        </property>
+        <property name="leftMargin">
+         <number>16</number>
+        </property>
+        <property name="topMargin">
+         <number>16</number>
+        </property>
+        <property name="rightMargin">
+         <number>16</number>
+        </property>
+        <property name="bottomMargin">
+         <number>16</number>
+        </property>
+        <item>
+         <spacer name="spacerTab2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="buttonLayout">
+      <property name="spacing">
+       <number>12</number>
+      </property>
+      <item>
+       <spacer name="buttonSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="confirm_btn">
+        <property name="minimumSize">
+         <size>
+          <width>136</width>
+          <height>42</height>
+         </size>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="text">
+         <string>Xác nhận</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="cancel_btn">
+        <property name="minimumSize">
+         <size>
+          <width>138</width>
+          <height>44</height>
+         </size>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="text">
+         <string>Cancel</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

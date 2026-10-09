@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>750</width>
+    <height>508</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>560</width>
+    <height>420</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Cấu hình Camera</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+/* ===== Global ===== */
+QMainWindow {
+    background-color: #f0f2f5;
+}
+QWidget {
+    font-family: &quot;Segoe UI&quot;, &quot;Arial&quot;, sans-serif;
+    font-size: 13px;
+}
+
+/* ===== GroupBox ===== */
+QGroupBox {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a1a2e;
+    border: 1px solid #d0d5dd;
+    border-radius: 8px;
+    margin-top: 14px;
+    padding-top: 18px;
+    background-color: #ffffff;
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 14px;
+    padding: 0 8px;
+    background-color: #ffffff;
+}
+
+/* ===== Labels ===== */
+QLabel {
+    color: #34495e;
+    font-size: 13px;
+}
+
+/* ===== Inputs ===== */
+QLineEdit, QComboBox, QSpinBox {
+    min-height: 30px;
+    padding: 3px 10px;
+    border: 1px solid #c8cdd5;
+    border-radius: 6px;
+    background-color: #ffffff;
+    selection-background-color: #3498db;
+}
+QLineEdit:hover, QComboBox:hover, QSpinBox:hover {
+    border-color: #3498db;
+}
+QLineEdit:focus, QComboBox:focus, QSpinBox:focus {
+    border: 1.5px solid #2980b9;
+}
+QComboBox::drop-down {
+    border: none;
+    width: 26px;
+}
+QSpinBox::up-button, QSpinBox::down-button {
+    width: 20px;
+}
+
+/* ===== TabWidget ===== */
+QTabWidget::pane {
+    border: 1px solid #d0d5dd;
+    border-radius: 0 0 8px 8px;
+    background-color: #ffffff;
+    top: -1px;
+}
+QTabBar::tab {
+    background-color: #e8eaed;
+    color: #5a6a7a;
+    border: 1px solid #d0d5dd;
+    border-bottom: none;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    min-width: 100px;
+    padding: 8px 18px;
+    margin-right: 3px;
+    font-weight: 500;
+}
+QTabBar::tab:selected {
+    background-color: #ffffff;
+    color: #1a1a2e;
+    font-weight: 600;
+    border-bottom: 2px solid #3498db;
+}
+QTabBar::tab:hover:!selected {
+    background-color: #f0f4f8;
+    color: #2c3e50;
+}
+</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="mainVerticalLayout">
+    <property name="spacing">
+     <number>14</number>
+    </property>
+    <property name="leftMargin">
+     <number>18</number>
+    </property>
+    <property name="topMargin">
+     <number>16</number>
+    </property>
+    <property name="rightMargin">
+     <number>18</number>
+    </property>
+    <property name="bottomMargin">
+     <number>16</number>
+    </property>
+    <item>
+     <layout class="QHBoxLayout" name="headerLayout">
+      <property name="spacing">
+       <number>12</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="labelItemCode">
+        <property name="minimumSize">
+         <size>
+          <width>120</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Name Item Code:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEdit_name_itemcod">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>38</height>
+         </size>
+        </property>
+        <property name="placeholderText">
+         <string>Enter the product code...</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="headerSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QLabel" name="labelNumsCamera">
+        <property name="text">
+         <string>Nums Camera:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="spinBox_quanty_cam">
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>38</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>90</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>16</number>
+        </property>
+        <property name="value">
+         <number>1</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QTabWidget" name="tab_camera">
+      <property name="currentIndex">
+       <number>1</number>
+      </property>
+      <property name="documentMode">
+       <bool>false</bool>
+      </property>
+      <property name="tabsClosable">
+       <bool>false</bool>
+      </property>
+      <property name="movable">
+       <bool>false</bool>
+      </property>
+      <widget class="QWidget" name="tabCamera1">
+       <attribute name="title">
+        <string>Camera 1</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="layoutCamera1">
+        <property name="spacing">
+         <number>12</number>
+        </property>
+        <property name="leftMargin">
+         <number>14</number>
+        </property>
+        <property name="topMargin">
+         <number>14</number>
+        </property>
+        <property name="rightMargin">
+         <number>14</number>
+        </property>
+        <property name="bottomMargin">
+         <number>14</number>
+        </property>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabCamera2">
+       <attribute name="title">
+        <string>Camera 2</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="layoutCamera2">
+        <property name="spacing">
+         <number>12</number>
+        </property>
+        <property name="leftMargin">
+         <number>14</number>
+        </property>
+        <property name="topMargin">
+         <number>14</number>
+        </property>
+        <property name="rightMargin">
+         <number>14</number>
+        </property>
+        <property name="bottomMargin">
+         <number>14</number>
+        </property>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

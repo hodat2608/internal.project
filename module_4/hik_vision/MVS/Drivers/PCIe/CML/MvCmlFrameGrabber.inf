@@ -1,0 +1,115 @@
+;
+; MvCmlFrameGrabber.inf
+;
+
+[Version]
+Signature       = "$WINDOWS NT$"
+Class           = %ClassName%
+ClassGuid       = {01FFB6EB-68B6-46BC-BB4B-C0E755323F91}
+Provider        = %ManufacturerName%
+DriverVer = 08/12/2024,2.4.1.2
+CatalogFile     = MvCmlFrameGrabber.cat
+PnpLockdown     = 1
+
+
+[DestinationDirs]
+DefaultDestDir = 12
+CoInstallerCopyFiles = 11
+; ======================================= Class section ============================================
+[ClassInstall32]
+AddReg = FrameGrabber.ClassReg
+
+[FrameGrabber.ClassReg]
+HKR,,,0,%ClassName%
+HKR,,Icon,,-5
+HKR,,DeviceCharacteristics,0x10001,0x100
+HKR,,Security,,"D:P(A;;GA;;;SY)(A;;GA;;;BA)(A;;GRGW;;;WD)"
+
+; ======================================= Install section ==========================================
+
+[ControlFlags]
+ExcludeFromSelect = *
+
+[Manufacturer]
+%ManufacturerName% = FrameGrabber, NTamd64
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+MvCmlFrameGrabber.sys=1,,
+WdfCoInstaller01009.dll=1,,
+
+[FrameGrabber.NTamd64]
+; DisplayName               Section             DeviceId
+; -----------               -------             --------
+%FG.Cml.Dual%           = FrameGrabber.Install, PCI\VEN_10EE&DEV_7024&SUBSYS_312710EE&REV_00
+
+[FrameGrabber.Install.NTamd64]
+CopyFiles = DriverFile
+
+[DriverFile]
+MvCmlFrameGrabber.sys,,,%COPYFLG_NOPRUNE%
+
+[FrameGrabber.Install.NTamd64.HW]
+Include=pci.inf,machine.inf
+Needs=PciIoSpaceNotRequired.HW
+AddReg = FrameGrabber.EnableMsi
+
+[FrameGrabber.EnableMsi]
+HKR,"Interrupt Management",,%REG_KEYONLY%
+HKR,"Interrupt Management\MessageSignaledInterruptProperties",,%REG_KEYONLY%
+HKR,"Interrupt Management\MessageSignaledInterruptProperties",MSISupported,%REG_DWORD%,1
+HKR,"Interrupt Management\MessageSignaledInterruptProperties",MessageNumberLimit,%REG_DWORD%,8
+HKR,"Config",,%REG_KEYONLY%
+HKR,"Config",StreamDDRNodeOverride,%REG_DWORD%,0x03030303
+HKR,"Config",PSDebugPortOn,%REG_DWORD%,0x00000000
+
+[FrameGrabber.Install.NTamd64.Services]
+AddService = MvCmlFrameGrabber,%SPSVCINST_ASSOCSERVICE%, FrameGrabber.Service, FrameGrabber.EventLogging
+
+[FrameGrabber.Service]
+DisplayName    = %FrameGrabber.SvcDesc%
+ServiceType    = %SERVICE_KERNEL_DRIVER%
+StartType      = %SERVICE_DEMAND_START%
+ErrorControl   = %SERVICE_ERROR_NORMAL%
+ServiceBinary  = %12%\MvCmlFrameGrabber.sys
+
+[FrameGrabber.EventLogging]
+AddReg = EventLogging.AddReg
+
+[EventLogging.AddReg]
+HKR,,EventMessageFile,0x00020000,"%%11%%\iologmsg.dll;%%12%%\MvCmlFrameGrabber.sys"
+HKR,,TypesSupported,0x00010001,7
+
+[FrameGrabber.Install.NTamd64.CoInstallers]
+AddReg      = CoInstallerAddReg
+CopyFiles   = CoInstallerCopyFiles
+
+[CoInstallerAddReg]
+HKR,,CoInstallers32,%REG_MULTI_SZ%,"WdfCoInstaller01009.dll,WdfCoInstaller"
+
+[CoInstallerCopyFiles]
+WdfCoInstaller01009.dll
+
+[FrameGrabber.Install.NTamd64.Wdf]
+KmdfService =  MvCmlFrameGrabber, FrameGrabber.Wdf
+
+[FrameGrabber.Wdf]
+KmdfLibraryVersion = 1.9
+;======================================== Strings section ==========================================
+[Strings]
+SPSVCINST_ASSOCSERVICE      = 0x00000002
+REG_KEYONLY                 = 0x00000010
+REG_DWORD                   = 0x00010001
+REG_MULTI_SZ                = 0x00010000
+COPYFLG_NOPRUNE             = 0x00002000
+SERVICE_KERNEL_DRIVER       = 1
+SERVICE_DEMAND_START        = 3
+SERVICE_ERROR_NORMAL        = 1
+ManufacturerName            = "MVFG"
+ClassName                   = "MVFG PCIe Devices"
+DiskName                    = "MVFG FrameGrabber Installation Disk"
+FG.Cml.Dual                 = "MVFG Dual CL Frame Grabber"
+FrameGrabber.SvcDesc        = "MVFG CL Driver Service"
+

@@ -1,0 +1,120 @@
+;
+; MvXoFFrameGrabber.inf
+;
+
+[Version]
+Signature       = "$WINDOWS NT$"
+Class           = %ClassName%
+ClassGuid       = {01FFB6EB-68B6-46BC-BB4B-C0E755323F91}
+Provider        = %ManufacturerName%
+DriverVer = 08/20/2024,2.4.1.2
+CatalogFile     = MvXoFFrameGrabber.cat
+PnpLockdown     = 1
+
+
+[DestinationDirs]
+DefaultDestDir = 12
+CoInstallerCopyFiles = 11
+; ======================================= Class section ============================================
+
+[ClassInstall32]
+Addreg = FrameGrabber.ClassReg
+
+[FrameGrabber.ClassReg]
+HKR,,,0,%ClassName%
+HKR,,Icon,,-5
+HKR,,DeviceCharacteristics,0x10001,0x100
+HKR,,Security,,"D:P(A;;GA;;;SY)(A;;GA;;;BA)(A;;GRGW;;;WD)"
+
+; ======================================= Install section ==========================================
+
+[ControlFlags]
+ExcludeFromSelect = *
+
+[Manufacturer]
+%ManufacturerName% = FrameGrabberInstall, NTamd64
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+MvXoFFrameGrabber.sys=1,,
+
+WdfCoInstaller01009.dll=1,,
+
+[FrameGrabberInstall.NTamd64]
+; DisplayName						Section               DeviceId
+; -----------						-------               --------
+%FrameGrabber.XoF%					= FrameGrabberDevice, PCI\VEN_10EE&DEV_7028&SUBSYS_862710EE&REV_00
+%FrameGrabber.XoF.GS1002F.V3%       = FrameGrabberDevice, PCI\VEN_10EE&DEV_8034&SUBSYS_862710EE&REV_00
+%FrameGrabber.XoF.GS1004F.Quad%     = FrameGrabberDevice, PCI\VEN_10EE&DEV_7028&SUBSYS_864710EE&REV_00
+%FrameGrabber.XoF.GS1004F.Quad.V3%  = FrameGrabberDevice, PCI\VEN_10EE&DEV_8034&SUBSYS_864710EE&REV_00
+%FrameGrabber.XoF.GS1104F.Quad%		= FrameGrabberDevice, PCI\VEN_10EE&DEV_8038&SUBSYS_864710EE&REV_00
+%FrameGrabber.XoF.GQ1001.Mono%      = FrameGrabberDevice, PCI\VEN_10EE&DEV_8038&SUBSYS_878710EE&REV_00
+%FrameGrabber.XoF.GQ1001.NEW.Mono%	= FrameGrabberDevice, PCI\VEN_10EE&DEV_8038&SUBSYS_874710EE&REV_00
+
+[FrameGrabberDevice.NTamd64]
+CopyFiles = DriverFile
+
+[DriverFile]
+MvXoFFrameGrabber.sys,,,%COPYFLG_NOPRUNE%
+
+[FrameGrabberDevice.NTamd64.HW]
+AddReg = FrameGrabber.EnableMsi
+
+[FrameGrabber.EnableMsi]
+HKR,"Interrupt Management",,%REG_KEYONLY%
+HKR,"Interrupt Management\MessageSignaledInterruptProperties",,%REG_KEYONLY%
+HKR,"Interrupt Management\MessageSignaledInterruptProperties",MSISupported,%REG_DWORD%,1
+HKR,"Interrupt Management\MessageSignaledInterruptProperties",MessageNumberLimit,%REG_DWORD%,8
+HKR,"Config",,%REG_KEYONLY%
+HKR,"Config",StreamDDRNodeOverride,%REG_DWORD%,0x03030303
+
+[FrameGrabberDevice.NTamd64.Services]
+AddService = MvXoFFrameGrabber,%SPSVCINST_ASSOCSERVICE%, FrameGrabberServiceInst
+
+[FrameGrabberServiceInst]
+DisplayName    = %FrameGrabber.SvcDesc%
+ServiceType    = %SERVICE_KERNEL_DRIVER%
+StartType      = %SERVICE_DEMAND_START%
+ErrorControl   = %SERVICE_ERROR_NORMAL%
+ServiceBinary  = %12%\MvXoFFrameGrabber.sys
+
+[FrameGrabberDevice.NTamd64.CoInstallers]
+AddReg      = CoInstallerAddReg
+CopyFiles   = CoInstallerCopyFiles
+
+[CoInstallerAddReg]
+HKR,,CoInstallers32,%REG_MULTI_SZ%,"WdfCoInstaller01009.dll,WdfCoInstaller"
+
+
+[CoInstallerCopyFiles]
+WdfCoInstaller01009.dll
+
+
+[FrameGrabberDevice.NTamd64.Wdf]
+KmdfService =  MvXoFFrameGrabber, FrameGrabberDriverWdf
+
+[FrameGrabberDriverWdf]
+KmdfLibraryVersion = 1.9
+;======================================== Strings section ==========================================
+[Strings]
+SPSVCINST_ASSOCSERVICE				= 0x00000002
+REG_KEYONLY							= 0x00000010
+REG_DWORD							= 0x00010001
+REG_MULTI_SZ						= 0x00010000
+COPYFLG_NOPRUNE						= 0x00002000
+SERVICE_KERNEL_DRIVER				= 1
+SERVICE_DEMAND_START				= 3
+SERVICE_ERROR_NORMAL				= 1
+ManufacturerName					= "MVFG"
+ClassName							= "MVFG PCIe Devices"
+DiskName							= "MVFG XoF Frame Grabber Installation Disk"
+FrameGrabber.XOF					= "MVFG Dual XoF 10G Frame Grabber"
+FrameGrabber.XoF.GS1002F.V3			= "MVFG Dual XoF 10G Frame Grabber"
+FrameGrabber.XoF.GS1004F.Quad		= "MVFG Quad XoF 10G Frame Grabber"
+FrameGrabber.XoF.GS1004F.Quad.V3	= "MVFG Quad XoF 10G Frame Grabber"
+FrameGrabber.XoF.GS1104F.Quad		= "MVFG Quad XoF 10G Frame Grabber"
+FrameGrabber.XoF.GQ1001.Mono		= "MVFG Mono XoF 50G Frame Grabber"
+FrameGrabber.XoF.GQ1001.NEW.Mono	= "MVFG Mono XoF 50G Frame Grabber"
+FrameGrabber.SvcDesc				= "MVFG XoF Frame Grabber Service"

@@ -1,0 +1,96 @@
+;
+; MvVirtualSerial.inf
+;
+
+[Version]
+Signature      = "$WINDOWS NT$"
+Class          = Ports
+ClassGuid      = {4d36e978-e325-11ce-bfc1-08002be10318}
+Provider       = %ManufacturerName%
+CatalogFile    = MvVirtualSerial.cat
+DriverVer = 08/12/2024,2.4.1.2
+PnpLockDown    = 1
+
+; ================= Device Install section =====================
+[ControlFlags]
+ExcludeFromSelect=*
+
+[Manufacturer]
+%ManufacturerName%=Standard,NTamd64
+
+[SourceDisksFiles]
+MvVirtualSerial.sys  = 1,,
+WdfCoInstaller01009.dll=1
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[DestinationDirs]
+DefaultDestDir = 12
+MvSerial_Device_CoInstaller_CopyFiles = 11
+
+[Standard.NTamd64]
+%MvCamSer.DeviceDesc%=MvSerial_Device, MVFGVIRTUALCOMBUS\CAMPORT
+%MvPsSer.DeviceDesc%=MvSerial_Device, MVFGVIRTUALCOMBUS\PSPORT
+
+[MvSerial_Device.NT]
+AddReg = MvSerial_Device.NT.AddReg
+Include=msports.inf
+Needs=SerialEnumerator.NT
+CopyFiles=Drivers_Dir
+
+[Drivers_Dir]
+MvVirtualSerial.sys
+
+; ================= Service Install section =====================
+[MvSerial_Device.NT.Services]
+AddReg = MvSerial_Device.NT.AddReg
+Include = msports.inf
+Needs = SerialEnumerator.NT.Services
+AddService = MvVirtualSerial,%SPSVCINST_ASSOCSERVICE%, MvSerial_Service_Inst
+
+[MvSerial_Device.NT.AddReg]
+HKR,,PortSubClass,1,01
+; HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
+; ◊¢ ÕµÙ ∆¡±Œ Ù–‘“≥
+
+; ================= MvVirtualSerial Driver Install sections =====================
+[MvSerial_Service_Inst]
+DisplayName    = %MvSerial.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\MvVirtualSerial.sys
+
+[MvSerial_Device.NT.HW]
+AddReg=MvSerial_Device.NT.HW.AddReg
+
+[MvSerial_Device.NT.HW.AddReg]
+HKR,,DeviceType,0x10001,0x0000001b
+HKR,,"UpperFilters",0x00010000,"serenum"
+
+
+; ===================== MvSerial_Device Coinstaller Install section =====================
+[MvSerial_Device.NT.CoInstallers]
+AddReg=MvSerial_Device_CoInstaller_AddReg
+CopyFiles=MvSerial_Device_CoInstaller_CopyFiles
+
+[MvSerial_Device_CoInstaller_AddReg]
+HKR,,CoInstallers32,0x00010000, "WdfCoInstaller01009.dll,WdfCoInstaller"
+
+[MvSerial_Device_CoInstaller_CopyFiles]
+WdfCoInstaller01009.dll
+
+[MvSerial_Device.NT.Wdf]
+KmdfService =  MvVirtualSerial, MvSerial_wdfsect
+
+[MvSerial_wdfsect]
+KmdfLibraryVersion = 1.9
+
+[Strings]
+SPSVCINST_ASSOCSERVICE     = 0x00000002
+ManufacturerName           = "MVFG"
+DiskName                   = "MVFG Virtual Serial Installation Disk"
+MvCamSer.DeviceDesc        = "MVFG Virtual Camera Serial Port"
+MvPsSer.DeviceDesc         = "MVFG Virtual Ps Serial Port"
+MvSerial.SVCDESC           = "MVFG Virtual Serial Port Service"

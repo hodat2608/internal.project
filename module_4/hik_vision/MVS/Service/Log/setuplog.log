@@ -1,0 +1,17 @@
+C:\Program Files (x86)\Common Files\MVS\Service\Log
+install LogServer...
+C:LogServer.ini
+1 File(s) copied
+C:\Windows\System32
+start LogServer...
+
+SERVICE_NAME: MvLogServer 
+        TYPE               : 10  WIN32_OWN_PROCESS  
+        STATE              : 2  START_PENDING 
+                                (NOT_STOPPABLE, NOT_PAUSABLE, IGNORES_SHUTDOWN)
+        WIN32_EXIT_CODE    : 0  (0x0)
+        SERVICE_EXIT_CODE  : 0  (0x0)
+        CHECKPOINT         : 0x1
+        WAIT_HINT          : 0x0
+        PID                : 14248
+        FLAGS              : 

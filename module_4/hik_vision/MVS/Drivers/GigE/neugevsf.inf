@@ -1,0 +1,104 @@
+
+[version]
+Signature       = "$Windows NT$"
+Class           = NetService
+ClassGUID       = {4D36E974-E325-11CE-BFC1-08002BE10318}
+Provider        = %Provider%
+DriverVer = 06/18/2024,4.4.0.3
+CatalogFile     = %MvInfAndCatName%.cat
+PnpLockdown     = 1
+
+[Manufacturer]
+%Provider%=PROVIDER,NTx86,NTia64,NTamd64
+
+[PROVIDER.NTx86]
+%MvGEVFilter_Desc%=Install, HKR_NeuGEVFilter
+
+[PROVIDER.NTia64]
+%MvGEVFilter_Desc%=Install, HKR_NeuGEVFilter
+
+[PROVIDER.NTamd64]
+%MvGEVFilter_Desc%=Install, HKR_NeuGEVFilter
+
+;-------------------------------------------------------------------------
+; Installation Section
+;-------------------------------------------------------------------------
+[Install]
+AddReg=Inst_Ndi
+Characteristics=0x40000
+NetCfgInstanceId="{277D4405-BD2F-49F8-AD72-83ADC175ADC6}"
+Copyfiles = Mvision.copyfiles.sys
+
+[Install.Remove]
+DelFiles = Mvision.copyfiles.sys
+
+[SourceDisksNames]
+1=%MvGEVFilter_Desc%,"",,
+
+[SourceDisksFiles]
+neugevfilter.sys=1
+
+[DestinationDirs]
+DefaultDestDir=12
+Mvision.copyfiles.sys=12
+
+[Mvision.copyfiles.sys]
+neugevfilter.sys,,,2
+
+;-------------------------------------------------------------------------
+; Ndi installation support
+;-------------------------------------------------------------------------
+[Inst_Ndi]
+HKR, Ndi,Service,,%MvDriverName%
+HKR, Ndi,CoServices,0x00010000,%MvDriverName%
+HKR, Ndi,HelpText,,%MvGEVFilter_HelpText%
+HKR, Ndi,FilterClass,, custom
+HKR, Ndi,FilterType,0x00010001,0x00000001 ; Monitor Filter
+HKR, Ndi\Interfaces,UpperRange,,"noupper"
+HKR, Ndi\Interfaces,LowerRange,,"nolower"
+HKR, Ndi\Interfaces, FilterMediaTypes,,"ethernet"
+HKR, Ndi,FilterRunType,0x00010001, 0x00000002 ; Optional filter
+
+;-------------------------------------------------------------------------
+; Service installation support
+;-------------------------------------------------------------------------
+[Install.Services]
+AddService=%MvDriverName%,,MvGEVFilter_Service_Inst
+
+[MvGEVFilter_Service_Inst]
+DisplayName     = %MvGEVFilter_Desc%
+ServiceType     = 1 ;SERVICE_KERNEL_DRIVER
+StartType       = 1 ;SERVICE_SYSTEM_START
+ErrorControl    = 1 ;SERVICE_ERROR_NORMAL
+ServiceBinary   = %12%\neugevfilter.sys
+LoadOrderGroup  = NDIS
+Description     = %MvGEVFilter_Desc%
+AddReg          = Common.Params.reg, NdisImPlatformBindingOptions.reg
+
+[Install.Remove.Services]
+DelService=%MvDriverName%,0x200 ; SPSVCINST_STOPSERVICE
+
+[Common.Params.reg]
+HKR, FilterDriverParams\DriverParam, 	 ParamDesc,   , "Driverparam for GEV"
+HKR, FilterDriverParams\DriverParam,     default,     , "5"
+HKR, FilterDriverParams\DriverParam,     type,        , "int"
+
+HKR, FilterAdapterParams\AdapterParam,   ParamDesc,   , "Adapterparam for GEV"
+HKR, FilterAdapterParams\AdapterParam,   default,     , "10"
+HKR, FilterAdapterParams\AdapterParam,   type,        , "int"
+
+[NdisImPlatformBindingOptions.reg]
+HKR, Parameters, NdisImPlatformBindingOptions,0x00010001,0 ; Subscribe to default behavior
+
+[Strings]
+MvInfAndCatName = "neugevsf"
+MvDriverName = "NeuGEVFilter"
+Provider = "None" ; Set blank here for neu driver
+ManufacturerName = "TODO-Set-Manufacturer"
+MvGEVFilter_Desc = "Neu GigEVision Image Filter Driver"
+MvGEVFilter_HelpText = "Neu GigEVision Image Filter Driver"
+
+
+
+
+

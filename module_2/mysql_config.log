@@ -1,0 +1,5 @@
+host=127.0.0.1
+user=root
+password=123456789
+port=3306
+database=DATA_AUTO_LOGIN

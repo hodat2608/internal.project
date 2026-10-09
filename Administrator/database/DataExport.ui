@@ -1,0 +1,730 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DataExportDialog</class>
+ <widget class="QDialog" name="DataExportDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1000</width>
+    <height>750</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Data Export</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../../module_3/assert/icon/transfer.png</normaloff>../../module_3/assert/icon/transfer.png</iconset>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QDialog {
+    background-color: #f0f0f0;
+}
+QGroupBox {
+    font-weight: bold;
+    border: 1px solid #c0c0c0;
+    border-radius: 3px;
+    margin-top: 8px;
+    padding-top: 8px;
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 8px;
+    padding: 0 4px;
+}
+QTabWidget::pane {
+    border: 1px solid #c0c0c0;
+    background: white;
+}
+QHeaderView::section {
+    background-color: #e8e8e8;
+    padding: 4px;
+    border: 1px solid #c0c0c0;
+}
+QTreeWidget, QListWidget, QTableWidget {
+    border: 1px solid #c0c0c0;
+    background: white;
+}
+QPushButton {
+    min-height: 24px;
+    padding: 4px 12px;
+}
+QLineEdit {
+    border: 1px solid #c0c0c0;
+    padding: 3px;
+    background: white;
+}
+</string>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <property name="spacing">
+    <number>6</number>
+   </property>
+   <property name="leftMargin">
+    <number>8</number>
+   </property>
+   <property name="topMargin">
+    <number>8</number>
+   </property>
+   <property name="rightMargin">
+    <number>8</number>
+   </property>
+   <property name="bottomMargin">
+    <number>8</number>
+   </property>
+   <item>
+    <layout class="QHBoxLayout" name="headerLayout">
+     <property name="spacing">
+      <number>8</number>
+     </property>
+     <property name="bottomMargin">
+      <number>9</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="iconLabel">
+       <property name="minimumSize">
+        <size>
+         <width>45</width>
+         <height>45</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font-size: 20px;</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap>../../module_3/assert/icon/data_export.png</pixmap>
+       </property>
+       <property name="scaledContents">
+        <bool>true</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="titleLabel">
+       <property name="styleSheet">
+        <string notr="true">font-size: 16px;</string>
+       </property>
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:18pt; font-weight:600;&quot;&gt;DATA EXPORT&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="headerSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnAdvancedOptions">
+       <property name="text">
+        <string>Advanced Options...</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tabObjectSelection">
+      <attribute name="title">
+       <string>Object Selection</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="objectSelectionLayout">
+       <property name="spacing">
+        <number>8</number>
+       </property>
+       <property name="leftMargin">
+        <number>6</number>
+       </property>
+       <property name="topMargin">
+        <number>6</number>
+       </property>
+       <property name="rightMargin">
+        <number>6</number>
+       </property>
+       <property name="bottomMargin">
+        <number>6</number>
+       </property>
+       <item>
+        <widget class="QGroupBox" name="groupTablesToExport">
+         <property name="title">
+          <string>Tables to Export</string>
+         </property>
+         <layout class="QHBoxLayout" name="tablesLayout">
+          <property name="spacing">
+           <number>6</number>
+          </property>
+          <item>
+           <layout class="QVBoxLayout" name="leftPanelLayout">
+            <property name="spacing">
+             <number>4</number>
+            </property>
+            <item>
+             <widget class="QTreeWidget" name="treeSchemas">
+              <property name="minimumSize">
+               <size>
+                <width>280</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="alternatingRowColors">
+               <bool>true</bool>
+              </property>
+              <property name="rootIsDecorated">
+               <bool>false</bool>
+              </property>
+              <property name="uniformRowHeights">
+               <bool>true</bool>
+              </property>
+              <column>
+               <property name="text">
+                <string>Schema</string>
+               </property>
+              </column>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="leftBottomLayout">
+              <item>
+               <widget class="QPushButton" name="btnRefresh">
+                <property name="text">
+                 <string>Refresh</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="lblTablesSelected">
+                <property name="text">
+                 <string>0 tables selected</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="leftBottomSpacer">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="rightPanelLayout">
+            <property name="spacing">
+             <number>4</number>
+            </property>
+            <item>
+             <widget class="QTreeWidget" name="treeSchemaObjects">
+              <property name="alternatingRowColors">
+               <bool>true</bool>
+              </property>
+              <property name="rootIsDecorated">
+               <bool>false</bool>
+              </property>
+              <property name="uniformRowHeights">
+               <bool>true</bool>
+              </property>
+              <column>
+               <property name="text">
+                <string>Schema Objects</string>
+               </property>
+              </column>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="rightBottomLayout">
+              <item>
+               <widget class="QComboBox" name="cmbDumpType">
+                <property name="minimumSize">
+                 <size>
+                  <width>160</width>
+                  <height>34</height>
+                 </size>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>Dump Structure and Data</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Dump Structure Only</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Dump Data Only</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnSelectViews">
+                <property name="text">
+                 <string>Select Views</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnSelectTables">
+                <property name="text">
+                 <string>Select Tables</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnUnselectAll">
+                <property name="text">
+                 <string>Unselect All</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupObjectsToExport">
+         <property name="title">
+          <string>Objects to Export</string>
+         </property>
+         <layout class="QHBoxLayout" name="objectsLayout">
+          <item>
+           <widget class="QCheckBox" name="chkDumpStoredProcedures">
+            <property name="text">
+             <string>Dump Stored Procedures and Functions</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="chkDumpEvents">
+            <property name="text">
+             <string>Dump Events</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="chkDumpTriggers">
+            <property name="text">
+             <string>Dump Triggers</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="objectsSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupExportOptions">
+         <property name="title">
+          <string>Export Options</string>
+         </property>
+         <layout class="QVBoxLayout" name="exportOptionsLayout">
+          <property name="spacing">
+           <number>6</number>
+          </property>
+          <item>
+           <layout class="QHBoxLayout" name="opt1Layout">
+            <item>
+             <widget class="QRadioButton" name="radioDumpProjectFolder">
+              <property name="text">
+               <string>Export to Dump Project Folder</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="editDumpProjectFolder">
+              <property name="text">
+               <string>C:\Users\WDM\Documents\dumps\Dump20260824</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btnBrowseProjectFolder">
+              <property name="maximumSize">
+               <size>
+                <width>30</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>../../module_3/assert/icon/folder.png</normaloff>../../module_3/assert/icon/folder.png</iconset>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QLabel" name="lblProjectFolderHint">
+            <property name="styleSheet">
+             <string notr="true">color: #666666; margin-left: 22px;</string>
+            </property>
+            <property name="text">
+             <string>Each table will be exported into a separate file. This allows a selective restore, but may be slower.</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="opt2Layout">
+            <item>
+             <widget class="QRadioButton" name="radioSelfContainedFile">
+              <property name="text">
+               <string>Export to Self-Contained File</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="editSelfContainedFile">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>C:\Users\WDM\Documents\dumps\Dump20260824.sql</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btnBrowseSelfContained">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>30</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>../../module_3/assert/icon/folder.png</normaloff>../../module_3/assert/icon/folder.png</iconset>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QLabel" name="lblSelfContainedHint">
+            <property name="styleSheet">
+             <string notr="true">color: #666666; margin-left: 22px;</string>
+            </property>
+            <property name="text">
+             <string>All selected database objects will be exported into a single, self-contained file.</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="extraOptsLayout">
+            <item>
+             <widget class="QCheckBox" name="chkSingleTransaction">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Create Dump in a Single Transaction (self-contained file only)</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="extraOptsSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="chkIncludeCreateSchema">
+              <property name="text">
+               <string>Include Create Schema</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="footerLayout">
+         <item>
+          <widget class="QLabel" name="lblStatus">
+           <property name="text">
+            <string>Press [Start Export] to start...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="footerSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnStartExport">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>34</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Start Export</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabExportProgress">
+      <attribute name="title">
+       <string>Export Progress</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="progressLayout">
+       <property name="spacing">
+        <number>8</number>
+       </property>
+       <property name="leftMargin">
+        <number>12</number>
+       </property>
+       <property name="topMargin">
+        <number>12</number>
+       </property>
+       <property name="rightMargin">
+        <number>12</number>
+       </property>
+       <property name="bottomMargin">
+        <number>12</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="lblProgressTitle">
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold; font-size: 13px;</string>
+         </property>
+         <property name="text">
+          <string>Export Progress</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QProgressBar" name="progressBar">
+         <property name="value">
+          <number>0</number>
+         </property>
+         <property name="textVisible">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPlainTextEdit" name="txtProgressLog">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+         <property name="placeholderText">
+          <string>Log messages will appear here during export...</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="progressFooterLayout">
+         <item>
+          <spacer name="progressSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnCancelExport">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Cancel</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnCloseProgress">
+           <property name="text">
+            <string>Close</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>radioDumpProjectFolder</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>editDumpProjectFolder</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>100</x>
+     <y>400</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>400</x>
+     <y>400</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioDumpProjectFolder</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>btnBrowseProjectFolder</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>100</x>
+     <y>400</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>700</x>
+     <y>400</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioSelfContainedFile</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>editSelfContainedFile</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>100</x>
+     <y>450</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>400</x>
+     <y>450</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioSelfContainedFile</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>btnBrowseSelfContained</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>100</x>
+     <y>450</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>700</x>
+     <y>450</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioSelfContainedFile</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>chkSingleTransaction</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>100</x>
+     <y>450</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>200</x>
+     <y>500</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

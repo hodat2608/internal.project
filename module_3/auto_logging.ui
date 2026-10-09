@@ -1,0 +1,708 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1885</width>
+    <height>1000</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <family>Segoe UI</family>
+    <pointsize>9</pointsize>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Auto Logging</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QMainWindow { background-color: #FFFFF0;}</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout_centralwidget">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>10</number>
+    </property>
+    <property name="topMargin">
+     <number>10</number>
+    </property>
+    <property name="rightMargin">
+     <number>10</number>
+    </property>
+    <property name="bottomMargin">
+     <number>10</number>
+    </property>
+    <item>
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="childrenCollapsible">
+       <bool>false</bool>
+      </property>
+      <widget class="QFrame" name="frame_2">
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <layout class="QVBoxLayout" name="vlayout_left">
+        <property name="spacing">
+         <number>12</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>6</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QGroupBox" name="groupBox_item">
+          <property name="font">
+           <font>
+            <pointsize>-1</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">/* Khung chính của GroupBox */
+QGroupBox {
+    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
+    border: 1px solid #c6c6c6; /* Viền xám mảnh để định hình khối */
+    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
+    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
+    font-size: 14px;           /* Kích thước chữ tiêu đề */
+    font-weight: bold;         /* Làm đậm chữ tiêu đề */
+    color: #333333;            /* Màu chữ tiêu đề */
+}
+
+/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */
+    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */
+    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */
+}
+</string>
+          </property>
+          <property name="title">
+           <string>Item Configuration</string>
+          </property>
+          <layout class="QVBoxLayout" name="vlayout_item">
+           <property name="spacing">
+            <number>8</number>
+           </property>
+           <property name="leftMargin">
+            <number>12</number>
+           </property>
+           <property name="topMargin">
+            <number>16</number>
+           </property>
+           <property name="rightMargin">
+            <number>12</number>
+           </property>
+           <property name="bottomMargin">
+            <number>12</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="label_2">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Item Code:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="hlayout_item_code">
+             <property name="spacing">
+              <number>8</number>
+             </property>
+             <item>
+              <widget class="QComboBox" name="comboBox_item_code">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>10</pointsize>
+                </font>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pushButton_set_load">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>100</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>10</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">QPushButton { background-color:#0067c0; color:white; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#005ba1; }</string>
+               </property>
+               <property name="text">
+                <string>Set Load</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pushButton_set_save">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>100</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>10</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">QPushButton { background-color:#0067c0; color:white; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#005ba1; }</string>
+               </property>
+               <property name="text">
+                <string>Set Save</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox_path">
+          <property name="font">
+           <font>
+            <pointsize>-1</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">/* Khung chính của GroupBox */
+QGroupBox {
+    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
+    border: 1px solid #c6c6c6; /* Viền xám mảnh để định hình khối */
+    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
+    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
+    font-size: 14px;           /* Kích thước chữ tiêu đề */
+    font-weight: bold;         /* Làm đậm chữ tiêu đề */
+    color: #333333;            /* Màu chữ tiêu đề */
+}
+
+/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */
+    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */
+    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */
+}
+</string>
+          </property>
+          <property name="title">
+           <string>Path to Image Logging</string>
+          </property>
+          <layout class="QVBoxLayout" name="vlayout_path">
+           <property name="spacing">
+            <number>8</number>
+           </property>
+           <property name="leftMargin">
+            <number>12</number>
+           </property>
+           <property name="topMargin">
+            <number>16</number>
+           </property>
+           <property name="rightMargin">
+            <number>12</number>
+           </property>
+           <property name="bottomMargin">
+            <number>12</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="label_3">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Folder Path:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="hlayout_folder">
+             <property name="spacing">
+              <number>8</number>
+             </property>
+             <item>
+              <widget class="QLineEdit" name="lineEdit_folder_path">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>10</pointsize>
+                </font>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pushButton_broswer_folder">
+               <property name="minimumSize">
+                <size>
+                 <width>100</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>10</pointsize>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }</string>
+               </property>
+               <property name="text">
+                <string>Browser</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pushButton_import">
+               <property name="minimumSize">
+                <size>
+                 <width>100</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>10</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">QPushButton { background-color:#0067c0; color:white; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#005ba1; }</string>
+               </property>
+               <property name="text">
+                <string>Import</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox_preview">
+          <property name="font">
+           <font>
+            <pointsize>-1</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">/* Khung chính của GroupBox */
+QGroupBox {
+    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
+    border: 1px solid #c6c6c6; /* Viền xám mảnh để định hình khối */
+    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
+    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
+    font-size: 14px;           /* Kích thước chữ tiêu đề */
+    font-weight: bold;         /* Làm đậm chữ tiêu đề */
+    color: #333333;            /* Màu chữ tiêu đề */
+}
+
+/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */
+    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */
+    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */
+}
+</string>
+          </property>
+          <property name="title">
+           <string>Image Preview</string>
+          </property>
+          <layout class="QVBoxLayout" name="vlayout_preview">
+           <property name="spacing">
+            <number>10</number>
+           </property>
+           <property name="leftMargin">
+            <number>12</number>
+           </property>
+           <property name="topMargin">
+            <number>16</number>
+           </property>
+           <property name="rightMargin">
+            <number>12</number>
+           </property>
+           <property name="bottomMargin">
+            <number>12</number>
+           </property>
+           <item>
+            <widget class="QWidget" name="widget" native="true">
+             <layout class="QVBoxLayout" name="vlayout_widget">
+              <property name="spacing">
+               <number>10</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="label_image_prev">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>600</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">background-color: rgb(0, 0, 0); color: rgb(255, 255, 255); border-radius:4px;</string>
+                </property>
+                <property name="frameShape">
+                 <enum>QFrame::Box</enum>
+                </property>
+                <property name="text">
+                 <string>IMAGE PREVIEW</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="hlayout_advanced">
+                <item>
+                 <spacer name="hspacer_adv">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_advanced_option">
+                  <property name="minimumSize">
+                   <size>
+                    <width>160</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>200</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <pointsize>10</pointsize>
+                    <weight>75</weight>
+                    <bold>true</bold>
+                   </font>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }</string>
+                  </property>
+                  <property name="text">
+                   <string>Advanced Options</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <spacer name="vspacer_left">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QFrame" name="frame">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>6</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QGroupBox" name="groupBox_table">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QGroupBox { font-weight:600; border:1px solid #d0d0d0; border-radius:6px; margin-top:10px; background-color:#fbfbfb;}QGroupBox::title { subcontrol-origin: margin; left:10px; padding:0 4px; color:#1b1b1b; }</string>
+          </property>
+          <property name="title">
+           <string>Logging Table</string>
+          </property>
+          <layout class="QVBoxLayout" name="vlayout_table">
+           <property name="leftMargin">
+            <number>10</number>
+           </property>
+           <property name="topMargin">
+            <number>16</number>
+           </property>
+           <property name="rightMargin">
+            <number>10</number>
+           </property>
+           <property name="bottomMargin">
+            <number>10</number>
+           </property>
+           <item>
+            <widget class="QTableWidget" name="tableWidget">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>600</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="alternatingRowColors">
+              <bool>true</bool>
+             </property>
+             <property name="gridStyle">
+              <enum>Qt::DashLine</enum>
+             </property>
+             <property name="rowCount">
+              <number>1</number>
+             </property>
+             <attribute name="horizontalHeaderCascadingSectionResizes">
+              <bool>true</bool>
+             </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>50</number>
+             </attribute>
+             <attribute name="horizontalHeaderDefaultSectionSize">
+              <number>150</number>
+             </attribute>
+             <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+              <bool>true</bool>
+             </attribute>
+             <attribute name="horizontalHeaderStretchLastSection">
+              <bool>true</bool>
+             </attribute>
+             <attribute name="verticalHeaderCascadingSectionResizes">
+              <bool>true</bool>
+             </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>20</number>
+             </attribute>
+             <attribute name="verticalHeaderDefaultSectionSize">
+              <number>30</number>
+             </attribute>
+             <attribute name="verticalHeaderShowSortIndicator" stdset="0">
+              <bool>false</bool>
+             </attribute>
+             <attribute name="verticalHeaderStretchLastSection">
+              <bool>false</bool>
+             </attribute>
+             <row/>
+             <column>
+              <property name="text">
+               <string>Join State</string>
+              </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Image Preview</string>
+              </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Description</string>
+              </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Select Camera</string>
+              </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Select Model</string>
+              </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>View Detection</string>
+              </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Register</string>
+              </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Value</string>
+              </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
+              </property>
+             </column>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1885</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
