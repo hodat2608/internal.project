@@ -132,7 +132,7 @@ class AutoLoggingProcess:
         self.ui_logging.label_image_prev.setPixmap(scaled_pixmap)
 
 
-    def save_values_auto_log_to_db(self,item_code_id,connection):
+    def save_values_auto_log_to_db(self,camera_id,connection):
         from PyQt5.QtCore import Qt
         from PyQt5.QtWidgets import QComboBox, QCheckBox, QPushButton
         cursor = connection.cursor()
@@ -183,14 +183,14 @@ class AutoLoggingProcess:
         if list_insert:
             try:
                 cursor.execute(
-                    f"DELETE FROM auto_logging WHERE item_code_id = %s",
-                    (item_code_id,),
+                    f"DELETE FROM auto_logging WHERE camera_id = %s",
+                    (camera_id,),
                 )
 
                 query = """
                     INSERT INTO auto_logging (
                         folder_path, join_state, image_path, description_image, 
-                        select_camera, select_model, register, value, item_code_id
+                        select_camera, select_model, register, value, camera_id
                     ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
                 
@@ -212,7 +212,7 @@ class AutoLoggingProcess:
                         select_model, 
                         register_val, 
                         value_val, 
-                        item_code_id
+                        camera_id
                     ))
                     
                 connection.commit()
@@ -231,14 +231,14 @@ class AutoLoggingProcess:
             print("Không có dữ liệu để lưu.")
 
 
-    def load_data_from_db(self,item_code_id,connection):
+    def load_data_from_db(self,camera_id,connection):
         from PyQt5.QtCore import Qt
         from PyQt5.QtWidgets import QTableWidgetItem, QCheckBox, QComboBox, QPushButton
         
         cursor = connection.cursor()
         cursor.execute(
-            f"SELECT * FROM auto_logging WHERE item_code_id = %s",
-            (item_code_id,),
+            f"SELECT * FROM auto_logging WHERE camera_id = %s",
+            (camera_id,),
         )
         result = cursor.fetchall()
         
@@ -357,7 +357,7 @@ class AutoLoggingProcess:
         if not hasattr(self, 'dict_view_results'):
             self.dict_view_results = {}
 
-        result_image_rgb, flag, list_register = self.process.process_image_func(
+        result_image_rgb, flag, list_register,_ = self.process.process_image_func(
                 result_image_rgb, self.model_loader, self.pyuic, True, self.valid_key, 12,
                 mode_load_jumper=False,
             )
@@ -386,7 +386,6 @@ class AutoLoggingProcess:
             QtCore.Qt.QueuedConnection,
             QtCore.Q_ARG(QtGui.QPixmap, pix)
         )
-
 
     def detect_clicked(self):
         row = self.ui_logging.tableWidget.currentRow()

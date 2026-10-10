@@ -85,9 +85,9 @@ QScrollBar::handle:vertical:hover {
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>-62</y>
-         <width>1788</width>
-         <height>1480</height>
+         <y>-445</y>
+         <width>1781</width>
+         <height>1503</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_17">
@@ -396,7 +396,7 @@ QPushButton:pressed {
                    </property>
                    <property name="icon">
                     <iconset>
-                     <normaloff>assert/icon/apply-now.png</normaloff>assert/icon/apply-now.png</iconset>
+                     <normaloff>assert/icon/floppy-disk.png</normaloff>assert/icon/floppy-disk.png</iconset>
                    </property>
                    <property name="iconSize">
                     <size>
@@ -468,7 +468,7 @@ QGroupBox::title {
 </string>
               </property>
               <property name="title">
-               <string>Setup the Counter</string>
+               <string>Setup Counter</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_23">
                <item row="0" column="0" colspan="2">
@@ -518,6 +518,8 @@ QGroupBox::title {
                      <font>
                       <family>Segoe UI</family>
                       <pointsize>10</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
                      </font>
                     </property>
                     <property name="text">
@@ -531,6 +533,8 @@ QGroupBox::title {
                      <font>
                       <family>Segoe UI</family>
                       <pointsize>10</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
                      </font>
                     </property>
                     <property name="text">
@@ -557,6 +561,8 @@ QGroupBox::title {
                      <font>
                       <family>Segoe UI</family>
                       <pointsize>10</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
                      </font>
                     </property>
                     <property name="text">
@@ -781,7 +787,7 @@ QGroupBox::title {
 </string>
                  </property>
                  <property name="title">
-                  <string>Reset Counter from PLC:</string>
+                  <string>Reset Counter:</string>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_7">
                   <item row="3" column="1">
@@ -790,6 +796,8 @@ QGroupBox::title {
                      <font>
                       <family>Segoe UI</family>
                       <pointsize>10</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
                      </font>
                     </property>
                     <property name="text">
@@ -803,6 +811,8 @@ QGroupBox::title {
                      <font>
                       <family>Segoe UI</family>
                       <pointsize>10</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
                      </font>
                     </property>
                     <property name="text">
@@ -945,7 +955,7 @@ QGroupBox::title {
               <property name="minimumSize">
                <size>
                 <width>0</width>
-                <height>250</height>
+                <height>0</height>
                </size>
               </property>
               <property name="font">
@@ -978,7 +988,7 @@ QGroupBox::title {
 </string>
               </property>
               <property name="title">
-               <string>Setup Mapping Mode</string>
+               <string>Setup Mode</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_24">
                <item row="3" column="0">
@@ -1165,7 +1175,7 @@ QGroupBox::title {
 </string>
                  </property>
                  <property name="title">
-                  <string>Set Trigger Sinals / Mode</string>
+                  <string>Communication Sinals / Mapping Mode</string>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_8">
                   <item row="0" column="0">
@@ -1179,10 +1189,287 @@ QGroupBox::title {
                     <property name="bottomMargin">
                      <number>10</number>
                     </property>
+                    <property name="horizontalSpacing">
+                     <number>10</number>
+                    </property>
                     <property name="verticalSpacing">
                      <number>20</number>
                     </property>
-                    <item row="2" column="0">
+                    <item row="4" column="4">
+                     <widget class="QComboBox" name="comboBox_set_trigger_logging">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>30</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>30</height>
+                       </size>
+                      </property>
+                      <property name="font">
+                       <font>
+                        <family>Segoe UI</family>
+                        <pointsize>10</pointsize>
+                       </font>
+                      </property>
+                      <item>
+                       <property name="text">
+                        <string>None</string>
+                       </property>
+                      </item>
+                     </widget>
+                    </item>
+                    <item row="3" column="8">
+                     <widget class="QComboBox" name="comboBox_set_completed_mirror">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>30</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>30</height>
+                       </size>
+                      </property>
+                      <property name="font">
+                       <font>
+                        <family>Segoe UI</family>
+                        <pointsize>10</pointsize>
+                       </font>
+                      </property>
+                      <item>
+                       <property name="text">
+                        <string>None</string>
+                       </property>
+                      </item>
+                     </widget>
+                    </item>
+                    <item row="0" column="6">
+                     <widget class="QLabel" name="label_22">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>30</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>30</height>
+                       </size>
+                      </property>
+                      <property name="font">
+                       <font>
+                        <family>Segoe UI</family>
+                        <pointsize>10</pointsize>
+                        <weight>75</weight>
+                        <bold>true</bold>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>Component</string>
+                      </property>
+                      <property name="alignment">
+                       <set>Qt::AlignCenter</set>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="2" column="3" rowspan="3">
+                     <widget class="Line" name="line_18">
+                      <property name="orientation">
+                       <enum>Qt::Vertical</enum>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="4" column="6">
+                     <widget class="QComboBox" name="comboBox_set_component_logging">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>30</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>30</height>
+                       </size>
+                      </property>
+                      <property name="font">
+                       <font>
+                        <family>Segoe UI</family>
+                        <pointsize>10</pointsize>
+                       </font>
+                      </property>
+                      <item>
+                       <property name="text">
+                        <string>None</string>
+                       </property>
+                      </item>
+                     </widget>
+                    </item>
+                    <item row="2" column="4">
+                     <widget class="QComboBox" name="comboBox_set_trigger_automatic">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>30</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>30</height>
+                       </size>
+                      </property>
+                      <property name="font">
+                       <font>
+                        <family>Segoe UI</family>
+                        <pointsize>10</pointsize>
+                       </font>
+                      </property>
+                      <item>
+                       <property name="text">
+                        <string>None</string>
+                       </property>
+                      </item>
+                     </widget>
+                    </item>
+                    <item row="0" column="8">
+                     <widget class="QLabel" name="label_23">
+                      <property name="font">
+                       <font>
+                        <family>Segoe UI</family>
+                        <pointsize>10</pointsize>
+                        <weight>75</weight>
+                        <bold>true</bold>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>Completed</string>
+                      </property>
+                      <property name="alignment">
+                       <set>Qt::AlignCenter</set>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="4">
+                     <widget class="QLabel" name="label_21">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>30</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>30</height>
+                       </size>
+                      </property>
+                      <property name="font">
+                       <font>
+                        <family>Segoe UI</family>
+                        <pointsize>10</pointsize>
+                        <weight>75</weight>
+                        <bold>true</bold>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>Trigger Selected</string>
+                      </property>
+                      <property name="alignment">
+                       <set>Qt::AlignCenter</set>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="3" column="4">
+                     <widget class="QComboBox" name="comboBox_set_trigger_mirror">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>30</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>30</height>
+                       </size>
+                      </property>
+                      <property name="font">
+                       <font>
+                        <family>Segoe UI</family>
+                        <pointsize>10</pointsize>
+                       </font>
+                      </property>
+                      <item>
+                       <property name="text">
+                        <string>None</string>
+                       </property>
+                      </item>
+                     </widget>
+                    </item>
+                    <item row="2" column="8">
+                     <widget class="QComboBox" name="comboBox_set_completed_automatic">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>30</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>30</height>
+                       </size>
+                      </property>
+                      <property name="font">
+                       <font>
+                        <family>Segoe UI</family>
+                        <pointsize>10</pointsize>
+                       </font>
+                      </property>
+                      <item>
+                       <property name="text">
+                        <string>None</string>
+                       </property>
+                      </item>
+                     </widget>
+                    </item>
+                    <item row="4" column="8">
+                     <widget class="QComboBox" name="comboBox_set_completed_logging">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>30</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>30</height>
+                       </size>
+                      </property>
+                      <property name="font">
+                       <font>
+                        <family>Segoe UI</family>
+                        <pointsize>10</pointsize>
+                       </font>
+                      </property>
+                      <item>
+                       <property name="text">
+                        <string>None</string>
+                       </property>
+                      </item>
+                     </widget>
+                    </item>
+                    <item row="3" column="0">
                      <widget class="QLabel" name="label_17">
                       <property name="font">
                        <font>
@@ -1191,12 +1478,12 @@ QGroupBox::title {
                        </font>
                       </property>
                       <property name="text">
-                       <string>⬥ Mirror:</string>
+                       <string>⬥ Mirror</string>
                       </property>
                      </widget>
                     </item>
-                    <item row="2" column="1">
-                     <widget class="QComboBox" name="comboBox_mirror_mode">
+                    <item row="2" column="2">
+                     <widget class="QComboBox" name="comboBox_automatic_mode">
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -1222,12 +1509,6 @@ QGroupBox::title {
 }
 </string>
                       </property>
-                      <property name="currentText">
-                       <string>Auto 2</string>
-                      </property>
-                      <property name="currentIndex">
-                       <number>1</number>
-                      </property>
                       <item>
                        <property name="text">
                         <string>Auto 1</string>
@@ -1245,7 +1526,131 @@ QGroupBox::title {
                       </item>
                      </widget>
                     </item>
-                    <item row="3" column="1">
+                    <item row="2" column="0">
+                     <widget class="QLabel" name="label_8">
+                      <property name="font">
+                       <font>
+                        <family>Segoe UI</family>
+                        <pointsize>10</pointsize>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>⬥ Automatic</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="2" column="5" rowspan="3">
+                     <widget class="Line" name="line_19">
+                      <property name="orientation">
+                       <enum>Qt::Vertical</enum>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="2" column="1" rowspan="3">
+                     <widget class="Line" name="line_17">
+                      <property name="orientation">
+                       <enum>Qt::Vertical</enum>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="4" column="0">
+                     <widget class="QLabel" name="label_18">
+                      <property name="font">
+                       <font>
+                        <family>Segoe UI</family>
+                        <pointsize>10</pointsize>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>⬥ Logging</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="3" column="6">
+                     <widget class="QComboBox" name="comboBox_set_component_mirror">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>30</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>30</height>
+                       </size>
+                      </property>
+                      <property name="font">
+                       <font>
+                        <family>Segoe UI</family>
+                        <pointsize>10</pointsize>
+                       </font>
+                      </property>
+                      <item>
+                       <property name="text">
+                        <string>None</string>
+                       </property>
+                      </item>
+                     </widget>
+                    </item>
+                    <item row="0" column="2">
+                     <widget class="QLabel" name="label_40">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>30</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>30</height>
+                       </size>
+                      </property>
+                      <property name="font">
+                       <font>
+                        <family>Segoe UI</family>
+                        <pointsize>10</pointsize>
+                        <weight>75</weight>
+                        <bold>true</bold>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>Mapping Mode</string>
+                      </property>
+                      <property name="alignment">
+                       <set>Qt::AlignCenter</set>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="2" column="6">
+                     <widget class="QComboBox" name="comboBox_set_component_automatic">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>30</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>30</height>
+                       </size>
+                      </property>
+                      <property name="font">
+                       <font>
+                        <family>Segoe UI</family>
+                        <pointsize>10</pointsize>
+                       </font>
+                      </property>
+                      <item>
+                       <property name="text">
+                        <string>None</string>
+                       </property>
+                      </item>
+                     </widget>
+                    </item>
+                    <item row="4" column="2">
                      <widget class="QComboBox" name="comboBox_logging_mode">
                       <property name="minimumSize">
                        <size>
@@ -1295,90 +1700,15 @@ QGroupBox::title {
                       </item>
                      </widget>
                     </item>
-                    <item row="0" column="0">
-                     <widget class="QLabel" name="label_6">
-                      <property name="font">
-                       <font>
-                        <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
-                       </font>
-                      </property>
-                      <property name="text">
-                       <string>⬥ Trigger Selected:</string>
+                    <item row="1" column="0" colspan="9">
+                     <widget class="Line" name="line_16">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
                       </property>
                      </widget>
                     </item>
-                    <item row="0" column="1">
-                     <widget class="QComboBox" name="comboBox_set_trigger">
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>30</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>30</height>
-                       </size>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
-                       </font>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="3">
-                     <widget class="QLabel" name="label_22">
-                      <property name="text">
-                       <string/>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="4">
-                     <widget class="QLabel" name="label_23">
-                      <property name="text">
-                       <string/>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="2">
-                     <widget class="QLabel" name="label_21">
-                      <property name="text">
-                       <string/>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="1" column="0">
-                     <widget class="QLabel" name="label_8">
-                      <property name="font">
-                       <font>
-                        <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
-                       </font>
-                      </property>
-                      <property name="text">
-                       <string>⬥ Automatic:</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="3" column="0">
-                     <widget class="QLabel" name="label_18">
-                      <property name="font">
-                       <font>
-                        <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
-                       </font>
-                      </property>
-                      <property name="text">
-                       <string>⬥ Logging:</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="1" column="1">
-                     <widget class="QComboBox" name="comboBox_automatic_mode">
+                    <item row="3" column="2">
+                     <widget class="QComboBox" name="comboBox_mirror_mode">
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -1404,6 +1734,12 @@ QGroupBox::title {
 }
 </string>
                       </property>
+                      <property name="currentText">
+                       <string>Auto 2</string>
+                      </property>
+                      <property name="currentIndex">
+                       <number>1</number>
+                      </property>
                       <item>
                        <property name="text">
                         <string>Auto 1</string>
@@ -1419,6 +1755,68 @@ QGroupBox::title {
                         <string>Auto 3</string>
                        </property>
                       </item>
+                     </widget>
+                    </item>
+                    <item row="0" column="0">
+                     <widget class="QLabel" name="label_6">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>30</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>30</height>
+                       </size>
+                      </property>
+                      <property name="font">
+                       <font>
+                        <family>Segoe UI</family>
+                        <pointsize>10</pointsize>
+                        <weight>75</weight>
+                        <bold>true</bold>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>Mode Name</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="2" column="7" rowspan="3">
+                     <widget class="Line" name="line_20">
+                      <property name="orientation">
+                       <enum>Qt::Vertical</enum>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="1">
+                     <widget class="Line" name="line_21">
+                      <property name="orientation">
+                       <enum>Qt::Vertical</enum>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="3">
+                     <widget class="Line" name="line_22">
+                      <property name="orientation">
+                       <enum>Qt::Vertical</enum>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="5">
+                     <widget class="Line" name="line_23">
+                      <property name="orientation">
+                       <enum>Qt::Vertical</enum>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="7">
+                     <widget class="Line" name="line_24">
+                      <property name="orientation">
+                       <enum>Qt::Vertical</enum>
+                      </property>
                      </widget>
                     </item>
                    </layout>

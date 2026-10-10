@@ -162,8 +162,8 @@ TABLES = [
         select_model VARCHAR(255) NOT NULL,
         register VARCHAR(255) NOT NULL,
         value VARCHAR(255) NOT NULL,
-        item_code_id INT NOT NULL,
-        FOREIGN KEY (item_code_id) REFERENCES ITEMS_CODE(id) ON DELETE CASCADE  
+        camera_id INT NOT NULL,
+        FOREIGN KEY (camera_id) REFERENCES NUMS_CAMERA(id) ON DELETE CASCADE  
         )
     """,
     """
@@ -180,11 +180,12 @@ TABLES = [
     CREATE TABLE IF NOT EXISTS setup_mapping_mode (
         id                  INT AUTO_INCREMENT PRIMARY KEY,
         camera_id           INT NOT NULL,
-        trigger_signal      VARCHAR(255),
-        automatic_mode      VARCHAR(255),
-        mirror_mode         VARCHAR(255),
-        logging_mode        VARCHAR(255),
-        UNIQUE KEY uq_camera_mapping_mode (camera_id),
+        mode_name           VARCHAR(50) NOT NULL,
+        mapping_mode        VARCHAR(255),
+        trigger_selected    VARCHAR(255),
+        component           VARCHAR(255),
+        completed           VARCHAR(255),
+        UNIQUE KEY uq_camera_mapping_mode (camera_id, mode_name),
         FOREIGN KEY (camera_id) REFERENCES NUMS_CAMERA(id) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     """,

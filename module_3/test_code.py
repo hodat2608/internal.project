@@ -28,3 +28,42 @@
 # conf_list [0.9677001237869263, 0.9486720561981201, 0.7170145511627197, 0.6256713271141052]
 dict_processors = {('camera-1', 'model-1'): '<module_3.handle_option_models.Process_Model object at 0x00000208510350A0>', ('camera-1', 'model-2'): '<module_3.handle_option_models.Process_Model object at 0x000002084F8BE570>', ('camera-1', 'model-3'): '<module_3.handle_option_models.Process_Model object at 0x000002085F0A6C30>', ('camera-1', 'model-4'): '<module_3.handle_option_models.Process_Model object at 0x0000020851044FB0>', ('camera-1', 'model-5'): '<module_3.handle_option_models.Process_Model object at 0x000002085F1A3230>', ('camera-2', 'model-1'): '<module_3.handle_option_models.Process_Model object at 0x000002084F80C470>', ('camera-2', 'model-2'): '<module_3.handle_option_models.Process_Model object at 0x0000020864F00A70>', ('camera-2', 'model-3'): '<module_3.handle_option_models.Process_Model object at 0x0000020864F421B0>', ('camera-2', 'model-4'): '<module_3.handle_option_models.Process_Model object at 0x000002085F3275F0>', ('camera-3', 'model-1'): '<module_3.handle_option_models.Process_Model object at 0x0000020864EC5640>'}
 print(dict_processors[('camera-1', 'model-1')])
+
+list_mode ={   
+    'automatic':
+                    {
+                    'mapping_mode' :'Auto 1',
+                    'trigger_selected': 'trigger',
+                    'component' : 'reset_ok',
+                    'completed' : 'complete'
+                    },
+
+    'mirror':
+                    {
+                    'mapping_mode' :'Auto 2',
+                    'trigger_selected': 'trigger',
+                    'component' : 'None',
+                    'completed' : 'complete'
+                    },
+    
+    'logging':
+                    {
+                    'mapping_mode' :'Auto 3',
+                    'trigger_selected': 'trigger',
+                    'component' : 'None',
+                    'completed' : 'None'
+                    }
+}
+
+
+
+list_mode =  {'automatic': {'mapping_mode': 'Auto 1', 'trigger_selected': 'trigger', 'component': 'reset_ok', 'completed': 'complete'}, 'mirror': {'mapping_mode': 'Auto 2', 'trigger_selected': 'trigger', 'component': 'None', 'completed': 'complete'}, 'logging': {'mapping_mode': 'Auto 3', 'trigger_selected': 'trigger', 'component': 'None', 'completed': 'None'}}
+automatic_mode = list_mode.get('automatic', {}).get('mapping_mode')
+trigger_selected = list_mode.get('automatic', {}).get('trigger_selected')
+component = list_mode.get('automatic', {}).get('component')
+completed = list_mode.get('automatic', {}).get('completed')
+
+print(automatic_mode)
+print(trigger_selected)
+print(component)
+print(completed)    

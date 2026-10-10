@@ -252,8 +252,9 @@ class PLCHandler:
 
         self.worker_thread    = PLCWorkerModeAuto1(self)
         self.built_in_objects = {}
+        self.built_in_mapping_mode = {}
         self.ui_itemcode      = None
-        self.mode_kick        = 'Auto 1'
+        self.mode_kick        = None  # được set từ mapping 'automatic' trong set_built_in_mapping_mode
 
         self._label_sizes: dict = {}
         self._active_triggers   = []
@@ -459,8 +460,17 @@ class PLCHandler:
     # Built-in objects / config
     # -----------------------------------------------------------------------
 
-    def set_built_in_objects(self, objects):
+    def set_built_in_config(self, objects, mapping):
         self.built_in_objects = objects
+        self.built_in_mapping_mode = mapping
+        if self.mode_kick is None:
+            # Mặc định: mode đang map cho 'automatic' (lấy từ camera đầu tiên có cấu hình)
+            self.mode_kick = next(
+                (m for cam in mapping.values()
+                 if (m := cam.get('mapping', {}).get('automatic', {}).get('mapping_mode'))),
+                None,
+            )
+            print("Mode Kick: ", self.mode_kick)
         self._update_trigger_cache()
         self._set_mode_reg_process()
         self._update_counter_settings()
@@ -483,8 +493,6 @@ class PLCHandler:
     def set_item_code_display(self, obj):
         self.ui_itemcode = obj
 
-    def set_built_in_mapping_mode(self, mapping):
-        self.built_in_mapping_mode = mapping
 
     # -----------------------------------------------------------------------
     # Load mã hàng
@@ -561,39 +569,50 @@ class PLCHandler:
 
         _log.info("[PLCHandler] Updated dict_signal_complete for mode: %s", self.mode_kick)
 
-    def _update_trigger_cache(self):
+    def _find_mode_mapping(self, camera_key, mode_key):
+        """Trả về (mode_name, config) của camera có mapping_mode == mode_key, hoặc (None, {})."""
+        mapping = self.built_in_mapping_mode.get(camera_key, {}).get('mapping', {})
+        for mode_name, cfg in mapping.items():
+            if cfg.get('mapping_mode') == mode_key:
+                return mode_name, cfg
+        return None, {}
+
+    def _update_trigger_cache(self, trigger_selected=None):
+        """trigger_selected: dict {camera_key: tên trigger}. None -> tự tính theo self.mode_kick."""
         new_triggers = []
+        mode_kick = self.mode_kick
         try:
-            if self.built_in_objects and self.mode_kick:
+            if self.built_in_objects and mode_kick:
                 for key, values in self.built_in_objects.items():
                     signals = values.get('signals')
-                    automation_ui = values.get('automation_ui')
-                    trigger_selected = automation_ui.comboBox_set_trigger.currentText()
-                    
-                    if not signals or self.mode_kick not in signals:
-                        _log.warning("[PLCHandler] Signals not found for mode: %s", self.mode_kick)
-                        continue
-                    
-                    target_reg = signals[self.mode_kick].get('values_signals', {}).get(trigger_selected)
-                    if not target_reg:
-                        _log.warning("[PLCHandler] Target register not found for key: %s", reg)
+                    mode_signals = signals.get(mode_kick) if signals else None
+                    if not mode_signals:
+                        _log.warning("[PLCHandler] Signals not found for mode: %s", mode_kick)
                         continue
 
-                    reg           = f"{target_reg['address']}{target_reg['read_register']}"
+                    if trigger_selected is None:
+                        trigger = self._find_mode_mapping(key, mode_kick)[1].get('trigger_selected')
+                    else:
+                        trigger = trigger_selected.get(key)
+
+                    target_reg = mode_signals.get('values_signals', {}).get(trigger)
+                    if not target_reg:
+                        _log.warning("[PLCHandler] Target register not found for trigger: %s", trigger)
+                        continue
+
                     read_value_on  = target_reg['read_value_on']
                     read_value_off = target_reg['read_value_off']
-                    if not reg or not read_value_on or not read_value_off:
-                        _log.warning("[PLCHandler] Target register not found for key: %s", trigger_selected)
+                    if not read_value_on or not read_value_off:
+                        _log.warning("[PLCHandler] Target register not found for key: %s", trigger)
                         continue
 
-                    if all([reg, read_value_on is not None, read_value_off is not None]):
-                        new_triggers.append({
-                            'reg' : reg,
-                            'on'  : int(read_value_on),
-                            'off' : int(read_value_off),
-                            'key' : key,
-                            'data': values,
-                        })
+                    new_triggers.append({
+                        'reg' : f"{target_reg['address']}{target_reg['read_register']}",
+                        'on'  : int(read_value_on),
+                        'off' : int(read_value_off),
+                        'key' : key,
+                        'data': values,
+                    })
         except Exception:
             _log.exception("[PLCHandler] _update_trigger_cache failed")
 
@@ -601,7 +620,7 @@ class PLCHandler:
             self._active_triggers = new_triggers
 
         _log.info("[PLCHandler] Trigger cache updated for mode: %s (Count: %s)",
-                  self.mode_kick, len(new_triggers))
+                  mode_kick, len(new_triggers))
 
     # -----------------------------------------------------------------------
     # Node / mode switching
@@ -620,36 +639,31 @@ class PLCHandler:
             for _k, values in self.processor.built_in_modes.items():
                 for mode_key, values1 in values.get('modes', {}).items():
                     register = values1.get('register')
-                    value_bit_on = values1.get('value_bit_on')
                     value_bit_off = values1.get('value_bit_off')
                     try:
                         current_value = self._safe_read_plc(register)
                         if current_value is None:
                             _log.error("[PLCHandler] _activate_mode failed for current_value: %s", current_value)
                             continue
-                        if int(current_value) == value_bit_on:
-                            print('register',register)
-                            print('value_bit_on',value_bit_on)
-                            print('value_bit_off',value_bit_off)
-                            with self._mode_lock:
-                                self.mode_kick = mode_key
-                            
-                            mapping = self.built_in_mapping_mode.get(_k, {}).get('mapping', {})
-                            automatic_mode = mapping.get('automatic_mode')
-                            mirror_mode    = mapping.get('mirror_mode')
-                            logging_mode   = mapping.get('logging_mode')
+                        if int(current_value) != values1.get('value_bit_on'):
+                            continue
 
-                            if mode_key == automatic_mode:
-                                _log.info('Mode Set Index: %s', 'automatic_mode' )
-                            elif mode_key == mirror_mode:
-                                _log.info('Mode Set Index: %s', 'mirror_mode' )
-                            elif mode_key == logging_mode:
-                                _log.info('Mode Set Index: %s', 'logging_mode' )
+                        with self._mode_lock:
+                            self.mode_kick = mode_key
 
-                            self._update_trigger_cache()
-                            self._set_mode_reg_process()
-                            self.load_user_set_selector_from_mode()
-                            self._safe_write_plc(str(register), value_bit_off)
+                        mode_name, _ = self._find_mode_mapping(_k, mode_key)
+                        if mode_name:
+                            _log.info('Mode Set Index: %s', f'{mode_name}_mode')
+
+                        # Trigger của từng camera theo mode vừa kích hoạt
+                        triggers = {
+                            cam: self._find_mode_mapping(cam, mode_key)[1].get('trigger_selected')
+                            for cam in self.built_in_mapping_mode
+                        }
+                        self._update_trigger_cache(triggers)
+                        self._set_mode_reg_process()
+                        self.load_user_set_selector_from_mode()
+                        self._safe_write_plc(str(register), value_bit_off)
                     except (TypeError, ValueError) as e:
                         _log.debug("[PLCHandler] _activate_mode value error for register %s: %s", register, e)
                         continue
@@ -706,7 +720,7 @@ class PLCHandler:
 
         any_camera_in_logging = False
         for k, v in self.built_in_mapping_mode.items():
-            if v.get('mapping', {}).get('logging_mode') == current_mode:
+            if v.get('mapping', {}).get('logging', {}).get('mapping_mode') == current_mode:
                 any_camera_in_logging = True
                 break
 
@@ -733,9 +747,9 @@ class PLCHandler:
                     self._safe_write_plc(str(item['reg']),item['off'])
                     
                     mapping = self.built_in_mapping_mode.get(key, {}).get('mapping', {})
-                    automatic_mode = mapping.get('automatic_mode')
-                    mirror_mode    = mapping.get('mirror_mode')
-                    logging_mode   = mapping.get('logging_mode')
+                    automatic_mode = mapping.get('automatic', {}).get('mapping_mode')
+                    mirror_mode    = mapping.get('mirror', {}).get('mapping_mode')
+                    logging_mode   = mapping.get('logging', {}).get('mapping_mode')
 
                     if current_mode == logging_mode:
                         self.handle_auto_logging_table_ui(key, item['data'])
@@ -1104,112 +1118,7 @@ class PLCHandler:
             [(key_model, pyuic, result_img, flag, list_register, logo_text)],
             f"⏱️: {elapsed:.2f} ms",
         )
-    # -----------------------------------------------------------------------
-    # Mode handlers mode manual
-    # -----------------------------------------------------------------------
 
-    def handle_result_mode_auto_manual(self, key: str, values: dict) -> None:
-        time_start = time.perf_counter()
-        start_time    = time.perf_counter()
-
-        automation_ui = values.get('automation_ui')
-
-        current_count = self.counter_shot(key, automation_ui)
-        
-        num_model = values.get('shot', {}).get(str(current_count))
-        if not num_model:
-            _log.debug('[%s] No model for shot %s — skipping', key, current_count)
-            return
-
-        camera        = key.removeprefix('built-in-')
-        key_model     = (camera, f'model-{num_model}')
-        model_loader  = values.get('model_loader', {}).get(key_model)
-        pyuic         = values.get('pyuic', {}).get(key_model)
-        
-        if not model_loader:
-            _log.error('[%s] model_loader missing for key_model=%s', key, key_model)
-            return
-        if not pyuic:
-            _log.error('[%s] pyuic missing for key_model=%s', key, key_model)
-            return
-        if not automation_ui:
-            _log.error('[%s] automation_ui missing', key)
-            return
-
-        # Snapshot UI state trên main thread trước khi chuyển sang background thread
-        capture_cfg = self.snapshot_capture_config(automation_ui)
-        # time.sleep(30)
-        raw_image = cv2.imread(r"C:\Users\VDM\Pictures\2026-05-15_14-50-57-175964.jpg")
-
-        try:
-            model_processor = self.processor.dict_processors.get(key_model)
-            if not model_processor or not model_processor.process_image_func:
-                _log.error('[%s] process_image_func is missing for key_model=%s', key, key_model)
-                return
-            result_img, flag, list_register,logo_text = model_processor.process_image_func(
-                raw_image, model_loader, pyuic, camera, key_model, current_count,
-                mode_load_jumper=self.mode_load_jumper,
-            )
-        except Exception:
-            _log.exception('[%s] process_image_func failed at shot %s', key, current_count)
-            return
-
-        elapsed = (time.perf_counter() - start_time) * 1000
-
-        self._accumulate_registers(key, list_register or [])
-
-        shot_complete = values.get('shot_complete', 0)
-        if current_count >= shot_complete:
-            all_registers = self._pop_registers(key)
-
-            try:
-                with self._signal_rwlock.read():
-                    comp_sig  = dict(self.dict_signal_complete[key]['complete'])
-                    reset_sig = dict(self.dict_signal_complete[key]['reset_ok'])
-            except KeyError:
-                _log.exception('[%s] Missing complete/reset signal in dict_signal_complete', key)
-                self._reset_counter(key)
-                return
-
-            if all_registers:
-                _log.info('[%s] NG registers: %s', key, all_registers)
-                for reg in all_registers:
-                    self._safe_write_plc(str(reg), 1)
-            else:
-                self._safe_write_plc(str(reset_sig['reg']), int(reset_sig['on']))
-
-            self._safe_write_plc(str(comp_sig['reg']), int(comp_sig['on']))
-            self._reset_counter(key)
-            _log.info('[%s] Complete shot %s | registers: %s | %.2fms',
-                      key, current_count, len(all_registers), elapsed)
-
-        state_str = 'OK' if flag else 'NG'
-        chk_orig = pyuic.checkBox_OK_image_original if flag else pyuic.checkBox_NG_image_original
-        
-        if chk_orig.isChecked():
-            path_save = (pyuic.lineEdit_OK_image_original if flag else pyuic.lineEdit_NG_image_original).text().strip()
-            if path_save:
-                chk_det = pyuic.checkBox_OK_image_detected if flag else pyuic.checkBox_NG_image_detected
-                save_det = chk_det.isChecked()
-                
-                self.executor.submit(
-                    self._save_ng_image, 
-                    raw_image.copy(), 
-                    path_save, 
-                    key, 
-                    state_str, 
-                    result_img.copy() if save_det else None, 
-                    save_det
-                )
-        
-        self.signals.update_display.emit(
-            [(key_model, pyuic, result_img, flag, list_register,logo_text)],
-            f"⏱️: {elapsed:.2f} ms",
-        )
-        time_end = time.perf_counter()
-        time_elapsed = (time_end - time_start) * 1000
-        time_str = f"⏱️: {time_elapsed:.2f} ms"
-        print('handle_result_mode_auto_manual',time_str)
     # -----------------------------------------------------------------------
     # Mode handlers mode_geji
     # -----------------------------------------------------------------------
@@ -1268,117 +1177,9 @@ class PLCHandler:
         elapsed       = (time.perf_counter() - start_time) * 1000
         self._reset_counter(key)
         self.signals.update_display.emit(
-            [(key_model, pyuic, result_img, flag, list_register, "Geji (No Model)")],
+            [(key_model, pyuic, result_img, flag, list_register, "Mirror (Use Mirror Model)")],
             f"⏱️: {elapsed:.2f} ms",
         )
-
-    # def handle_result_mode_logging(self, key: str, values: dict) -> None:
-    #     camera        = key.removeprefix('built-in-')
-    #     key_model     = (camera, 'model-1')
-    #     model_loader  = values.get('model_loader', {}).get(key_model)
-    #     pyuic         = values.get('pyuic', {}).get(key_model)
-    #     automation_ui = values.get('automation_ui')
-
-    #     if not model_loader:
-    #         _log.error('[handle_result_mode_logging][%s] model_loader missing for key_model=%s', key, key_model)
-    #         return
-    #     if not pyuic:
-    #         _log.error('[handle_result_mode_logging][%s] pyuic missing for key_model=%s', key, key_model)
-    #         return
-    #     if not automation_ui:
-    #         _log.error('[handle_result_mode_logging][%s] automation_ui missing', key)
-    #         return
-
-    #     path_save_image = pyuic.lineEdit_logging_image.text().strip()
-    #     if not path_save_image:
-    #         _log.error('[handle_result_mode_logging][%s] lineEdit_logging_image trống', key)
-    #         self._warn("Cảnh báo", "Đường dẫn lưu ảnh logging trống")
-    #         return
-
-    #     path_to_image_logging = os.path.join(path_save_image, 'logging')
-    #     os.makedirs(path_to_image_logging, exist_ok=True)
-
-    #     self._submit(
-    #         self.executor,
-    #         self.handle_image_logging,
-    #         path_to_image_logging,
-    #         model_loader,
-    #         pyuic,
-    #         camera,
-    #         key_model,
-    #         key,
-    #     )
-
-    # def handle_image_logging(
-    #     self,
-    #     path_to_image_logging: str,
-    #     model_loader,
-    #     pyuic,
-    #     camera: str,
-    #     key_model: tuple,
-    #     key: str,
-    # ) -> None:
-    #     self._flag_logging[key] = True
-
-    #     image_paths = glob.glob(os.path.join(path_to_image_logging, '*.jpg'))
-    #     if not image_paths:
-    #         _log.warning('[%s] Không có hình trong folder: %s', key, path_to_image_logging)
-    #         return
-
-    #     _log.info('[%s] handle_image_logging — processing %s images', key, len(image_paths))
-    #     current_count = 1
-
-    #     for path in image_paths:
-    #         try:
-    #             start_time = time.perf_counter()
-
-    #             raw_image = cv2.imread(path)
-    #             if raw_image is None:
-    #                 _log.error('[%s] cv2.imread returned None for: %s', key, path)
-    #                 self._flag_logging[key] = False
-    #                 continue
-
-    #             raw_image = cv2.cvtColor(raw_image, cv2.COLOR_BGR2RGB)
-
-    #             result_img, flag, list_register = self.processor.processor.process_image_func(
-    #                 raw_image, model_loader, pyuic, camera, key_model, current_count,
-    #             )
-    #             elapsed     = (time.perf_counter() - start_time) * 1000
-
-    #             self.signals.update_display.emit(
-    #                 [(key_model, pyuic, result_img, flag, list_register)],
-    #                 f"⏱️: {elapsed:.2f} ms",
-    #             )
-
-    #             if not flag:
-    #                 _log.info('[%s] NG detected for image: %s', key, path)
-    #                 self._flag_logging[key] = False
-
-    #         except Exception:
-    #             _log.exception('[%s] handle_image_logging — error processing image: %s', key, path)
-    #             self._flag_logging[key] = False
-
-    #     try:
-    #         with self._signal_rwlock.read():
-    #             comp_sig    = dict(self.dict_signal_complete[key]['complete'])
-    #             trigger_sig = dict(self.dict_signal_complete[key]['trigger'])
-    #     except KeyError:
-    #         _log.exception('[%s] handle_image_logging — missing signal config', key)
-    #         return
-
-    #     if 'built-in-camera-2' in key:
-    #         self._flag_logging[key] = False
-
-    #     all_ok = self._flag_logging[key]
-
-    #     # BUG GỐC: cả hai nhánh đều dùng comp_sig['on']
-    #     # Nếu muốn gửi giá trị khác cho NG, sửa nhánh else:
-    #     #   comp_value = int(comp_sig['off']) if not all_ok else int(comp_sig['on'])
-    #     comp_value = int(comp_sig['on'])
-
-    #     _log.info('[%s] handle_image_logging complete — result: %s', key, 'OK' if all_ok else 'NG')
-    #     self._safe_write_plc(str(comp_sig['reg']),    comp_value)
-    #     self._safe_write_plc(str(trigger_sig['reg']), int(trigger_sig['off']))
 
 
     # -----------------------------------------------------------------------
@@ -1475,7 +1276,7 @@ class PLCHandler:
 
                     # raw_image = cv2.cvtColor(raw_image, cv2.COLOR_BGR2RGB)
 
-                    result_img, flag, list_register = self.processor.processor.process_image_func(
+                    result_img, flag, list_register,_ = self.processor.processor.process_image_func(
                         raw_image, model_loader, pyuic, camera, key_model, current_count,
                     )
                     elapsed     = (time.perf_counter() - start_time) * 1000
@@ -1491,7 +1292,7 @@ class PLCHandler:
                     self._safe_write_plc(register, 0)
 
                     self.signals.update_display.emit(
-                        [(key_model, pyuic, result_img, flag, list_register)],
+                        [(key_model, pyuic, result_img, flag, list_register, "Logging (Model Representation Mapping)")],
                         f"⏱️: {elapsed:.2f} ms",
                     )
 
@@ -2221,22 +2022,51 @@ class CameraTabManager:
         tab_widget_2.addTab(single_tab_widget, "Detect Model")
         product_code_forms.append(single_tab_widget)
 
+    # def create_auto_log_tab(self,tab_widget_2,built_in_objects,camera_id,camera_name,item_code_id,total_key,product_code_forms,process):
+    #     _translate = QtCore.QCoreApplication.translate
+    #     auto_log_tab = QtWidgets.QMainWindow()
+    #     auto_log_tab_ui = Auto_Logging()
+    #     auto_log_tab_ui.setupUi(auto_log_tab)
+    #     tab_widget_2.addTab(auto_log_tab, "Auto Logging")
+    #     product_code_forms.append(auto_log_tab)
+    #     auto_log_tab_ui.comboBox_item_code.clear()
+    #     auto_log_tab_ui.comboBox_item_code.addItem(str(self.i_code))
+    #     self.logging_process = AutoLoggingProcess(auto_log_tab_ui,self.connect_plc.connection.cursor(),process,built_in_objects)
+    #     self.logging_process.load_data_from_db(item_code_id,self.connect_plc.connection)
+    #     auto_log_tab_ui.pushButton_broswer_folder.clicked.connect(self.logging_process.broswer_folder)
+    #     auto_log_tab_ui.pushButton_import.clicked.connect(lambda: self.logging_process.generate_table(total_key))
+    #     auto_log_tab_ui.tableWidget.itemSelectionChanged.connect(self.logging_process.show_image_preview)
+    #     auto_log_tab_ui.pushButton_set_save.clicked.connect(lambda: self.logging_process.save_values_auto_log_to_db(item_code_id,self.connect_plc.connection))
+    #     auto_log_tab_ui.pushButton_set_load.clicked.connect(lambda: self.logging_process.load_data_from_db(item_code_id,self.connect_plc.connection))
+
+    #     return auto_log_tab_ui
+
     def create_auto_log_tab(self,tab_widget_2,built_in_objects,camera_id,camera_name,item_code_id,total_key,product_code_forms,process):
         _translate = QtCore.QCoreApplication.translate
         auto_log_tab = QtWidgets.QMainWindow()
-        self.auto_log_tab_ui = Auto_Logging()
-        self.auto_log_tab_ui.setupUi(auto_log_tab)
+        auto_log_tab_ui = Auto_Logging()
+        auto_log_tab_ui.setupUi(auto_log_tab)
         tab_widget_2.addTab(auto_log_tab, "Auto Logging")
         product_code_forms.append(auto_log_tab)
-        self.auto_log_tab_ui.comboBox_item_code.clear()
-        self.auto_log_tab_ui.comboBox_item_code.addItem(str(self.i_code))
-        self.logging_process = AutoLoggingProcess(self.auto_log_tab_ui,self.connect_plc.connection.cursor(),process,built_in_objects)
-        self.logging_process.load_data_from_db(item_code_id,self.connect_plc.connection)
-        self.auto_log_tab_ui.pushButton_broswer_folder.clicked.connect(self.logging_process.broswer_folder)
-        self.auto_log_tab_ui.pushButton_import.clicked.connect(lambda: self.logging_process.generate_table(total_key))
-        self.auto_log_tab_ui.tableWidget.itemSelectionChanged.connect(self.logging_process.show_image_preview)
-        self.auto_log_tab_ui.pushButton_set_save.clicked.connect(lambda: self.logging_process.save_values_auto_log_to_db(item_code_id,self.connect_plc.connection))
-        self.auto_log_tab_ui.pushButton_set_load.clicked.connect(lambda: self.logging_process.load_data_from_db(item_code_id,self.connect_plc.connection))
+        auto_log_tab_ui.comboBox_item_code.clear()
+        auto_log_tab_ui.comboBox_item_code.addItem(str(self.i_code))
+
+        logging_process = AutoLoggingProcess(auto_log_tab_ui,self.connect_plc.connection.cursor(),process,built_in_objects)
+        # Giữ tham chiếu mạnh cho từng camera, không bị GC khi camera sau tạo tab
+        if not hasattr(self, 'logging_processes'):
+            self.logging_processes = {}
+        self.logging_processes[(camera_id, camera_name)] = logging_process
+        self.logging_process = logging_process  # giữ tương thích code cũ
+
+        logging_process.load_data_from_db(camera_id,self.connect_plc.connection)
+        auto_log_tab_ui.pushButton_broswer_folder.clicked.connect(logging_process.broswer_folder)
+        auto_log_tab_ui.pushButton_import.clicked.connect(lambda _=False, lp=logging_process, cn=camera_name: lp.generate_table([k for k in self.total_key if k[0] == f'camera-{cn}']))
+        auto_log_tab_ui.tableWidget.itemSelectionChanged.connect(logging_process.show_image_preview)
+        auto_log_tab_ui.pushButton_set_save.clicked.connect(lambda _=False, lp=logging_process: lp.save_values_auto_log_to_db(camera_id,self.connect_plc.connection))
+        auto_log_tab_ui.pushButton_set_load.clicked.connect(lambda _=False, lp=logging_process: lp.load_data_from_db(camera_id,self.connect_plc.connection))
+
+        return auto_log_tab_ui
+
 
     def set_camera_data(self, camera_name, ui_instances, ui_modelloader, path_instances, 
         dict_signals, shot_complete, dict_shot, parameter_models,automation_ui,device=None,dev=None,auto_logging_ui=None):

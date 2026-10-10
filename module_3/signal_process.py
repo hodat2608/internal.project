@@ -1030,18 +1030,8 @@ class DataProcessSignal:
             list_model.lineEdit().setAlignment(QtCore.Qt.AlignCenter)
             self.uic.tableWidget_shotxmodel.setCellWidget(row,1,list_model)
 
-    def table_signal_up_to_selected_trigger_signals(self):
-        current_text = self.uic.comboBox_set_trigger.currentText()
-        self.uic.comboBox_set_trigger.clear()
-        
-        for row in range(self.uic.tableWidget.rowCount()):
-            item = self.uic.tableWidget.verticalHeaderItem(row)
-            if item:
-                self.uic.comboBox_set_trigger.addItem(item.text())
-                
-        index = self.uic.comboBox_set_trigger.findText(current_text)
-        if index >= 0:
-            self.uic.comboBox_set_trigger.setCurrentIndex(index)
+
+
 
     def setup_counter_shot(self, cursor, connect_db, camera_id):
         is_check_pc = self.uic.radioButton_counter_pc.isChecked()
@@ -1098,47 +1088,87 @@ class DataProcessSignal:
             elif is_reset == 'NONE_RESET':
                 self.uic.radioButton_none_reset.setChecked(True)
 
+    def table_signal_up_to_selected_trigger_signals(self):
+        current_text = self.uic.comboBox_set_trigger_automatic.currentText()
+        self.uic.comboBox_set_trigger_automatic.clear()
+        
+        for row in range(self.uic.tableWidget.rowCount()):
+            item = self.uic.tableWidget.verticalHeaderItem(row)
+            if item:
+                self.uic.comboBox_set_trigger_automatic.addItem(item.text())
+                self.uic.comboBox_set_trigger_mirror.addItem(item.text())
+                self.uic.comboBox_set_trigger_logging.addItem(item.text())
+                self.uic.comboBox_set_component_automatic.addItem(item.text())
+                self.uic.comboBox_set_component_mirror.addItem(item.text())
+                self.uic.comboBox_set_component_logging.addItem(item.text())
+                self.uic.comboBox_set_completed_automatic.addItem(item.text())
+                self.uic.comboBox_set_completed_mirror.addItem(item.text())
+                self.uic.comboBox_set_completed_logging.addItem(item.text())
+                
+        index = self.uic.comboBox_set_trigger_automatic.findText(current_text)
+        if index >= 0:
+            self.uic.comboBox_set_trigger_automatic.setCurrentIndex(index)           
+
+    MAPPING_MODE_NAMES = ('automatic', 'mirror', 'logging')
+
+    def _mapping_mode_widgets(self, mode_name):
+        return {
+            'mapping_mode':     getattr(self.uic, f'comboBox_{mode_name}_mode'),
+            'trigger_selected': getattr(self.uic, f'comboBox_set_trigger_{mode_name}'),
+            'component':        getattr(self.uic, f'comboBox_set_component_{mode_name}'),
+            'completed':        getattr(self.uic, f'comboBox_set_completed_{mode_name}'),
+        }
+
     def setup_mapping_mode(self, cursor, connect_db, camera_id):
-        trigger_signal = self.uic.comboBox_set_trigger.currentText()
-        automatic_mode = self.uic.comboBox_automatic_mode.currentText()
-        mirror_mode = self.uic.comboBox_mirror_mode.currentText()
-        logging_mode = self.uic.comboBox_logging_mode.currentText()
         try:
             cursor.execute("DELETE FROM setup_mapping_mode WHERE camera_id = %s", (camera_id,))
             sql_command = """
                 INSERT INTO setup_mapping_mode
-                    (camera_id, trigger_signal, automatic_mode, mirror_mode, logging_mode)
-                VALUES (%s, %s, %s, %s, %s)
+                    (camera_id, mode_name, mapping_mode, trigger_selected, component, completed)
+                VALUES (%s, %s, %s, %s, %s, %s)
             """
-            cursor.execute(sql_command, (camera_id, trigger_signal, automatic_mode, mirror_mode, logging_mode))
+            for mode_name in self.MAPPING_MODE_NAMES:
+                w = self._mapping_mode_widgets(mode_name)
+                cursor.execute(sql_command, (
+                    camera_id,
+                    mode_name,
+                    w['mapping_mode'].currentText(),
+                    w['trigger_selected'].currentText(),
+                    w['component'].currentText(),
+                    w['completed'].currentText(),
+                ))
             connect_db.connection.commit()
             QtWidgets.QMessageBox.information(None, "Thành công", "Thiết lập Mapping Mode thành công!")
         except Exception as e:
             QtWidgets.QMessageBox.critical(None, "Lỗi khi thiết lập Mapping Mode", str(e))
 
     def load_mapping_mode(self, cursor, camera_id):
-        cursor.execute("SELECT trigger_signal, automatic_mode, mirror_mode, logging_mode FROM setup_mapping_mode WHERE camera_id = %s", (camera_id,))
-        result = cursor.fetchone()
-        list_mode = {}
-        automatic_mode = None
-        mirror_mode = None
-        logging_mode = None
-        
-        if result:
-            trigger_signal, automatic_mode, mirror_mode, logging_mode = result
-            if trigger_signal:
-                self.uic.comboBox_set_trigger.setCurrentText(trigger_signal)
-            if automatic_mode:
-                self.uic.comboBox_automatic_mode.setCurrentText(automatic_mode)
-            if mirror_mode:
-                self.uic.comboBox_mirror_mode.setCurrentText(mirror_mode)
-            if logging_mode:
-                self.uic.comboBox_logging_mode.setCurrentText(logging_mode)
+        cursor.execute(
+            "SELECT mode_name, mapping_mode, trigger_selected, component, completed "
+            "FROM setup_mapping_mode WHERE camera_id = %s", (camera_id,))
+        rows = cursor.fetchall()
+        print('rows',rows)
+        list_mode = {
+            name: {'mapping_mode': None, 'trigger_selected': None, 'component': None, 'completed': None}
+            for name in self.MAPPING_MODE_NAMES
+        }
 
-        list_mode['automatic_mode'] = automatic_mode
-        list_mode['mirror_mode'] = mirror_mode
-        list_mode['logging_mode'] = logging_mode
-        
+        for mode_name, mapping_mode, trigger_selected, component, completed in rows:
+            if mode_name not in list_mode:
+                continue
+            values = {
+                'mapping_mode': mapping_mode,
+                'trigger_selected': trigger_selected,
+                'component': component,
+                'completed': completed,
+            }
+            widgets = self._mapping_mode_widgets(mode_name)
+            for field, value in values.items():
+                if value:
+                    widgets[field].setCurrentText(value)
+            list_mode[mode_name] = values
+        print('list_mode',list_mode)
         return list_mode
+
 
         

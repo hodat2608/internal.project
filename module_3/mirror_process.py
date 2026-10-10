@@ -666,9 +666,6 @@ class Process_Mirror_Device:
             min = self.sinal.get_value(params, 'min')
             max = self.sinal.get_value(params, 'max')
             status = self.sinal.get_value(params, 'status')
-
-            print(params, result_values, min, max, status, camera_id)
-
             self.cursor.execute("""
                 INSERT INTO MIRROR_CONFIG (
                     parameter_name, result_value, min_value, max_value, status, camera_id
@@ -700,5 +697,5 @@ class Process_Mirror_Device:
 
         self.connect_db.connection.commit()
         self.get_value_from_table() # Lấy giá trị lưu vào biến Dict trên Main Thread
-        QMessageBox.information(None, "Thành công", "Tải thành công mode auto!")
+        # QMessageBox.information(None, "Thành công", "Tải thành công mode auto!")
         

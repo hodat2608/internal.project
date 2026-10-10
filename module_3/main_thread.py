@@ -173,9 +173,8 @@ class Ui_MainWindow(object):
                 self.progress_callback(base_progress, f"Đang thiết lập camera {camera_name}...")
             self._setup_camera_interface(camera_id, camera_name, item_code_id,total_models,total_cameras, base_progress, step_progress)
             
-        self.plc_handler.set_built_in_objects(self.camera_manager.built_in_objects)
+        self.plc_handler.set_built_in_config(self.camera_manager.built_in_objects, self.camera_manager.built_in_mapping_mode)
         self.plc_handler.set_item_code_display(self.camera_manager.ui_mother)
-        self.plc_handler.set_built_in_mapping_mode(self.camera_manager.built_in_mapping_mode)
         
     def get_num_models(self, camera_id):
         models = self.db_manager.get_models_for_camera(camera_id)
@@ -247,8 +246,7 @@ class Ui_MainWindow(object):
         if self.progress_callback:
             self.progress_callback(base_progress + int(step_progress * 0.8), f"Đang khởi tạo lịch sử lỗi (Log tab) camera {camera_name}...")
             
-        self.camera_manager.create_auto_log_tab(self.tabWidget_2,self.camera_manager.built_in_objects,camera_name,camera_id,item_code_id,self.camera_manager.total_key,self.product_code_forms,self.camera_manager.processor)
-        auto_logging_ui = self.camera_manager.auto_log_tab_ui
+        auto_logging_ui = self.camera_manager.create_auto_log_tab(self.tabWidget_2,self.camera_manager.built_in_objects,camera_id,camera_name,item_code_id,self.camera_manager.total_key,self.product_code_forms,self.camera_manager.processor)
         
         if self.progress_callback:
             self.progress_callback(base_progress + int(step_progress * 0.9), f"Hoàn tất liên kết dữ liệu camera {camera_name}...")
