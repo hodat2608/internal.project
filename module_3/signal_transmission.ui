@@ -85,9 +85,9 @@ QScrollBar::handle:vertical:hover {
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>-445</y>
+         <y>-501</y>
          <width>1781</width>
-         <height>1503</height>
+         <height>1559</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_17">
@@ -139,7 +139,7 @@ QGroupBox {
     border: 1px solid #000000; /* Viền xám mảnh để định hình khối */
     border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
     margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
-    font-size: 14px;           /* Kích thước chữ tiêu đề */
+    font-size: 15px;           /* Kích thước chữ tiêu đề */
     font-weight: bold;         /* Làm đậm chữ tiêu đề */
     color: #333333;            /* Màu chữ tiêu đề */
 }
@@ -432,10 +432,16 @@ QPushButton:pressed {
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>350</height>
+               </size>
+              </property>
               <property name="maximumSize">
                <size>
                 <width>16777215</width>
-                <height>300</height>
+                <height>350</height>
                </size>
               </property>
               <property name="font">
@@ -453,7 +459,7 @@ QGroupBox {
     border: 1px solid #000000; /* Viền xám mảnh để định hình khối */
     border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
     margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
-    font-size: 14px;           /* Kích thước chữ tiêu đề */
+    font-size: 15px;           /* Kích thước chữ tiêu đề */
     font-weight: bold;         /* Làm đậm chữ tiêu đề */
     color: #333333;            /* Màu chữ tiêu đề */
 }
@@ -491,10 +497,10 @@ QGroupBox::title {
                   <string notr="true">/* Khung chính của GroupBox */
 QGroupBox {
     background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
-    border: 1px solid #c6c6c6; /* Viền xám mảnh để định hình khối */
+    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */
     border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
     margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
-    font-size: 14px;           /* Kích thước chữ tiêu đề */
+    font-size: 15px;           /* Kích thước chữ tiêu đề */
     font-weight: bold;         /* Làm đậm chữ tiêu đề */
     color: #333333;            /* Màu chữ tiêu đề */
 }
@@ -512,22 +518,7 @@ QGroupBox::title {
                   <string>Increment Counter Shot</string>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_5">
-                  <item row="2" column="4">
-                   <widget class="QRadioButton" name="radioButton_condition_plc_pc">
-                    <property name="font">
-                     <font>
-                      <family>Segoe UI</family>
-                      <pointsize>10</pointsize>
-                      <weight>75</weight>
-                      <bold>true</bold>
-                     </font>
-                    </property>
-                    <property name="text">
-                     <string>Set Condition from PLC to PC</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="2">
+                  <item row="1" column="2">
                    <widget class="QRadioButton" name="radioButton_counter_plc">
                     <property name="font">
                      <font>
@@ -538,11 +529,86 @@ QGroupBox::title {
                      </font>
                     </property>
                     <property name="text">
-                     <string>Set Counter from PLC</string>
+                     <string>PLC</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="2" column="0">
+                  <item row="1" column="7">
+                   <widget class="QComboBox" name="comboBox_increment_counter_signal_selected">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>30</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <item>
+                     <property name="text">
+                      <string>None</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                  <item row="1" column="4">
+                   <widget class="QRadioButton" name="radioButton_condition_plc_pc">
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>PLC to PC</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="6">
+                   <widget class="QLabel" name="label_24">
+                    <property name="maximumSize">
+                     <size>
+                      <width>100</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Signal:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QRadioButton" name="radioButton_counter_pc">
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>PC</string>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
                    <widget class="QLabel" name="label_10">
                     <property name="maximumSize">
                      <size>
@@ -555,49 +621,17 @@ QGroupBox::title {
                     </property>
                    </widget>
                   </item>
-                  <item row="2" column="1">
-                   <widget class="QRadioButton" name="radioButton_counter_pc">
-                    <property name="font">
-                     <font>
-                      <family>Segoe UI</family>
-                      <pointsize>10</pointsize>
-                      <weight>75</weight>
-                      <bold>true</bold>
-                     </font>
-                    </property>
-                    <property name="text">
-                     <string>Set Counter from PC</string>
-                    </property>
-                    <property name="checked">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="1">
-                   <widget class="QLabel" name="label_15">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="1">
-                   <widget class="QLabel" name="label_19">
-                    <property name="text">
-                     <string/>
+                  <item row="1" column="5">
+                   <widget class="Line" name="line_25">
+                    <property name="orientation">
+                     <enum>Qt::Vertical</enum>
                     </property>
                    </widget>
                   </item>
                  </layout>
                 </widget>
                </item>
-               <item row="2" column="0" colspan="2">
-                <widget class="Line" name="line_14">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="0">
+               <item row="4" column="0">
                 <layout class="QGridLayout" name="gridLayout_20" rowstretch="0">
                  <property name="spacing">
                   <number>0</number>
@@ -749,6 +783,13 @@ QPushButton:pressed {
                  </item>
                 </layout>
                </item>
+               <item row="3" column="0" colspan="2">
+                <widget class="Line" name="line_14">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                </widget>
+               </item>
                <item row="1" column="0" colspan="2">
                 <widget class="QGroupBox" name="groupBox">
                  <property name="minimumSize">
@@ -769,10 +810,10 @@ QPushButton:pressed {
                   <string notr="true">/* Khung chính của GroupBox */
 QGroupBox {
     background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
-    border: 1px solid #c6c6c6; /* Viền xám mảnh để định hình khối */
+    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */
     border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
     margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
-    font-size: 14px;           /* Kích thước chữ tiêu đề */
+    font-size: 15px;           /* Kích thước chữ tiêu đề */
     font-weight: bold;         /* Làm đậm chữ tiêu đề */
     color: #333333;            /* Màu chữ tiêu đề */
 }
@@ -790,22 +831,7 @@ QGroupBox::title {
                   <string>Reset Counter:</string>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_7">
-                  <item row="3" column="1">
-                   <widget class="QRadioButton" name="radioButton_none_reset">
-                    <property name="font">
-                     <font>
-                      <family>Segoe UI</family>
-                      <pointsize>10</pointsize>
-                      <weight>75</weight>
-                      <bold>true</bold>
-                     </font>
-                    </property>
-                    <property name="text">
-                     <string>None</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="1">
+                  <item row="0" column="1">
                    <widget class="QRadioButton" name="radioButton_reset">
                     <property name="font">
                      <font>
@@ -823,14 +849,7 @@ QGroupBox::title {
                     </property>
                    </widget>
                   </item>
-                  <item row="0" column="1">
-                   <widget class="QLabel" name="label_20">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="0">
+                  <item row="0" column="0">
                    <widget class="QLabel" name="label_13">
                     <property name="maximumSize">
                      <size>
@@ -843,10 +862,236 @@ QGroupBox::title {
                     </property>
                    </widget>
                   </item>
-                  <item row="2" column="1">
-                   <widget class="QLabel" name="label_24">
+                  <item row="0" column="4">
+                   <widget class="Line" name="line_26">
+                    <property name="orientation">
+                     <enum>Qt::Vertical</enum>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="6">
+                   <widget class="QComboBox" name="comboBox_reset_counter_signal_selected">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>30</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <item>
+                     <property name="text">
+                      <string>None</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                  <item row="0" column="5">
+                   <widget class="QLabel" name="label_19">
+                    <property name="maximumSize">
+                     <size>
+                      <width>100</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Signal:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="3">
+                   <widget class="QRadioButton" name="radioButton_none_1">
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>None</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="2">
+                   <widget class="QRadioButton" name="radioButton_none_reset">
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>No Reset</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item row="2" column="0" colspan="2">
+                <widget class="QGroupBox" name="groupBox_6">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <family>Segoe UI</family>
+                   <pointsize>-1</pointsize>
+                   <weight>75</weight>
+                   <bold>true</bold>
+                  </font>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">/* Khung chính của GroupBox */
+QGroupBox {
+    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
+    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */
+    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
+    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
+    font-size: 15px;           /* Kích thước chữ tiêu đề */
+    font-weight: bold;         /* Làm đậm chữ tiêu đề */
+    color: #333333;            /* Màu chữ tiêu đề */
+}
+
+/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */
+    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */
+    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */
+}
+</string>
+                 </property>
+                 <property name="title">
+                  <string>Method</string>
+                 </property>
+                 <layout class="QGridLayout" name="gridLayout_25">
+                  <item row="0" column="4">
+                   <widget class="Line" name="line_27">
+                    <property name="orientation">
+                     <enum>Qt::Vertical</enum>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="6">
+                   <widget class="QComboBox" name="comboBox_method_use_signal_selected">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>30</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                     </font>
+                    </property>
+                    <item>
+                     <property name="text">
+                      <string>None</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                  <item row="0" column="2">
+                   <widget class="QRadioButton" name="radioButton_cycle_frame">
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Cycle</string>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_15">
+                    <property name="maximumSize">
+                     <size>
+                      <width>50</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
                     <property name="text">
                      <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QRadioButton" name="radioButton_single_frame">
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Single</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="5">
+                   <widget class="QLabel" name="label_41">
+                    <property name="maximumSize">
+                     <size>
+                      <width>100</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Signal:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="3">
+                   <widget class="QRadioButton" name="radioButton_none_2">
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>10</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>None</string>
                     </property>
                    </widget>
                   </item>
@@ -890,6 +1135,14 @@ QGroupBox::title {
                 <height>0</height>
                </size>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>-1</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="styleSheet">
                <string notr="true">/* Khung chính của GroupBox */
 QGroupBox {
@@ -897,7 +1150,7 @@ QGroupBox {
     border: 1px solid #000000; /* Viền xám mảnh để định hình khối */
     border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
     margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
-    font-size: 14px;           /* Kích thước chữ tiêu đề */
+    font-size: 15px;           /* Kích thước chữ tiêu đề */
     font-weight: bold;         /* Làm đậm chữ tiêu đề */
     color: #333333;            /* Màu chữ tiêu đề */
 }
@@ -912,10 +1165,10 @@ QGroupBox::title {
 </string>
               </property>
               <property name="title">
-               <string>GroupBox</string>
+               <string>Transmit Result Signals</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_4">
-               <item row="0" column="0">
+               <item row="2" column="0">
                 <spacer name="horizontalSpacer">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
@@ -924,6 +1177,19 @@ QGroupBox::title {
                   <size>
                    <width>40</width>
                    <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="1" column="0">
+                <spacer name="verticalSpacer_3">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
                   </size>
                  </property>
                 </spacer>
@@ -973,7 +1239,7 @@ QGroupBox {
     border: 1px solid #000000; /* Viền xám mảnh để định hình khối */
     border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
     margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
-    font-size: 14px;           /* Kích thước chữ tiêu đề */
+    font-size: 15px;           /* Kích thước chữ tiêu đề */
     font-weight: bold;         /* Làm đậm chữ tiêu đề */
     color: #333333;            /* Màu chữ tiêu đề */
 }
@@ -1157,10 +1423,10 @@ QPushButton:pressed {
                   <string notr="true">/* Khung chính của GroupBox */
 QGroupBox {
     background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
-    border: 1px solid #c6c6c6; /* Viền xám mảnh để định hình khối */
+    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */
     border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
     margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
-    font-size: 14px;           /* Kích thước chữ tiêu đề */
+    font-size: 15px;           /* Kích thước chữ tiêu đề */
     font-weight: bold;         /* Làm đậm chữ tiêu đề */
     color: #333333;            /* Màu chữ tiêu đề */
 }
@@ -1920,7 +2186,7 @@ QGroupBox {
     border: 1px solid #000000; /* Viền xám mảnh để định hình khối */
     border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
     margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
-    font-size: 14px;           /* Kích thước chữ tiêu đề */
+    font-size: 15px;           /* Kích thước chữ tiêu đề */
     font-weight: bold;         /* Làm đậm chữ tiêu đề */
     color: #333333;            /* Màu chữ tiêu đề */
 }
@@ -2111,7 +2377,7 @@ QTableView::item:selected {
                    </column>
                    <column>
                     <property name="text">
-                     <string>📥 read [reg]</string>
+                     <string>✦ read-[reg]</string>
                     </property>
                     <property name="font">
                      <font>
@@ -2125,7 +2391,7 @@ QTableView::item:selected {
                    </column>
                    <column>
                     <property name="text">
-                     <string>🟢 read [bit on]</string>
+                     <string>🡩 read.{bit_on}</string>
                     </property>
                     <property name="font">
                      <font>
@@ -2139,7 +2405,7 @@ QTableView::item:selected {
                    </column>
                    <column>
                     <property name="text">
-                     <string>🔴 read [bit off]</string>
+                     <string>🡫 read.{bit_off}</string>
                     </property>
                     <property name="font">
                      <font>
@@ -2153,7 +2419,7 @@ QTableView::item:selected {
                    </column>
                    <column>
                     <property name="text">
-                     <string>📤 write [reg]</string>
+                     <string>✦ write-[reg]</string>
                     </property>
                     <property name="font">
                      <font>
@@ -2167,7 +2433,7 @@ QTableView::item:selected {
                    </column>
                    <column>
                     <property name="text">
-                     <string>🟢 write [bit on]</string>
+                     <string>🡩 write.{bit_on}</string>
                     </property>
                     <property name="font">
                      <font>
@@ -2181,7 +2447,7 @@ QTableView::item:selected {
                    </column>
                    <column>
                     <property name="text">
-                     <string>🔴 write [bit off]</string>
+                     <string>🡫 write.{bit_off}</string>
                     </property>
                     <property name="font">
                      <font>
@@ -2830,7 +3096,7 @@ QGroupBox {
     border: 1px solid #000000; /* Viền xám mảnh để định hình khối */
     border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
     margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
-    font-size: 14px;           /* Kích thước chữ tiêu đề */
+    font-size: 15px;           /* Kích thước chữ tiêu đề */
     font-weight: bold;         /* Làm đậm chữ tiêu đề */
     color: #333333;            /* Màu chữ tiêu đề */
 }
@@ -2878,10 +3144,10 @@ QGroupBox::title {
                       <string notr="true">/* Khung chính của GroupBox */
 QGroupBox {
     background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
-    border: 1px solid #c6c6c6; /* Viền xám mảnh để định hình khối */
+    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */
     border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
     margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
-    font-size: 14px;           /* Kích thước chữ tiêu đề */
+    font-size: 15px;           /* Kích thước chữ tiêu đề */
     font-weight: bold;         /* Làm đậm chữ tiêu đề */
     color: #333333;            /* Màu chữ tiêu đề */
 }
@@ -3841,10 +4107,10 @@ QCheckBox::indicator {
                       <string notr="true">/* Khung chính của GroupBox */
 QGroupBox {
     background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
-    border: 1px solid #c6c6c6; /* Viền xám mảnh để định hình khối */
+    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */
     border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
     margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
-    font-size: 14px;           /* Kích thước chữ tiêu đề */
+    font-size: 15px;           /* Kích thước chữ tiêu đề */
     font-weight: bold;         /* Làm đậm chữ tiêu đề */
     color: #333333;            /* Màu chữ tiêu đề */
 }
@@ -4934,7 +5200,7 @@ QGroupBox {
     border: 1px solid #5B5B5B; /* Viền xám mảnh để định hình khối */
     border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
     margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
-    font-size: 14px;           /* Kích thước chữ tiêu đề */
+    font-size: 15px;           /* Kích thước chữ tiêu đề */
     font-weight: bold;         /* Làm đậm chữ tiêu đề */
     color: #333333;            /* Màu chữ tiêu đề */
 }
@@ -5494,7 +5760,7 @@ QGroupBox {
     border: 1px solid #000000; /* Viền xám mảnh để định hình khối */
     border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
     margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
-    font-size: 14px;           /* Kích thước chữ tiêu đề */
+    font-size: 15px;           /* Kích thước chữ tiêu đề */
     font-weight: bold;         /* Làm đậm chữ tiêu đề */
     color: #333333;            /* Màu chữ tiêu đề */
 }
@@ -5946,7 +6212,7 @@ QGroupBox {
     border: 1px solid #000000; /* Viền xám mảnh để định hình khối */
     border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
     margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
-    font-size: 14px;           /* Kích thước chữ tiêu đề */
+    font-size: 15px;           /* Kích thước chữ tiêu đề */
     font-weight: bold;         /* Làm đậm chữ tiêu đề */
     color: #333333;            /* Màu chữ tiêu đề */
 }
@@ -6305,7 +6571,7 @@ QGroupBox {
     border: 1px solid #000000; /* Viền xám mảnh để định hình khối */
     border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
     margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
-    font-size: 14px;           /* Kích thước chữ tiêu đề */
+    font-size: 15px;           /* Kích thước chữ tiêu đề */
     font-weight: bold;         /* Làm đậm chữ tiêu đề */
     color: #333333;            /* Màu chữ tiêu đề */
 }
@@ -6557,7 +6823,7 @@ QGroupBox {
     border: 1px solid #000000; /* Viền xám mảnh để định hình khối */
     border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
     margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
-    font-size: 14px;           /* Kích thước chữ tiêu đề */
+    font-size: 15px;           /* Kích thước chữ tiêu đề */
     font-weight: bold;         /* Làm đậm chữ tiêu đề */
     color: #333333;            /* Màu chữ tiêu đề */
 }
@@ -7003,7 +7269,7 @@ QGroupBox::title {
   <connection>
    <sender>radioButton_counter_plc</sender>
    <signal>clicked(bool)</signal>
-   <receiver>radioButton_none_reset</receiver>
+   <receiver>radioButton_none_1</receiver>
    <slot>setChecked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -7033,7 +7299,7 @@ QGroupBox::title {
    </hints>
   </connection>
   <connection>
-   <sender>radioButton_none_reset</sender>
+   <sender>radioButton_none_1</sender>
    <signal>clicked(bool)</signal>
    <receiver>radioButton_counter_plc</receiver>
    <slot>setChecked(bool)</slot>

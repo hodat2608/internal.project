@@ -172,6 +172,10 @@ TABLES = [
         camera_id           INT NOT NULL,
         setup_counter_shot  VARCHAR(255) NOT NULL DEFAULT 'PC',
         reset_counter       VARCHAR(255) NOT NULL DEFAULT 'NONE',
+        method_use          VARCHAR(255) NOT NULL DEFAULT 'Cycle',
+        increment_counter_signal_selected VARCHAR(255) NOT NULL DEFAULT 'NONE',
+        reset_counter_signal_selected   VARCHAR(255) NOT NULL DEFAULT 'NONE',
+        method_use_signal_selected      VARCHAR(255) NOT NULL DEFAULT 'NONE',
         UNIQUE KEY uq_camera_counter_setup (camera_id),
         FOREIGN KEY (camera_id) REFERENCES NUMS_CAMERA(id) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

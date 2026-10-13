@@ -182,6 +182,7 @@ class PLCWorkerModeAuto1(QThread):
                 triggered = self.plc_handler._run_trigger_from_activated_mode()
                 self.plc_handler._activate_mode()
                 self.plc_handler.load_item_code()
+                self.plc_handler.reset_counter_from_plc()
             except Exception:
                 # Worker loop KHÔNG được chết — log rồi tiếp tục
                 _log.exception("[PLCWorkerModeAuto1] Unhandled exception in main loop")
@@ -473,26 +474,43 @@ class PLCHandler:
             print("Mode Kick: ", self.mode_kick)
         self._update_trigger_cache()
         self._set_mode_reg_process()
-        self._update_counter_settings()
+        # self._update_counter_settings()
 
-    def _update_counter_settings(self):
-        self.counter_settings = {}
-        if self.built_in_objects:
-            for key, values in self.built_in_objects.items():
-                automation_ui = values.get('automation_ui')
-                if automation_ui:
-                    if automation_ui.radioButton_counter_pc.isChecked():
-                        self.counter_settings[key] = 'PC'
-                    elif automation_ui.radioButton_counter_plc.isChecked():
-                        self.counter_settings[key] = 'PLC'
-                    elif automation_ui.radioButton_condition_plc_pc.isChecked():
-                        self.counter_settings[key] = 'PLC_TO_PC'
-                    else:
-                        self.counter_settings[key] = 'PC'
-
+    def _update_counter_settings(self,automation_ui):
+        if automation_ui:
+            if automation_ui.radioButton_counter_pc.isChecked():
+                return 'PC'
+            elif automation_ui.radioButton_counter_plc.isChecked():
+                return 'PLC'
+            elif automation_ui.radioButton_condition_plc_pc.isChecked():
+                return 'PLC_TO_PC'
+                
     def set_item_code_display(self, obj):
         self.ui_itemcode = obj
 
+
+    # -----------------------------------------------------------------------
+    # reset counter from PLC
+    # -----------------------------------------------------------------------
+    def reset_counter_from_plc(self):
+        if not self.built_in_objects or not self.dict_signal_complete:
+            pass
+
+        for key, value in self.built_in_objects.items():
+                automation_ui = value.get('automation_ui')
+                if automation_ui and automation_ui.radioButton_reset.isChecked():
+                    signals_selected = automation_ui.comboBox_reset_counter_signal_selected.currentText()
+                    signals = dict(self.dict_signal_complete.get(key, {}))
+                    if signals_selected not in signals:
+                        return 
+                    reg = signals.get(signals_selected, {}).get('reg')
+                    if not reg:
+                        return
+                    
+                    if self._safe_read_plc(reg) != 0 :
+                        self._reset_counter(key)
+                        _log.info("[PLCHandler] Reset counter %s", key)
+                        self._safe_write_plc(reg, 0)
 
     # -----------------------------------------------------------------------
     # Load mã hàng
@@ -577,6 +595,18 @@ class PLCHandler:
                 return mode_name, cfg
         return None, {}
 
+    def _resolve_signal(self, key, field):
+        """Signal dict của `field` ('trigger_selected'/'component'/'completed') theo mapping
+        của (key, self.mode_kick). Trả None nếu chưa cấu hình ('None'/rỗng).
+        Gọi bên trong _signal_rwlock.read(); KeyError nếu signal không có trong dict_signal_complete."""
+        name = self._find_mode_mapping(key, self.mode_kick)[1].get(field)
+        if not name or name == 'None':
+            return None
+        if name in self.dict_signal_complete[key]:
+            return dict(self.dict_signal_complete[key][name])
+        else:
+            return None
+
     def _update_trigger_cache(self, trigger_selected=None):
         """trigger_selected: dict {camera_key: tên trigger}. None -> tự tính theo self.mode_kick."""
         new_triggers = []
@@ -637,15 +667,15 @@ class PLCHandler:
                 return
 
             for _k, values in self.processor.built_in_modes.items():
-                for mode_key, values1 in values.get('modes', {}).items():
-                    register = values1.get('register')
-                    value_bit_off = values1.get('value_bit_off')
+                for mode_key, value in values.get('modes', {}).items():
+                    register = value.get('register')
+                    value_bit_off = value.get('value_bit_off')
                     try:
                         current_value = self._safe_read_plc(register)
                         if current_value is None:
                             _log.error("[PLCHandler] _activate_mode failed for current_value: %s", current_value)
                             continue
-                        if int(current_value) != values1.get('value_bit_on'):
+                        if int(current_value) != value.get('value_bit_on'):
                             continue
 
                         with self._mode_lock:
@@ -811,6 +841,7 @@ class PLCHandler:
                 'pre':  {
                     'enabled': automation_ui.checkBox_join_gate_2.isChecked(),
                     'value':   int(automation_ui.comboBox_value_gate_2.currentText()),
+                    'ordinal': getattr(automation_ui.spinBox_Ordinal_gate_2, 'value', lambda: getattr(automation_ui.spinBox_Ordinal_gate_2, 'text', lambda: getattr(automation_ui.spinBox_Ordinal_gate_2, 'currentText', lambda: 0)())())(),
                     'before':  automation_ui.checkBox_before_gate_2.isChecked(),
                     'after':   automation_ui.checkBox_after_gate_2.isChecked(),
                     'delay':   _safe_float(automation_ui.lineEdit_timer_gate_2.text()),
@@ -818,6 +849,7 @@ class PLCHandler:
                 'post': {
                     'enabled': automation_ui.checkBox_join_gate_3.isChecked(),
                     'value':   int(automation_ui.comboBox_value_gate_3.currentText()),
+                    'ordinal': getattr(automation_ui.spinBox_Ordinal_gate_3, 'value', lambda: getattr(automation_ui.spinBox_Ordinal_gate_3, 'text', lambda: getattr(automation_ui.spinBox_Ordinal_gate_3, 'currentText', lambda: 0)())())(),
                     'before':  automation_ui.checkBox_before_gate_3.isChecked(),
                     'after':   automation_ui.checkBox_after_gate_3.isChecked(),
                     'delay':   _safe_float(automation_ui.lineEdit_timer_gate_3.text()),
@@ -827,6 +859,7 @@ class PLCHandler:
                 'pre':  {
                     'enabled': automation_ui.checkBox_join_busy_2.isChecked(),
                     'value':   int(automation_ui.comboBox_value_busy_2.currentText()),
+                    'ordinal': getattr(automation_ui.spinBox_Ordinal_busy_2, 'value', lambda: getattr(automation_ui.spinBox_Ordinal_busy_2, 'text', lambda: getattr(automation_ui.spinBox_Ordinal_busy_2, 'currentText', lambda: 0)())())(),
                     'before':  automation_ui.checkBox_before_busy_2.isChecked(),
                     'after':   automation_ui.checkBox_after_busy_2.isChecked(),
                     'delay':   _safe_float(automation_ui.lineEdit_timer_busy_2.text()),
@@ -834,6 +867,7 @@ class PLCHandler:
                 'post': {
                     'enabled': automation_ui.checkBox_join_busy_3.isChecked(),
                     'value':   int(automation_ui.comboBox_value_busy_3.currentText()),
+                    'ordinal': getattr(automation_ui.spinBox_Ordinal_busy_3, 'value', lambda: getattr(automation_ui.spinBox_Ordinal_busy_3, 'text', lambda: getattr(automation_ui.spinBox_Ordinal_busy_3, 'currentText', lambda: 0)())())(),
                     'before':  automation_ui.checkBox_before_busy_3.isChecked(),
                     'after':   automation_ui.checkBox_after_busy_3.isChecked(),
                     'delay':   _safe_float(automation_ui.lineEdit_timer_busy_3.text()),
@@ -843,6 +877,7 @@ class PLCHandler:
                 'pre':  {
                     'enabled': automation_ui.checkBox_join_ready_2.isChecked(),
                     'value':   int(automation_ui.comboBox_value_ready_2.currentText()),
+                    'ordinal': getattr(automation_ui.spinBox_Ordinal_ready_2, 'value', lambda: getattr(automation_ui.spinBox_Ordinal_ready_2, 'text', lambda: getattr(automation_ui.spinBox_Ordinal_ready_2, 'currentText', lambda: 0)())())(),
                     'before':  automation_ui.checkBox_before_ready_2.isChecked(),
                     'after':   automation_ui.checkBox_after_ready_2.isChecked(),
                     'delay':   _safe_float(automation_ui.lineEdit_timer_ready_2.text()),
@@ -850,6 +885,7 @@ class PLCHandler:
                 'post': {
                     'enabled': automation_ui.checkBox_join_ready_3.isChecked(),
                     'value':   int(automation_ui.comboBox_value_ready_3.currentText()),
+                    'ordinal': getattr(automation_ui.spinBox_Ordinal_ready_3, 'value', lambda: getattr(automation_ui.spinBox_Ordinal_ready_3, 'text', lambda: getattr(automation_ui.spinBox_Ordinal_ready_3, 'currentText', lambda: 0)())())(),
                     'before':  automation_ui.checkBox_before_ready_3.isChecked(),
                     'after':   automation_ui.checkBox_after_ready_3.isChecked(),
                     'delay':   _safe_float(automation_ui.lineEdit_timer_ready_3.text()),
@@ -857,27 +893,43 @@ class PLCHandler:
             },
         }
 
-    def _apply_signal_phase(self, cfg: dict, signals: dict, sig_key: str, plc_value_key: str, phase: str) -> None:
+    def _apply_signal_phase(self, cfg: dict, signals: dict, phase: str, sig_keys: list) -> None:
         """Gửi tín hiệu PLC theo cấu hình phase (pre/post), có delay trước hoặc sau.
+        Thứ tự gửi được quyết định bởi tham số 'ordinal' (tăng dần).
         Chạy hoàn toàn trên background thread, không chạm Qt widget."""
-        phase_cfg = cfg.get(sig_key, {}).get(phase, {})
-        if not phase_cfg.get('enabled'):
-            return
-        sig = signals.get(sig_key)
-        if not sig:
-            return
-        delay = phase_cfg['delay']
-        value = phase_cfg['value']
-        write = self._safe_write_plc
-        reg   = str(sig['reg'])
-        if phase_cfg['before']:
-            if delay > 0:
-                time.sleep(delay)
-            write(reg, int(value))
-        elif phase_cfg['after']:
-            write(reg, int(value))
-            if delay > 0:
-                time.sleep(delay)
+        tasks = []
+        for sig_key in sig_keys:
+            phase_cfg = cfg.get(sig_key, {}).get(phase, {})
+            if not phase_cfg.get('enabled'):
+                continue
+            sig = signals.get(sig_key)
+            if not sig:
+                continue
+            try:
+                ordinal = int(phase_cfg.get('ordinal', 0))
+            except (ValueError, TypeError):
+                ordinal = 0
+            tasks.append((ordinal, sig_key, phase_cfg, sig))
+
+        # Sắp xếp theo ordinal tăng dần
+        tasks.sort(key=lambda x: x[0])
+
+        for ordinal, sig_key, phase_cfg, sig in tasks:
+            delay = phase_cfg.get('delay', 0.0)
+            value = phase_cfg.get('value', 0)
+            reg   = str(sig.get('reg', ''))
+            if not reg:
+                continue
+            write = self._safe_write_plc
+            
+            if phase_cfg.get('before'):
+                if delay > 0:
+                    time.sleep(delay)
+                write(reg, int(value))
+            elif phase_cfg.get('after'):
+                write(reg, int(value))
+                if delay > 0:
+                    time.sleep(delay)
 
     def take_image(self, device, key, capture_cfg: dict):
         """Lấy ảnh từ camera công nghiệp.
@@ -898,8 +950,7 @@ class PLCHandler:
             return None
 
         # --- Phase PRE-grab: gửi tín hiệu gate/busy/ready trước khi chụp ---
-        for sig_key, plc_val_key in [('gate', 'on'), ('busy', 'on'), ('ready', 'off')]:
-            self._apply_signal_phase(capture_cfg, signals, sig_key, plc_val_key, 'pre')
+        self._apply_signal_phase(capture_cfg, signals, 'pre', ['gate', 'busy', 'ready'])
 
         raw_image_rgb = grab_with_retry()
 
@@ -916,8 +967,7 @@ class PLCHandler:
             raw_image_rgb = grab_with_retry()
 
         # --- Phase POST-grab: gửi tín hiệu gate/busy/ready sau khi chụp ---
-        for sig_key, plc_val_key in [('gate', 'off'), ('busy', 'off'), ('ready', 'on')]:
-            self._apply_signal_phase(capture_cfg, signals, sig_key, plc_val_key, 'post')
+        self._apply_signal_phase(capture_cfg, signals, 'post', ['gate', 'busy', 'ready'])
 
         return raw_image_rgb
 
@@ -972,23 +1022,22 @@ class PLCHandler:
     # -----------------------------------------------------------------------
 
     def counter_shot(self,key, automation_ui):
-        if not hasattr(self, 'counter_settings'):
-            self._update_counter_settings()
-            
-        counter_mode = self.counter_settings.get(key, 'PC')
+
+        counter_mode = self._update_counter_settings(automation_ui)
         read = self._safe_read_plc
         signals = dict(self.dict_signal_complete.get(key, {}))
         current_count = 0
-
+        print('counter_mode',counter_mode)
         if counter_mode == 'PC':
             current_count = self._increment_counter(key)
+            print('current_count',current_count)
         elif counter_mode == 'PLC':
-            reg = signals.get('counter_plc', {}).get('reg')
+            reg = signals.get(automation_ui.comboBox_increment_counter_signal_selected.currentText(), {}).get('reg')
             if reg:
                 current_count = read(str(reg))
         elif counter_mode == 'PLC_TO_PC':
             current_count_pc = self._increment_counter(key)
-            reg = signals.get('counter_plc', {}).get('reg')
+            reg = signals.get(automation_ui.comboBox_increment_counter_signal_selected.currentText(), {}).get('reg')
             if reg:
                 current_count_plc = read(str(reg))
                 if current_count_pc == current_count_plc:
@@ -1009,6 +1058,8 @@ class PLCHandler:
         automation_ui = values.get('automation_ui')
 
         current_count = self.counter_shot(key, automation_ui)
+
+        _log.info('[%s] Current count for: %s', key, current_count)
         
         num_model = values.get('shot', {}).get(str(current_count))
         if not num_model:
@@ -1068,32 +1119,62 @@ class PLCHandler:
             _log.exception('[%s] process_image_func failed at shot %s', key, current_count)
             return
 
-        self._accumulate_registers(key, list_register or [])
+        if automation_ui.radioButton_cycle_frame.isChecked():
+            self._accumulate_registers(key, list_register or [])
 
-        shot_complete = values.get('shot_complete', 0)
+            shot_complete = values.get('shot_complete', 0)
 
-        if current_count >= shot_complete:
-            all_registers = self._pop_registers(key)
+            if current_count >= shot_complete:
+                all_registers = self._pop_registers(key)
 
+                try:
+                    with self._signal_rwlock.read():
+                        comp_sig  = self._resolve_signal(key, 'completed')
+                        reset_sig = self._resolve_signal(key, 'component')
+                except KeyError:
+                    _log.exception('[%s] Missing complete/reset signal in dict_signal_complete', key)
+                    self._reset_counter(key)
+                    return
+
+                if all_registers:
+                    _log.info('[%s] NG registers: %s', key, all_registers)
+                    for reg in all_registers:
+                        self._safe_write_plc(str(reg), 1)
+                else:
+                    if reset_sig:
+                        _log.info(f'Send Reset Signal OK {reset_sig}')
+                        self._safe_write_plc(str(reset_sig['reg']), int(reset_sig['on']))
+
+                if comp_sig:
+                    _log.info(f'Send Complete Signal {comp_sig}')
+                    self._safe_write_plc(str(comp_sig['reg']), int(comp_sig['on']))
+                self._reset_counter(key)
+                _log.info('[%s] Complete Cycle Shot %s | registers: %s',key, current_count, len(all_registers))
+
+        elif automation_ui.radioButton_single_frame.isChecked():
             try:
                 with self._signal_rwlock.read():
-                    comp_sig  = dict(self.dict_signal_complete[key]['complete'])
-                    reset_sig = dict(self.dict_signal_complete[key]['reset_ok'])
+                        comp_sig  = self._resolve_signal(key, 'completed')
+                        reset_sig = self._resolve_signal(key, 'component')
             except KeyError:
                 _log.exception('[%s] Missing complete/reset signal in dict_signal_complete', key)
                 self._reset_counter(key)
                 return
 
-            if all_registers:
-                _log.info('[%s] NG registers: %s', key, all_registers)
-                for reg in all_registers:
+            if list_register:
+                _log.info('[%s] NG registers: %s', key, list_register)
+                for reg in list_register:
                     self._safe_write_plc(str(reg), 1)
             else:
-                self._safe_write_plc(str(reset_sig['reg']), int(reset_sig['on']))
+                if reset_sig:
+                    _log.info(f'Send Reset Signal OK {reset_sig}')
+                    self._safe_write_plc(str(reset_sig['reg']), int(reset_sig['on']))
 
-            self._safe_write_plc(str(comp_sig['reg']), int(comp_sig['on']))
-            self._reset_counter(key)
-            _log.info('[%s] Complete shot %s | registers: %s',key, current_count, len(all_registers))
+            if comp_sig:
+                _log.info(f'Send Complete Signal {comp_sig}')
+                self._safe_write_plc(str(comp_sig['reg']), int(comp_sig['on']))
+
+            _log.info('[%s] Complete Single frame %s | registers: %s',key, current_count, len(list_register))
 
         state_str = 'OK' if flag else 'NG'
         chk_orig = pyuic.checkBox_OK_image_original if flag else pyuic.checkBox_NG_image_original
@@ -1164,14 +1245,18 @@ class PLCHandler:
         # NOTE: PLC write PHẢI ngoài read-lock để tránh deadlock
         try:
             with self._signal_rwlock.read():
-                reset_ok_sig   = dict(self.dict_signal_complete[key]['reset_ok'])
-                trigger_sig = dict(self.dict_signal_complete[key]['trigger'])
+                reset_ok_sig = self._resolve_signal(key, 'component')
+                complete_sig = self._resolve_signal(key, 'completed')
         except KeyError:
             _log.exception('[handle_result_mode_geji][%s] Missing signal config', key)
             return
 
-        self._safe_write_plc(str(reset_ok_sig['reg']),   int(reset_ok_sig['on']))
-        self._safe_write_plc(str(trigger_sig['reg']), int(trigger_sig['off']))
+        if reset_ok_sig:
+            self._safe_write_plc(str(reset_ok_sig['reg']), int(reset_ok_sig['on']))
+            print(f'Send reset ok sig {reset_ok_sig}')
+        if complete_sig:
+            self._safe_write_plc(str(complete_sig['reg']), int(complete_sig['on']))
+            print(f'Send complete sig {complete_sig}')
 
         list_register = []
         elapsed       = (time.perf_counter() - start_time) * 1000
@@ -1300,6 +1385,23 @@ class PLCHandler:
                         _log.info('[%s] NG detected for image: %s', key, path)
                 finally:
                     self._flag_logging[key] = False
+                
+                # NOTE: PLC write PHẢI ngoài read-lock để tránh deadlock
+                try:
+                    with self._signal_rwlock.read():
+                        reset_ok_sig = self._resolve_signal(key, 'component')
+                        complete_sig = self._resolve_signal(key, 'completed')
+                except KeyError:
+                    _log.exception('[handle_result_mode_logging][%s] Missing signal config', key)
+                    return
+
+                if reset_ok_sig:
+                    self._safe_write_plc(str(reset_ok_sig['reg']), int(reset_ok_sig['on']))
+                    print(f'Send reset ok sig {reset_ok_sig}')
+                if complete_sig:
+                    self._safe_write_plc(str(complete_sig['reg']), int(complete_sig['on']))
+                    print(f'Send complete sig {complete_sig}')
+
 
     # -----------------------------------------------------------------------
     # UI update slot (main thread)
@@ -1851,7 +1953,7 @@ class CameraTabManager:
         _signals_processor.load_counter_shot(self.db_manager.cursor, camera_id)
         
         #setup_mapping_mode
-        self.automation_ui.pushButton_apply_Set_mode.clicked.connect(lambda _: _signals_processor.setup_mapping_mode(self.db_manager.cursor, self.db_manager.connect_db, camera_id))
+        self.automation_ui.pushButton_apply_Set_mode.clicked.connect(lambda _: _signals_processor.save_mapping_mode(self.db_manager.cursor, self.db_manager.connect_db, camera_id))
         self.automation_ui.pushButton_load_Set_mode.clicked.connect(lambda _: _signals_processor.load_mapping_mode(self.db_manager.cursor, camera_id))
         list_mode = _signals_processor.load_mapping_mode(self.db_manager.cursor, camera_id)
         #save_signal_transmission_and_receptions

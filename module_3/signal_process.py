@@ -1050,20 +1050,33 @@ class DataProcessSignal:
         is_reset_counter = self.uic.radioButton_reset.isChecked()
         is_none_reset = self.uic.radioButton_none_reset.isChecked()
 
+        is_cycle_shot = self.uic.radioButton_cycle_frame.isChecked()
+        is_single_frame = self.uic.radioButton_single_frame.isChecked()
+
+        if is_cycle_shot:
+            method_use = 'Cycle'
+        elif is_single_frame:
+            method_use = 'Single'
+
         if is_reset_counter:
             is_reset = 'RESET'
         elif is_none_reset:
             is_reset = 'NONE_RESET'
+
+        increment_counter_signal_selected = self.uic.comboBox_increment_counter_signal_selected.currentText()
+        reset_counter_signal_selected = self.uic.comboBox_reset_counter_signal_selected.currentText()
+        method_use_signal_selected = self.uic.comboBox_method_use_signal_selected.currentText()
+
         try:
             cursor.execute("DELETE FROM counter_shot_setup WHERE camera_id = %s", (camera_id,))
 
             sql_command = """
                 INSERT INTO counter_shot_setup
-                    (camera_id, setup_counter_shot, reset_counter)
-                VALUES (%s, %s, %s)
+                    (camera_id, setup_counter_shot, reset_counter, method_use, increment_counter_signal_selected, reset_counter_signal_selected, method_use_signal_selected)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
             """
 
-            cursor.execute(sql_command, (camera_id, is_check, is_reset))
+            cursor.execute(sql_command, (camera_id, is_check, is_reset, method_use, increment_counter_signal_selected, reset_counter_signal_selected, method_use_signal_selected))
             connect_db.connection.commit()
             QtWidgets.QMessageBox.information(None, "Thành công", "Thiết lập counter shot thành công!")
         except Exception as e:
@@ -1075,7 +1088,7 @@ class DataProcessSignal:
         cursor.execute("SELECT * FROM counter_shot_setup WHERE camera_id = %s", (camera_id,))
         result = cursor.fetchone()
         if result:
-            _, _, is_check, is_reset = result
+            _, _, is_check, is_reset,method_use,increment_counter_signal_selected,reset_counter_signal_selected,method_use_signal_selected = result
             if is_check == 'PC':
                 self.uic.radioButton_counter_pc.setChecked(True)
             elif is_check == 'PLC':
@@ -1087,6 +1100,15 @@ class DataProcessSignal:
                 self.uic.radioButton_reset.setChecked(True)
             elif is_reset == 'NONE_RESET':
                 self.uic.radioButton_none_reset.setChecked(True)
+
+            if method_use == 'Cycle':
+                self.uic.radioButton_cycle_frame.setChecked(True)
+            elif method_use == 'Single':
+                self.uic.radioButton_single_frame.setChecked(True)
+
+            self.uic.comboBox_increment_counter_signal_selected.setCurrentText(increment_counter_signal_selected)
+            self.uic.comboBox_reset_counter_signal_selected.setCurrentText(reset_counter_signal_selected)
+            self.uic.comboBox_method_use_signal_selected.setCurrentText(method_use_signal_selected)
 
     def table_signal_up_to_selected_trigger_signals(self):
         current_text = self.uic.comboBox_set_trigger_automatic.currentText()
@@ -1104,6 +1126,9 @@ class DataProcessSignal:
                 self.uic.comboBox_set_completed_automatic.addItem(item.text())
                 self.uic.comboBox_set_completed_mirror.addItem(item.text())
                 self.uic.comboBox_set_completed_logging.addItem(item.text())
+                self.uic.comboBox_increment_counter_signal_selected.addItem(item.text())
+                self.uic.comboBox_reset_counter_signal_selected.addItem(item.text())
+                self.uic.comboBox_method_use_signal_selected.addItem(item.text())
                 
         index = self.uic.comboBox_set_trigger_automatic.findText(current_text)
         if index >= 0:
@@ -1119,7 +1144,7 @@ class DataProcessSignal:
             'completed':        getattr(self.uic, f'comboBox_set_completed_{mode_name}'),
         }
 
-    def setup_mapping_mode(self, cursor, connect_db, camera_id):
+    def save_mapping_mode(self, cursor, connect_db, camera_id):
         try:
             cursor.execute("DELETE FROM setup_mapping_mode WHERE camera_id = %s", (camera_id,))
             sql_command = """
@@ -1147,7 +1172,6 @@ class DataProcessSignal:
             "SELECT mode_name, mapping_mode, trigger_selected, component, completed "
             "FROM setup_mapping_mode WHERE camera_id = %s", (camera_id,))
         rows = cursor.fetchall()
-        print('rows',rows)
         list_mode = {
             name: {'mapping_mode': None, 'trigger_selected': None, 'component': None, 'completed': None}
             for name in self.MAPPING_MODE_NAMES
@@ -1167,7 +1191,7 @@ class DataProcessSignal:
                 if value:
                     widgets[field].setCurrentText(value)
             list_mode[mode_name] = values
-        print('list_mode',list_mode)
+
         return list_mode
 
 

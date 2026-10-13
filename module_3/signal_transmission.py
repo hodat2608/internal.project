@@ -9,7 +9,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+from module_1.root_path import resource_path
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -65,7 +65,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, -445, 1781, 1503))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, -501, 1781, 1559))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.gridLayout_17 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents)
         self.gridLayout_17.setObjectName("gridLayout_17")
@@ -94,7 +94,7 @@ class Ui_MainWindow(object):
 "    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
 "    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
 "    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 14px;           /* Kích thước chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
 "    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
 "    color: #333333;            /* Màu chữ tiêu đề */\n"
 "}\n"
@@ -196,7 +196,7 @@ class Ui_MainWindow(object):
 "}")
         self.pushButton_clear_shotx.setText("")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("assert/icon/remove.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/remove.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.pushButton_clear_shotx.setIcon(icon)
         self.pushButton_clear_shotx.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_clear_shotx.setObjectName("pushButton_clear_shotx")
@@ -230,7 +230,7 @@ class Ui_MainWindow(object):
 "}")
         self.pushButton_applyshotxmodel.setText("")
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap("assert/icon/floppy-disk.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/floppy-disk.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.pushButton_applyshotxmodel.setIcon(icon1)
         self.pushButton_applyshotxmodel.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_applyshotxmodel.setObjectName("pushButton_applyshotxmodel")
@@ -248,7 +248,8 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.groupAnimationEffect.sizePolicy().hasHeightForWidth())
         self.groupAnimationEffect.setSizePolicy(sizePolicy)
-        self.groupAnimationEffect.setMaximumSize(QtCore.QSize(16777215, 300))
+        self.groupAnimationEffect.setMinimumSize(QtCore.QSize(0, 350))
+        self.groupAnimationEffect.setMaximumSize(QtCore.QSize(16777215, 350))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(-1)
@@ -261,7 +262,7 @@ class Ui_MainWindow(object):
 "    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
 "    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
 "    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 14px;           /* Kích thước chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
 "    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
 "    color: #333333;            /* Màu chữ tiêu đề */\n"
 "}\n"
@@ -288,10 +289,10 @@ class Ui_MainWindow(object):
         self.groupBox_3.setStyleSheet("/* Khung chính của GroupBox */\n"
 "QGroupBox {\n"
 "    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */\n"
-"    border: 1px solid #c6c6c6; /* Viền xám mảnh để định hình khối */\n"
+"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
 "    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
 "    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 14px;           /* Kích thước chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
 "    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
 "    color: #333333;            /* Màu chữ tiêu đề */\n"
 "}\n"
@@ -307,15 +308,6 @@ class Ui_MainWindow(object):
         self.groupBox_3.setObjectName("groupBox_3")
         self.gridLayout_5 = QtWidgets.QGridLayout(self.groupBox_3)
         self.gridLayout_5.setObjectName("gridLayout_5")
-        self.radioButton_condition_plc_pc = QtWidgets.QRadioButton(self.groupBox_3)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.radioButton_condition_plc_pc.setFont(font)
-        self.radioButton_condition_plc_pc.setObjectName("radioButton_condition_plc_pc")
-        self.gridLayout_5.addWidget(self.radioButton_condition_plc_pc, 2, 4, 1, 1)
         self.radioButton_counter_plc = QtWidgets.QRadioButton(self.groupBox_3)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
@@ -324,12 +316,35 @@ class Ui_MainWindow(object):
         font.setWeight(75)
         self.radioButton_counter_plc.setFont(font)
         self.radioButton_counter_plc.setObjectName("radioButton_counter_plc")
-        self.gridLayout_5.addWidget(self.radioButton_counter_plc, 2, 2, 1, 1)
-        self.label_10 = QtWidgets.QLabel(self.groupBox_3)
-        self.label_10.setMaximumSize(QtCore.QSize(50, 16777215))
-        self.label_10.setText("")
-        self.label_10.setObjectName("label_10")
-        self.gridLayout_5.addWidget(self.label_10, 2, 0, 1, 1)
+        self.gridLayout_5.addWidget(self.radioButton_counter_plc, 1, 2, 1, 1)
+        self.comboBox_increment_counter_signal_selected = QtWidgets.QComboBox(self.groupBox_3)
+        self.comboBox_increment_counter_signal_selected.setMinimumSize(QtCore.QSize(0, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.comboBox_increment_counter_signal_selected.setFont(font)
+        self.comboBox_increment_counter_signal_selected.setObjectName("comboBox_increment_counter_signal_selected")
+        self.comboBox_increment_counter_signal_selected.addItem("")
+        self.gridLayout_5.addWidget(self.comboBox_increment_counter_signal_selected, 1, 7, 1, 1)
+        self.radioButton_condition_plc_pc = QtWidgets.QRadioButton(self.groupBox_3)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.radioButton_condition_plc_pc.setFont(font)
+        self.radioButton_condition_plc_pc.setObjectName("radioButton_condition_plc_pc")
+        self.gridLayout_5.addWidget(self.radioButton_condition_plc_pc, 1, 4, 1, 1)
+        self.label_24 = QtWidgets.QLabel(self.groupBox_3)
+        self.label_24.setMaximumSize(QtCore.QSize(100, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_24.setFont(font)
+        self.label_24.setObjectName("label_24")
+        self.gridLayout_5.addWidget(self.label_24, 1, 6, 1, 1)
         self.radioButton_counter_pc = QtWidgets.QRadioButton(self.groupBox_3)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
@@ -339,21 +354,18 @@ class Ui_MainWindow(object):
         self.radioButton_counter_pc.setFont(font)
         self.radioButton_counter_pc.setChecked(True)
         self.radioButton_counter_pc.setObjectName("radioButton_counter_pc")
-        self.gridLayout_5.addWidget(self.radioButton_counter_pc, 2, 1, 1, 1)
-        self.label_15 = QtWidgets.QLabel(self.groupBox_3)
-        self.label_15.setText("")
-        self.label_15.setObjectName("label_15")
-        self.gridLayout_5.addWidget(self.label_15, 1, 1, 1, 1)
-        self.label_19 = QtWidgets.QLabel(self.groupBox_3)
-        self.label_19.setText("")
-        self.label_19.setObjectName("label_19")
-        self.gridLayout_5.addWidget(self.label_19, 3, 1, 1, 1)
+        self.gridLayout_5.addWidget(self.radioButton_counter_pc, 1, 1, 1, 1)
+        self.label_10 = QtWidgets.QLabel(self.groupBox_3)
+        self.label_10.setMaximumSize(QtCore.QSize(50, 16777215))
+        self.label_10.setText("")
+        self.label_10.setObjectName("label_10")
+        self.gridLayout_5.addWidget(self.label_10, 1, 0, 1, 1)
+        self.line_25 = QtWidgets.QFrame(self.groupBox_3)
+        self.line_25.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_25.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_25.setObjectName("line_25")
+        self.gridLayout_5.addWidget(self.line_25, 1, 5, 1, 1)
         self.gridLayout_23.addWidget(self.groupBox_3, 0, 0, 1, 2)
-        self.line_14 = QtWidgets.QFrame(self.groupAnimationEffect)
-        self.line_14.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_14.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_14.setObjectName("line_14")
-        self.gridLayout_23.addWidget(self.line_14, 2, 0, 1, 2)
         self.gridLayout_20 = QtWidgets.QGridLayout()
         self.gridLayout_20.setSpacing(0)
         self.gridLayout_20.setObjectName("gridLayout_20")
@@ -379,7 +391,7 @@ class Ui_MainWindow(object):
 "}")
         self.pushButton_load_setting_for_counter.setText("")
         icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap("assert/icon/apply-now.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon2.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/apply-now.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.pushButton_load_setting_for_counter.setIcon(icon2)
         self.pushButton_load_setting_for_counter.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_load_setting_for_counter.setObjectName("pushButton_load_setting_for_counter")
@@ -421,7 +433,12 @@ class Ui_MainWindow(object):
         self.label_35.setText("")
         self.label_35.setObjectName("label_35")
         self.gridLayout_20.addWidget(self.label_35, 0, 1, 1, 1)
-        self.gridLayout_23.addLayout(self.gridLayout_20, 3, 0, 1, 1)
+        self.gridLayout_23.addLayout(self.gridLayout_20, 4, 0, 1, 1)
+        self.line_14 = QtWidgets.QFrame(self.groupAnimationEffect)
+        self.line_14.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_14.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_14.setObjectName("line_14")
+        self.gridLayout_23.addWidget(self.line_14, 3, 0, 1, 2)
         self.groupBox = QtWidgets.QGroupBox(self.groupAnimationEffect)
         self.groupBox.setMinimumSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
@@ -433,10 +450,10 @@ class Ui_MainWindow(object):
         self.groupBox.setStyleSheet("/* Khung chính của GroupBox */\n"
 "QGroupBox {\n"
 "    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */\n"
-"    border: 1px solid #c6c6c6; /* Viền xám mảnh để định hình khối */\n"
+"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
 "    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
 "    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 14px;           /* Kích thước chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
 "    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
 "    color: #333333;            /* Màu chữ tiêu đề */\n"
 "}\n"
@@ -452,15 +469,6 @@ class Ui_MainWindow(object):
         self.groupBox.setObjectName("groupBox")
         self.gridLayout_7 = QtWidgets.QGridLayout(self.groupBox)
         self.gridLayout_7.setObjectName("gridLayout_7")
-        self.radioButton_none_reset = QtWidgets.QRadioButton(self.groupBox)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.radioButton_none_reset.setFont(font)
-        self.radioButton_none_reset.setObjectName("radioButton_none_reset")
-        self.gridLayout_7.addWidget(self.radioButton_none_reset, 3, 1, 1, 1)
         self.radioButton_reset = QtWidgets.QRadioButton(self.groupBox)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
@@ -470,21 +478,143 @@ class Ui_MainWindow(object):
         self.radioButton_reset.setFont(font)
         self.radioButton_reset.setChecked(True)
         self.radioButton_reset.setObjectName("radioButton_reset")
-        self.gridLayout_7.addWidget(self.radioButton_reset, 1, 1, 1, 1)
-        self.label_20 = QtWidgets.QLabel(self.groupBox)
-        self.label_20.setText("")
-        self.label_20.setObjectName("label_20")
-        self.gridLayout_7.addWidget(self.label_20, 0, 1, 1, 1)
+        self.gridLayout_7.addWidget(self.radioButton_reset, 0, 1, 1, 1)
         self.label_13 = QtWidgets.QLabel(self.groupBox)
         self.label_13.setMaximumSize(QtCore.QSize(50, 16777215))
         self.label_13.setText("")
         self.label_13.setObjectName("label_13")
-        self.gridLayout_7.addWidget(self.label_13, 1, 0, 1, 1)
-        self.label_24 = QtWidgets.QLabel(self.groupBox)
-        self.label_24.setText("")
-        self.label_24.setObjectName("label_24")
-        self.gridLayout_7.addWidget(self.label_24, 2, 1, 1, 1)
+        self.gridLayout_7.addWidget(self.label_13, 0, 0, 1, 1)
+        self.line_26 = QtWidgets.QFrame(self.groupBox)
+        self.line_26.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_26.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_26.setObjectName("line_26")
+        self.gridLayout_7.addWidget(self.line_26, 0, 4, 1, 1)
+        self.comboBox_reset_counter_signal_selected = QtWidgets.QComboBox(self.groupBox)
+        self.comboBox_reset_counter_signal_selected.setMinimumSize(QtCore.QSize(0, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.comboBox_reset_counter_signal_selected.setFont(font)
+        self.comboBox_reset_counter_signal_selected.setObjectName("comboBox_reset_counter_signal_selected")
+        self.comboBox_reset_counter_signal_selected.addItem("")
+        self.gridLayout_7.addWidget(self.comboBox_reset_counter_signal_selected, 0, 6, 1, 1)
+        self.label_19 = QtWidgets.QLabel(self.groupBox)
+        self.label_19.setMaximumSize(QtCore.QSize(100, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_19.setFont(font)
+        self.label_19.setObjectName("label_19")
+        self.gridLayout_7.addWidget(self.label_19, 0, 5, 1, 1)
+        self.radioButton_none_1 = QtWidgets.QRadioButton(self.groupBox)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.radioButton_none_1.setFont(font)
+        self.radioButton_none_1.setObjectName("radioButton_none_1")
+        self.gridLayout_7.addWidget(self.radioButton_none_1, 0, 3, 1, 1)
+        self.radioButton_none_reset = QtWidgets.QRadioButton(self.groupBox)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.radioButton_none_reset.setFont(font)
+        self.radioButton_none_reset.setObjectName("radioButton_none_reset")
+        self.gridLayout_7.addWidget(self.radioButton_none_reset, 0, 2, 1, 1)
         self.gridLayout_23.addWidget(self.groupBox, 1, 0, 1, 2)
+        self.groupBox_6 = QtWidgets.QGroupBox(self.groupAnimationEffect)
+        self.groupBox_6.setMinimumSize(QtCore.QSize(0, 0))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.groupBox_6.setFont(font)
+        self.groupBox_6.setStyleSheet("/* Khung chính của GroupBox */\n"
+"QGroupBox {\n"
+"    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */\n"
+"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
+"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
+"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
+"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
+"    color: #333333;            /* Màu chữ tiêu đề */\n"
+"}\n"
+"\n"
+"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
+"QGroupBox::title {\n"
+"    subcontrol-origin: margin;\n"
+"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
+"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
+"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
+"}\n"
+"")
+        self.groupBox_6.setObjectName("groupBox_6")
+        self.gridLayout_25 = QtWidgets.QGridLayout(self.groupBox_6)
+        self.gridLayout_25.setObjectName("gridLayout_25")
+        self.line_27 = QtWidgets.QFrame(self.groupBox_6)
+        self.line_27.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_27.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_27.setObjectName("line_27")
+        self.gridLayout_25.addWidget(self.line_27, 0, 4, 1, 1)
+        self.comboBox_method_use_signal_selected = QtWidgets.QComboBox(self.groupBox_6)
+        self.comboBox_method_use_signal_selected.setMinimumSize(QtCore.QSize(0, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.comboBox_method_use_signal_selected.setFont(font)
+        self.comboBox_method_use_signal_selected.setObjectName("comboBox_method_use_signal_selected")
+        self.comboBox_method_use_signal_selected.addItem("")
+        self.gridLayout_25.addWidget(self.comboBox_method_use_signal_selected, 0, 6, 1, 1)
+        self.radioButton_cycle_frame = QtWidgets.QRadioButton(self.groupBox_6)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.radioButton_cycle_frame.setFont(font)
+        self.radioButton_cycle_frame.setChecked(True)
+        self.radioButton_cycle_frame.setObjectName("radioButton_cycle_frame")
+        self.gridLayout_25.addWidget(self.radioButton_cycle_frame, 0, 2, 1, 1)
+        self.label_15 = QtWidgets.QLabel(self.groupBox_6)
+        self.label_15.setMaximumSize(QtCore.QSize(50, 16777215))
+        self.label_15.setText("")
+        self.label_15.setObjectName("label_15")
+        self.gridLayout_25.addWidget(self.label_15, 0, 0, 1, 1)
+        self.radioButton_single_frame = QtWidgets.QRadioButton(self.groupBox_6)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.radioButton_single_frame.setFont(font)
+        self.radioButton_single_frame.setObjectName("radioButton_single_frame")
+        self.gridLayout_25.addWidget(self.radioButton_single_frame, 0, 1, 1, 1)
+        self.label_41 = QtWidgets.QLabel(self.groupBox_6)
+        self.label_41.setMaximumSize(QtCore.QSize(100, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_41.setFont(font)
+        self.label_41.setObjectName("label_41")
+        self.gridLayout_25.addWidget(self.label_41, 0, 5, 1, 1)
+        self.radioButton_none_2 = QtWidgets.QRadioButton(self.groupBox_6)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.radioButton_none_2.setFont(font)
+        self.radioButton_none_2.setObjectName("radioButton_none_2")
+        self.gridLayout_25.addWidget(self.radioButton_none_2, 0, 3, 1, 1)
+        self.gridLayout_23.addWidget(self.groupBox_6, 2, 0, 1, 2)
         self.hlayout_bottomrow.addWidget(self.groupAnimationEffect)
         self.vlayout_bottomrow_container_wrap.addLayout(self.hlayout_bottomrow)
         self.gridLayout_17.addLayout(self.vlayout_bottomrow_container_wrap, 6, 0, 1, 1)
@@ -497,13 +627,19 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.groupBox_5 = QtWidgets.QGroupBox(self.scrollAreaWidgetContents)
         self.groupBox_5.setMinimumSize(QtCore.QSize(500, 0))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.groupBox_5.setFont(font)
         self.groupBox_5.setStyleSheet("/* Khung chính của GroupBox */\n"
 "QGroupBox {\n"
 "    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */\n"
 "    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
 "    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
 "    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 14px;           /* Kích thước chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
 "    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
 "    color: #333333;            /* Màu chữ tiêu đề */\n"
 "}\n"
@@ -520,7 +656,9 @@ class Ui_MainWindow(object):
         self.gridLayout_4 = QtWidgets.QGridLayout(self.groupBox_5)
         self.gridLayout_4.setObjectName("gridLayout_4")
         spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_4.addItem(spacerItem2, 0, 0, 1, 1)
+        self.gridLayout_4.addItem(spacerItem2, 2, 0, 1, 1)
+        spacerItem3 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.gridLayout_4.addItem(spacerItem3, 1, 0, 1, 1)
         self.verticalLayout_2.addWidget(self.groupBox_5)
         self.horizontalLayout.addLayout(self.verticalLayout_2)
         self.verticalLayout = QtWidgets.QVBoxLayout()
@@ -541,7 +679,7 @@ class Ui_MainWindow(object):
 "    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
 "    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
 "    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 14px;           /* Kích thước chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
 "    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
 "    color: #333333;            /* Màu chữ tiêu đề */\n"
 "}\n"
@@ -590,8 +728,8 @@ class Ui_MainWindow(object):
         self.label_36.setText("")
         self.label_36.setObjectName("label_36")
         self.gridLayout_14.addWidget(self.label_36, 0, 3, 1, 1)
-        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_14.addItem(spacerItem3, 0, 0, 1, 1)
+        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_14.addItem(spacerItem4, 0, 0, 1, 1)
         self.pushButton_apply_Set_mode = QtWidgets.QPushButton(self.groupBox_4)
         self.pushButton_apply_Set_mode.setMinimumSize(QtCore.QSize(0, 30))
         self.pushButton_apply_Set_mode.setMaximumSize(QtCore.QSize(30, 16777215))
@@ -633,10 +771,10 @@ class Ui_MainWindow(object):
         self.groupBox_2.setStyleSheet("/* Khung chính của GroupBox */\n"
 "QGroupBox {\n"
 "    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */\n"
-"    border: 1px solid #c6c6c6; /* Viền xám mảnh để định hình khối */\n"
+"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
 "    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
 "    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 14px;           /* Kích thước chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
 "    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
 "    color: #333333;            /* Màu chữ tiêu đề */\n"
 "}\n"
@@ -942,7 +1080,7 @@ class Ui_MainWindow(object):
         self.pushButton_admin.setFont(font)
         self.pushButton_admin.setStyleSheet("QPushButton { background-color:#209E3D; color:white; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#005ba1; }")
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap("assert/icon/admin-panel.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/admin-panel.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.pushButton_admin.setIcon(icon3)
         self.pushButton_admin.setIconSize(QtCore.QSize(30, 30))
         self.pushButton_admin.setObjectName("pushButton_admin")
@@ -971,7 +1109,7 @@ class Ui_MainWindow(object):
 "    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
 "    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
 "    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 14px;           /* Kích thước chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
 "    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
 "    color: #333333;            /* Màu chữ tiêu đề */\n"
 "}\n"
@@ -1301,13 +1439,13 @@ class Ui_MainWindow(object):
 "}")
         self.pushButton_add_reg.setText("")
         icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap("assert/icon/new-file.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon4.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/new-file.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.pushButton_add_reg.setIcon(icon4)
         self.pushButton_add_reg.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_add_reg.setObjectName("pushButton_add_reg")
         self.gridLayout_11.addWidget(self.pushButton_add_reg, 0, 1, 1, 1)
-        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_11.addItem(spacerItem4, 0, 0, 1, 1)
+        spacerItem5 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_11.addItem(spacerItem5, 0, 0, 1, 1)
         self.label_30 = QtWidgets.QLabel(self.groupAssignPLC)
         self.label_30.setMinimumSize(QtCore.QSize(20, 0))
         self.label_30.setText("")
@@ -1388,7 +1526,7 @@ class Ui_MainWindow(object):
 "    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
 "    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
 "    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 14px;           /* Kích thước chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
 "    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
 "    color: #333333;            /* Màu chữ tiêu đề */\n"
 "}\n"
@@ -1425,10 +1563,10 @@ class Ui_MainWindow(object):
         self.groupSignalTransmission.setStyleSheet("/* Khung chính của GroupBox */\n"
 "QGroupBox {\n"
 "    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */\n"
-"    border: 1px solid #c6c6c6; /* Viền xám mảnh để định hình khối */\n"
+"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
 "    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
 "    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 14px;           /* Kích thước chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
 "    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
 "    color: #333333;            /* Màu chữ tiêu đề */\n"
 "}\n"
@@ -1890,10 +2028,10 @@ class Ui_MainWindow(object):
         self.groupDelayHandling.setStyleSheet("/* Khung chính của GroupBox */\n"
 "QGroupBox {\n"
 "    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */\n"
-"    border: 1px solid #c6c6c6; /* Viền xám mảnh để định hình khối */\n"
+"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
 "    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
 "    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 14px;           /* Kích thước chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
 "    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
 "    color: #333333;            /* Màu chữ tiêu đề */\n"
 "}\n"
@@ -2361,8 +2499,8 @@ class Ui_MainWindow(object):
         self.label_33.setText("")
         self.label_33.setObjectName("label_33")
         self.gridLayout_12.addWidget(self.label_33, 0, 3, 1, 1)
-        spacerItem5 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_12.addItem(spacerItem5, 0, 0, 1, 1)
+        spacerItem6 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_12.addItem(spacerItem6, 0, 0, 1, 1)
         self.pushButton_apply_tranmission_reception = QtWidgets.QPushButton(self.groupFunction)
         self.pushButton_apply_tranmission_reception.setMinimumSize(QtCore.QSize(0, 30))
         self.pushButton_apply_tranmission_reception.setMaximumSize(QtCore.QSize(30, 16777215))
@@ -2443,7 +2581,7 @@ class Ui_MainWindow(object):
 "    border: 1px solid #5B5B5B; /* Viền xám mảnh để định hình khối */\n"
 "    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
 "    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 14px;           /* Kích thước chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
 "    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
 "    color: #333333;            /* Màu chữ tiêu đề */\n"
 "}\n"
@@ -2605,8 +2743,8 @@ class Ui_MainWindow(object):
         self.pushButton_add_mode.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_add_mode.setObjectName("pushButton_add_mode")
         self.gridLayout_9.addWidget(self.pushButton_add_mode, 0, 1, 1, 1)
-        spacerItem6 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_9.addItem(spacerItem6, 0, 0, 1, 1)
+        spacerItem7 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_9.addItem(spacerItem7, 0, 0, 1, 1)
         self.label_26 = QtWidgets.QLabel(self.groupModeOption)
         self.label_26.setMinimumSize(QtCore.QSize(20, 0))
         self.label_26.setText("")
@@ -2687,7 +2825,7 @@ class Ui_MainWindow(object):
 "    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
 "    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
 "    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 14px;           /* Kích thước chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
 "    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
 "    color: #333333;            /* Màu chữ tiêu đề */\n"
 "}\n"
@@ -2834,8 +2972,8 @@ class Ui_MainWindow(object):
         self.label_29.setText("")
         self.label_29.setObjectName("label_29")
         self.gridLayout_10.addWidget(self.label_29, 0, 3, 1, 1)
-        spacerItem7 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_10.addItem(spacerItem7, 0, 0, 1, 1)
+        spacerItem8 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_10.addItem(spacerItem8, 0, 0, 1, 1)
         self.pushButton_apply_itemcode_assign = QtWidgets.QPushButton(self.groupItemLineCode)
         self.pushButton_apply_itemcode_assign.setMinimumSize(QtCore.QSize(0, 30))
         self.pushButton_apply_itemcode_assign.setMaximumSize(QtCore.QSize(30, 16777215))
@@ -2886,7 +3024,7 @@ class Ui_MainWindow(object):
 "    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
 "    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
 "    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 14px;           /* Kích thước chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
 "    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
 "    color: #333333;            /* Màu chữ tiêu đề */\n"
 "}\n"
@@ -2999,8 +3137,8 @@ class Ui_MainWindow(object):
         self.spinBox_num_shot.setObjectName("spinBox_num_shot")
         self.grid_indexcamera.addWidget(self.spinBox_num_shot, 4, 1, 1, 1)
         self.vlayout_groupIndexCamera_outer.addLayout(self.grid_indexcamera)
-        spacerItem8 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.vlayout_groupIndexCamera_outer.addItem(spacerItem8)
+        spacerItem9 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.vlayout_groupIndexCamera_outer.addItem(spacerItem9)
         self.hlayout_toprow.addWidget(self.groupIndexCamera)
         self.groupDeviceProtocol = QtWidgets.QGroupBox(self.scrollAreaWidgetContents)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
@@ -3021,7 +3159,7 @@ class Ui_MainWindow(object):
 "    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
 "    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
 "    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 14px;           /* Kích thước chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
 "    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
 "    color: #333333;            /* Màu chữ tiêu đề */\n"
 "}\n"
@@ -3112,8 +3250,8 @@ class Ui_MainWindow(object):
         self.line_9.setObjectName("line_9")
         self.grid_deviceprotocol.addWidget(self.line_9, 3, 0, 1, 2)
         self.vlayout_groupDeviceProtocol_outer.addLayout(self.grid_deviceprotocol)
-        spacerItem9 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.vlayout_groupDeviceProtocol_outer.addItem(spacerItem9)
+        spacerItem10 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.vlayout_groupDeviceProtocol_outer.addItem(spacerItem10)
         self.hlayout_toprow.addWidget(self.groupDeviceProtocol)
         self.groupControlPanel = QtWidgets.QGroupBox(self.scrollAreaWidgetContents)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
@@ -3135,7 +3273,7 @@ class Ui_MainWindow(object):
 "    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
 "    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
 "    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 14px;           /* Kích thước chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
 "    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
 "    color: #333333;            /* Màu chữ tiêu đề */\n"
 "}\n"
@@ -3351,10 +3489,10 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         self.comboBox_logging_mode.setCurrentIndex(2)
         self.comboBox_mirror_mode.setCurrentIndex(1)
-        self.radioButton_counter_pc.clicked['bool'].connect(self.radioButton_reset.setChecked) # type: ignore
-        self.radioButton_counter_plc.clicked['bool'].connect(self.radioButton_none_reset.setChecked) # type: ignore
-        self.radioButton_reset.clicked['bool'].connect(self.radioButton_counter_pc.setChecked) # type: ignore
-        self.radioButton_none_reset.clicked['bool'].connect(self.radioButton_counter_plc.setChecked) # type: ignore
+        # self.radioButton_counter_pc.clicked['bool'].connect(self.radioButton_reset.setChecked) # type: ignore
+        # self.radioButton_counter_plc.clicked['bool'].connect(self.radioButton_none_1.setChecked) # type: ignore
+        # self.radioButton_reset.clicked['bool'].connect(self.radioButton_counter_pc.setChecked) # type: ignore
+        # self.radioButton_none_1.clicked['bool'].connect(self.radioButton_counter_plc.setChecked) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -3369,15 +3507,26 @@ class Ui_MainWindow(object):
         self.pushButton_applyshotxmodel.setToolTip(_translate("MainWindow", "Save Parameters for Mode selected"))
         self.groupAnimationEffect.setTitle(_translate("MainWindow", "Setup Counter"))
         self.groupBox_3.setTitle(_translate("MainWindow", "Increment Counter Shot"))
-        self.radioButton_condition_plc_pc.setText(_translate("MainWindow", "Set Condition from PLC to PC"))
-        self.radioButton_counter_plc.setText(_translate("MainWindow", "Set Counter from PLC"))
-        self.radioButton_counter_pc.setText(_translate("MainWindow", "Set Counter from PC"))
+        self.radioButton_counter_plc.setText(_translate("MainWindow", "PLC"))
+        self.comboBox_increment_counter_signal_selected.setItemText(0, _translate("MainWindow", "None"))
+        self.radioButton_condition_plc_pc.setText(_translate("MainWindow", "PLC to PC"))
+        self.label_24.setText(_translate("MainWindow", "Signal:"))
+        self.radioButton_counter_pc.setText(_translate("MainWindow", "PC"))
         self.pushButton_load_setting_for_counter.setToolTip(_translate("MainWindow", "Load Parameter from Mode selected"))
         self.pushButton_apply_setting_for_counter.setToolTip(_translate("MainWindow", "Save Parameters for Mode selected"))
         self.groupBox.setTitle(_translate("MainWindow", "Reset Counter:"))
-        self.radioButton_none_reset.setText(_translate("MainWindow", "None"))
         self.radioButton_reset.setText(_translate("MainWindow", "Reset "))
-        self.groupBox_5.setTitle(_translate("MainWindow", "GroupBox"))
+        self.comboBox_reset_counter_signal_selected.setItemText(0, _translate("MainWindow", "None"))
+        self.label_19.setText(_translate("MainWindow", "Signal:"))
+        self.radioButton_none_1.setText(_translate("MainWindow", "None"))
+        self.radioButton_none_reset.setText(_translate("MainWindow", "No Reset"))
+        self.groupBox_6.setTitle(_translate("MainWindow", "Method"))
+        self.comboBox_method_use_signal_selected.setItemText(0, _translate("MainWindow", "None"))
+        self.radioButton_cycle_frame.setText(_translate("MainWindow", "Cycle"))
+        self.radioButton_single_frame.setText(_translate("MainWindow", "Single"))
+        self.label_41.setText(_translate("MainWindow", "Signal:"))
+        self.radioButton_none_2.setText(_translate("MainWindow", "None"))
+        self.groupBox_5.setTitle(_translate("MainWindow", "Transmit Result Signals"))
         self.groupBox_4.setTitle(_translate("MainWindow", "Setup Mode"))
         self.pushButton_load_Set_mode.setToolTip(_translate("MainWindow", "Load Parameter from Mode selected"))
         self.pushButton_apply_Set_mode.setToolTip(_translate("MainWindow", "Save Parameters for Mode selected"))
@@ -3433,17 +3582,17 @@ class Ui_MainWindow(object):
         item = self.tableWidget.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "⦾ DMA"))
         item = self.tableWidget.horizontalHeaderItem(1)
-        item.setText(_translate("MainWindow", "📥 read [reg]"))
+        item.setText(_translate("MainWindow", "✦ read-[reg]"))
         item = self.tableWidget.horizontalHeaderItem(2)
-        item.setText(_translate("MainWindow", "🟢 read [bit on]"))
+        item.setText(_translate("MainWindow", "🡩 read.{bit_on}"))
         item = self.tableWidget.horizontalHeaderItem(3)
-        item.setText(_translate("MainWindow", "🔴 read [bit off]"))
+        item.setText(_translate("MainWindow", "🡫 read.{bit_off}"))
         item = self.tableWidget.horizontalHeaderItem(4)
-        item.setText(_translate("MainWindow", "📤 write [reg]"))
+        item.setText(_translate("MainWindow", "✦ write-[reg]"))
         item = self.tableWidget.horizontalHeaderItem(5)
-        item.setText(_translate("MainWindow", "🟢 write [bit on]"))
+        item.setText(_translate("MainWindow", "🡩 write.{bit_on}"))
         item = self.tableWidget.horizontalHeaderItem(6)
-        item.setText(_translate("MainWindow", "🔴 write [bit off]"))
+        item.setText(_translate("MainWindow", "🡫 write.{bit_off}"))
         __sortingEnabled = self.tableWidget.isSortingEnabled()
         self.tableWidget.setSortingEnabled(False)
         self.tableWidget.setSortingEnabled(__sortingEnabled)
