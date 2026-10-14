@@ -50,6 +50,7 @@ from module_3.layout_option_model import Ui_MainWindow  as uicmain
 from module_3.handle_option_models import Process_Model 
 from module_3.signal_transmission import Ui_MainWindow as AutomationInterface
 from module_3.signal_process import DataProcessSignal as signals 
+from module_3.config_status_logger import PLCConfigStatusLogger 
 from module_4.hik_vision.pyuic5.hik_mvs_setting_device_list import Ui_MainWindow as Camera_Device
 from module_4.hik_vision.core.core_plus_manual import Initial_Device as Initial_Device_MVS_Manual
 from module_4.hik_vision.core.core_plus_auto import Initial_Device_Auto as Initial_Device_MVS_Auto
@@ -469,7 +470,7 @@ class PLCHandler:
             self.mode_kick = next(
                 (m for cam in mapping.values()
                  if (m := cam.get('mapping', {}).get('automatic', {}).get('mapping_mode'))),
-                None,
+                None
             )
             print("Mode Kick: ", self.mode_kick)
         self._update_trigger_cache()
@@ -1920,6 +1921,7 @@ class CameraTabManager:
         self.automation_ui = AutomationInterface()
         self.automation_ui.setupUi(automation_tab)
         tab_widget_2.addTab(automation_tab, "PLC Settings")
+        
         _signals_processor = signals(self.automation_ui)
         _automation_ui = self.automation_ui
         _automation_ui.comboBox_camera.setItemText(0, _translate("MainWindow", str(camera_name)))
@@ -1940,6 +1942,14 @@ class CameraTabManager:
             mode_auto_id = _signals_processor.load_params_signals_from_gui_mapping_db(self.db_manager.cursor, camera_id)
             if mode_auto_id:
                 _signals_processor.load_shotxmodel_from_db(self.db_manager.cursor, self.db_manager.connect_db, mode_auto_id,str(len(models)))
+            if hasattr(self.automation_ui, 'config_logger') and self.automation_ui.config_logger:
+                self.automation_ui.config_logger.check_initial_db(
+                    self.db_manager.cursor,
+                    camera_id,
+                    item_code_id,
+                    self.automation_ui.comboBox_mode_auto.currentText(),
+                    self.automation_ui.comboBox_Itemcode.currentText()
+                )
         self.automation_ui.pushButton_set_loa_mode.clicked.connect(_on_load_mode)
         self.automation_ui.pushButton_apply_itemcode_assign.clicked.connect(lambda _: _signals_processor.save_register_name_line_code(self.db_manager.cursor, self.db_manager.connect_db))
         mode_dict = self.get_mode(_signals_processor,camera_id)
@@ -1960,6 +1970,27 @@ class CameraTabManager:
         self.automation_ui.pushButton_apply_tranmission_reception.clicked.connect(lambda _: _signals_processor.save_all_data(self.db_manager.cursor, self.db_manager.connect_db,camera_id))
         self.automation_ui.pushButton_load_tranmission_reception.clicked.connect(lambda _: _signals_processor.load_all_data(self.db_manager.cursor, camera_id))
         _signals_processor.load_all_data(self.db_manager.cursor,camera_id)
+
+        # Quét trạng thái CSDL ban đầu và hiển thị lên log realtime
+        self.automation_ui.config_logger.check_initial_db(
+            self.db_manager.cursor,
+            camera_id,
+            item_code_id,
+            self.automation_ui.comboBox_mode_auto.currentText(),
+            self.automation_ui.comboBox_Itemcode.currentText()
+        )
+
+        def _on_mode_combo_changed(mode_name):
+            if hasattr(self.automation_ui, 'config_logger') and self.automation_ui.config_logger:
+                self.automation_ui.config_logger.check_initial_db(
+                    self.db_manager.cursor,
+                    camera_id,
+                    item_code_id,
+                    mode_name,
+                    self.automation_ui.comboBox_Itemcode.currentText()
+                )
+        self.automation_ui.comboBox_mode_auto.currentTextChanged.connect(_on_mode_combo_changed)
+
         product_code_forms.append(automation_tab)
         return dict_signals, shot_complete, dict_shot,mode_dict,self.automation_ui,list_mode
         
@@ -1991,7 +2022,7 @@ class CameraTabManager:
         _device_tab_ui.pushButton_trigger_software.clicked.connect(partial(device_camera.trigger_once_public_class))
         _device_tab_ui.pushButton_trigger_get_img_buffer.clicked.connect(partial(device_camera.GetImgArayBuffer_public_class))
         _device_tab_ui.pushButton.clicked.connect(lambda _: driver.query_mode_id_to_user_index(item_code_id,_device_tab_ui))
-
+        # device_camera.user_set_load_public_class()
         #mirror action
         _mirror_tab_widget.pushButton_streaming.clicked.connect(lambda _: dev.set_live_stream(True))
         if hasattr(device_camera, 'start_grabbing_public_class_mirror'):

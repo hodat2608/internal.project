@@ -85,7 +85,7 @@ QScrollBar::handle:vertical:hover {
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>-501</y>
+         <y>0</y>
          <width>1781</width>
          <height>1559</height>
         </rect>
@@ -121,7 +121,7 @@ QScrollBar::handle:vertical:hover {
               <property name="maximumSize">
                <size>
                 <width>16777215</width>
-                <height>300</height>
+                <height>350</height>
                </size>
               </property>
               <property name="font">
@@ -154,7 +154,7 @@ QGroupBox::title {
 </string>
               </property>
               <property name="title">
-               <string>Assign Shot to Model</string>
+               <string>Shot x Model</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_22">
                <item row="0" column="0">
@@ -474,7 +474,7 @@ QGroupBox::title {
 </string>
               </property>
               <property name="title">
-               <string>Setup Counter</string>
+               <string/>
               </property>
               <layout class="QGridLayout" name="gridLayout_23">
                <item row="0" column="0" colspan="2">
@@ -515,7 +515,7 @@ QGroupBox::title {
 </string>
                  </property>
                  <property name="title">
-                  <string>Increment Counter Shot</string>
+                  <string>Increment Counter</string>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_5">
                   <item row="1" column="2">
@@ -565,7 +565,7 @@ QGroupBox::title {
                      </font>
                     </property>
                     <property name="text">
-                     <string>PLC to PC</string>
+                     <string>PLC 🗲 PC</string>
                     </property>
                    </widget>
                   </item>
@@ -828,7 +828,7 @@ QGroupBox::title {
 </string>
                  </property>
                  <property name="title">
-                  <string>Reset Counter:</string>
+                  <string>Reset Counter</string>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_7">
                   <item row="0" column="1">
@@ -982,7 +982,7 @@ QGroupBox::title {
 </string>
                  </property>
                  <property name="title">
-                  <string>Method</string>
+                  <string>Method Complete</string>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_25">
                   <item row="0" column="4">
@@ -1168,7 +1168,7 @@ QGroupBox::title {
                <string>Transmit Result Signals</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_4">
-               <item row="2" column="0">
+               <item row="1" column="0">
                 <spacer name="horizontalSpacer">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
@@ -1177,19 +1177,6 @@ QGroupBox::title {
                   <size>
                    <width>40</width>
                    <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="1" column="0">
-                <spacer name="verticalSpacer_3">
-                 <property name="orientation">
-                  <enum>Qt::Vertical</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>20</width>
-                   <height>40</height>
                   </size>
                  </property>
                 </spacer>
@@ -1254,7 +1241,7 @@ QGroupBox::title {
 </string>
               </property>
               <property name="title">
-               <string>Setup Mode</string>
+               <string>Configua Mode</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_24">
                <item row="3" column="0">
@@ -1441,7 +1428,7 @@ QGroupBox::title {
 </string>
                  </property>
                  <property name="title">
-                  <string>Communication Sinals / Mapping Mode</string>
+                  <string/>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_8">
                   <item row="0" column="0">
@@ -2201,7 +2188,7 @@ QGroupBox::title {
 </string>
               </property>
               <property name="title">
-               <string>Assign Value to PLC</string>
+               <string>PC 🡮 🡬 PLC</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_16">
                <item row="0" column="0">
@@ -3111,7 +3098,7 @@ QGroupBox::title {
 </string>
               </property>
               <property name="title">
-               <string>Setting for Timer</string>
+               <string>Timer Setup</string>
               </property>
               <layout class="QGridLayout" name="gridLayout">
                <item row="0" column="0">
@@ -3162,7 +3149,7 @@ QGroupBox::title {
 </string>
                      </property>
                      <property name="title">
-                      <string>Signal transmission and reception</string>
+                      <string/>
                      </property>
                      <layout class="QVBoxLayout" name="vlayout_groupSignalTransmission_outer">
                       <property name="leftMargin">
@@ -4125,7 +4112,7 @@ QGroupBox::title {
 </string>
                      </property>
                      <property name="title">
-                      <string>Delay Handling Function</string>
+                      <string/>
                      </property>
                      <layout class="QVBoxLayout" name="vlayout_groupDelayHandling_outer">
                       <property name="leftMargin">
@@ -5215,7 +5202,7 @@ QGroupBox::title {
 </string>
             </property>
             <property name="title">
-             <string>Set Register For Mode Option</string>
+             <string>Register 🡺 Mode</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_18">
              <item row="0" column="0">
@@ -5775,7 +5762,7 @@ QGroupBox::title {
 </string>
             </property>
             <property name="title">
-             <string>Set Register For Item Line Code</string>
+             <string>Register 🡺 Item Code</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_19">
              <item row="0" column="0">
@@ -6227,7 +6214,7 @@ QGroupBox::title {
 </string>
             </property>
             <property name="title">
-             <string>Index Camera/Models</string>
+             <string>Camera/Models/Free shot</string>
             </property>
             <layout class="QVBoxLayout" name="vlayout_groupIndexCamera_outer">
              <property name="leftMargin">
@@ -6586,7 +6573,7 @@ QGroupBox::title {
 </string>
             </property>
             <property name="title">
-             <string>Set Type Device/Protocol</string>
+             <string>Device/Protocol</string>
             </property>
             <layout class="QVBoxLayout" name="vlayout_groupDeviceProtocol_outer">
              <property name="leftMargin">
@@ -6838,7 +6825,7 @@ QGroupBox::title {
 </string>
             </property>
             <property name="title">
-             <string>IP Addess PC to PLC</string>
+             <string>IP Address</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_2">
              <item row="1" column="0">

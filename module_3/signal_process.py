@@ -18,6 +18,7 @@ from mysql.connector import Error
 from module_3.animation import PLCSignalScene
 from module_1.root_path import resource_path
 import re
+from module_3.config_status_logger import PLCConfigStatusLogger
 class SignalTableHelper:
     def __init__(self, table_widget):
         self.table = table_widget
@@ -33,7 +34,6 @@ class SignalTableHelper:
             'write_value_off': 6
         }
         
-
     def update_rows_mapping(self):
         self.rows = {}
         for row in range(self.table.rowCount()):
@@ -97,6 +97,42 @@ class DataProcessSignal:
         self.table_signal_up_to_selected_trigger_signals()
         self.is_unlocked = False
         self.set_ui_enabled(False)
+        self._setup_config_status_log_ui()
+
+    def _setup_config_status_log_ui(self):
+        """Khởi tạo textBrowser_status_log động bên trong self.uic.groupBox_5
+        để không bị mất khi biên dịch lại file giao diện .ui."""
+        if not hasattr(self.uic, 'groupBox_5'):
+            return
+
+        self.uic.groupBox_5.setTitle("PLC Configuration Status")
+
+        # Xóa các item / spacer cũ trong gridLayout_4 nếu có
+        if hasattr(self.uic, 'gridLayout_4') and self.uic.gridLayout_4:
+            while self.uic.gridLayout_4.count():
+                item = self.uic.gridLayout_4.takeAt(0)
+                if item.widget():
+                    item.widget().deleteLater()
+
+        # Tạo textBrowser_status_log động
+        self.uic.textBrowser_status_log = QtWidgets.QTextBrowser(self.uic.groupBox_5)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.uic.textBrowser_status_log.setFont(font)
+        self.uic.textBrowser_status_log.setStyleSheet("""
+            QTextBrowser {
+                background-color: #FFFFFF;
+                border: 1px solid #000000;
+                border-radius: 4px;
+                padding: 8px;
+            }
+        """)
+        self.uic.textBrowser_status_log.setObjectName("textBrowser_status_log")
+        self.uic.gridLayout_4.addWidget(self.uic.textBrowser_status_log, 0, 0, 1, 1)
+
+        # Gắn logger vào self.uic
+        self.uic.config_logger = PLCConfigStatusLogger(self.uic.textBrowser_status_log)
 
     def _add_dma_combobox_to_row(self, row_index):
         combo = QtWidgets.QComboBox()
@@ -209,6 +245,9 @@ class DataProcessSignal:
         assign_register = self.uic.lineEdit_assign_itemcode_plc.text()
         value_bit_on = self.uic.comboBox_value_register_bit_on.currentText()
         value_bit_off = self.uic.comboBox_value_register_bit_off.currentText()
+        if not assign_register or assign_register == '':
+            QMessageBox.warning(None, "Cảnh báo", f"Vui lòng nhập thanh ghi cho Mã hàng {Itemcode}")
+            return
         try:
             cursor.execute("""
                     SELECT id FROM ITEMS_CODE 
@@ -221,11 +260,17 @@ class DataProcessSignal:
                             WHERE name_line_code = %s 
                 """, (assign_register, value_bit_on, value_bit_off, Itemcode))
                 connect_db.connection.commit()
+                if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
+                    self.uic.config_logger.set_status('item_code', 'success', f"Đã lưu thành công mã hàng '{Itemcode}' (Reg: {assign_register})")
                 QMessageBox.information(None, "Thành công", f"Lưu thành công Ma hang {Itemcode}!")
             else:
+                if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
+                    self.uic.config_logger.set_status('item_code', 'error', f"Không tìm thấy mã hàng '{Itemcode}'")
                 QMessageBox.critical(None, "Error", f"Khong tim thay Ma hang {Itemcode}")
         except mysql.connector.Error as error:
             connect_db.connection.rollback()
+            if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
+                self.uic.config_logger.set_status('item_code', 'error', f"Lỗi lưu mã hàng: {str(error)}")
             QMessageBox.critical(None, "Error", f"Lỗi Update: {str(error)}")
             raise    
 
@@ -258,6 +303,11 @@ class DataProcessSignal:
             value_bit_on = self.uic.comboBox_value_mode_selector_bit_on.currentText()
             value_bit_off = self.uic.comboBox_value_mode_selector_bit_off.currentText()
             mode_name = self.uic.comboBox_mode_auto.currentText()
+
+            if not register_mode or register_mode == '':
+                QMessageBox.warning(None, "Cảnh báo", f"Vui lòng nhập thanh ghi cho chế độ {mode_name}")
+                return
+
             cursor.execute("""
                         SELECT id FROM NUMS_CAMERA 
                         WHERE item_code_id = %s AND nums_camera = %s
@@ -290,10 +340,14 @@ class DataProcessSignal:
 
             self.mode_auto_id = result[0] if result else None
             connect_db.connection.commit()
+            if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
+                self.uic.config_logger.set_status('mode_auto', 'success', f"Đã lưu thành công Mode '{mode_name}'")
             QMessageBox.information(None, "Thành công", "Lưu thành công mode auto!")
 
         except mysql.connector.Error as error:
                 connect_db.connection.rollback()
+                if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
+                    self.uic.config_logger.set_status('mode_auto', 'error', f"Lỗi lưu mode: {str(error)}")
                 QMessageBox.critical(None, "Error", f"Lỗi Insert: {str(error)}")
                 raise    
         
@@ -351,17 +405,25 @@ class DataProcessSignal:
                         mode_auto_id
                     ))
                 connect_db.connection.commit()
+                if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
+                    self.uic.config_logger.set_status('signal_table', 'success', "Đã lưu thành công bảng tín hiệu PLC")
                 QMessageBox.information(None, "Thành công", "Lưu thành công mode auto!")
 
             except Error as e:
                 connect_db.connection.rollback()
+                if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
+                    self.uic.config_logger.set_status('signal_table', 'error', f"Lỗi MySQL: {e}")
                 QMessageBox.critical(None, "Lỗi", f"MySQL Error: {e}")
 
             except Exception as e:
                 connect_db.connection.rollback()
+                if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
+                    self.uic.config_logger.set_status('signal_table', 'error', f"Lỗi: {e}")
                 QMessageBox.critical(None, "Lỗi không xác định", str(e))
 
         else:
+            if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
+                self.uic.config_logger.set_status('signal_table', 'error', "Chưa lưu Mode Auto trước khi lưu tín hiệu")
             QMessageBox.critical(None, "Lỗi", f"Please Save Mode Auto Before Save Sinals Parameters")
 
     def load_values_signal_default_mode_from_db_up_to_gui(self,cursor,camera_id):
@@ -595,17 +657,25 @@ class DataProcessSignal:
                         no_of_model = int(row.get(1, 0))  
                         cursor.execute(insert_query, (shot, no_of_model,mode_auto_id))
                     connect_db.connection.commit()
+                    if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
+                        self.uic.config_logger.set_status('shot_model', 'success', f"Đã lưu thành công bảng Shot x Model ({len(list_insert)} dòng)")
                     QMessageBox.information(None, "Thành công", "Lưu thành công shot link model!")
 
             except Error as e:
                 connect_db.connection.rollback()
+                if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
+                    self.uic.config_logger.set_status('shot_model', 'error', f"Lỗi lưu Shot x Model: {e}")
                 QMessageBox.critical(None, "Lỗi", f"MySQL Error: {e}")
 
             except Exception as e:
                 connect_db.connection.rollback()
+                if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
+                    self.uic.config_logger.set_status('shot_model', 'error', f"Lỗi lưu Shot x Model: {e}")
                 QMessageBox.critical(None, "Lỗi không xác định", str(e))
 
         else:
+            if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
+                self.uic.config_logger.set_status('shot_model', 'error', "Chưa lưu Mode Auto trước khi lưu Shot x Model")
             QMessageBox.critical(None, "Lỗi", f"Please Save Mode Auto Before Save Sinals Parameters")
 
     def load_shotxmodel_from_db(self,cursor,connect_db,mode_auto_id,num_models):
@@ -765,8 +835,14 @@ class DataProcessSignal:
 
 
     def save_all_data(self,cursor,connect_db,camera_id):
-        self.save_signal_transmission_and_reception(cursor,connect_db,camera_id)
-        self.save_signal_timing_config(cursor,connect_db,camera_id)
+        try:
+            self.save_signal_transmission_and_reception(cursor,connect_db,camera_id)
+            self.save_signal_timing_config(cursor,connect_db,camera_id)
+            if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
+                self.uic.config_logger.set_status('transmission_timing', 'success', "Đã lưu thành công dữ liệu truyền nhận & timing")
+        except Exception as e:
+            if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
+                self.uic.config_logger.set_status('transmission_timing', 'error', f"Lỗi lưu truyền nhận & timing: {str(e)}")
 
     def load_all_data(self,cursor,camera_id):
         self.load_data_signal_transmission_and_reception(cursor,camera_id)
@@ -1078,8 +1154,12 @@ class DataProcessSignal:
 
             cursor.execute(sql_command, (camera_id, is_check, is_reset, method_use, increment_counter_signal_selected, reset_counter_signal_selected, method_use_signal_selected))
             connect_db.connection.commit()
+            if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
+                self.uic.config_logger.set_status('counter_shot', 'success', f"Đã lưu thành công thiết lập Counter Shot ({method_use})")
             QtWidgets.QMessageBox.information(None, "Thành công", "Thiết lập counter shot thành công!")
         except Exception as e:
+            if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
+                self.uic.config_logger.set_status('counter_shot', 'error', f"Lỗi thiết lập counter shot: {str(e)}")
             QtWidgets.QMessageBox.critical(None, "Lỗi khi thiết lập counter shot", str(e))
 
         
@@ -1163,8 +1243,12 @@ class DataProcessSignal:
                     w['completed'].currentText(),
                 ))
             connect_db.connection.commit()
+            if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
+                self.uic.config_logger.set_status('mapping_mode', 'success', "Đã lưu thành công thiết lập Mapping Mode")
             QtWidgets.QMessageBox.information(None, "Thành công", "Thiết lập Mapping Mode thành công!")
         except Exception as e:
+            if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
+                self.uic.config_logger.set_status('mapping_mode', 'error', f"Lỗi Mapping Mode: {str(e)}")
             QtWidgets.QMessageBox.critical(None, "Lỗi khi thiết lập Mapping Mode", str(e))
 
     def load_mapping_mode(self, cursor, camera_id):

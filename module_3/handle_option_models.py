@@ -842,28 +842,41 @@ class Process_Camera_Device:
                     SELECT id FROM MODE_AUTO 
                     WHERE mode_name = %s AND camera_id = %s 
                 """, (mode_name,camera_id))
-                if mode_id := self.cursor.fetchone()[0]:
+                mode_row = self.cursor.fetchone()
+                if mode_row and (mode_id := mode_row[0]):
                     self.cursor.execute("""
                     SELECT * FROM USER_SET_CAMERA 
                     WHERE mode_id = %s
                 """, (mode_id,))
-                result_record = self.cursor.fetchone() 
-                if not result_record:
-                    self.cursor.execute("""
-                        INSERT INTO USER_SET_CAMERA (index_user_selector, user_set_selector,mode_id)
-                        VALUES (%s, %s, %s)
-                    """, (index_user_selector,user_set_selector,mode_id))
-                    
-                else:
-                    self.cursor.execute("""
-                        UPDATE USER_SET_CAMERA 
-                        SET index_user_selector = %s, user_set_selector = %s
-                        WHERE mode_id = %s
-                    """, (index_user_selector,user_set_selector,mode_id))
+                    result_record = self.cursor.fetchone() 
+                    if not result_record:
+                        self.cursor.execute("""
+                            INSERT INTO USER_SET_CAMERA (index_user_selector, user_set_selector,mode_id)
+                            VALUES (%s, %s, %s)
+                        """, (index_user_selector,user_set_selector,mode_id))
+                        
+                    else:
+                        self.cursor.execute("""
+                            UPDATE USER_SET_CAMERA 
+                            SET index_user_selector = %s, user_set_selector = %s
+                            WHERE mode_id = %s
+                        """, (index_user_selector,user_set_selector,mode_id))
 
-            self.connection.connection.commit()
-            QMessageBox.information(None, "Information", f"Lưu thay đổi thành công")
-        except Error as error:
+                    self.connection.connection.commit()
+                    if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
+                        self.uic.config_logger.set_status('userset_camera', 'success', f"Đã lưu UserSet '{user_set_selector}' cho mode '{mode_name}'")
+                    QMessageBox.information(None, "Information", f"Lưu thay đổi thành công")
+                else:
+                    if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
+                        self.uic.config_logger.set_status('userset_camera', 'error', f"Chưa tồn tại Mode '{mode_name}' trong CSDL để gán UserSet")
+                    QMessageBox.critical(None, "Error", f"Mode '{mode_name}' chưa tồn tại!")
+            else:
+                if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
+                    self.uic.config_logger.set_status('userset_camera', 'error', f"Không tìm thấy camera '{camera_name}'")
+                QMessageBox.critical(None, "Error", f"Không tìm thấy camera '{camera_name}'!")
+        except Exception as error:
+            if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
+                self.uic.config_logger.set_status('userset_camera', 'error', f"Lỗi lưu UserSet: {str(error)}")
             QMessageBox.critical(None, "Error", f"Lỗi Insert: {str(error)}")
 
 

@@ -401,7 +401,8 @@ class Initial_Device(QObject):
         if ret != MV_OK:
             strError = "Set param failed ret:" + ToHexStr(ret)
             QMessageBox.warning(self.mainWindow, "Error", strError, QMessageBox.Ok)
-        QMessageBox.information(self.mainWindow, "Save Successful", strError, QMessageBox.Ok)
+            return ret
+        QMessageBox.information(self.mainWindow, "Save Successful", "Lưu thông số camera thành công!", QMessageBox.Ok)
         return MV_OK
     
 
