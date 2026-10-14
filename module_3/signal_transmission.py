@@ -65,7 +65,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 1781, 1559))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, -71, 1781, 1559))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.gridLayout_17 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents)
         self.gridLayout_17.setObjectName("gridLayout_17")
@@ -324,6 +324,11 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.comboBox_increment_counter_signal_selected.setFont(font)
+        self.comboBox_increment_counter_signal_selected.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 60px; \n"
+"}\n"
+"")
         self.comboBox_increment_counter_signal_selected.setObjectName("comboBox_increment_counter_signal_selected")
         self.comboBox_increment_counter_signal_selected.addItem("")
         self.gridLayout_5.addWidget(self.comboBox_increment_counter_signal_selected, 1, 7, 1, 1)
@@ -496,6 +501,11 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.comboBox_reset_counter_signal_selected.setFont(font)
+        self.comboBox_reset_counter_signal_selected.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 60px; \n"
+"}\n"
+"")
         self.comboBox_reset_counter_signal_selected.setObjectName("comboBox_reset_counter_signal_selected")
         self.comboBox_reset_counter_signal_selected.addItem("")
         self.gridLayout_7.addWidget(self.comboBox_reset_counter_signal_selected, 0, 6, 1, 1)
@@ -569,6 +579,11 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.comboBox_method_use_signal_selected.setFont(font)
+        self.comboBox_method_use_signal_selected.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 60px; \n"
+"}\n"
+"")
         self.comboBox_method_use_signal_selected.setObjectName("comboBox_method_use_signal_selected")
         self.comboBox_method_use_signal_selected.addItem("")
         self.gridLayout_25.addWidget(self.comboBox_method_use_signal_selected, 0, 6, 1, 1)
@@ -802,6 +817,11 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.comboBox_set_trigger_logging.setFont(font)
+        self.comboBox_set_trigger_logging.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 50px; \n"
+"}\n"
+"")
         self.comboBox_set_trigger_logging.setObjectName("comboBox_set_trigger_logging")
         self.comboBox_set_trigger_logging.addItem("")
         self.gridLayout_13.addWidget(self.comboBox_set_trigger_logging, 4, 4, 1, 1)
@@ -812,6 +832,11 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.comboBox_set_completed_mirror.setFont(font)
+        self.comboBox_set_completed_mirror.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 50px; \n"
+"}\n"
+"")
         self.comboBox_set_completed_mirror.setObjectName("comboBox_set_completed_mirror")
         self.comboBox_set_completed_mirror.addItem("")
         self.gridLayout_13.addWidget(self.comboBox_set_completed_mirror, 3, 8, 1, 1)
@@ -839,6 +864,11 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.comboBox_set_component_logging.setFont(font)
+        self.comboBox_set_component_logging.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 50px; \n"
+"}\n"
+"")
         self.comboBox_set_component_logging.setObjectName("comboBox_set_component_logging")
         self.comboBox_set_component_logging.addItem("")
         self.gridLayout_13.addWidget(self.comboBox_set_component_logging, 4, 6, 1, 1)
@@ -849,6 +879,11 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.comboBox_set_trigger_automatic.setFont(font)
+        self.comboBox_set_trigger_automatic.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 50px; \n"
+"}\n"
+"")
         self.comboBox_set_trigger_automatic.setObjectName("comboBox_set_trigger_automatic")
         self.comboBox_set_trigger_automatic.addItem("")
         self.gridLayout_13.addWidget(self.comboBox_set_trigger_automatic, 2, 4, 1, 1)
@@ -881,6 +916,11 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.comboBox_set_trigger_mirror.setFont(font)
+        self.comboBox_set_trigger_mirror.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 50px; \n"
+"}\n"
+"")
         self.comboBox_set_trigger_mirror.setObjectName("comboBox_set_trigger_mirror")
         self.comboBox_set_trigger_mirror.addItem("")
         self.gridLayout_13.addWidget(self.comboBox_set_trigger_mirror, 3, 4, 1, 1)
@@ -891,6 +931,11 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.comboBox_set_completed_automatic.setFont(font)
+        self.comboBox_set_completed_automatic.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 50px; \n"
+"}\n"
+"")
         self.comboBox_set_completed_automatic.setObjectName("comboBox_set_completed_automatic")
         self.comboBox_set_completed_automatic.addItem("")
         self.gridLayout_13.addWidget(self.comboBox_set_completed_automatic, 2, 8, 1, 1)
@@ -901,6 +946,11 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.comboBox_set_completed_logging.setFont(font)
+        self.comboBox_set_completed_logging.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 50px; \n"
+"}\n"
+"")
         self.comboBox_set_completed_logging.setObjectName("comboBox_set_completed_logging")
         self.comboBox_set_completed_logging.addItem("")
         self.gridLayout_13.addWidget(self.comboBox_set_completed_logging, 4, 8, 1, 1)
@@ -920,7 +970,7 @@ class Ui_MainWindow(object):
         self.comboBox_automatic_mode.setFont(font)
         self.comboBox_automatic_mode.setStyleSheet("QComboBox {\n"
 "    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 45px; \n"
+"    padding-left: 50px; \n"
 "}\n"
 "")
         self.comboBox_automatic_mode.setObjectName("comboBox_automatic_mode")
@@ -959,6 +1009,11 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.comboBox_set_component_mirror.setFont(font)
+        self.comboBox_set_component_mirror.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 50px; \n"
+"}\n"
+"")
         self.comboBox_set_component_mirror.setObjectName("comboBox_set_component_mirror")
         self.comboBox_set_component_mirror.addItem("")
         self.gridLayout_13.addWidget(self.comboBox_set_component_mirror, 3, 6, 1, 1)
@@ -981,6 +1036,11 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.comboBox_set_component_automatic.setFont(font)
+        self.comboBox_set_component_automatic.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 50px; \n"
+"}\n"
+"")
         self.comboBox_set_component_automatic.setObjectName("comboBox_set_component_automatic")
         self.comboBox_set_component_automatic.addItem("")
         self.gridLayout_13.addWidget(self.comboBox_set_component_automatic, 2, 6, 1, 1)
@@ -993,7 +1053,7 @@ class Ui_MainWindow(object):
         self.comboBox_logging_mode.setFont(font)
         self.comboBox_logging_mode.setStyleSheet("QComboBox {\n"
 "    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 45px; \n"
+"    padding-left: 50px; \n"
 "}\n"
 "")
         self.comboBox_logging_mode.setObjectName("comboBox_logging_mode")
@@ -1015,7 +1075,7 @@ class Ui_MainWindow(object):
         self.comboBox_mirror_mode.setFont(font)
         self.comboBox_mirror_mode.setStyleSheet("QComboBox {\n"
 "    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 45px; \n"
+"    padding-left: 50px; \n"
 "}\n"
 "")
         self.comboBox_mirror_mode.setObjectName("comboBox_mirror_mode")
@@ -2650,7 +2710,11 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.comboBox_default_mode.setFont(font)
-        self.comboBox_default_mode.setStyleSheet("")
+        self.comboBox_default_mode.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 25px; \n"
+"}\n"
+"")
         self.comboBox_default_mode.setObjectName("comboBox_default_mode")
         self.comboBox_default_mode.addItem("")
         self.comboBox_default_mode.addItem("")
@@ -2662,7 +2726,11 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.comboBox_mode_auto.setFont(font)
-        self.comboBox_mode_auto.setStyleSheet("")
+        self.comboBox_mode_auto.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 25px; \n"
+"}\n"
+"")
         self.comboBox_mode_auto.setObjectName("comboBox_mode_auto")
         self.comboBox_mode_auto.addItem("")
         self.comboBox_mode_auto.addItem("")
@@ -2675,6 +2743,11 @@ class Ui_MainWindow(object):
         self.grid_modeoption.addWidget(self.line_10, 8, 0, 1, 4)
         self.comboBox_value_mode_selector_bit_on = QtWidgets.QComboBox(self.groupModeOption)
         self.comboBox_value_mode_selector_bit_on.setMinimumSize(QtCore.QSize(100, 28))
+        self.comboBox_value_mode_selector_bit_on.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 45px; \n"
+"}\n"
+"")
         self.comboBox_value_mode_selector_bit_on.setObjectName("comboBox_value_mode_selector_bit_on")
         self.comboBox_value_mode_selector_bit_on.addItem("")
         self.comboBox_value_mode_selector_bit_on.addItem("")
@@ -2701,6 +2774,11 @@ class Ui_MainWindow(object):
         self.grid_modeoption.addWidget(self.line, 2, 0, 1, 4)
         self.comboBox_value_mode_selector_bit_off = QtWidgets.QComboBox(self.groupModeOption)
         self.comboBox_value_mode_selector_bit_off.setMinimumSize(QtCore.QSize(0, 28))
+        self.comboBox_value_mode_selector_bit_off.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 45px; \n"
+"}\n"
+"")
         self.comboBox_value_mode_selector_bit_off.setObjectName("comboBox_value_mode_selector_bit_off")
         self.comboBox_value_mode_selector_bit_off.addItem("")
         self.comboBox_value_mode_selector_bit_off.addItem("")
@@ -2777,16 +2855,16 @@ class Ui_MainWindow(object):
         self.pushButton_set_save_mode.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_set_save_mode.setObjectName("pushButton_set_save_mode")
         self.gridLayout_9.addWidget(self.pushButton_set_save_mode, 0, 5, 1, 1)
-        self.pushButton_set_loa_mode = QtWidgets.QPushButton(self.groupModeOption)
-        self.pushButton_set_loa_mode.setMinimumSize(QtCore.QSize(0, 30))
-        self.pushButton_set_loa_mode.setMaximumSize(QtCore.QSize(30, 16777215))
+        self.pushButton_load_params_from_mode = QtWidgets.QPushButton(self.groupModeOption)
+        self.pushButton_load_params_from_mode.setMinimumSize(QtCore.QSize(0, 30))
+        self.pushButton_load_params_from_mode.setMaximumSize(QtCore.QSize(30, 16777215))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
-        self.pushButton_set_loa_mode.setFont(font)
-        self.pushButton_set_loa_mode.setStyleSheet("QPushButton {\n"
+        self.pushButton_load_params_from_mode.setFont(font)
+        self.pushButton_load_params_from_mode.setStyleSheet("QPushButton {\n"
 "    background-color: transparent;\n"
 "    border: none;\n"
 "    border-radius: 6px;\n"
@@ -2797,11 +2875,11 @@ class Ui_MainWindow(object):
 "QPushButton:pressed {\n"
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
-        self.pushButton_set_loa_mode.setText("")
-        self.pushButton_set_loa_mode.setIcon(icon2)
-        self.pushButton_set_loa_mode.setIconSize(QtCore.QSize(25, 25))
-        self.pushButton_set_loa_mode.setObjectName("pushButton_set_loa_mode")
-        self.gridLayout_9.addWidget(self.pushButton_set_loa_mode, 0, 3, 1, 1)
+        self.pushButton_load_params_from_mode.setText("")
+        self.pushButton_load_params_from_mode.setIcon(icon2)
+        self.pushButton_load_params_from_mode.setIconSize(QtCore.QSize(25, 25))
+        self.pushButton_load_params_from_mode.setObjectName("pushButton_load_params_from_mode")
+        self.gridLayout_9.addWidget(self.pushButton_load_params_from_mode, 0, 3, 1, 1)
         self.label_27 = QtWidgets.QLabel(self.groupModeOption)
         self.label_27.setMinimumSize(QtCore.QSize(20, 0))
         self.label_27.setText("")
@@ -2868,6 +2946,11 @@ class Ui_MainWindow(object):
         self.grid_itemlinecode.addWidget(self.line_5, 1, 0, 1, 3)
         self.comboBox_value_register_bit_off = QtWidgets.QComboBox(self.groupItemLineCode)
         self.comboBox_value_register_bit_off.setMinimumSize(QtCore.QSize(0, 28))
+        self.comboBox_value_register_bit_off.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 35px; \n"
+"}\n"
+"")
         self.comboBox_value_register_bit_off.setObjectName("comboBox_value_register_bit_off")
         self.comboBox_value_register_bit_off.addItem("")
         self.comboBox_value_register_bit_off.addItem("")
@@ -2886,6 +2969,11 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.comboBox_value_register_bit_on.setFont(font)
+        self.comboBox_value_register_bit_on.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 35px; \n"
+"}\n"
+"")
         self.comboBox_value_register_bit_on.setObjectName("comboBox_value_register_bit_on")
         self.comboBox_value_register_bit_on.addItem("")
         self.comboBox_value_register_bit_on.addItem("")
@@ -2914,7 +3002,11 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.comboBox_Itemcode.setFont(font)
-        self.comboBox_Itemcode.setStyleSheet("")
+        self.comboBox_Itemcode.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 45px; \n"
+"}\n"
+"")
         self.comboBox_Itemcode.setObjectName("comboBox_Itemcode")
         self.comboBox_Itemcode.addItem("")
         self.grid_itemlinecode.addWidget(self.comboBox_Itemcode, 0, 1, 1, 2)
@@ -3053,7 +3145,11 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.comboBox_n_model.setFont(font)
-        self.comboBox_n_model.setStyleSheet("")
+        self.comboBox_n_model.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 50px; \n"
+"}\n"
+"")
         self.comboBox_n_model.setObjectName("comboBox_n_model")
         self.comboBox_n_model.addItem("")
         self.comboBox_n_model.addItem("")
@@ -3102,7 +3198,11 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.comboBox_camera.setFont(font)
-        self.comboBox_camera.setStyleSheet("")
+        self.comboBox_camera.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 50px; \n"
+"}\n"
+"")
         self.comboBox_camera.setObjectName("comboBox_camera")
         self.comboBox_camera.addItem("")
         self.comboBox_camera.addItem("")
@@ -3528,7 +3628,7 @@ class Ui_MainWindow(object):
         self.label_41.setText(_translate("MainWindow", "Signal:"))
         self.radioButton_none_2.setText(_translate("MainWindow", "None"))
         self.groupBox_5.setTitle(_translate("MainWindow", "Transmit Result Signals"))
-        self.groupBox_4.setTitle(_translate("MainWindow", "Configua Mode"))
+        self.groupBox_4.setTitle(_translate("MainWindow", "Mode Configuration"))
         self.pushButton_load_Set_mode.setToolTip(_translate("MainWindow", "Load Parameter from Mode selected"))
         self.pushButton_apply_Set_mode.setToolTip(_translate("MainWindow", "Save Parameters for Mode selected"))
         self.comboBox_set_trigger_logging.setItemText(0, _translate("MainWindow", "None"))
@@ -3684,7 +3784,7 @@ class Ui_MainWindow(object):
         self.comboBox_value_mode_selector_bit_off.setItemText(9, _translate("MainWindow", "9"))
         self.pushButton_add_mode.setToolTip(_translate("MainWindow", "Add more Mode"))
         self.pushButton_set_save_mode.setToolTip(_translate("MainWindow", "Save Parameters for Mode selected"))
-        self.pushButton_set_loa_mode.setToolTip(_translate("MainWindow", "Load Parameter from Mode selected"))
+        self.pushButton_load_params_from_mode.setToolTip(_translate("MainWindow", "Load Parameter from Mode selected"))
         self.groupItemLineCode.setTitle(_translate("MainWindow", "Register 🡺 Item Code"))
         self.label_12.setText(_translate("MainWindow", "🔴 Bit OFF:"))
         self.label.setText(_translate("MainWindow", "⬥ Register:"))

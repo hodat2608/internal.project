@@ -254,7 +254,7 @@ class Ui_MainWindow(object):
         self.camera_manager.set_camera_data(camera_name, ui_instances, ui_modelloader, path_instances, dict_signals, shot_complete, dict_shot, parameter_models, automation_ui, self.device, self.dev,auto_logging_ui)
         self.camera_manager.set_mode_data(camera_name, mode_dict, self.device)
         self.camera_manager.set_list_mapping_mode(camera_name, list_mode)
-        self.camera_manager.create_single_tab_detect(self.tabWidget_2,self.camera_manager.built_in_objects,self.camera_manager.processor,self.camera_manager.total_key,self.product_code_forms)
+        # self.camera_manager.create_single_tab_detect(self.tabWidget_2,self.camera_manager.built_in_objects,self.camera_manager.processor,self.camera_manager.total_key,self.product_code_forms)
         _log.info("Camera %s initialization completed", camera_name)
 
     def cleanup(self):

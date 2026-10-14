@@ -204,19 +204,25 @@ class ItemCodeConfigEditor(QMainWindow):
         ic_layout = QGridLayout(ic_group)
         ic_layout.setColumnStretch(1, 1)
 
-        self._name_edit     = QLineEdit()
-        self._register_edit = QLineEdit()
-        self._value_register_spin = QSpinBox()
-        self._value_register_spin.setRange(0, 9999999)
+        self._name_edit          = QLineEdit()
+        self._register_edit      = QLineEdit()
+        self._value_bit_on_spin  = QSpinBox()
+        self._value_bit_on_spin.setRange(-9999999, 9999999)
+        self._value_bit_on_spin.setValue(1)
+        self._value_bit_off_spin = QSpinBox()
+        self._value_bit_off_spin.setRange(-9999999, 9999999)
+        self._value_bit_off_spin.setValue(0)
         self._name_edit.setPlaceholderText("Tên mã hàng (name_line_code)")
         self._register_edit.setPlaceholderText("VD: DM100")
 
-        ic_layout.addWidget(_label("Tên mã hàng:"),    0, 0)
-        ic_layout.addWidget(self._name_edit,            0, 1)
-        ic_layout.addWidget(_label("Assign register:"),1, 0)
-        ic_layout.addWidget(self._register_edit,        1, 1)
-        ic_layout.addWidget(_label("Value register:"), 2, 0)
-        ic_layout.addWidget(self._value_register_spin,  2, 1)
+        ic_layout.addWidget(_label("Tên mã hàng:"),     0, 0)
+        ic_layout.addWidget(self._name_edit,             0, 1)
+        ic_layout.addWidget(_label("Assign register:"), 1, 0)
+        ic_layout.addWidget(self._register_edit,         1, 1)
+        ic_layout.addWidget(_label("Value bit ON:"),    2, 0)
+        ic_layout.addWidget(self._value_bit_on_spin,     2, 1)
+        ic_layout.addWidget(_label("Value bit OFF:"),   3, 0)
+        ic_layout.addWidget(self._value_bit_off_spin,    3, 1)
 
         main_layout.addWidget(ic_group)
 
@@ -275,7 +281,7 @@ class ItemCodeConfigEditor(QMainWindow):
 
             # ITEMS_CODE
             cur.execute(
-                "SELECT id, name_line_code, assign_register, value_register FROM ITEMS_CODE WHERE name_line_code = %s",
+                "SELECT id, name_line_code, assign_register, value_bit_on, value_bit_off FROM ITEMS_CODE WHERE name_line_code = %s",
                 (self._item_code,)
             )
             row = cur.fetchone()
@@ -287,7 +293,8 @@ class ItemCodeConfigEditor(QMainWindow):
             self._item_db_id = row[0]
             self._name_edit.setText(row[1] or '')
             self._register_edit.setText(row[2] or '')
-            self._value_register_spin.setValue(row[3] or 0)
+            self._value_bit_on_spin.setValue(int(row[3]) if row[3] is not None else 1)
+            self._value_bit_off_spin.setValue(int(row[4]) if row[4] is not None else 0)
 
             # NUMS_CAMERA
             cur.execute(
@@ -366,8 +373,16 @@ class ItemCodeConfigEditor(QMainWindow):
 
             # ── 1. Update ITEMS_CODE ─────────────────────────────────────────
             cur.execute(
-                "UPDATE ITEMS_CODE SET name_line_code = %s, assign_register = %s, value_register = %s WHERE id = %s",
-                (new_name, self._register_edit.text().strip() or None, self._value_register_spin.value(), self._item_db_id)
+                """UPDATE ITEMS_CODE 
+                   SET name_line_code = %s, assign_register = %s, value_bit_on = %s, value_bit_off = %s 
+                   WHERE id = %s""",
+                (
+                    new_name,
+                    self._register_edit.text().strip() or None,
+                    self._value_bit_on_spin.value(),
+                    self._value_bit_off_spin.value(),
+                    self._item_db_id
+                )
             )
 
             # ── 2. Collect current camera db-ids (to detect removed ones) ───

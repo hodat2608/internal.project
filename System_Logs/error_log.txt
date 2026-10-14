@@ -12,3 +12,465 @@
 2026-10-14 07:39:43 [INFO] legion.module_2.main_core: Success to initialize connections
 2026-10-14 07:39:43 [INFO] legion.module_2.main_core: [core.__init__] init_plc_data...
 2026-10-14 07:39:43 [INFO] legion.module_6.keyence.initial: [+] Kết nối tới Keyence PLC 192.168.42.36:8051 qua pymcprotocol
+2026-10-14 07:39:47 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.36:8051 (Attempt 1/3) -> timed out
+2026-10-14 07:39:47 [INFO] legion.module_2.main_core: Success to connect PLC KEYENCE at 192.168.42.36:8051
+2026-10-14 07:39:47 [INFO] legion.module_2.main_core: [core.__init__] Connecting trigger signal...
+2026-10-14 07:39:47 [INFO] legion.module_2.main_core: [core.__init__] collect_dict_item...
+2026-10-14 07:39:47 [WARNING] legion.module_2.main_core: Mode Manual Login or No Connection
+2026-10-14 07:39:47 [INFO] legion.module_2.main_core: [core.__init__] DONE
+2026-10-14 07:39:49 [INFO] legion.module_2.main_core: Success to check hardware key
+2026-10-14 07:39:49 [INFO] legion.module_2.main_core: Success to start monitoring
+2026-10-14 07:39:49 [INFO] legion.module_2.main_core: [CoreWorker] Running in thread: Dummy-3
+2026-10-14 07:55:28 [ERROR] legion.module_1.config_editor: Error loading config data: 1054 (42S22): Unknown column 'value_register' in 'field list'
+2026-10-14 07:55:49 [ERROR] legion.module_1.config_editor: Error loading config data: 1054 (42S22): Unknown column 'value_register' in 'field list'
+2026-10-14 08:01:35 [INFO] legion.module_2.main_core: Stopping CoreWorker...
+2026-10-14 08:01:35 [INFO] legion.module_2.main_core: No instance of pyuic6_instance found to close
+2026-10-14 08:01:35 [INFO] legion.module_2.main_core: Success to stop monitoring
+2026-10-14 08:01:45 [INFO] legion.module_2.main_core: [core.__init__] START
+2026-10-14 08:01:45 [INFO] legion.module_2.main_core: [core.__init__] Creating CoreWorker...
+2026-10-14 08:01:45 [INFO] legion.module_2.main_core: [core.__init__] CoreWorker created. Connecting to MySQL...
+2026-10-14 08:01:45 [INFO] legion.module_2.main_core: [connect_to_mysql] Calling connect_mysql_from_log...
+2026-10-14 08:01:45 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Reading config from C:\project_vision\intenal\module_2/mysql_config.log
+2026-10-14 08:01:45 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Attempting mysql.connector.connect with host=127.0.0.1, user=root, port=3306...
+2026-10-14 08:01:45 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Success to connect mysql
+2026-10-14 08:01:45 [INFO] legion.module_2.main_core: [connect_to_mysql] connect_mysql_from_log returned: <mysql.connector.connection.MySQLConnection object at 0x000001FEB7867D70>
+2026-10-14 08:01:45 [INFO] legion.module_2.main_core: [connect_to_mysql] Creating default table...
+2026-10-14 08:01:45 [INFO] legion.module_2.main_core: [connect_to_mysql] Success to connect MySQL (Manual mode)
+2026-10-14 08:01:45 [INFO] legion.module_2.main_core: [core.__init__] connect_to_mysql done. connect_result=<mysql.connector.connection.MySQLConnection object at 0x000001FEB7867D70>
+2026-10-14 08:01:45 [INFO] legion.module_2.main_core: Success to initialize connections
+2026-10-14 08:01:45 [INFO] legion.module_2.main_core: [core.__init__] init_plc_data...
+2026-10-14 08:01:45 [INFO] legion.module_6.keyence.initial: [+] Kết nối tới Keyence PLC 192.168.42.36:8051 qua pymcprotocol
+2026-10-14 08:01:49 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.36:8051 (Attempt 1/3) -> timed out
+2026-10-14 08:01:49 [INFO] legion.module_2.main_core: Success to connect PLC KEYENCE at 192.168.42.36:8051
+2026-10-14 08:01:49 [INFO] legion.module_2.main_core: [core.__init__] Connecting trigger signal...
+2026-10-14 08:01:49 [INFO] legion.module_2.main_core: [core.__init__] collect_dict_item...
+2026-10-14 08:01:49 [WARNING] legion.module_2.main_core: Mode Manual Login or No Connection
+2026-10-14 08:01:49 [INFO] legion.module_2.main_core: [core.__init__] DONE
+2026-10-14 08:01:50 [INFO] legion.module_2.main_core: Success to check hardware key
+2026-10-14 08:01:50 [INFO] legion.module_2.main_core: Success to start monitoring
+2026-10-14 08:01:50 [INFO] legion.module_2.main_core: [CoreWorker] Running in thread: Dummy-3
+2026-10-14 08:01:55 [INFO] legion.module_1.config_editor: Config editor loaded data for tbnq_plate_b/50-E22AA-A
+2026-10-14 08:03:46 [INFO] legion.module_2.main_core: Success to write data save default: 50-E22AA-A, tbnq_plate_b
+2026-10-14 08:03:46 [INFO] legion.module_3.main_thread: Khởi động Legion Vision App - ItemCode: 50-E22AA-A
+2026-10-14 08:03:46 [INFO] legion.module_3.main_core: Select database: tbnq_plate_b
+2026-10-14 08:03:46 [INFO] legion.module_3.main_core: Get item code id: 50-E22AA-A
+2026-10-14 08:03:46 [INFO] legion.module_3.main_core: Get camera records for item code: 1
+2026-10-14 08:03:46 [INFO] legion.module_3.main_thread: Found 3 cameras for item code: 50-E22AA-A
+2026-10-14 08:03:46 [INFO] legion.module_3.main_core: Get models for camera: 1
+2026-10-14 08:03:46 [INFO] legion.module_3.main_core: Get models for camera: 2
+2026-10-14 08:03:46 [INFO] legion.module_3.main_core: Get models for camera: 3
+2026-10-14 08:03:46 [INFO] legion.module_3.main_thread: Setting up camera: 1 (ID: 1)
+2026-10-14 08:03:46 [INFO] legion.module_3.main_core: Get models for camera: 1
+2026-10-14 08:03:46 [INFO] legion.module_3.main_thread: Found 5 models for camera 1
+2026-10-14 08:03:46 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:03:46 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:03:46 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:03:46 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:03:46 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:03:46 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:03:46 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:03:46 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:03:46 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:03:46 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:03:46 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:03:46 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:03:46 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:03:46 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:03:46 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:03:47 [WARNING] legion.module_3.signal_process: Non Initialized index_userset and usersetselector for Auto 2!
+2026-10-14 08:03:47 [WARNING] legion.module_3.signal_process: Non Initialized index_userset and usersetselector for Auto 3!
+2026-10-14 08:03:47 [INFO] legion.module_3.main_thread: Camera 1 initialization completed
+2026-10-14 08:03:47 [INFO] legion.module_3.main_thread: Setting up camera: 2 (ID: 2)
+2026-10-14 08:03:47 [INFO] legion.module_3.main_core: Get models for camera: 2
+2026-10-14 08:03:47 [INFO] legion.module_3.main_thread: Found 4 models for camera 2
+2026-10-14 08:03:47 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:03:47 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:03:47 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:03:47 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:03:47 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:03:47 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:03:47 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:03:47 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:03:47 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:03:47 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:03:47 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:03:47 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:03:47 [WARNING] legion.module_3.signal_process: Non Initialized index_userset and usersetselector for Auto 2!
+2026-10-14 08:03:47 [WARNING] legion.module_3.signal_process: Non Initialized index_userset and usersetselector for Auto 3!
+2026-10-14 08:03:47 [INFO] legion.module_3.main_thread: Camera 2 initialization completed
+2026-10-14 08:03:47 [INFO] legion.module_3.main_thread: Setting up camera: 3 (ID: 3)
+2026-10-14 08:03:47 [INFO] legion.module_3.main_core: Get models for camera: 3
+2026-10-14 08:03:47 [INFO] legion.module_3.main_thread: Found 1 models for camera 3
+2026-10-14 08:03:47 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:03:47 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:03:47 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:03:48 [WARNING] legion.module_3.signal_process: Non Initialized index_userset and usersetselector for Auto 1!
+2026-10-14 08:03:48 [WARNING] legion.module_3.signal_process: Non Initialized index_userset and usersetselector for Auto 2!
+2026-10-14 08:03:48 [WARNING] legion.module_3.signal_process: Non Initialized index_userset and usersetselector for Auto 3!
+2026-10-14 08:03:48 [INFO] legion.module_3.main_thread: Camera 3 initialization completed
+2026-10-14 08:03:48 [WARNING] legion.module_3.main_core: [PLCHandler] Target register not found for trigger: None
+2026-10-14 08:03:48 [WARNING] legion.module_3.main_core: [PLCHandler] Target register not found for trigger: None
+2026-10-14 08:03:48 [INFO] legion.module_3.main_core: [PLCHandler] Trigger cache updated for mode: Auto 1 (Count: 1)
+2026-10-14 08:03:48 [INFO] legion.module_3.main_core: [PLCHandler] Updated dict_signal_complete for mode: Auto 1
+2026-10-14 08:03:48 [INFO] legion.module_3.main_core: [PLCWorkerModeAuto1] Running in thread: Dummy-4
+2026-10-14 08:06:11 [INFO] legion.module_3.handle_option_models: Find model_id successfully
+2026-10-14 08:06:11 [INFO] legion.module_3.handle_option_models: Save parameter successfully
+2026-10-14 08:13:29 [INFO] legion.module_2.main_core: Success to write mysql config
+2026-10-14 08:13:41 [INFO] legion.module_2.main_core: [core.__init__] START
+2026-10-14 08:13:41 [INFO] legion.module_2.main_core: [core.__init__] Creating CoreWorker...
+2026-10-14 08:13:41 [INFO] legion.module_2.main_core: [core.__init__] CoreWorker created. Connecting to MySQL...
+2026-10-14 08:13:41 [INFO] legion.module_2.main_core: [connect_to_mysql] Calling connect_mysql_from_log...
+2026-10-14 08:13:41 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Reading config from C:\project_vision\intenal\module_2/mysql_config.log
+2026-10-14 08:13:41 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Attempting mysql.connector.connect with host=127.0.0.1, user=root, port=3306...
+2026-10-14 08:13:41 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Success to connect mysql
+2026-10-14 08:13:41 [INFO] legion.module_2.main_core: [connect_to_mysql] connect_mysql_from_log returned: <mysql.connector.connection.MySQLConnection object at 0x0000026DA78260C0>
+2026-10-14 08:13:41 [INFO] legion.module_2.main_core: [connect_to_mysql] Creating default table...
+2026-10-14 08:13:41 [INFO] legion.module_2.main_core: [connect_to_mysql] Success to connect MySQL (Auto-login enabled)
+2026-10-14 08:13:41 [INFO] legion.module_2.main_core: [core.__init__] connect_to_mysql done. connect_result=<mysql.connector.connection.MySQLConnection object at 0x0000026DA78260C0>
+2026-10-14 08:13:41 [INFO] legion.module_2.main_core: Success to initialize connections
+2026-10-14 08:13:41 [INFO] legion.module_2.main_core: [core.__init__] init_plc_data...
+2026-10-14 08:13:41 [INFO] legion.module_6.keyence.initial: [+] Kết nối tới Keyence PLC 192.168.42.36:8051 qua pymcprotocol
+2026-10-14 08:13:45 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.36:8051 (Attempt 1/3) -> timed out
+2026-10-14 08:13:45 [INFO] legion.module_2.main_core: Success to connect PLC KEYENCE at 192.168.42.36:8051
+2026-10-14 08:13:45 [INFO] legion.module_2.main_core: [core.__init__] Connecting trigger signal...
+2026-10-14 08:13:45 [INFO] legion.module_2.main_core: [core.__init__] collect_dict_item...
+2026-10-14 08:13:45 [INFO] legion.module_2.main_core: Mode Automatic Login in MySQL (Optimized)
+2026-10-14 08:13:45 [INFO] legion.module_2.main_core: Successfully loaded items from 2 databases
+2026-10-14 08:13:45 [INFO] legion.module_2.main_core: [core.__init__] DONE
+2026-10-14 08:13:46 [INFO] legion.module_2.main_core: Success to check hardware key
+2026-10-14 08:13:46 [INFO] legion.module_2.main_core: Success to start monitoring
+2026-10-14 08:13:46 [INFO] legion.module_2.main_core: [CoreWorker] Running in thread: Dummy-3
+2026-10-14 08:13:46 [INFO] legion.module_2.main_core: Auto-restoring from last saved state: 50-E22AA-A, tbnq_plate_b (saved at 2026-10-14 08:03:46)
+2026-10-14 08:13:47 [INFO] legion.module_3.main_thread: Khởi động Legion Vision App - ItemCode: 50-E22AA-A
+2026-10-14 08:13:47 [INFO] legion.module_3.main_core: Select database: tbnq_plate_b
+2026-10-14 08:13:47 [INFO] legion.module_3.main_core: Get item code id: 50-E22AA-A
+2026-10-14 08:13:47 [INFO] legion.module_3.main_core: Get camera records for item code: 1
+2026-10-14 08:13:47 [INFO] legion.module_3.main_thread: Found 3 cameras for item code: 50-E22AA-A
+2026-10-14 08:13:47 [INFO] legion.module_3.main_core: Get models for camera: 1
+2026-10-14 08:13:47 [INFO] legion.module_3.main_core: Get models for camera: 2
+2026-10-14 08:13:47 [INFO] legion.module_3.main_core: Get models for camera: 3
+2026-10-14 08:13:47 [INFO] legion.module_3.main_thread: Setting up camera: 1 (ID: 1)
+2026-10-14 08:13:47 [INFO] legion.module_3.main_core: Get models for camera: 1
+2026-10-14 08:13:47 [INFO] legion.module_3.main_thread: Found 5 models for camera 1
+2026-10-14 08:13:47 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:13:47 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:13:47 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:13:47 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:13:47 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:13:47 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:13:47 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:13:47 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:13:47 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:13:47 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:13:47 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:13:47 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:13:47 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:13:47 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:13:47 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:13:48 [WARNING] legion.module_3.signal_process: Non Initialized index_userset and usersetselector for Auto 2!
+2026-10-14 08:13:48 [WARNING] legion.module_3.signal_process: Non Initialized index_userset and usersetselector for Auto 3!
+2026-10-14 08:13:48 [INFO] legion.module_3.main_core: [Camera 1] Lần thử 1: Đang kết nối (USB - DB2254099)...
+2026-10-14 08:13:48 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Open camera HIK successfully
+2026-10-14 08:13:48 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Set user selector HIK successfully
+2026-10-14 08:13:49 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Start Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:13:58 [INFO] legion.module_3.main_core: [Camera 1] ✅ Kết nối thành công sau 1 lần thử!
+2026-10-14 08:13:58 [INFO] legion.module_6.keyence.initial: [+] Kết nối tới Keyence PLC 192.168.42.36:8051 qua pymcprotocol
+2026-10-14 08:14:02 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.36:8051 (Attempt 1/3) -> timed out
+2026-10-14 08:19:27 [INFO] legion.module_2.main_core: [core.__init__] START
+2026-10-14 08:19:27 [INFO] legion.module_2.main_core: [core.__init__] Creating CoreWorker...
+2026-10-14 08:19:27 [INFO] legion.module_2.main_core: [core.__init__] CoreWorker created. Connecting to MySQL...
+2026-10-14 08:19:27 [INFO] legion.module_2.main_core: [connect_to_mysql] Calling connect_mysql_from_log...
+2026-10-14 08:19:27 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Reading config from C:\project_vision\intenal\module_2/mysql_config.log
+2026-10-14 08:19:27 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Attempting mysql.connector.connect with host=127.0.0.1, user=root, port=3306...
+2026-10-14 08:19:27 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Success to connect mysql
+2026-10-14 08:19:27 [INFO] legion.module_2.main_core: [connect_to_mysql] connect_mysql_from_log returned: <mysql.connector.connection.MySQLConnection object at 0x000002BD598391C0>
+2026-10-14 08:19:27 [INFO] legion.module_2.main_core: [connect_to_mysql] Creating default table...
+2026-10-14 08:19:27 [INFO] legion.module_2.main_core: [connect_to_mysql] Success to connect MySQL (Auto-login enabled)
+2026-10-14 08:19:27 [INFO] legion.module_2.main_core: [core.__init__] connect_to_mysql done. connect_result=<mysql.connector.connection.MySQLConnection object at 0x000002BD598391C0>
+2026-10-14 08:19:27 [INFO] legion.module_2.main_core: Success to initialize connections
+2026-10-14 08:19:27 [INFO] legion.module_2.main_core: [core.__init__] init_plc_data...
+2026-10-14 08:19:27 [INFO] legion.module_6.keyence.initial: [+] Kết nối tới Keyence PLC 192.168.42.36:8051 qua pymcprotocol
+2026-10-14 08:19:31 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.36:8051 (Attempt 1/3) -> timed out
+2026-10-14 08:19:31 [INFO] legion.module_2.main_core: Success to connect PLC KEYENCE at 192.168.42.36:8051
+2026-10-14 08:19:31 [INFO] legion.module_2.main_core: [core.__init__] Connecting trigger signal...
+2026-10-14 08:19:31 [INFO] legion.module_2.main_core: [core.__init__] collect_dict_item...
+2026-10-14 08:19:31 [INFO] legion.module_2.main_core: Mode Automatic Login in MySQL (Optimized)
+2026-10-14 08:19:31 [INFO] legion.module_2.main_core: Successfully loaded items from 2 databases
+2026-10-14 08:19:31 [INFO] legion.module_2.main_core: [core.__init__] DONE
+2026-10-14 08:19:32 [INFO] legion.module_2.main_core: Success to check hardware key
+2026-10-14 08:19:32 [INFO] legion.module_2.main_core: Success to start monitoring
+2026-10-14 08:19:32 [INFO] legion.module_2.main_core: [CoreWorker] Running in thread: Dummy-3
+2026-10-14 08:19:32 [INFO] legion.module_2.main_core: Auto-restoring from last saved state: 50-E22AA-A, tbnq_plate_b (saved at 2026-10-14 08:03:46)
+2026-10-14 08:19:32 [INFO] legion.module_3.main_thread: Khởi động Legion Vision App - ItemCode: 50-E22AA-A
+2026-10-14 08:19:32 [INFO] legion.module_3.main_core: Select database: tbnq_plate_b
+2026-10-14 08:19:32 [INFO] legion.module_3.main_core: Get item code id: 50-E22AA-A
+2026-10-14 08:19:32 [INFO] legion.module_3.main_core: Get camera records for item code: 1
+2026-10-14 08:19:32 [INFO] legion.module_3.main_thread: Found 3 cameras for item code: 50-E22AA-A
+2026-10-14 08:19:32 [INFO] legion.module_3.main_core: Get models for camera: 1
+2026-10-14 08:19:32 [INFO] legion.module_3.main_core: Get models for camera: 2
+2026-10-14 08:19:32 [INFO] legion.module_3.main_core: Get models for camera: 3
+2026-10-14 08:19:32 [INFO] legion.module_3.main_thread: Setting up camera: 1 (ID: 1)
+2026-10-14 08:19:32 [INFO] legion.module_3.main_core: Get models for camera: 1
+2026-10-14 08:19:32 [INFO] legion.module_3.main_thread: Found 5 models for camera 1
+2026-10-14 08:19:32 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:19:32 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:19:32 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:19:32 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:19:32 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:19:32 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:19:33 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:19:33 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:19:33 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:19:33 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:19:33 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:19:33 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:19:33 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:19:33 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:19:33 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:19:33 [WARNING] legion.module_3.signal_process: Non Initialized index_userset and usersetselector for Auto 2!
+2026-10-14 08:19:33 [WARNING] legion.module_3.signal_process: Non Initialized index_userset and usersetselector for Auto 3!
+2026-10-14 08:19:33 [INFO] legion.module_3.main_core: [Camera 1] Lần thử 1: Đang kết nối (USB - DB2254099)...
+2026-10-14 08:19:33 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Open camera HIK successfully
+2026-10-14 08:19:33 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Set user selector HIK successfully
+2026-10-14 08:19:33 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Start Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:19:47 [INFO] legion.module_3.main_core: [Camera 1] ✅ Kết nối thành công sau 1 lần thử!
+2026-10-14 08:19:47 [INFO] legion.module_6.keyence.initial: [+] Kết nối tới Keyence PLC 192.168.42.36:8051 qua pymcprotocol
+2026-10-14 08:19:51 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.36:8051 (Attempt 1/3) -> timed out
+2026-10-14 08:19:51 [INFO] legion.module_3.main_thread: Camera 1 initialization completed
+2026-10-14 08:19:51 [INFO] legion.module_3.main_thread: Setting up camera: 2 (ID: 2)
+2026-10-14 08:19:51 [INFO] legion.module_3.main_core: Get models for camera: 2
+2026-10-14 08:19:51 [INFO] legion.module_3.main_thread: Found 4 models for camera 2
+2026-10-14 08:19:51 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:19:51 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:19:51 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:19:51 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:19:51 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:19:51 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:19:51 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:19:51 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:19:51 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:19:51 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:19:51 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:19:51 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:19:52 [WARNING] legion.module_3.signal_process: Non Initialized index_userset and usersetselector for Auto 2!
+2026-10-14 08:19:52 [WARNING] legion.module_3.signal_process: Non Initialized index_userset and usersetselector for Auto 3!
+2026-10-14 08:19:52 [INFO] legion.module_3.main_core: [Camera 2] Lần thử 1: Đang kết nối (USB - DB2254101)...
+2026-10-14 08:19:52 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Open camera HIK successfully
+2026-10-14 08:19:52 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Set user selector HIK successfully
+2026-10-14 08:19:52 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Start Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:20:08 [INFO] legion.module_3.main_core: [Camera 2] ✅ Kết nối thành công sau 1 lần thử!
+2026-10-14 08:20:08 [INFO] legion.module_6.keyence.initial: [+] Kết nối tới Keyence PLC 192.168.42.36:8051 qua pymcprotocol
+2026-10-14 08:20:12 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.36:8051 (Attempt 1/3) -> timed out
+2026-10-14 08:20:12 [INFO] legion.module_3.main_thread: Camera 2 initialization completed
+2026-10-14 08:20:12 [INFO] legion.module_3.main_thread: Setting up camera: 3 (ID: 3)
+2026-10-14 08:20:12 [INFO] legion.module_3.main_core: Get models for camera: 3
+2026-10-14 08:20:12 [INFO] legion.module_3.main_thread: Found 1 models for camera 3
+2026-10-14 08:20:12 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:20:12 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:20:12 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:20:12 [WARNING] legion.module_3.signal_process: Non Initialized index_userset and usersetselector for Auto 1!
+2026-10-14 08:20:12 [WARNING] legion.module_3.signal_process: Non Initialized index_userset and usersetselector for Auto 2!
+2026-10-14 08:20:12 [WARNING] legion.module_3.signal_process: Non Initialized index_userset and usersetselector for Auto 3!
+2026-10-14 08:20:13 [INFO] legion.module_3.main_core: [Camera 3] Lần thử 1: Đang kết nối (USB - DB2254102)...
+2026-10-14 08:20:13 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Open camera HIK successfully
+2026-10-14 08:20:13 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Set user selector HIK successfully
+2026-10-14 08:20:13 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Start Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:20:29 [INFO] legion.module_3.main_core: [Camera 3] ✅ Kết nối thành công sau 1 lần thử!
+2026-10-14 08:20:29 [INFO] legion.module_6.keyence.initial: [+] Kết nối tới Keyence PLC 192.168.42.36:8051 qua pymcprotocol
+2026-10-14 08:20:33 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.36:8051 (Attempt 1/3) -> timed out
+2026-10-14 08:20:33 [INFO] legion.module_3.main_thread: Camera 3 initialization completed
+2026-10-14 08:20:33 [WARNING] legion.module_3.main_core: [PLCHandler] Target register not found for trigger: None
+2026-10-14 08:20:33 [WARNING] legion.module_3.main_core: [PLCHandler] Target register not found for trigger: None
+2026-10-14 08:20:33 [INFO] legion.module_3.main_core: [PLCHandler] Trigger cache updated for mode: Auto 1 (Count: 1)
+2026-10-14 08:20:33 [INFO] legion.module_3.main_core: [PLCHandler] Updated dict_signal_complete for mode: Auto 1
+2026-10-14 08:20:33 [INFO] legion.module_3.main_core: [PLCWorkerModeAuto1] Running in thread: Dummy-4
+2026-10-14 08:21:09 [INFO] legion.module_3.main_core: Mode Set Index: logging_mode
+2026-10-14 08:21:09 [WARNING] legion.module_3.main_core: [PLCHandler] Target register not found for trigger: None
+2026-10-14 08:21:09 [WARNING] legion.module_3.main_core: [PLCHandler] Target register not found for trigger: None
+2026-10-14 08:21:09 [INFO] legion.module_3.main_core: [PLCHandler] Trigger cache updated for mode: Auto 3 (Count: 1)
+2026-10-14 08:21:09 [INFO] legion.module_3.main_core: [PLCHandler] Updated dict_signal_complete for mode: Auto 3
+2026-10-14 08:21:09 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Stop Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:21:09 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Stop Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:21:09 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Stop Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:21:09 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Set user selector HIK successfully
+2026-10-14 08:21:09 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Set user selector HIK successfully
+2026-10-14 08:21:09 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Set user selector HIK successfully
+2026-10-14 08:21:09 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Start Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:21:09 [INFO] legion.module_3.main_core: UserSetNone from Mode: Auto 3 in camera-1 loaded successfully
+2026-10-14 08:21:09 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Start Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:21:09 [INFO] legion.module_3.main_core: UserSetNone from Mode: Auto 3 in camera-3 loaded successfully
+2026-10-14 08:21:09 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Start Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:21:09 [INFO] legion.module_3.main_core: UserSetNone from Mode: Auto 3 in camera-2 loaded successfully
+2026-10-14 08:21:16 [INFO] legion.module_3.main_core: [PLCWorkerAutoLogging] Running in thread: Dummy-5
+2026-10-14 08:24:30 [INFO] legion.module_3.main_core: [built-in-camera-1] handle_image_logging — processing C:/Users/VDM/Documents/hdar/camera 1\2026-05-16_11-09-19-224533.jpg images
+2026-10-14 08:24:34 [ERROR] legion.module_3.main_core: [PLCHandler] _accumulate_registers failed for key: built-in-camera-1
+2026-10-14 08:24:59 [INFO] legion.module_3.main_core: [built-in-camera-1] handle_image_logging — processing C:/Users/VDM/Documents/hdar/camera 1\2026-05-16_11-09-21-387990.jpg images
+2026-10-14 08:24:59 [ERROR] legion.module_3.main_core: [PLCHandler] _accumulate_registers failed for key: built-in-camera-1
+2026-10-14 08:25:19 [INFO] legion.module_3.main_core: [built-in-camera-1] handle_image_logging — processing C:/Users/VDM/Documents/hdar/camera 1\2026-05-16_11-09-19-224533.jpg images
+2026-10-14 08:25:19 [ERROR] legion.module_3.main_core: [PLCHandler] _accumulate_registers failed for key: built-in-camera-1
+2026-10-14 08:25:27 [INFO] legion.module_3.main_core: [built-in-camera-1] handle_image_logging — processing C:/Users/VDM/Documents/hdar/camera 1\2026-05-16_11-09-21-387990.jpg images
+2026-10-14 08:25:27 [ERROR] legion.module_3.main_core: [PLCHandler] _accumulate_registers failed for key: built-in-camera-1
+2026-10-14 08:26:07 [WARNING] legion.module_3.main_core: [PLCHandler] Target register not found for trigger: None
+2026-10-14 08:26:07 [WARNING] legion.module_3.main_core: [PLCHandler] Target register not found for trigger: None
+2026-10-14 08:26:07 [INFO] legion.module_3.main_core: [PLCHandler] Trigger cache updated for mode: Auto 3 (Count: 1)
+2026-10-14 08:26:07 [INFO] legion.module_3.main_core: [PLCHandler] Updated dict_signal_complete for mode: Auto 3
+2026-10-14 08:26:07 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Stop Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:26:07 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Stop Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:26:07 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Stop Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:26:07 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Set user selector HIK successfully
+2026-10-14 08:26:07 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Set user selector HIK successfully
+2026-10-14 08:26:07 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Set user selector HIK successfully
+2026-10-14 08:26:07 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Start Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:26:07 [INFO] legion.module_3.main_core: UserSetNone from Mode: Auto 3 in camera-1 loaded successfully
+2026-10-14 08:26:07 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Start Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:26:07 [INFO] legion.module_3.main_core: UserSetNone from Mode: Auto 3 in camera-3 loaded successfully
+2026-10-14 08:26:07 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Start Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:26:07 [INFO] legion.module_3.main_core: UserSetNone from Mode: Auto 3 in camera-2 loaded successfully
+2026-10-14 08:27:28 [WARNING] legion.module_3.main_core: [PLCHandler] Target register not found for trigger: None
+2026-10-14 08:27:28 [WARNING] legion.module_3.main_core: [PLCHandler] Target register not found for trigger: None
+2026-10-14 08:27:28 [INFO] legion.module_3.main_core: [PLCHandler] Trigger cache updated for mode: Auto 3 (Count: 1)
+2026-10-14 08:27:28 [INFO] legion.module_3.main_core: [PLCHandler] Updated dict_signal_complete for mode: Auto 3
+2026-10-14 08:27:29 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Stop Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:27:29 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Stop Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:27:29 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Stop Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:27:29 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Set user selector HIK successfully
+2026-10-14 08:27:29 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Set user selector HIK successfully
+2026-10-14 08:27:29 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Start Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:27:29 [INFO] legion.module_3.main_core: UserSetNone from Mode: Auto 3 in camera-1 loaded successfully
+2026-10-14 08:27:29 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Start Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:27:29 [INFO] legion.module_3.main_core: UserSetNone from Mode: Auto 3 in camera-3 loaded successfully
+2026-10-14 08:27:29 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Set user selector HIK successfully
+2026-10-14 08:27:29 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Start Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:27:29 [INFO] legion.module_3.main_core: UserSetNone from Mode: Auto 3 in camera-2 loaded successfully
+2026-10-14 08:30:57 [DEBUG] legion.module_3.signal_process: list_insert: [{0: '1', 1: '1'}, {0: '2', 1: '1'}, {0: '3', 1: '1'}, {0: '4', 1: '1'}]
+2026-10-14 08:37:52 [INFO] legion.module_2.main_core: [core.__init__] START
+2026-10-14 08:37:52 [INFO] legion.module_2.main_core: [core.__init__] Creating CoreWorker...
+2026-10-14 08:37:52 [INFO] legion.module_2.main_core: [core.__init__] CoreWorker created. Connecting to MySQL...
+2026-10-14 08:37:52 [INFO] legion.module_2.main_core: [connect_to_mysql] Calling connect_mysql_from_log...
+2026-10-14 08:37:52 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Reading config from C:\project_vision\intenal\module_2/mysql_config.log
+2026-10-14 08:37:52 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Attempting mysql.connector.connect with host=127.0.0.1, user=root, port=3306...
+2026-10-14 08:37:52 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Success to connect mysql
+2026-10-14 08:37:52 [INFO] legion.module_2.main_core: [connect_to_mysql] connect_mysql_from_log returned: <mysql.connector.connection.MySQLConnection object at 0x000001CC733D9100>
+2026-10-14 08:37:52 [INFO] legion.module_2.main_core: [connect_to_mysql] Creating default table...
+2026-10-14 08:37:52 [INFO] legion.module_2.main_core: [connect_to_mysql] Success to connect MySQL (Auto-login enabled)
+2026-10-14 08:37:52 [INFO] legion.module_2.main_core: [core.__init__] connect_to_mysql done. connect_result=<mysql.connector.connection.MySQLConnection object at 0x000001CC733D9100>
+2026-10-14 08:37:52 [INFO] legion.module_2.main_core: Success to initialize connections
+2026-10-14 08:37:52 [INFO] legion.module_2.main_core: [core.__init__] init_plc_data...
+2026-10-14 08:37:52 [INFO] legion.module_6.keyence.initial: [+] Kết nối tới Keyence PLC 192.168.42.36:8051 qua pymcprotocol
+2026-10-14 08:37:56 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.36:8051 (Attempt 1/3) -> timed out
+2026-10-14 08:37:56 [INFO] legion.module_2.main_core: Success to connect PLC KEYENCE at 192.168.42.36:8051
+2026-10-14 08:37:56 [INFO] legion.module_2.main_core: [core.__init__] Connecting trigger signal...
+2026-10-14 08:37:56 [INFO] legion.module_2.main_core: [core.__init__] collect_dict_item...
+2026-10-14 08:37:56 [INFO] legion.module_2.main_core: Mode Automatic Login in MySQL (Optimized)
+2026-10-14 08:37:56 [INFO] legion.module_2.main_core: Successfully loaded items from 2 databases
+2026-10-14 08:37:56 [INFO] legion.module_2.main_core: [core.__init__] DONE
+2026-10-14 08:37:57 [INFO] legion.module_2.main_core: Success to check hardware key
+2026-10-14 08:37:57 [INFO] legion.module_2.main_core: Success to start monitoring
+2026-10-14 08:37:57 [INFO] legion.module_2.main_core: [CoreWorker] Running in thread: Dummy-3
+2026-10-14 08:37:57 [INFO] legion.module_2.main_core: Auto-restoring from last saved state: 50-E22AA-A, tbnq_plate_b (saved at 2026-10-14 08:03:46)
+2026-10-14 08:37:57 [INFO] legion.module_3.main_thread: Khởi động Legion Vision App - ItemCode: 50-E22AA-A
+2026-10-14 08:37:57 [INFO] legion.module_3.main_core: Select database: tbnq_plate_b
+2026-10-14 08:37:57 [INFO] legion.module_3.main_core: Get item code id: 50-E22AA-A
+2026-10-14 08:37:57 [INFO] legion.module_3.main_core: Get camera records for item code: 1
+2026-10-14 08:37:57 [INFO] legion.module_3.main_thread: Found 3 cameras for item code: 50-E22AA-A
+2026-10-14 08:37:57 [INFO] legion.module_3.main_core: Get models for camera: 1
+2026-10-14 08:37:57 [INFO] legion.module_3.main_core: Get models for camera: 2
+2026-10-14 08:37:57 [INFO] legion.module_3.main_core: Get models for camera: 3
+2026-10-14 08:37:57 [INFO] legion.module_3.main_thread: Setting up camera: 1 (ID: 1)
+2026-10-14 08:37:57 [INFO] legion.module_3.main_core: Get models for camera: 1
+2026-10-14 08:37:57 [INFO] legion.module_3.main_thread: Found 5 models for camera 1
+2026-10-14 08:37:57 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:37:58 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:37:58 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:37:58 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:37:58 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:37:58 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:37:58 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:37:58 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:37:58 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:37:58 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:37:58 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:37:58 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:37:58 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:37:58 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:37:58 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:37:58 [WARNING] legion.module_3.signal_process: Non Initialized index_userset and usersetselector for Auto 2!
+2026-10-14 08:37:58 [WARNING] legion.module_3.signal_process: Non Initialized index_userset and usersetselector for Auto 3!
+2026-10-14 08:37:58 [INFO] legion.module_3.main_core: [Camera 1] Lần thử 1: Đang kết nối (USB - DB2254099)...
+2026-10-14 08:37:59 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Open camera HIK successfully
+2026-10-14 08:37:59 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Set user selector HIK successfully
+2026-10-14 08:37:59 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Start Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:38:12 [INFO] legion.module_3.main_core: [Camera 1] ✅ Kết nối thành công sau 1 lần thử!
+2026-10-14 08:38:12 [INFO] legion.module_6.keyence.initial: [+] Kết nối tới Keyence PLC 192.168.42.36:8051 qua pymcprotocol
+2026-10-14 08:38:16 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.36:8051 (Attempt 1/3) -> timed out
+2026-10-14 08:38:16 [INFO] legion.module_3.main_thread: Camera 1 initialization completed
+2026-10-14 08:38:16 [INFO] legion.module_3.main_thread: Setting up camera: 2 (ID: 2)
+2026-10-14 08:38:16 [INFO] legion.module_3.main_core: Get models for camera: 2
+2026-10-14 08:38:16 [INFO] legion.module_3.main_thread: Found 4 models for camera 2
+2026-10-14 08:38:16 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:38:16 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:38:16 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:38:16 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:38:16 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:38:16 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:38:16 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:38:16 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:38:16 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:38:17 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:38:17 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:38:17 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:38:17 [WARNING] legion.module_3.signal_process: Non Initialized index_userset and usersetselector for Auto 2!
+2026-10-14 08:38:17 [WARNING] legion.module_3.signal_process: Non Initialized index_userset and usersetselector for Auto 3!
+2026-10-14 08:38:17 [INFO] legion.module_3.main_core: [Camera 2] Lần thử 1: Đang kết nối (USB - DB2254101)...
+2026-10-14 08:38:17 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Open camera HIK successfully
+2026-10-14 08:38:17 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Set user selector HIK successfully
+2026-10-14 08:38:17 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Start Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:38:30 [INFO] legion.module_3.main_core: [Camera 2] ✅ Kết nối thành công sau 1 lần thử!
+2026-10-14 08:38:30 [INFO] legion.module_6.keyence.initial: [+] Kết nối tới Keyence PLC 192.168.42.36:8051 qua pymcprotocol
+2026-10-14 08:38:34 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.36:8051 (Attempt 1/3) -> timed out
+2026-10-14 08:38:34 [INFO] legion.module_3.main_thread: Camera 2 initialization completed
+2026-10-14 08:38:34 [INFO] legion.module_3.main_thread: Setting up camera: 3 (ID: 3)
+2026-10-14 08:38:34 [INFO] legion.module_3.main_core: Get models for camera: 3
+2026-10-14 08:38:34 [INFO] legion.module_3.main_thread: Found 1 models for camera 3
+2026-10-14 08:38:34 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-10-14 08:38:34 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-10-14 08:38:34 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-14 08:38:35 [WARNING] legion.module_3.signal_process: Non Initialized index_userset and usersetselector for Auto 1!
+2026-10-14 08:38:35 [WARNING] legion.module_3.signal_process: Non Initialized index_userset and usersetselector for Auto 2!
+2026-10-14 08:38:35 [WARNING] legion.module_3.signal_process: Non Initialized index_userset and usersetselector for Auto 3!
+2026-10-14 08:38:35 [INFO] legion.module_3.main_core: [Camera 3] Lần thử 1: Đang kết nối (USB - DB2254102)...
+2026-10-14 08:38:35 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Open camera HIK successfully
+2026-10-14 08:38:35 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Set user selector HIK successfully
+2026-10-14 08:38:35 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Start Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:38:51 [INFO] legion.module_3.main_core: [Camera 3] ✅ Kết nối thành công sau 1 lần thử!
+2026-10-14 08:38:51 [INFO] legion.module_6.keyence.initial: [+] Kết nối tới Keyence PLC 192.168.42.36:8051 qua pymcprotocol
+2026-10-14 08:38:55 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.36:8051 (Attempt 1/3) -> timed out
+2026-10-14 08:38:55 [INFO] legion.module_3.main_thread: Camera 3 initialization completed
+2026-10-14 08:38:55 [WARNING] legion.module_3.main_core: [PLCHandler] Target register not found for trigger: None
+2026-10-14 08:38:55 [INFO] legion.module_3.main_core: [PLCHandler] Trigger cache updated for mode: Auto 1 (Count: 2)
+2026-10-14 08:38:55 [INFO] legion.module_3.main_core: [PLCHandler] Updated dict_signal_complete for mode: Auto 1
+2026-10-14 08:38:55 [INFO] legion.module_3.main_core: [PLCWorkerModeAuto1] Running in thread: Dummy-4
+2026-10-14 08:38:55 [INFO] legion.module_3.main_core: [built-in-camera-3] Current count for: 1
+2026-10-14 08:38:55 [DEBUG] legion.module_3.main_core: [take_image] Retrieve latency (attempt 1): 44.88ms
+2026-10-14 08:38:58 [ERROR] legion.module_3.main_core: [PLCHandler] _accumulate_registers failed for key: built-in-camera-3
+2026-10-14 08:39:45 [INFO] legion.module_3.main_core: Mode Set Index: logging_mode
+2026-10-14 08:39:45 [WARNING] legion.module_3.main_core: [PLCHandler] Target register not found for trigger: None
+2026-10-14 08:39:45 [INFO] legion.module_3.main_core: [PLCHandler] Trigger cache updated for mode: Auto 3 (Count: 2)
+2026-10-14 08:39:45 [INFO] legion.module_3.main_core: [PLCHandler] Updated dict_signal_complete for mode: Auto 3
+2026-10-14 08:39:45 [INFO] legion.module_3.main_core: [PLCWorkerAutoLogging] Running in thread: Dummy-6
+2026-10-14 08:39:45 [INFO] legion.module_3.main_core: [built-in-camera-3] handle_image_logging — processing C:/Users/VDM/Documents/hdar/camera 3\2026-05-16_11-09-23-909369 - Copy.jpg images
+2026-10-14 08:39:45 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Stop Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:39:45 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Stop Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:39:45 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Stop Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:39:45 [ERROR] legion.module_3.main_core: [PLCHandler] _accumulate_registers failed for key: built-in-camera-3
+2026-10-14 08:39:45 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Set user selector HIK successfully
+2026-10-14 08:39:45 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Set user selector HIK successfully
+2026-10-14 08:39:45 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Start Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:39:45 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Set user selector HIK successfully
+2026-10-14 08:39:45 [INFO] legion.module_3.main_core: UserSetNone from Mode: Auto 3 in camera-3 loaded successfully
+2026-10-14 08:39:45 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Start Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:39:45 [INFO] legion.module_3.main_core: UserSetNone from Mode: Auto 3 in camera-2 loaded successfully
+2026-10-14 08:39:45 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Start Grabbing MVS DRIVER Succesfully!
+2026-10-14 08:39:45 [INFO] legion.module_3.main_core: UserSetNone from Mode: Auto 3 in camera-1 loaded successfully
+2026-10-14 08:40:08 [INFO] legion.module_3.main_core: [built-in-camera-3] handle_image_logging — processing C:/Users/VDM/Documents/hdar/camera 3\2026-05-16_11-09-23-909369 - Copy.jpg images
+2026-10-14 08:40:08 [ERROR] legion.module_3.main_core: [PLCHandler] _accumulate_registers failed for key: built-in-camera-3

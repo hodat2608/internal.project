@@ -1313,6 +1313,7 @@ class PLCHandler:
                             'values':values,
                             'key':key
                         }
+                    print("self.register_table_logging",self.register_table_logging)
 
     def handle_auto_logging_process_image(self):
         if not getattr(self, 'register_table_logging', None):
@@ -1950,7 +1951,7 @@ class CameraTabManager:
                     self.automation_ui.comboBox_mode_auto.currentText(),
                     self.automation_ui.comboBox_Itemcode.currentText()
                 )
-        self.automation_ui.pushButton_set_loa_mode.clicked.connect(_on_load_mode)
+        self.automation_ui.pushButton_load_params_from_mode.clicked.connect(_on_load_mode)
         self.automation_ui.pushButton_apply_itemcode_assign.clicked.connect(lambda _: _signals_processor.save_register_name_line_code(self.db_manager.cursor, self.db_manager.connect_db))
         mode_dict = self.get_mode(_signals_processor,camera_id)
 
@@ -2146,34 +2147,6 @@ class CameraTabManager:
     def get_mode(self,signals_processor,camera_id):
         return signals_processor.collect_dict_from_mode_auto(self.db_manager.cursor, camera_id)
     
-
-    def create_single_tab_detect(self,tab_widget_2,built_in_objects,process,total_key,product_code_forms):
-        _translate = QtCore.QCoreApplication.translate
-        single_tab_widget = QtWidgets.QMainWindow()
-        self.single_tab_widget_ui = Single_Tab_Detect(built_in_objects,process,total_key)
-        self.single_tab_widget_ui.setupUi(single_tab_widget)
-        tab_widget_2.addTab(single_tab_widget, "Detect Model")
-        product_code_forms.append(single_tab_widget)
-
-    # def create_auto_log_tab(self,tab_widget_2,built_in_objects,camera_id,camera_name,item_code_id,total_key,product_code_forms,process):
-    #     _translate = QtCore.QCoreApplication.translate
-    #     auto_log_tab = QtWidgets.QMainWindow()
-    #     auto_log_tab_ui = Auto_Logging()
-    #     auto_log_tab_ui.setupUi(auto_log_tab)
-    #     tab_widget_2.addTab(auto_log_tab, "Auto Logging")
-    #     product_code_forms.append(auto_log_tab)
-    #     auto_log_tab_ui.comboBox_item_code.clear()
-    #     auto_log_tab_ui.comboBox_item_code.addItem(str(self.i_code))
-    #     self.logging_process = AutoLoggingProcess(auto_log_tab_ui,self.connect_plc.connection.cursor(),process,built_in_objects)
-    #     self.logging_process.load_data_from_db(item_code_id,self.connect_plc.connection)
-    #     auto_log_tab_ui.pushButton_broswer_folder.clicked.connect(self.logging_process.broswer_folder)
-    #     auto_log_tab_ui.pushButton_import.clicked.connect(lambda: self.logging_process.generate_table(total_key))
-    #     auto_log_tab_ui.tableWidget.itemSelectionChanged.connect(self.logging_process.show_image_preview)
-    #     auto_log_tab_ui.pushButton_set_save.clicked.connect(lambda: self.logging_process.save_values_auto_log_to_db(item_code_id,self.connect_plc.connection))
-    #     auto_log_tab_ui.pushButton_set_load.clicked.connect(lambda: self.logging_process.load_data_from_db(item_code_id,self.connect_plc.connection))
-
-    #     return auto_log_tab_ui
-
     def create_auto_log_tab(self,tab_widget_2,built_in_objects,camera_id,camera_name,item_code_id,total_key,product_code_forms,process):
         _translate = QtCore.QCoreApplication.translate
         auto_log_tab = QtWidgets.QMainWindow()
