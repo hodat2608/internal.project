@@ -208,19 +208,21 @@ class core:
             if not result:
                 return connection, 0
 
-            manual    = result[0][5]
-            automatic = result[0][6]
+            manual    = bool(result[0][5])
+            automatic = bool(result[0][6])
             
             if not manual and automatic:
                 _log.info("[connect_to_mysql] Success to connect MySQL (Auto-login enabled)")
                 return connection, 1
-            elif manual and not automatic:
+            else:
                 _log.info("[connect_to_mysql] Success to connect MySQL (Manual mode)")
                 return connection, 0
 
         except Exception as e:
             _log.error("Error in connect_to_mysql: %s", e)
             return connection, 0
+
+        return connection, 0
 
     def init_plc_data(self):
         if not self.connection:

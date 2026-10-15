@@ -3591,10 +3591,10 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         self.comboBox_logging_mode.setCurrentIndex(2)
         self.comboBox_mirror_mode.setCurrentIndex(1)
-        self.radioButton_counter_pc.clicked['bool'].connect(self.radioButton_reset.setChecked) # type: ignore
-        self.radioButton_counter_plc.clicked['bool'].connect(self.radioButton_none_1.setChecked) # type: ignore
-        self.radioButton_reset.clicked['bool'].connect(self.radioButton_counter_pc.setChecked) # type: ignore
-        self.radioButton_none_1.clicked['bool'].connect(self.radioButton_counter_plc.setChecked) # type: ignore
+        # self.radioButton_counter_pc.clicked['bool'].connect(self.radioButton_reset.setChecked) # type: ignore
+        # self.radioButton_counter_plc.clicked['bool'].connect(self.radioButton_none_1.setChecked) # type: ignore
+        # self.radioButton_reset.clicked['bool'].connect(self.radioButton_counter_pc.setChecked) # type: ignore
+        # self.radioButton_none_1.clicked['bool'].connect(self.radioButton_counter_plc.setChecked) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):

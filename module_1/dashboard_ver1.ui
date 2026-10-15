@@ -6,35 +6,59 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>850</width>
-    <height>800</height>
+    <width>900</width>
+    <height>820</height>
    </rect>
   </property>
+  <property name="font">
+   <font>
+    <family>Segoe UI</family>
+    <pointsize>9</pointsize>
+   </font>
+  </property>
   <property name="windowTitle">
-   <string>DEVICE DASHBOARD</string>
+   <string>VISUAL SYSTEM CONFIG</string>
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>../module_3/assert/icon/dashboard (1).png</normaloff>../module_3/assert/icon/dashboard (1).png</iconset>
+    <normaloff>../../../project_vision/intenal/module_3/assert/icon/dashboard (1).png</normaloff>../../../project_vision/intenal/module_3/assert/icon/dashboard (1).png</iconset>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QMainWindow { background-color: #FFFFF0;}</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
+   <layout class="QVBoxLayout" name="verticalLayout_centralwidget">
+    <property name="spacing">
+     <number>14</number>
+    </property>
+    <property name="leftMargin">
+     <number>16</number>
+    </property>
+    <property name="topMargin">
+     <number>14</number>
+    </property>
+    <property name="rightMargin">
+     <number>16</number>
+    </property>
+    <property name="bottomMargin">
+     <number>14</number>
+    </property>
+    <item>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <property name="spacing">
-       <number>7</number>
+       <number>10</number>
       </property>
       <property name="leftMargin">
-       <number>5</number>
+       <number>4</number>
       </property>
       <property name="topMargin">
-       <number>7</number>
+       <number>4</number>
       </property>
       <property name="rightMargin">
-       <number>5</number>
+       <number>4</number>
       </property>
       <property name="bottomMargin">
-       <number>6</number>
+       <number>4</number>
       </property>
       <item>
        <widget class="QLabel" name="label">
@@ -50,11 +74,16 @@
           <height>40</height>
          </size>
         </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI</family>
+         </font>
+        </property>
         <property name="text">
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap>../module_3/assert/icon/report.png</pixmap>
+         <pixmap>../../../project_vision/intenal/module_3/assert/icon/report.png</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -62,62 +91,41 @@
        </widget>
       </item>
       <item>
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Minimum</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>10</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
        <widget class="QLabel" name="heading">
         <property name="maximumSize">
          <size>
           <width>16777215</width>
-          <height>40</height>
+          <height>44</height>
          </size>
         </property>
         <property name="font">
          <font>
-          <family>Microsoft YaHei</family>
-          <pointsize>22</pointsize>
+          <family>Segoe UI</family>
+          <pointsize>20</pointsize>
           <weight>75</weight>
-          <italic>false</italic>
           <bold>true</bold>
          </font>
         </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
+        <property name="styleSheet">
+         <string notr="true">QLabel { color: #1b1b1b; }</string>
         </property>
         <property name="text">
-         <string>Vision System Setup</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::RichText</enum>
+         <string> Computer System Configuration</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
       <item>
-       <spacer name="horizontalSpacer">
+       <spacer name="header_spacer">
+        <property name="font">
+         <font>
+          <family>Segoe UI</family>
+         </font>
+        </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Expanding</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -132,26 +140,22 @@
         <property name="minimumSize">
          <size>
           <width>100</width>
-          <height>40</height>
+          <height>36</height>
          </size>
         </property>
         <property name="font">
          <font>
-          <family>Microsoft YaHei</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
+          <family>Segoe UI</family>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
          </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton { background-color:#209E3D; color:white; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#4EA117; }</string>
         </property>
         <property name="text">
          <string>MySQL</string>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>30</width>
-          <height>25</height>
-         </size>
         </property>
        </widget>
       </item>
@@ -159,81 +163,36 @@
        <widget class="QPushButton" name="pushButton">
         <property name="minimumSize">
          <size>
-          <width>100</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>16777215</height>
+          <width>110</width>
+          <height>36</height>
          </size>
         </property>
         <property name="font">
          <font>
-          <family>Microsoft YaHei</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
+          <family>Segoe UI</family>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
          </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton { background-color:#0067c0; color:white; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#005ba1; }</string>
         </property>
         <property name="text">
          <string>EXECUTE</string>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>20</width>
-          <height>20</height>
-         </size>
         </property>
        </widget>
       </item>
      </layout>
     </item>
-    <item row="2" column="0">
-     <widget class="QTabWidget" name="tab_item_code">
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>16777215</height>
-       </size>
+    <item>
+     <widget class="Line" name="line">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
       </property>
-      <property name="font">
-       <font>
-        <family>Microsoft YaHei</family>
-        <pointsize>11</pointsize>
-        <weight>50</weight>
-        <italic>false</italic>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="tabPosition">
-       <enum>QTabWidget::North</enum>
-      </property>
-      <property name="tabShape">
-       <enum>QTabWidget::Rounded</enum>
-      </property>
-      <property name="currentIndex">
-       <number>1</number>
-      </property>
-      <property name="elideMode">
-       <enum>Qt::ElideNone</enum>
-      </property>
-      <widget class="QWidget" name="tab_itemcode_1">
-       <attribute name="title">
-        <string>Mã hàng 1</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_2"/>
-      </widget>
-      <widget class="QWidget" name="tab_itemcode_2">
-       <attribute name="title">
-        <string>Mã hàng 2</string>
-       </attribute>
-      </widget>
      </widget>
     </item>
-    <item row="1" column="0">
+    <item>
      <widget class="QGroupBox" name="groupBox_namedevice_itemcode">
       <property name="minimumSize">
        <size>
@@ -244,158 +203,340 @@
       <property name="maximumSize">
        <size>
         <width>16777215</width>
-        <height>200</height>
+        <height>160</height>
        </size>
       </property>
       <property name="font">
        <font>
-        <family>Microsoft YaHei</family>
-        <pointsize>11</pointsize>
-        <weight>50</weight>
-        <italic>false</italic>
-        <bold>false</bold>
+        <family>Segoe UI</family>
+        <pointsize>-1</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
        </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">/* Khung chính của GroupBox */
+QGroupBox {
+    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
+    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */
+    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
+    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
+    font-size: 15px;           /* Kích thước chữ tiêu đề */
+    font-weight: bold;         /* Làm đậm chữ tiêu đề */
+    color: #333333;            /* Màu chữ tiêu đề */
+}
+
+/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */
+    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */
+    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */
+}
+</string>
       </property>
       <property name="title">
        <string>Setup Device Name</string>
       </property>
-      <layout class="QGridLayout" name="gridLayout_2">
-       <item row="1" column="0">
-        <widget class="QLineEdit" name="lineEdit_name_devic">
-         <property name="maximumSize">
-          <size>
-           <width>800</width>
-           <height>30</height>
-          </size>
+      <layout class="QVBoxLayout" name="vlayout_device">
+       <property name="spacing">
+        <number>8</number>
+       </property>
+       <property name="leftMargin">
+        <number>14</number>
+       </property>
+       <property name="topMargin">
+        <number>18</number>
+       </property>
+       <property name="rightMargin">
+        <number>14</number>
+       </property>
+       <property name="bottomMargin">
+        <number>14</number>
+       </property>
+       <item>
+        <layout class="QHBoxLayout" name="hlayout_device_fields">
+         <property name="spacing">
+          <number>16</number>
          </property>
-         <property name="font">
-          <font>
-           <family>Microsoft YaHei</family>
-           <pointsize>11</pointsize>
-           <weight>50</weight>
-           <italic>false</italic>
-           <bold>false</bold>
-          </font>
-         </property>
-        </widget>
+         <item>
+          <layout class="QVBoxLayout" name="vlayout_name">
+           <property name="spacing">
+            <number>4</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="label_name_device">
+             <property name="font">
+              <font>
+               <family>Segoe UI</family>
+               <pointsize>11</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Device Name:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_name_devic">
+             <property name="minimumSize">
+              <size>
+               <width>500</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>800</width>
+               <height>35</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <family>Segoe UI</family>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="placeholderText">
+              <string>Enter the device name...</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="vlayout_qty">
+           <property name="spacing">
+            <number>4</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="label_quanty_itemcode">
+             <property name="font">
+              <font>
+               <family>Segoe UI</family>
+               <pointsize>11</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Quantity:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="spinBox_num_itemcode">
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>160</width>
+               <height>35</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <family>Segoe UI</family>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>10</number>
+             </property>
+             <property name="value">
+              <number>1</number>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <spacer name="device_spacer">
+           <property name="font">
+            <font>
+             <family>Segoe UI</family>
+            </font>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
        </item>
-       <item row="1" column="1">
-        <widget class="QSpinBox" name="spinBox_num_itemcode">
-         <property name="minimumSize">
-          <size>
-           <width>100</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>800</width>
-           <height>35</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <family>Microsoft YaHei</family>
-           <pointsize>11</pointsize>
-           <weight>50</weight>
-           <italic>false</italic>
-           <bold>false</bold>
-          </font>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-         <property name="maximum">
-          <number>10</number>
-         </property>
-         <property name="value">
-          <number>1</number>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_name_device">
-         <property name="maximumSize">
-          <size>
-           <width>115</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <family>Microsoft YaHei</family>
-           <pointsize>11</pointsize>
-           <weight>50</weight>
-           <italic>false</italic>
-           <bold>false</bold>
-          </font>
-         </property>
+       <item>
+        <widget class="QLabel" name="label_2">
          <property name="text">
-          <string> Device Name:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLabel" name="label_quanty_itemcode">
-         <property name="maximumSize">
-          <size>
-           <width>115</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <family>Microsoft YaHei</family>
-           <pointsize>11</pointsize>
-           <weight>50</weight>
-           <italic>false</italic>
-           <bold>false</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Quantity:</string>
+          <string/>
          </property>
         </widget>
        </item>
       </layout>
      </widget>
     </item>
-    <item row="3" column="0">
+    <item>
+     <widget class="QTabWidget" name="tab_item_code">
+      <property name="font">
+       <font>
+        <family>Segoe UI</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">/* 1. Tùy biến khung nền nội dung phía dưới các tab */
+QTabWidget::pane {
+    border: 1px solid #3c3c3c;
+    background-color: #F7FFFD;
+    position: absolute;
+    top: -1px; /* Giúp khung nền khít với thanh tab, không bị lộ viền đè */
+    border-radius: 6px;
+}
+
+/* 2. Cấu hình thanh chứa các tab */
+QTabBar {
+    qproperty-drawBase: 0; /* Xóa đường viền mặc định đáng ghét dưới thanh tab */
+    left: 5px; /* Tạo khoảng cách lề trái cho các tab */
+}
+
+/* 3. Phong cách chung cho TẤT CẢ các Tab */
+QTabBar::tab {
+    background-color: #F7FFFD;
+    color: #b1b1b1;
+    border: 1px solid #F7FFFD;
+    border-bottom-color: none; /* Giấu viền dưới để nối liền với pane khi được chọn */
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    padding: 6px 16px;
+    margin-right: 2px;
+    font-family: &quot;Segoe UI&quot;, sans-serif;
+    font-size: 12px;
+}
+
+/* 4. Hiệu ứng khi di chuột qua tab (Hover) */
+QTabBar::tab:hover {
+    background-color: #383838;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+/* 5. Phong cách khi Tab ĐƯỢC CHỌN (Active) */
+QTabBar::tab:selected {
+    background-color: #1e1e1e; /* Trùng màu với màu nền QTabWidget::pane */
+    color: #4fc3f7; /* Màu chữ xanh neon tạo điểm nhấn hi-tech */
+    border-bottom-color: #1e1e1e; /* Làm chìm viền dưới để hòa vào nền */
+    font-weight: bold;
+}
+
+/* 6. Rút gọn tab không được chọn để tạo chiều sâu */
+QTabBar::tab:!selected {
+    margin-top: 2px; /* Làm tab chưa chọn thấp xuống một chút */
+}
+</string>
+      </property>
+      <property name="tabPosition">
+       <enum>QTabWidget::North</enum>
+      </property>
+      <property name="tabShape">
+       <enum>QTabWidget::Rounded</enum>
+      </property>
+      <property name="currentIndex">
+       <number>1</number>
+      </property>
+      <widget class="QWidget" name="tab_itemcode_1">
+       <attribute name="title">
+        <string>No.1</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="spacing">
+         <number>8</number>
+        </property>
+        <property name="leftMargin">
+         <number>8</number>
+        </property>
+        <property name="topMargin">
+         <number>8</number>
+        </property>
+        <property name="rightMargin">
+         <number>8</number>
+        </property>
+        <property name="bottomMargin">
+         <number>8</number>
+        </property>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_itemcode_2">
+       <attribute name="title">
+        <string>No.2</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_tab2">
+        <property name="leftMargin">
+         <number>8</number>
+        </property>
+        <property name="topMargin">
+         <number>8</number>
+        </property>
+        <property name="rightMargin">
+         <number>8</number>
+        </property>
+        <property name="bottomMargin">
+         <number>8</number>
+        </property>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>10</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
       <property name="topMargin">
-       <number>15</number>
+       <number>6</number>
       </property>
       <property name="rightMargin">
        <number>0</number>
       </property>
       <property name="bottomMargin">
-       <number>15</number>
+       <number>4</number>
       </property>
       <item>
        <widget class="QPushButton" name="pushButton_2">
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>35</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>16777215</height>
+          <height>36</height>
          </size>
         </property>
         <property name="font">
          <font>
-          <family>Microsoft YaHei</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
+          <family>Segoe UI</family>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
          </font>
         </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton { background-color:#8BD25B; color:black; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#4EA117; }</string>
+        </property>
         <property name="text">
-         <string>Save Config 🡺</string>
+         <string>SAVE CONFIG 🡺</string>
         </property>
        </widget>
       </item>
@@ -404,26 +545,22 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>35</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>16777215</height>
+          <height>36</height>
          </size>
         </property>
         <property name="font">
          <font>
-          <family>Microsoft YaHei</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
+          <family>Segoe UI</family>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
          </font>
         </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton { background-color:#8BD25B; color:black; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#4EA117; }</string>
+        </property>
         <property name="text">
-         <string>Apply 🡺</string>
+         <string>APPLY 🡺</string>
         </property>
        </widget>
       </item>
@@ -432,26 +569,22 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>35</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>16777215</height>
+          <height>36</height>
          </size>
         </property>
         <property name="font">
          <font>
-          <family>Microsoft YaHei</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
+          <family>Segoe UI</family>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
          </font>
         </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton { background-color:#8BD25B; color:black; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#4EA117; }</string>
+        </property>
         <property name="text">
-         <string>Clear 🡺</string>
+         <string>CLEAR 🡺</string>
         </property>
        </widget>
       </item>
@@ -460,20 +593,22 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>35</height>
+          <height>36</height>
          </size>
         </property>
         <property name="font">
          <font>
-          <family>Microsoft YaHei</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
+          <family>Segoe UI</family>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
          </font>
         </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton { background-color:#8BD25B; color:black; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#4EA117; }</string>
+        </property>
         <property name="text">
-         <string>Sync System  🔄</string>
+         <string>* SYNC SYSTEM  🔄</string>
         </property>
        </widget>
       </item>
@@ -486,7 +621,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>850</width>
+     <width>900</width>
      <height>21</height>
     </rect>
    </property>

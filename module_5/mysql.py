@@ -78,7 +78,8 @@ class MySQL_Core:
                 SELECT * FROM INFOR 
                 WHERE hostname = %s
             """, (self.hostname,))
-            if results := self.cursor.fetchall():
+            results = self.cursor.fetchall()
+            if results:
                 self.cursor.execute("""
                     DELETE FROM INFOR """)
                 
@@ -137,21 +138,26 @@ class MySQL_Core:
                 self.flag = True
                 layer.groupBox_plc_connection.setEnabled(True)
                 layer.pushButton_apply_login_setting.setEnabled(True)
+                self.update_mysql_badges(True)
             else:
                 self.flag = False
                 layer.groupBox_plc_connection.setEnabled(True)
                 layer.pushButton_apply_login_setting.setEnabled(True)
+                self.update_mysql_badges(False)
                 QMessageBox.warning(None, "Lỗi", "Không thể kết nối đến MySQL.")
         except Error as e:
+            self.update_mysql_badges(False)
             QMessageBox.critical(None, "Lỗi kết nối", f"Lỗi: {str(e)}")
 
     def auto_mysql(self):
         if self.connection is not None:
             self.flag = True
-            self.ui_connection_sql.radioButton_user_manual_login.setChecked(False)
+            if hasattr(self.ui_connection_sql, 'radioButton_user_manual_login'):
+                self.ui_connection_sql.radioButton_user_manual_login.setChecked(False)
         else:
             self.flag = False
-            self.ui_connection_sql.radioButton_user_manual_login.setChecked(True)
+            if hasattr(self.ui_connection_sql, 'radioButton_user_manual_login'):
+                self.ui_connection_sql.radioButton_user_manual_login.setChecked(True)
             self.ui_connection_sql.lineEdit_Host_name.setEnabled(True)
             self.ui_connection_sql.lineEdit_UserName.setEnabled(True)
             self.ui_connection_sql.lineEdit_password.setEnabled(True)
@@ -159,20 +165,88 @@ class MySQL_Core:
             self.ui_connection_sql.pushButton_test_connection.setEnabled(True)
             QMessageBox.warning(None, "Lỗi", "Không thể kết nối đến MySQL.")
 
+    @staticmethod
+    def _update_badge(label, is_connected: bool, online_text: str, offline_text: str, online_state: str, offline_state: str, online_bg: str = "#DCFCE7", online_color: str = "#115E59", online_border: str = "#86EFAC"):
+        """Cập nhật giao diện badge trạng thái kết nối MySQL chuẩn đẹp, tương phản cao."""
+        if not label:
+            return
+        state = online_state if is_connected else offline_state
+        text = online_text if is_connected else offline_text
+        label.setText(text)
+        label.setProperty("state", state)
+        label.setStyleSheet(f"""
+            QLabel {{
+                background-color: #FEF2F2;
+                color: #991B1B;
+                border: 1px solid #FCA5A5;
+                border-radius: 11px;
+                padding: 4px 14px;
+                font-family: "Segoe UI", Arial, sans-serif;
+                font-size: 8pt;
+                font-weight: 700;
+            }}
+            QLabel[state="{online_state}"] {{
+                background-color: {online_bg};
+                color: {online_color};
+                border: 1px solid {online_border};
+            }}
+        """)
+        label.style().unpolish(label)
+        label.style().polish(label)
+
+    def update_mysql_badges(self, is_connected: bool):
+        """Cập nhật trạng thái cho cả 2 badge: label_status_mysql (Header) và label_mysql_state (Tab)"""
+        # 1. Badge trạng thái trên thanh Header chính (label_status_mysql)
+        if hasattr(self.ui_connection_sql, 'label_status_mysql'):
+            self._update_badge(
+                label=self.ui_connection_sql.label_status_mysql,
+                is_connected=is_connected,
+                online_text="●  MYSQL  ONLINE",
+                offline_text="●  MYSQL  OFFLINE",
+                online_state="mysql_online",
+                offline_state="mysql_offline",
+                online_bg="#F0FDF4",
+                online_color="#166534",
+                online_border="#DCFCE7"
+            )
+
+        # 2. Badge trạng thái trong Tab Database Login (label_mysql_state)
+        if hasattr(self.ui_connection_sql, 'label_mysql_state'):
+            self._update_badge(
+                label=self.ui_connection_sql.label_mysql_state,
+                is_connected=is_connected,
+                online_text="●  CONNECTED",
+                offline_text="●  DISCONNECTED",
+                online_state="connected",
+                offline_state="disconnected",
+                online_bg="#DCFCE7",
+                online_color="#115E59",
+                online_border="#86EFAC"
+            )
+
     def load_mode_login(self):
-        if self.main_core.mode_init:
-            self.ui_connection_sql.radioButton_automatic_login.setChecked(True) 
-            # self.ui_connection_sql.radioButton_manual_login.setEnabled(False)
+        if getattr(self.main_core, 'mode_init', 0):
+            self.ui_connection_sql.radioButton_automatic_login.setChecked(True)
+            self.ui_connection_sql.radioButton_manual_login.setChecked(False)
         else:
-            # self.ui_connection_sql.radioButton_automatic_login.setChecked(False)
-            self.ui_connection_sql.radioButton_manual_login.setEnabled(True)
+            self.ui_connection_sql.radioButton_automatic_login.setChecked(False)
+            self.ui_connection_sql.radioButton_manual_login.setChecked(True)
+
+        # Cập nhật trạng thái 2 label: label_mysql_state và label_status_mysql
+        is_connected = bool(self.connection and hasattr(self.connection, 'is_connected') and self.connection.is_connected())
+        self.update_mysql_badges(is_connected)
 
     def disconnect_mysql(self):
         try:
-            if self.main_core.connection.is_connected():
-                self.main_core.connection.close()
+            conn = getattr(self.main_core, 'connection', None) or self.connection
+            if conn and conn.is_connected():
+                conn.close()
                 self.main_core.mode_init = False
-                QMessageBox.information(None,"Succesfull","Ngắt kết nối thành công MySQL")
+                self.main_core.connection = None
+                self.connection = None
+                self.update_mysql_badges(False)
+                QMessageBox.information(None, "Succesfull", "Ngắt kết nối thành công MySQL")
         except:
-            QMessageBox.information(None,"Something Wrong!!","Đang ngắt kết nối với MySQL") 
+            self.update_mysql_badges(False)
+            QMessageBox.information(None, "Something Wrong!!", "Đang ngắt kết nối với MySQL") 
             return

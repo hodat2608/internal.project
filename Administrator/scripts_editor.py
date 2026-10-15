@@ -209,7 +209,7 @@ class DeveloperAuthDialog(QDialog):
         layout.addLayout(btn_layout)
 
     def _verify(self):
-        EXPECTED_HASH = "96cae35ce8a9b0244178bf28e4966c2ce1b8385723a96a6b838858cdd6ca0a1e"
+        EXPECTED_HASH = "2c6a4ee56bfec670aab2f13d0489f462bba435e9abe30a90125008f94cbdf079"
         user_input_hash = hashlib.sha256(self.key_input.text().encode("utf-8")).hexdigest()
         if user_input_hash == EXPECTED_HASH:
             self.authenticated = True
@@ -1321,11 +1321,18 @@ class IDEWindow(QMainWindow):
         self.show_ws = self.settings.value("show_ws", False, type=bool)
         self.interpreter = self.settings.value("interpreter", "") or default_python()
 
-        # Base directory (giữ nguyên logic gốc)
+        # Base directory (thư mục code gốc của dự án phần mềm)
         if getattr(sys, "frozen", False):
-            self.root_path = sys._MEIPASS if hasattr(sys, "_MEIPASS") else os.path.dirname(sys.executable)
+            if hasattr(sys, "_MEIPASS") and os.path.isdir(sys._MEIPASS):
+                self.root_path = os.path.abspath(sys._MEIPASS)
+            else:
+                exe_dir = os.path.dirname(os.path.abspath(sys.executable))
+                internal_dir = os.path.join(exe_dir, "_internal")
+                self.root_path = internal_dir if os.path.isdir(internal_dir) else exe_dir
         else:
             self.root_path = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+        self.default_project_root = self.root_path
+
         saved_root = self.settings.value("root", "")
         self.tree_root = saved_root if saved_root and os.path.isdir(saved_root) else self.root_path
 
@@ -1389,13 +1396,25 @@ class IDEWindow(QMainWindow):
         self.side_tabs.addTab(self.tree_view, "Explorer")
         self.side_tabs.addTab(self.outline_tree, "Outline")
 
+        self.btn_project_root = QPushButton("🏠 Project Code")
+        self.btn_project_root.setStyleSheet("text-align: left; padding: 8px; font-weight: bold; border: none;")
+        self.btn_project_root.setCursor(Qt.PointingHandCursor)
+        self.btn_project_root.setToolTip("Trở về thư mục code dự án của phần mềm (Default Project Root)")
+        self.btn_project_root.clicked.connect(self.reset_to_project_root)
+
         self.btn_settings = QPushButton("⚙️ Settings")
         self.btn_settings.setStyleSheet("text-align: left; padding: 8px; font-weight: bold; border: none;")
         self.btn_settings.setCursor(Qt.PointingHandCursor)
         self.btn_settings.clicked.connect(self.show_settings_menu)
         
+        sidebar_bottom = QHBoxLayout()
+        sidebar_bottom.setContentsMargins(0, 0, 0, 0)
+        sidebar_bottom.setSpacing(0)
+        sidebar_bottom.addWidget(self.btn_project_root, 1)
+        sidebar_bottom.addWidget(self.btn_settings, 1)
+
         sidebar_layout.addWidget(self.side_tabs, 1)
-        sidebar_layout.addWidget(self.btn_settings)
+        sidebar_layout.addLayout(sidebar_bottom)
 
         # --- VÙNG SOẠN THẢO ---
         editor_area = QWidget()
@@ -1488,8 +1507,10 @@ class IDEWindow(QMainWindow):
 
     def show_settings_menu(self):
         menu = QMenu(self)
+        menu.addAction("🏠 Trở về Project Code", self.reset_to_project_root)
+        menu.addSeparator()
         menu.addAction("🎨 Color Theme", self.show_theme_picker)
-        menu.addAction("⌨️ Keyboard Shortcuts", lambda: QMessageBox.information(self, "Shortcuts", "Ctrl+P: Quick Open\nCtrl+Shift+P: Command Palette\nCtrl+F: Find/Replace\nCtrl+Shift+F: Find in Files\nCtrl+S: Save\nCtrl+/: Toggle Comment\nAlt+Up/Down: Move Line\nCtrl+D: Duplicate Line"))
+        menu.addAction("⌨️ Keyboard Shortcuts", lambda: QMessageBox.information(self, "Shortcuts", "Ctrl+P: Quick Open\nCtrl+Shift+P: Command Palette\nCtrl+Shift+H: Project Code\nCtrl+F: Find/Replace\nCtrl+Shift+F: Find in Files\nCtrl+S: Save\nCtrl+/: Toggle Comment\nAlt+Up/Down: Move Line\nCtrl+D: Duplicate Line"))
         menu.addAction("⚙️ Settings", lambda: QMessageBox.information(self, "Settings", "Settings file support sẽ có trong bản tới!"))
         
         pos = self.btn_settings.mapToGlobal(self.btn_settings.rect().bottomLeft())
@@ -1527,6 +1548,7 @@ class IDEWindow(QMainWindow):
         A = self._act
         # File
         self.act_open_folder = A("📁 Open Folder", lambda: self.open_folder(), "Ctrl+Shift+O")
+        self.act_reset_project = A("🏠 Project Code", lambda: self.reset_to_project_root(), "Ctrl+Shift+H")
         self.act_open_file = A("📂 Open File", lambda: self.open_file(), "Ctrl+O")
         self.act_new_file = A("📄 New File", lambda: self.new_file(), "Ctrl+N")
         self.act_new_untitled = A("New Untitled", lambda: self.new_untitled(), "Ctrl+Alt+N")
@@ -1586,7 +1608,7 @@ class IDEWindow(QMainWindow):
     def _create_menus(self):
         mb = self.menuBar()
         m = mb.addMenu("File")
-        for a in (self.act_open_folder, self.act_open_file, self.act_new_file, self.act_new_untitled,
+        for a in (self.act_open_folder, self.act_reset_project, self.act_open_file, self.act_new_file, self.act_new_untitled,
                   None, self.act_save, self.act_save_as, self.act_save_all, None,
                   self.act_quick_open, self.act_close_tab):
             m.addAction(a) if a else m.addSeparator()
@@ -1616,7 +1638,7 @@ class IDEWindow(QMainWindow):
         tb = QToolBar("Main Toolbar")
         tb.setObjectName("mainToolbar")
         self.addToolBar(tb)
-        for a in (self.act_open_folder, self.act_open_file, self.act_new_file, self.act_save, None,
+        for a in (self.act_open_folder, self.act_reset_project, self.act_open_file, self.act_new_file, self.act_save, None,
                   self.act_undo, self.act_redo, None, self.act_find, self.act_format, None,
                   self.act_run, self.act_debug, self.act_stop, None, self.act_check):
             tb.addAction(a) if a else tb.addSeparator()
@@ -1664,6 +1686,9 @@ class IDEWindow(QMainWindow):
         self.file_model.setRootPath(path)
         root_index = self.file_model.index(path)
         self.tree_view.setRootIndex(self.proxy_model.mapFromSource(root_index))
+        folder_name = os.path.basename(os.path.abspath(path)) or path
+        self.side_tabs.setTabText(0, f"📁 {folder_name}")
+        self.side_tabs.setTabToolTip(0, f"Folder: {path}")
 
     def _path_of(self, proxy_index):
         return self.file_model.filePath(self.proxy_model.mapToSource(proxy_index))
@@ -1678,6 +1703,8 @@ class IDEWindow(QMainWindow):
         path = self._path_of(idx) if idx.isValid() else self.tree_root
         target_dir = path if os.path.isdir(path) else os.path.dirname(path)
         menu = QMenu(self)
+        menu.addAction("🏠 Trở về Project Code", self.reset_to_project_root)
+        menu.addSeparator()
         menu.addAction("New File...", lambda: self.new_file(target_dir))
         menu.addAction("New Folder...", lambda: self.new_folder(target_dir))
         if idx.isValid():
@@ -1871,6 +1898,16 @@ class IDEWindow(QMainWindow):
         self._update_cursor_status(ed)
         self.run_lint()
         self.build_outline()
+
+    def reset_to_project_root(self):
+        root = getattr(self, "default_project_root", self.root_path)
+        if not os.path.isdir(root):
+            QMessageBox.warning(self, "Cảnh báo", f"Thư mục code dự án không tồn tại:\n{root}")
+            return
+        self.set_tree_root(root)
+        self.settings.setValue("root", root)
+        self.side_tabs.setCurrentIndex(0)
+        self.status.showMessage(f"🏠 Đã trở về thư mục code dự án: {root}")
 
     def open_folder(self):
         folder = QFileDialog.getExistingDirectory(self, "Select Folder", self.tree_root)

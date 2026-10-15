@@ -9,524 +9,767 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from module_2.StyleSheet import *
-from module_1.root_path import resource_path
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(700, 530)
+        MainWindow.resize(1000, 791)
         MainWindow.setStyleSheet("\n"
-"/* ========== GLOBAL ========== */\n"
-"QMainWindow, QWidget {\n"
-"    background-color: #f5f7fa;\n"
-"    font-family: \"Segoe UI\", \"Arial\", sans-serif;\n"
-"    font-size: 13px;\n"
-"    color: #2c3e50;\n"
+"* { font-family: \"Segoe UI\", \"Inter\", \"Roboto\", \"Helvetica Neue\", Arial, sans-serif; }\n"
+"QMainWindow, QWidget#centralwidget { background-color: #F1F5F9; }\n"
+"QWidget#tab, QWidget#tab_2, QWidget#tab_3 { background-color: #F1F5F9; }\n"
+"QToolTip { background-color: #0F172A; color: #F8FAFC; border: 1px solid #334155; padding: 6px 8px; }\n"
+"\n"
+"/* ---------- application header ---------- */\n"
+"QFrame#frame_app_header {\n"
+"    background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #0B1E36, stop:1 #0F3B63);\n"
+"    border: none; border-radius: 12px;\n"
+"}\n"
+"QLabel#label_app_logo {\n"
+"    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #38BDF8, stop:1 #0284C7);\n"
+"    color: #FFFFFF; border-radius: 10px; font-size: 10pt; font-weight: 800;\n"
+"}\n"
+"QLabel#label_app_title { color: #FFFFFF; font-size: 14pt; font-weight: 700; background: transparent; }\n"
+"QLabel#label_app_subtitle { color: #9CC3E6; font-size: 9pt; background: transparent; }\n"
+"QLabel#label_status_mysql, QLabel#label_status_plc {\n"
+"    background-color: #1E3350; color: #94A3B8; border: 1px solid #2B4668;\n"
+"    border-radius: 11px; padding: 3px 14px; font-size: 8pt; font-weight: 700;\n"
+"}\n"
+"QLabel#label_status_mysql[state=\"online\"], QLabel#label_status_plc[state=\"online\"] {\n"
+"    background-color: #0B3D31; color: #6EE7B7; border: 1px solid #0F766E;\n"
 "}\n"
 "\n"
-"/* ========== LOGO PANEL ========== */\n"
-"QFrame#frameLogo {\n"
-"    background-color: #ffffff;\n"
-"    border: 1px solid #e1e5eb;\n"
-"    border-radius: 10px;\n"
+"/* ---------- tabs ---------- */\n"
+"QTabWidget::pane { border: none; border-top: 1px solid #CBD5E1; background: transparent; }\n"
+"QTabWidget::tab-bar { left: 4px; }\n"
+"QTabBar { background: transparent; }\n"
+"QTabBar::tab {\n"
+"    background: transparent; color: #64748B; padding: 10px 22px; margin-right: 2px;\n"
+"    border: none; border-bottom: 3px solid transparent; font-size: 9pt; font-weight: 600;\n"
 "}\n"
-"QLabel#labelLogoTitle {\n"
-"    font-size: 28px;\n"
-"    font-weight: 700;\n"
-"    color: #00758f;\n"
-"    letter-spacing: 1px;\n"
+"QTabBar::tab:hover { color: #0F172A; }\n"
+"QTabBar::tab:selected { color: #0369A1; border-bottom: 3px solid #0284C7; }\n"
+"\n"
+"QMenuBar { background-color: #FFFFFF; border-bottom: 1px solid #E2E8F0; }\n"
+"QStatusBar { background-color: #FFFFFF; border-top: 1px solid #E2E8F0; color: #64748B; }\n"
+"\n"
+"/* ---------- page header ---------- */\n"
+"QLabel { color: #334155; font-size: 9pt; font-weight: 400; background: transparent; }\n"
+"QLabel:disabled { color: #94A3B8; }\n"
+"QLabel#label_page_title_mysql, QLabel#label_page_title_plc, QLabel#label_plc_test_title {\n"
+"    color: #0F172A; font-size: 15pt; font-weight: 700;\n"
 "}\n"
-"QLabel#labelLogoSub {\n"
-"    font-size: 12px;\n"
-"    color: #7f8c8d;\n"
+"QLabel#label_page_sub_mysql, QLabel#label_page_sub_plc, QLabel#label_plc_test_subtitle {\n"
+"    color: #64748B; font-size: 9pt;\n"
+"}\n"
+"QLabel#label_plc_conn_target { color: #64748B; font-size: 8pt; }\n"
+"QFrame#frame_plc_test_header { background: transparent; border: none; }\n"
+"\n"
+"QLabel#label_mysql_state, QLabel#label_plc_state, QLabel#label_plc_conn_status {\n"
+"    background-color: #FEE2E2; color: #B91C1C; border: 1px solid #FCA5A5;\n"
+"    border-radius: 11px; padding: 3px 14px; font-size: 8pt; font-weight: 700;\n"
+"}\n"
+"QLabel#label_mysql_state[state=\"connected\"], QLabel#label_plc_state[state=\"connected\"],\n"
+"QLabel#label_plc_conn_status[state=\"connected\"] {\n"
+"    background-color: #DCFCE7; color: #15803D; border: 1px solid #86EFAC;\n"
 "}\n"
 "\n"
-"/* ========== FORM PANEL ========== */\n"
-"QFrame#frameForm {\n"
-"    background-color: #ffffff;\n"
-"    border: 1px solid #e1e5eb;\n"
-"    border-radius: 10px;\n"
+"/* ---------- cards ---------- */\n"
+"QGroupBox {\n"
+"    background-color: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px;\n"
+"    margin-top: 12px; padding: 22px 16px 16px 16px;\n"
+"    font-size: 9pt; font-weight: 700; color: #0F172A;\n"
 "}\n"
-"QLabel {\n"
-"    color: #34495e;\n"
+"QGroupBox::title {\n"
+"    subcontrol-origin: margin; subcontrol-position: top left;\n"
+"    left: 14px; padding: 0px 8px; color: #0369A1; background-color: #F1F5F9;\n"
 "}\n"
-"QLabel#labelDesc {\n"
-"    color: #95a5a6;\n"
-"    font-size: 11px;\n"
-"    font-style: italic;\n"
+"QGroupBox:disabled { color: #94A3B8; }\n"
+"QLabel[role=\"section\"] { color: #0369A1; font-size: 8pt; font-weight: 700; padding-top: 6px; }\n"
+"QLabel[role=\"section\"]:disabled { color: #94A3B8; }\n"
+"\n"
+"/* side \"quick guide\" panels */\n"
+"QFrame#frame_2, QFrame#frame {\n"
+"    background-color: #F0F9FF; border: 1px solid #BAE6FD; border-radius: 10px;\n"
+"}\n"
+"QLabel#label_mysql_guide_title, QLabel#label_plc_guide_title { color: #0369A1; font-size: 8pt; font-weight: 700; }\n"
+"QLabel#label_mysql_guide_body, QLabel#label_plc_guide_body { color: #334155; font-size: 9pt; }\n"
+"\n"
+"/* ---------- inputs ---------- */\n"
+"QLineEdit, QComboBox, QSpinBox {\n"
+"    background-color: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 6px;\n"
+"    padding: 5px 10px; min-height: 22px; color: #0F172A; font-size: 9pt; font-weight: 400;\n"
+"    selection-background-color: #0284C7; selection-color: #FFFFFF;\n"
+"}\n"
+"QLineEdit:hover, QComboBox:hover, QSpinBox:hover { border: 1px solid #94A3B8; }\n"
+"QLineEdit:focus, QComboBox:focus, QSpinBox:focus { border: 1px solid #0284C7; }\n"
+"QLineEdit:disabled, QComboBox:disabled, QSpinBox:disabled { background-color: #F1F5F9; color: #94A3B8; border: 1px solid #E2E8F0; }\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF; color: #0F172A; border: 1px solid #CBD5E1;\n"
+"    selection-background-color: #E0F2FE; selection-color: #0369A1; outline: none;\n"
 "}\n"
 "\n"
-"/* ========== INPUTS ========== */\n"
-"QLineEdit, QSpinBox {\n"
-"    min-height: 30px;\n"
-"    padding: 3px 10px;\n"
-"    border: 1px solid #cdd3db;\n"
-"    border-radius: 6px;\n"
-"    background-color: #ffffff;\n"
-"    selection-background-color: #3498db;\n"
+"QCheckBox, QRadioButton { color: #334155; font-size: 9pt; font-weight: 400; spacing: 8px; background: transparent; }\n"
+"QCheckBox:disabled, QRadioButton:disabled { color: #94A3B8; }\n"
+"QCheckBox::indicator { width: 14px; height: 14px; border: 1px solid #94A3B8; border-radius: 4px; background-color: #FFFFFF; }\n"
+"QCheckBox::indicator:hover { border: 1px solid #0284C7; }\n"
+"QCheckBox::indicator:checked { background-color: #0284C7; border: 1px solid #0284C7; }\n"
+"QCheckBox::indicator:disabled { background-color: #F1F5F9; border: 1px solid #CBD5E1; }\n"
+"QRadioButton::indicator { width: 14px; height: 14px; border: 1px solid #94A3B8; border-radius: 8px; background-color: #FFFFFF; }\n"
+"QRadioButton::indicator:hover { border: 1px solid #0284C7; }\n"
+"QRadioButton::indicator:checked {\n"
+"    border: 1px solid #0284C7;\n"
+"    background-color: qradialgradient(cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5,\n"
+"                                      stop:0 #0284C7, stop:0.5 #0284C7, stop:0.56 #FFFFFF, stop:1 #FFFFFF);\n"
 "}\n"
-"QLineEdit:hover, QSpinBox:hover {\n"
-"    border-color: #3498db;\n"
-"}\n"
-"QLineEdit:focus, QSpinBox:focus {\n"
-"    border: 1.5px solid #2980b9;\n"
-"}\n"
-"QLineEdit#lineEditPassword {\n"
-"    /* password echo mode set in properties */\n"
-"}\n"
+"QRadioButton::indicator:disabled { background-color: #F1F5F9; border: 1px solid #CBD5E1; }\n"
 "\n"
-"/* ========== BUTTONS ========== */\n"
+"/* ---------- buttons ---------- */\n"
 "QPushButton {\n"
-"    min-height: 32px;\n"
-"    min-width: 110px;\n"
-"    padding: 5px 16px;\n"
-"    border: 1px solid #cdd3db;\n"
-"    border-radius: 6px;\n"
-"    background-color: #f8f9fb;\n"
-"    color: #2c3e50;\n"
-"    font-weight: 500;\n"
+"    background-color: #FFFFFF; color: #334155; border: 1px solid #CBD5E1; border-radius: 6px;\n"
+"    padding: 7px 18px; min-height: 20px; font-size: 9pt; font-weight: 600;\n"
 "}\n"
-"QPushButton:hover {\n"
-"    background-color: #e8f0fe;\n"
-"    border-color: #3498db;\n"
-"    color: #1a73e8;\n"
-"}\n"
-"QPushButton:pressed {\n"
-"    background-color: #d2e3fc;\n"
-"}\n"
-"QPushButton#btnOK {\n"
-"    background-color: #00758f;\n"
-"    color: white;\n"
-"    border: none;\n"
-"    font-weight: 600;\n"
-"}\n"
-"QPushButton#btnOK:hover {\n"
-"    background-color: #00a3c4;\n"
-"}\n"
-"QPushButton#btnTest {\n"
-"    background-color: #2980b9;\n"
-"    color: white;\n"
-"    border: none;\n"
-"    font-weight: 600;\n"
-"}\n"
-"QPushButton#btnTest:hover {\n"
-"    background-color: #3498db;\n"
-"}\n"
+"QPushButton:hover { background-color: #F1F5F9; border: 1px solid #94A3B8; }\n"
+"QPushButton:pressed { background-color: #E2E8F0; }\n"
+"QPushButton:disabled { background-color: #F1F5F9; color: #94A3B8; border: 1px solid #E2E8F0; }\n"
 "\n"
-"/* ========== CHECKBOX ========== */\n"
-"QCheckBox {\n"
-"    spacing: 8px;\n"
-"    color: #34495e;\n"
+"QPushButton#pushButton_apply_login_setting, QPushButton#pushButton_apply_ip_add_setting_2,\n"
+"QPushButton#pushButton_plc_receive {\n"
+"    background-color: #0284C7; color: #FFFFFF; border: none;\n"
 "}\n"
-"QCheckBox::indicator {\n"
-"    width: 16px;\n"
-"    height: 16px;\n"
-"    border-radius: 3px;\n"
-"    border: 1px solid #b0b8c1;\n"
+"QPushButton#pushButton_apply_login_setting:hover, QPushButton#pushButton_apply_ip_add_setting_2:hover,\n"
+"QPushButton#pushButton_plc_receive:hover { background-color: #0369A1; }\n"
+"QPushButton#pushButton_apply_login_setting:pressed, QPushButton#pushButton_apply_ip_add_setting_2:pressed,\n"
+"QPushButton#pushButton_plc_receive:pressed { background-color: #075985; }\n"
+"QPushButton#pushButton_apply_login_setting:disabled, QPushButton#pushButton_apply_ip_add_setting_2:disabled,\n"
+"QPushButton#pushButton_plc_receive:disabled { background-color: #CBD5E1; color: #F8FAFC; }\n"
+"\n"
+"QPushButton#pushButton_plc_send { background-color: #059669; color: #FFFFFF; border: none; }\n"
+"QPushButton#pushButton_plc_send:hover { background-color: #047857; }\n"
+"QPushButton#pushButton_plc_send:pressed { background-color: #065F46; }\n"
+"QPushButton#pushButton_plc_send:disabled { background-color: #CBD5E1; color: #F8FAFC; }\n"
+"\n"
+"QPushButton#pushButton_test_connection, QPushButton#pushButton_test_connection_3 {\n"
+"    color: #0369A1; border: 1px solid #7DD3FC; background-color: #F0F9FF;\n"
 "}\n"
-"QCheckBox::indicator:checked {\n"
-"    background-color: #00758f;\n"
-"    border-color: #00758f;\n"
+"QPushButton#pushButton_test_connection:hover, QPushButton#pushButton_test_connection_3:hover { background-color: #E0F2FE; }\n"
+"QPushButton#pushButton_test_connection:disabled, QPushButton#pushButton_test_connection_3:disabled {\n"
+"    color: #94A3B8; border: 1px solid #E2E8F0; background-color: #F1F5F9;\n"
+"}\n"
+"QPushButton#pushButton_disconnect_mysql { color: #B91C1C; border: 1px solid #FCA5A5; background-color: #FEF2F2; }\n"
+"QPushButton#pushButton_disconnect_mysql:hover { background-color: #FEE2E2; }\n"
+"QPushButton#pushButton_disconnect_mysql:disabled { color: #94A3B8; border: 1px solid #E2E8F0; background-color: #F1F5F9; }\n"
+"\n"
+"/* ---------- PLC signal test ---------- */\n"
+"QLineEdit#lineEdit_read_value {\n"
+"    background-color: #0F172A; border: 1px solid #1E3A5F; border-radius: 8px;\n"
+"    color: #38BDF8; padding: 6px 14px; min-height: 34px;\n"
+"    font-family: \"Consolas\", \"Cascadia Mono\", \"Courier New\", monospace;\n"
+"    font-size: 16pt; font-weight: 700;\n"
+"}\n"
+"QLineEdit#lineEdit_read_value:disabled { background-color: #1E293B; border: 1px solid #334155; color: #475569; }\n"
+"\n"
+"QLabel#label_read_status, QLabel#label_write_result {\n"
+"    background-color: #F1F5F9; color: #64748B; border: 1px solid #E2E8F0;\n"
+"    border-radius: 6px; padding: 7px 12px; font-size: 9pt; font-weight: 700;\n"
+"}\n"
+"QLabel#label_read_status[state=\"ok\"], QLabel#label_write_result[state=\"ok\"] {\n"
+"    background-color: #DCFCE7; color: #15803D; border: 1px solid #86EFAC;\n"
+"}\n"
+"QLabel#label_read_status[state=\"error\"], QLabel#label_write_result[state=\"error\"] {\n"
+"    background-color: #FEE2E2; color: #B91C1C; border: 1px solid #FCA5A5;\n"
+"}\n"
+"QLabel#label_read_status[state=\"pending\"], QLabel#label_write_result[state=\"pending\"] {\n"
+"    background-color: #FEF3C7; color: #B45309; border: 1px solid #FCD34D;\n"
+"}\n"
+"QPushButton#pushButton_plc_clear_log, QPushButton#pushButton_plc_copy_log { padding: 5px 14px; }\n"
+"\n"
+"QTextEdit#textEdit_plc_log {\n"
+"    background-color: #0F172A; color: #CBD5E1; border: 1px solid #1E293B; border-radius: 8px;\n"
+"    padding: 6px; selection-background-color: #0284C7;\n"
+"    font-family: \"Consolas\", \"Cascadia Mono\", \"Courier New\", monospace; font-size: 9pt;\n"
 "}\n"
 "")
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/operation.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        MainWindow.setWindowIcon(icon)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
+        self.gridLayout.setContentsMargins(16, 16, 16, 16)
+        self.gridLayout.setVerticalSpacing(12)
         self.gridLayout.setObjectName("gridLayout")
+        self.frame_app_header = QtWidgets.QFrame(self.centralwidget)
+        self.frame_app_header.setMinimumSize(QtCore.QSize(0, 68))
+        self.frame_app_header.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.frame_app_header.setObjectName("frame_app_header")
+        self.horizontalLayout_app_header = QtWidgets.QHBoxLayout(self.frame_app_header)
+        self.horizontalLayout_app_header.setContentsMargins(18, 10, 18, 10)
+        self.horizontalLayout_app_header.setSpacing(14)
+        self.horizontalLayout_app_header.setObjectName("horizontalLayout_app_header")
+        self.label_app_logo = QtWidgets.QLabel(self.frame_app_header)
+        self.label_app_logo.setMinimumSize(QtCore.QSize(46, 46))
+        self.label_app_logo.setMaximumSize(QtCore.QSize(46, 46))
+        self.label_app_logo.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_app_logo.setObjectName("label_app_logo")
+        self.horizontalLayout_app_header.addWidget(self.label_app_logo)
+        self.verticalLayout_app_header = QtWidgets.QVBoxLayout()
+        self.verticalLayout_app_header.setSpacing(0)
+        self.verticalLayout_app_header.setObjectName("verticalLayout_app_header")
+        self.label_app_title = QtWidgets.QLabel(self.frame_app_header)
+        self.label_app_title.setObjectName("label_app_title")
+        self.verticalLayout_app_header.addWidget(self.label_app_title)
+        self.label_app_subtitle = QtWidgets.QLabel(self.frame_app_header)
+        self.label_app_subtitle.setObjectName("label_app_subtitle")
+        self.verticalLayout_app_header.addWidget(self.label_app_subtitle)
+        self.horizontalLayout_app_header.addLayout(self.verticalLayout_app_header)
+        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_app_header.addItem(spacerItem)
+        self.label_status_mysql = QtWidgets.QLabel(self.frame_app_header)
+        self.label_status_mysql.setMaximumSize(QtCore.QSize(16777215, 28))
+        self.label_status_mysql.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_status_mysql.setObjectName("label_status_mysql")
+        self.horizontalLayout_app_header.addWidget(self.label_status_mysql)
+        self.label_status_plc = QtWidgets.QLabel(self.frame_app_header)
+        self.label_status_plc.setMaximumSize(QtCore.QSize(16777215, 28))
+        self.label_status_plc.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_status_plc.setObjectName("label_status_plc")
+        self.horizontalLayout_app_header.addWidget(self.label_status_plc)
+        self.gridLayout.addWidget(self.frame_app_header, 0, 0, 1, 1)
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
-        font = QtGui.QFont()
-        font.setFamily("Microsoft Tai Le")
-        font.setPointSize(10)
-        self.tabWidget.setFont(font)
+        self.tabWidget.setMaximumSize(QtCore.QSize(16777215, 650))
         self.tabWidget.setTabPosition(QtWidgets.QTabWidget.North)
         self.tabWidget.setTabShape(QtWidgets.QTabWidget.Rounded)
+        self.tabWidget.setIconSize(QtCore.QSize(16, 16))
         self.tabWidget.setObjectName("tabWidget")
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")
         self.gridLayout_3 = QtWidgets.QGridLayout(self.tab)
+        self.gridLayout_3.setContentsMargins(16, 16, 16, 16)
+        self.gridLayout_3.setHorizontalSpacing(16)
+        self.gridLayout_3.setVerticalSpacing(14)
         self.gridLayout_3.setObjectName("gridLayout_3")
         self.groupBox_auto_login = QtWidgets.QGroupBox(self.tab)
-        font = QtGui.QFont()
-        font.setFamily("Microsoft Tai Le")
-        font.setPointSize(10)
-        self.groupBox_auto_login.setFont(font)
         self.groupBox_auto_login.setObjectName("groupBox_auto_login")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.groupBox_auto_login)
+        self.gridLayout_2.setSpacing(12)
         self.gridLayout_2.setObjectName("gridLayout_2")
-        self.lineEdit_UserName = QtWidgets.QLineEdit(self.groupBox_auto_login)
-        self.lineEdit_UserName.setEnabled(False)
-        self.lineEdit_UserName.setMinimumSize(QtCore.QSize(0, 30))
-        font = QtGui.QFont()
-        font.setFamily("Microsoft Tai Le")
-        font.setPointSize(10)
-        self.lineEdit_UserName.setFont(font)
-        self.lineEdit_UserName.setObjectName("lineEdit_UserName")
-        self.gridLayout_2.addWidget(self.lineEdit_UserName, 1, 1, 1, 2)
-        self.label_5 = QtWidgets.QLabel(self.groupBox_auto_login)
-        self.label_5.setMinimumSize(QtCore.QSize(0, 30))
-        self.label_5.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Microsoft Tai Le")
-        font.setPointSize(10)
-        self.label_5.setFont(font)
-        self.label_5.setObjectName("label_5")
-        self.gridLayout_2.addWidget(self.label_5, 4, 0, 1, 1)
-        self.pushButton_test_connection = QtWidgets.QPushButton(self.groupBox_auto_login)
-        self.pushButton_test_connection.setEnabled(False)
-        self.pushButton_test_connection.setMinimumSize(QtCore.QSize(0, 40))
-        font = QtGui.QFont()
-        font.setFamily("Microsoft Tai Le")
-        font.setPointSize(10)
-        self.pushButton_test_connection.setFont(font)
-        self.pushButton_test_connection.setToolTip("")
-        self.pushButton_test_connection.setObjectName("pushButton_test_connection")
-        self.gridLayout_2.addWidget(self.pushButton_test_connection, 8, 2, 1, 1)
-        self.spinBox_retry_attpents = QtWidgets.QSpinBox(self.groupBox_auto_login)
-        self.spinBox_retry_attpents.setEnabled(False)
-        self.spinBox_retry_attpents.setMinimumSize(QtCore.QSize(0, 30))
-        font = QtGui.QFont()
-        font.setFamily("Microsoft Tai Le")
-        font.setPointSize(10)
-        self.spinBox_retry_attpents.setFont(font)
-        self.spinBox_retry_attpents.setObjectName("spinBox_retry_attpents")
-        self.gridLayout_2.addWidget(self.spinBox_retry_attpents, 6, 1, 1, 1)
-        self.pushButton_apply_login_setting = QtWidgets.QPushButton(self.groupBox_auto_login)
-        self.pushButton_apply_login_setting.setEnabled(True)
-        self.pushButton_apply_login_setting.setMinimumSize(QtCore.QSize(0, 40))
-        font = QtGui.QFont()
-        font.setFamily("Microsoft Tai Le")
-        font.setPointSize(10)
-        self.pushButton_apply_login_setting.setFont(font)
-        self.pushButton_apply_login_setting.setObjectName("pushButton_apply_login_setting")
-        self.gridLayout_2.addWidget(self.pushButton_apply_login_setting, 8, 3, 1, 1)
+        self.label_sec_mysql_mode = QtWidgets.QLabel(self.groupBox_auto_login)
+        self.label_sec_mysql_mode.setObjectName("label_sec_mysql_mode")
+        self.gridLayout_2.addWidget(self.label_sec_mysql_mode, 0, 0, 1, 4)
+        self.label = QtWidgets.QLabel(self.groupBox_auto_login)
+        self.label.setMinimumSize(QtCore.QSize(118, 0))
+        self.label.setObjectName("label")
+        self.gridLayout_2.addWidget(self.label, 1, 0, 1, 1)
+        self.horizontalLayout_login_modes = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_login_modes.setSpacing(18)
+        self.horizontalLayout_login_modes.setObjectName("horizontalLayout_login_modes")
         self.radioButton_manual_login = QtWidgets.QRadioButton(self.groupBox_auto_login)
         self.radioButton_manual_login.setEnabled(True)
-        self.radioButton_manual_login.setMinimumSize(QtCore.QSize(0, 30))
-        font = QtGui.QFont()
-        font.setFamily("Microsoft Tai Le")
-        font.setPointSize(10)
-        self.radioButton_manual_login.setFont(font)
         self.radioButton_manual_login.setCheckable(True)
         self.radioButton_manual_login.setChecked(True)
-        self.radioButton_manual_login.setAutoRepeat(True)
         self.radioButton_manual_login.setAutoExclusive(True)
         self.radioButton_manual_login.setObjectName("radioButton_manual_login")
-        self.gridLayout_2.addWidget(self.radioButton_manual_login, 0, 1, 1, 1)
+        self.horizontalLayout_login_modes.addWidget(self.radioButton_manual_login)
         self.radioButton_automatic_login = QtWidgets.QRadioButton(self.groupBox_auto_login)
-        self.radioButton_automatic_login.setMinimumSize(QtCore.QSize(0, 30))
-        font = QtGui.QFont()
-        font.setFamily("Microsoft Tai Le")
-        font.setPointSize(10)
-        self.radioButton_automatic_login.setFont(font)
-        self.radioButton_automatic_login.setAutoRepeat(True)
+        self.radioButton_automatic_login.setChecked(False)
         self.radioButton_automatic_login.setObjectName("radioButton_automatic_login")
-        self.gridLayout_2.addWidget(self.radioButton_automatic_login, 0, 2, 1, 1)
-        self.label_4 = QtWidgets.QLabel(self.groupBox_auto_login)
-        self.label_4.setMinimumSize(QtCore.QSize(0, 30))
-        self.label_4.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Microsoft Tai Le")
-        font.setPointSize(10)
-        self.label_4.setFont(font)
-        self.label_4.setObjectName("label_4")
-        self.gridLayout_2.addWidget(self.label_4, 3, 0, 1, 1)
+        self.horizontalLayout_login_modes.addWidget(self.radioButton_automatic_login)
+        self.radioButton_user_manual_login = QtWidgets.QRadioButton(self.groupBox_auto_login)
+        self.radioButton_user_manual_login.setEnabled(True)
+        self.radioButton_user_manual_login.setChecked(False)
+        self.radioButton_user_manual_login.setObjectName("radioButton_user_manual_login")
+        self.horizontalLayout_login_modes.addWidget(self.radioButton_user_manual_login)
+        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_login_modes.addItem(spacerItem1)
+        self.gridLayout_2.addLayout(self.horizontalLayout_login_modes, 1, 1, 1, 3)
+        self.label_sec_mysql_server = QtWidgets.QLabel(self.groupBox_auto_login)
+        self.label_sec_mysql_server.setObjectName("label_sec_mysql_server")
+        self.gridLayout_2.addWidget(self.label_sec_mysql_server, 2, 0, 1, 4)
+        self.label_3 = QtWidgets.QLabel(self.groupBox_auto_login)
+        self.label_3.setMinimumSize(QtCore.QSize(118, 0))
+        self.label_3.setObjectName("label_3")
+        self.gridLayout_2.addWidget(self.label_3, 3, 0, 1, 1)
         self.lineEdit_Host_name = QtWidgets.QLineEdit(self.groupBox_auto_login)
         self.lineEdit_Host_name.setEnabled(False)
-        self.lineEdit_Host_name.setMinimumSize(QtCore.QSize(0, 30))
-        font = QtGui.QFont()
-        font.setFamily("Microsoft Tai Le")
-        font.setPointSize(10)
-        self.lineEdit_Host_name.setFont(font)
         self.lineEdit_Host_name.setObjectName("lineEdit_Host_name")
-        self.gridLayout_2.addWidget(self.lineEdit_Host_name, 2, 1, 1, 2)
-        self.label_6 = QtWidgets.QLabel(self.groupBox_auto_login)
-        self.label_6.setEnabled(False)
-        self.label_6.setMinimumSize(QtCore.QSize(0, 30))
-        font = QtGui.QFont()
-        font.setFamily("Microsoft Tai Le")
-        font.setPointSize(10)
-        self.label_6.setFont(font)
-        self.label_6.setObjectName("label_6")
-        self.gridLayout_2.addWidget(self.label_6, 6, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.lineEdit_Host_name, 3, 1, 1, 1)
+        self.label_4 = QtWidgets.QLabel(self.groupBox_auto_login)
+        self.label_4.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_4.setObjectName("label_4")
+        self.gridLayout_2.addWidget(self.label_4, 3, 2, 1, 1)
+        self.lineEdit_port = QtWidgets.QLineEdit(self.groupBox_auto_login)
+        self.lineEdit_port.setEnabled(False)
+        self.lineEdit_port.setObjectName("lineEdit_port")
+        self.gridLayout_2.addWidget(self.lineEdit_port, 3, 3, 1, 1)
+        self.label_sec_mysql_credentials = QtWidgets.QLabel(self.groupBox_auto_login)
+        self.label_sec_mysql_credentials.setObjectName("label_sec_mysql_credentials")
+        self.gridLayout_2.addWidget(self.label_sec_mysql_credentials, 4, 0, 1, 4)
+        self.label_2 = QtWidgets.QLabel(self.groupBox_auto_login)
+        self.label_2.setMinimumSize(QtCore.QSize(118, 0))
+        self.label_2.setObjectName("label_2")
+        self.gridLayout_2.addWidget(self.label_2, 5, 0, 1, 1)
+        self.lineEdit_UserName = QtWidgets.QLineEdit(self.groupBox_auto_login)
+        self.lineEdit_UserName.setEnabled(False)
+        self.lineEdit_UserName.setObjectName("lineEdit_UserName")
+        self.gridLayout_2.addWidget(self.lineEdit_UserName, 5, 1, 1, 3)
+        self.label_5 = QtWidgets.QLabel(self.groupBox_auto_login)
+        self.label_5.setMinimumSize(QtCore.QSize(118, 0))
+        self.label_5.setObjectName("label_5")
+        self.gridLayout_2.addWidget(self.label_5, 6, 0, 1, 1)
         self.lineEdit_password = QtWidgets.QLineEdit(self.groupBox_auto_login)
         self.lineEdit_password.setEnabled(False)
-        self.lineEdit_password.setMinimumSize(QtCore.QSize(0, 30))
-        font = QtGui.QFont()
-        font.setFamily("Microsoft Tai Le")
-        font.setPointSize(10)
-        self.lineEdit_password.setFont(font)
         self.lineEdit_password.setText("")
         self.lineEdit_password.setEchoMode(QtWidgets.QLineEdit.Password)
         self.lineEdit_password.setObjectName("lineEdit_password")
-        self.gridLayout_2.addWidget(self.lineEdit_password, 4, 1, 1, 2)
-        self.label = QtWidgets.QLabel(self.groupBox_auto_login)
-        self.label.setMinimumSize(QtCore.QSize(0, 30))
-        self.label.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Microsoft Tai Le")
-        font.setPointSize(10)
-        self.label.setFont(font)
-        self.label.setObjectName("label")
-        self.gridLayout_2.addWidget(self.label, 0, 0, 1, 1)
-        self.label_2 = QtWidgets.QLabel(self.groupBox_auto_login)
-        self.label_2.setMinimumSize(QtCore.QSize(0, 30))
-        self.label_2.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Microsoft Tai Le")
-        font.setPointSize(10)
-        self.label_2.setFont(font)
-        self.label_2.setObjectName("label_2")
-        self.gridLayout_2.addWidget(self.label_2, 1, 0, 1, 1)
-        self.lineEdit_port = QtWidgets.QLineEdit(self.groupBox_auto_login)
-        self.lineEdit_port.setEnabled(False)
-        self.lineEdit_port.setMinimumSize(QtCore.QSize(0, 30))
-        font = QtGui.QFont()
-        font.setFamily("Microsoft Tai Le")
-        font.setPointSize(10)
-        self.lineEdit_port.setFont(font)
-        self.lineEdit_port.setObjectName("lineEdit_port")
-        self.gridLayout_2.addWidget(self.lineEdit_port, 3, 1, 1, 2)
-        self.label_3 = QtWidgets.QLabel(self.groupBox_auto_login)
-        self.label_3.setMinimumSize(QtCore.QSize(0, 30))
-        self.label_3.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Microsoft Tai Le")
-        font.setPointSize(10)
-        self.label_3.setFont(font)
-        self.label_3.setObjectName("label_3")
-        self.gridLayout_2.addWidget(self.label_3, 2, 0, 1, 1)
-        self.radioButton_user_manual_login = QtWidgets.QRadioButton(self.groupBox_auto_login)
-        self.radioButton_user_manual_login.setEnabled(True)
-        self.radioButton_user_manual_login.setMinimumSize(QtCore.QSize(0, 30))
-        font = QtGui.QFont()
-        font.setFamily("Microsoft Tai Le")
-        font.setPointSize(10)
-        self.radioButton_user_manual_login.setFont(font)
-        self.radioButton_user_manual_login.setChecked(False)
-        self.radioButton_user_manual_login.setObjectName("radioButton_user_manual_login")
-        self.gridLayout_2.addWidget(self.radioButton_user_manual_login, 0, 3, 1, 1)
+        self.gridLayout_2.addWidget(self.lineEdit_password, 6, 1, 1, 3)
+        self.label_sec_mysql_behaviour = QtWidgets.QLabel(self.groupBox_auto_login)
+        self.label_sec_mysql_behaviour.setObjectName("label_sec_mysql_behaviour")
+        self.gridLayout_2.addWidget(self.label_sec_mysql_behaviour, 7, 0, 1, 4)
+        self.label_6 = QtWidgets.QLabel(self.groupBox_auto_login)
+        self.label_6.setEnabled(False)
+        self.label_6.setMinimumSize(QtCore.QSize(118, 0))
+        self.label_6.setObjectName("label_6")
+        self.gridLayout_2.addWidget(self.label_6, 8, 0, 1, 1)
+        self.spinBox_retry_attpents = QtWidgets.QSpinBox(self.groupBox_auto_login)
+        self.spinBox_retry_attpents.setEnabled(False)
+        self.spinBox_retry_attpents.setButtonSymbols(QtWidgets.QAbstractSpinBox.NoButtons)
+        self.spinBox_retry_attpents.setObjectName("spinBox_retry_attpents")
+        self.gridLayout_2.addWidget(self.spinBox_retry_attpents, 8, 1, 1, 1)
+        self.horizontalLayout_mysql_options = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_mysql_options.setSpacing(20)
+        self.horizontalLayout_mysql_options.setObjectName("horizontalLayout_mysql_options")
+        self.checkBox_remember_credentials = QtWidgets.QCheckBox(self.groupBox_auto_login)
+        self.checkBox_remember_credentials.setEnabled(False)
+        self.checkBox_remember_credentials.setObjectName("checkBox_remember_credentials")
+        self.horizontalLayout_mysql_options.addWidget(self.checkBox_remember_credentials)
         self.checkBox_auto_connect_on_disconnect = QtWidgets.QCheckBox(self.groupBox_auto_login)
         self.checkBox_auto_connect_on_disconnect.setEnabled(False)
-        self.checkBox_auto_connect_on_disconnect.setMinimumSize(QtCore.QSize(0, 30))
-        font = QtGui.QFont()
-        font.setFamily("Microsoft Tai Le")
-        font.setPointSize(10)
-        self.checkBox_auto_connect_on_disconnect.setFont(font)
         self.checkBox_auto_connect_on_disconnect.setObjectName("checkBox_auto_connect_on_disconnect")
-        self.gridLayout_2.addWidget(self.checkBox_auto_connect_on_disconnect, 7, 0, 1, 1)
-        self.gridLayout_3.addWidget(self.groupBox_auto_login, 0, 0, 1, 1)
+        self.horizontalLayout_mysql_options.addWidget(self.checkBox_auto_connect_on_disconnect)
+        spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_mysql_options.addItem(spacerItem2)
+        self.gridLayout_2.addLayout(self.horizontalLayout_mysql_options, 9, 1, 1, 3)
+        self.horizontalLayout_mysql_buttons = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_mysql_buttons.setSpacing(10)
+        self.horizontalLayout_mysql_buttons.setObjectName("horizontalLayout_mysql_buttons")
+        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_mysql_buttons.addItem(spacerItem3)
+        self.pushButton_test_connection = QtWidgets.QPushButton(self.groupBox_auto_login)
+        self.pushButton_test_connection.setEnabled(False)
+        self.pushButton_test_connection.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.pushButton_test_connection.setToolTip("")
+        self.pushButton_test_connection.setObjectName("pushButton_test_connection")
+        self.horizontalLayout_mysql_buttons.addWidget(self.pushButton_test_connection)
+        self.pushButton_apply_login_setting = QtWidgets.QPushButton(self.groupBox_auto_login)
+        self.pushButton_apply_login_setting.setEnabled(True)
+        self.pushButton_apply_login_setting.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.pushButton_apply_login_setting.setObjectName("pushButton_apply_login_setting")
+        self.horizontalLayout_mysql_buttons.addWidget(self.pushButton_apply_login_setting)
+        self.gridLayout_2.addLayout(self.horizontalLayout_mysql_buttons, 10, 0, 1, 4)
+        self.gridLayout_2.setColumnStretch(1, 3)
+        self.gridLayout_2.setColumnStretch(3, 1)
+        self.gridLayout_3.addWidget(self.groupBox_auto_login, 1, 0, 1, 1)
+        self.frame_2 = QtWidgets.QFrame(self.tab)
+        self.frame_2.setMinimumSize(QtCore.QSize(250, 0))
+        self.frame_2.setMaximumSize(QtCore.QSize(290, 16777215))
+        self.frame_2.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame_2.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame_2.setObjectName("frame_2")
+        self.verticalLayout_guide_mysql = QtWidgets.QVBoxLayout(self.frame_2)
+        self.verticalLayout_guide_mysql.setContentsMargins(16, 16, 16, 16)
+        self.verticalLayout_guide_mysql.setSpacing(10)
+        self.verticalLayout_guide_mysql.setObjectName("verticalLayout_guide_mysql")
+        self.label_mysql_guide_title = QtWidgets.QLabel(self.frame_2)
+        self.label_mysql_guide_title.setObjectName("label_mysql_guide_title")
+        self.verticalLayout_guide_mysql.addWidget(self.label_mysql_guide_title)
+        self.label_mysql_guide_body = QtWidgets.QLabel(self.frame_2)
+        self.label_mysql_guide_body.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.label_mysql_guide_body.setWordWrap(True)
+        self.label_mysql_guide_body.setObjectName("label_mysql_guide_body")
+        self.verticalLayout_guide_mysql.addWidget(self.label_mysql_guide_body)
+        spacerItem4 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_guide_mysql.addItem(spacerItem4)
+        self.gridLayout_3.addWidget(self.frame_2, 1, 1, 1, 1)
+        self.horizontalLayout_page_header_mysql = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_page_header_mysql.setSpacing(12)
+        self.horizontalLayout_page_header_mysql.setObjectName("horizontalLayout_page_header_mysql")
+        self.verticalLayout_page_header_mysql = QtWidgets.QVBoxLayout()
+        self.verticalLayout_page_header_mysql.setSpacing(2)
+        self.verticalLayout_page_header_mysql.setObjectName("verticalLayout_page_header_mysql")
+        self.label_page_title_mysql = QtWidgets.QLabel(self.tab)
+        self.label_page_title_mysql.setObjectName("label_page_title_mysql")
+        self.verticalLayout_page_header_mysql.addWidget(self.label_page_title_mysql)
+        self.label_page_sub_mysql = QtWidgets.QLabel(self.tab)
+        self.label_page_sub_mysql.setObjectName("label_page_sub_mysql")
+        self.verticalLayout_page_header_mysql.addWidget(self.label_page_sub_mysql)
+        self.horizontalLayout_page_header_mysql.addLayout(self.verticalLayout_page_header_mysql)
+        spacerItem5 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_page_header_mysql.addItem(spacerItem5)
+        self.label_mysql_state = QtWidgets.QLabel(self.tab)
+        self.label_mysql_state.setMaximumSize(QtCore.QSize(16777215, 28))
+        self.label_mysql_state.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_mysql_state.setObjectName("label_mysql_state")
+        self.horizontalLayout_page_header_mysql.addWidget(self.label_mysql_state)
+        self.gridLayout_3.addLayout(self.horizontalLayout_page_header_mysql, 0, 0, 1, 2)
+        self.gridLayout_3.setColumnStretch(0, 1)
         self.tabWidget.addTab(self.tab, "")
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
         self.gridLayout_4 = QtWidgets.QGridLayout(self.tab_2)
+        self.gridLayout_4.setContentsMargins(16, 16, 16, 16)
+        self.gridLayout_4.setHorizontalSpacing(16)
+        self.gridLayout_4.setVerticalSpacing(14)
         self.gridLayout_4.setObjectName("gridLayout_4")
+        self.horizontalLayout_page_header_plc = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_page_header_plc.setSpacing(12)
+        self.horizontalLayout_page_header_plc.setObjectName("horizontalLayout_page_header_plc")
+        self.verticalLayout_page_header_plc = QtWidgets.QVBoxLayout()
+        self.verticalLayout_page_header_plc.setSpacing(2)
+        self.verticalLayout_page_header_plc.setObjectName("verticalLayout_page_header_plc")
+        self.label_page_title_plc = QtWidgets.QLabel(self.tab_2)
+        self.label_page_title_plc.setObjectName("label_page_title_plc")
+        self.verticalLayout_page_header_plc.addWidget(self.label_page_title_plc)
+        self.label_page_sub_plc = QtWidgets.QLabel(self.tab_2)
+        self.label_page_sub_plc.setObjectName("label_page_sub_plc")
+        self.verticalLayout_page_header_plc.addWidget(self.label_page_sub_plc)
+        self.horizontalLayout_page_header_plc.addLayout(self.verticalLayout_page_header_plc)
+        spacerItem6 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_page_header_plc.addItem(spacerItem6)
+        self.label_plc_state = QtWidgets.QLabel(self.tab_2)
+        self.label_plc_state.setMaximumSize(QtCore.QSize(16777215, 28))
+        self.label_plc_state.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_plc_state.setObjectName("label_plc_state")
+        self.horizontalLayout_page_header_plc.addWidget(self.label_plc_state)
+        self.gridLayout_4.addLayout(self.horizontalLayout_page_header_plc, 0, 0, 1, 2)
         self.groupBox_plc_connection = QtWidgets.QGroupBox(self.tab_2)
         self.groupBox_plc_connection.setEnabled(False)
         self.groupBox_plc_connection.setObjectName("groupBox_plc_connection")
         self.gridLayout_7 = QtWidgets.QGridLayout(self.groupBox_plc_connection)
+        self.gridLayout_7.setSpacing(12)
         self.gridLayout_7.setObjectName("gridLayout_7")
-        self.comboBox_connection_type_2 = QtWidgets.QComboBox(self.groupBox_plc_connection)
-        self.comboBox_connection_type_2.setMinimumSize(QtCore.QSize(0, 30))
-        self.comboBox_connection_type_2.setMaximumSize(QtCore.QSize(120, 16777215))
-        self.comboBox_connection_type_2.setObjectName("comboBox_connection_type_2")
-        self.comboBox_connection_type_2.addItem("")
-        self.gridLayout_7.addWidget(self.comboBox_connection_type_2, 3, 1, 1, 1)
-        self.widget_3 = QtWidgets.QWidget(self.groupBox_plc_connection)
-        self.widget_3.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        self.widget_3.setObjectName("widget_3")
-        self.gridLayout_6 = QtWidgets.QGridLayout(self.widget_3)
-        self.gridLayout_6.setObjectName("gridLayout_6")
-        self.pushButton_apply_ip_add_setting_2 = QtWidgets.QPushButton(self.widget_3)
-        self.pushButton_apply_ip_add_setting_2.setMinimumSize(QtCore.QSize(0, 40))
-        self.pushButton_apply_ip_add_setting_2.setObjectName("pushButton_apply_ip_add_setting_2")
-        self.gridLayout_6.addWidget(self.pushButton_apply_ip_add_setting_2, 1, 3, 1, 1)
-        self.pushButton_test_connection_3 = QtWidgets.QPushButton(self.widget_3)
-        self.pushButton_test_connection_3.setMinimumSize(QtCore.QSize(0, 40))
-        self.pushButton_test_connection_3.setObjectName("pushButton_test_connection_3")
-        self.gridLayout_6.addWidget(self.pushButton_test_connection_3, 1, 1, 1, 1)
-        self.pushButton = QtWidgets.QPushButton(self.widget_3)
-        self.pushButton.setMinimumSize(QtCore.QSize(0, 40))
-        self.pushButton.setObjectName("pushButton")
-        self.gridLayout_6.addWidget(self.pushButton, 1, 0, 1, 1)
-        self.gridLayout_7.addWidget(self.widget_3, 9, 0, 1, 6)
-        self.label_17 = QtWidgets.QLabel(self.groupBox_plc_connection)
-        self.label_17.setMinimumSize(QtCore.QSize(0, 30))
-        self.label_17.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
-        self.label_17.setObjectName("label_17")
-        self.gridLayout_7.addWidget(self.label_17, 5, 0, 1, 1)
-        self.pushButton_get_local_ip_2 = QtWidgets.QPushButton(self.groupBox_plc_connection)
-        self.pushButton_get_local_ip_2.setMinimumSize(QtCore.QSize(0, 35))
-        self.pushButton_get_local_ip_2.setObjectName("pushButton_get_local_ip_2")
-        self.gridLayout_7.addWidget(self.pushButton_get_local_ip_2, 6, 2, 1, 1)
+        self.label_sec_plc_device = QtWidgets.QLabel(self.groupBox_plc_connection)
+        self.label_sec_plc_device.setObjectName("label_sec_plc_device")
+        self.gridLayout_7.addWidget(self.label_sec_plc_device, 0, 0, 1, 4)
+        self.label_15 = QtWidgets.QLabel(self.groupBox_plc_connection)
+        self.label_15.setMinimumSize(QtCore.QSize(118, 0))
+        self.label_15.setObjectName("label_15")
+        self.gridLayout_7.addWidget(self.label_15, 1, 0, 1, 1)
+        self.horizontalLayout_plc_modes = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_plc_modes.setSpacing(18)
+        self.horizontalLayout_plc_modes.setObjectName("horizontalLayout_plc_modes")
+        self.radioButton_manul_plc_2 = QtWidgets.QRadioButton(self.groupBox_plc_connection)
+        self.radioButton_manul_plc_2.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.radioButton_manul_plc_2.setChecked(True)
+        self.radioButton_manul_plc_2.setObjectName("radioButton_manul_plc_2")
+        self.horizontalLayout_plc_modes.addWidget(self.radioButton_manul_plc_2)
         self.radioButton_automatic_plc_2 = QtWidgets.QRadioButton(self.groupBox_plc_connection)
-        self.radioButton_automatic_plc_2.setMinimumSize(QtCore.QSize(0, 30))
         self.radioButton_automatic_plc_2.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.radioButton_automatic_plc_2.setObjectName("radioButton_automatic_plc_2")
-        self.gridLayout_7.addWidget(self.radioButton_automatic_plc_2, 0, 1, 1, 1)
+        self.horizontalLayout_plc_modes.addWidget(self.radioButton_automatic_plc_2)
+        spacerItem7 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_plc_modes.addItem(spacerItem7)
+        self.gridLayout_7.addLayout(self.horizontalLayout_plc_modes, 1, 1, 1, 3)
+        self.label_7 = QtWidgets.QLabel(self.groupBox_plc_connection)
+        self.label_7.setMinimumSize(QtCore.QSize(118, 0))
+        self.label_7.setObjectName("label_7")
+        self.gridLayout_7.addWidget(self.label_7, 2, 0, 1, 1)
         self.comboBox = QtWidgets.QComboBox(self.groupBox_plc_connection)
-        self.comboBox.setMinimumSize(QtCore.QSize(0, 30))
-        self.comboBox.setMaximumSize(QtCore.QSize(120, 16777215))
         self.comboBox.setObjectName("comboBox")
         self.comboBox.addItem("")
         self.comboBox.addItem("")
         self.comboBox.addItem("")
-        self.gridLayout_7.addWidget(self.comboBox, 2, 1, 1, 1)
-        self.label_14 = QtWidgets.QLabel(self.groupBox_plc_connection)
-        self.label_14.setMinimumSize(QtCore.QSize(0, 30))
-        self.label_14.setObjectName("label_14")
-        self.gridLayout_7.addWidget(self.label_14, 7, 0, 1, 1)
-        self.checkBox_2 = QtWidgets.QCheckBox(self.groupBox_plc_connection)
-        self.checkBox_2.setMinimumSize(QtCore.QSize(0, 30))
-        self.checkBox_2.setObjectName("checkBox_2")
-        self.gridLayout_7.addWidget(self.checkBox_2, 8, 0, 1, 1)
-        self.spinBox_2 = QtWidgets.QSpinBox(self.groupBox_plc_connection)
-        self.spinBox_2.setMinimumSize(QtCore.QSize(0, 30))
-        self.spinBox_2.setMaximumSize(QtCore.QSize(60, 16777215))
-        self.spinBox_2.setObjectName("spinBox_2")
-        self.gridLayout_7.addWidget(self.spinBox_2, 7, 1, 1, 1)
-        self.lineEdit_port_3 = QtWidgets.QLineEdit(self.groupBox_plc_connection)
-        self.lineEdit_port_3.setMinimumSize(QtCore.QSize(0, 30))
-        self.lineEdit_port_3.setMaximumSize(QtCore.QSize(120, 16777215))
-        self.lineEdit_port_3.setText("")
-        self.lineEdit_port_3.setAlignment(QtCore.Qt.AlignCenter)
-        self.lineEdit_port_3.setObjectName("lineEdit_port_3")
-        self.gridLayout_7.addWidget(self.lineEdit_port_3, 5, 1, 1, 1)
-        self.label_16 = QtWidgets.QLabel(self.groupBox_plc_connection)
-        self.label_16.setMinimumSize(QtCore.QSize(0, 30))
-        self.label_16.setObjectName("label_16")
-        self.gridLayout_7.addWidget(self.label_16, 4, 0, 1, 1)
+        self.gridLayout_7.addWidget(self.comboBox, 2, 1, 1, 3)
         self.label_18 = QtWidgets.QLabel(self.groupBox_plc_connection)
-        self.label_18.setMinimumSize(QtCore.QSize(0, 30))
+        self.label_18.setMinimumSize(QtCore.QSize(118, 0))
         self.label_18.setObjectName("label_18")
         self.gridLayout_7.addWidget(self.label_18, 3, 0, 1, 1)
-        self.radioButton_manul_plc_2 = QtWidgets.QRadioButton(self.groupBox_plc_connection)
-        self.radioButton_manul_plc_2.setMinimumSize(QtCore.QSize(0, 30))
-        self.radioButton_manul_plc_2.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.radioButton_manul_plc_2.setChecked(True)
-        self.radioButton_manul_plc_2.setObjectName("radioButton_manul_plc_2")
-        self.gridLayout_7.addWidget(self.radioButton_manul_plc_2, 1, 1, 1, 1)
-        self.label_7 = QtWidgets.QLabel(self.groupBox_plc_connection)
-        self.label_7.setMinimumSize(QtCore.QSize(0, 30))
-        self.label_7.setObjectName("label_7")
-        self.gridLayout_7.addWidget(self.label_7, 2, 0, 1, 1)
-        self.gridLayout_5 = QtWidgets.QGridLayout()
-        self.gridLayout_5.setObjectName("gridLayout_5")
-        self.label_8 = QtWidgets.QLabel(self.groupBox_plc_connection)
-        font = QtGui.QFont()
-        font.setFamily("Microsoft Tai Le")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_8.setFont(font)
-        self.label_8.setObjectName("label_8")
-        self.gridLayout_5.addWidget(self.label_8, 0, 3, 1, 1)
-        self.label_9 = QtWidgets.QLabel(self.groupBox_plc_connection)
-        font = QtGui.QFont()
-        font.setFamily("Microsoft Tai Le")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_9.setFont(font)
-        self.label_9.setObjectName("label_9")
-        self.gridLayout_5.addWidget(self.label_9, 0, 1, 1, 1)
-        self.lineEdit_ip_2 = QtWidgets.QLineEdit(self.groupBox_plc_connection)
-        self.lineEdit_ip_2.setMaxLength(3)
-        self.lineEdit_ip_2.setAlignment(QtCore.Qt.AlignCenter)
-        self.lineEdit_ip_2.setObjectName("lineEdit_ip_2")
-        self.gridLayout_5.addWidget(self.lineEdit_ip_2, 0, 2, 1, 1)
-        self.lineEdit_ip_3 = QtWidgets.QLineEdit(self.groupBox_plc_connection)
-        self.lineEdit_ip_3.setMaxLength(3)
-        self.lineEdit_ip_3.setAlignment(QtCore.Qt.AlignCenter)
-        self.lineEdit_ip_3.setObjectName("lineEdit_ip_3")
-        self.gridLayout_5.addWidget(self.lineEdit_ip_3, 0, 4, 1, 1)
-        self.label_10 = QtWidgets.QLabel(self.groupBox_plc_connection)
-        font = QtGui.QFont()
-        font.setFamily("Microsoft Tai Le")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_10.setFont(font)
-        self.label_10.setObjectName("label_10")
-        self.gridLayout_5.addWidget(self.label_10, 0, 5, 1, 1)
-        self.lineEdit_ip_1 = QtWidgets.QLineEdit(self.groupBox_plc_connection)
-        self.lineEdit_ip_1.setMaxLength(3)
-        self.lineEdit_ip_1.setAlignment(QtCore.Qt.AlignCenter)
-        self.lineEdit_ip_1.setObjectName("lineEdit_ip_1")
-        self.gridLayout_5.addWidget(self.lineEdit_ip_1, 0, 0, 1, 1)
-        self.lineEdit_ip_4 = QtWidgets.QLineEdit(self.groupBox_plc_connection)
-        self.lineEdit_ip_4.setMaxLength(3)
-        self.lineEdit_ip_4.setAlignment(QtCore.Qt.AlignCenter)
-        self.lineEdit_ip_4.setObjectName("lineEdit_ip_4")
-        self.gridLayout_5.addWidget(self.lineEdit_ip_4, 0, 6, 1, 1)
-        self.gridLayout_7.addLayout(self.gridLayout_5, 4, 1, 1, 1)
+        self.comboBox_connection_type_2 = QtWidgets.QComboBox(self.groupBox_plc_connection)
+        self.comboBox_connection_type_2.setObjectName("comboBox_connection_type_2")
+        self.comboBox_connection_type_2.addItem("")
+        self.gridLayout_7.addWidget(self.comboBox_connection_type_2, 3, 1, 1, 3)
+        self.label_sec_plc_network = QtWidgets.QLabel(self.groupBox_plc_connection)
+        self.label_sec_plc_network.setObjectName("label_sec_plc_network")
+        self.gridLayout_7.addWidget(self.label_sec_plc_network, 4, 0, 1, 4)
+        self.label_16 = QtWidgets.QLabel(self.groupBox_plc_connection)
+        self.label_16.setMinimumSize(QtCore.QSize(118, 0))
+        self.label_16.setObjectName("label_16")
+        self.gridLayout_7.addWidget(self.label_16, 5, 0, 1, 1)
+        self.lineEdit_ip_address_2 = QtWidgets.QLineEdit(self.groupBox_plc_connection)
+        self.lineEdit_ip_address_2.setObjectName("lineEdit_ip_address_2")
+        self.gridLayout_7.addWidget(self.lineEdit_ip_address_2, 5, 1, 1, 1)
+        self.label_17 = QtWidgets.QLabel(self.groupBox_plc_connection)
+        self.label_17.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_17.setObjectName("label_17")
+        self.gridLayout_7.addWidget(self.label_17, 5, 2, 1, 1)
+        self.lineEdit_port_3 = QtWidgets.QLineEdit(self.groupBox_plc_connection)
+        self.lineEdit_port_3.setObjectName("lineEdit_port_3")
+        self.gridLayout_7.addWidget(self.lineEdit_port_3, 5, 3, 1, 1)
         self.label_13 = QtWidgets.QLabel(self.groupBox_plc_connection)
-        self.label_13.setMinimumSize(QtCore.QSize(0, 30))
+        self.label_13.setMinimumSize(QtCore.QSize(118, 0))
         self.label_13.setObjectName("label_13")
         self.gridLayout_7.addWidget(self.label_13, 6, 0, 1, 1)
-        self.label_15 = QtWidgets.QLabel(self.groupBox_plc_connection)
-        self.label_15.setMinimumSize(QtCore.QSize(0, 30))
-        self.label_15.setObjectName("label_15")
-        self.gridLayout_7.addWidget(self.label_15, 0, 0, 2, 1)
-        self.gridLayout_9 = QtWidgets.QGridLayout()
-        self.gridLayout_9.setObjectName("gridLayout_9")
-        self.label_20 = QtWidgets.QLabel(self.groupBox_plc_connection)
-        font = QtGui.QFont()
-        font.setFamily("Microsoft Tai Le")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_20.setFont(font)
-        self.label_20.setObjectName("label_20")
-        self.gridLayout_9.addWidget(self.label_20, 0, 3, 1, 1)
-        self.label_21 = QtWidgets.QLabel(self.groupBox_plc_connection)
-        font = QtGui.QFont()
-        font.setFamily("Microsoft Tai Le")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_21.setFont(font)
-        self.label_21.setObjectName("label_21")
-        self.gridLayout_9.addWidget(self.label_21, 0, 1, 1, 1)
-        self.lineEdit_ip_local_2 = QtWidgets.QLineEdit(self.groupBox_plc_connection)
-        self.lineEdit_ip_local_2.setMaxLength(3)
-        self.lineEdit_ip_local_2.setAlignment(QtCore.Qt.AlignCenter)
-        self.lineEdit_ip_local_2.setObjectName("lineEdit_ip_local_2")
-        self.gridLayout_9.addWidget(self.lineEdit_ip_local_2, 0, 2, 1, 1)
-        self.lineEdit_ip_local_3 = QtWidgets.QLineEdit(self.groupBox_plc_connection)
-        self.lineEdit_ip_local_3.setMaxLength(3)
-        self.lineEdit_ip_local_3.setAlignment(QtCore.Qt.AlignCenter)
-        self.lineEdit_ip_local_3.setObjectName("lineEdit_ip_local_3")
-        self.gridLayout_9.addWidget(self.lineEdit_ip_local_3, 0, 4, 1, 1)
-        self.label_22 = QtWidgets.QLabel(self.groupBox_plc_connection)
-        font = QtGui.QFont()
-        font.setFamily("Microsoft Tai Le")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_22.setFont(font)
-        self.label_22.setObjectName("label_22")
-        self.gridLayout_9.addWidget(self.label_22, 0, 5, 1, 1)
-        self.lineEdit_ip_local_1 = QtWidgets.QLineEdit(self.groupBox_plc_connection)
-        self.lineEdit_ip_local_1.setMaxLength(3)
-        self.lineEdit_ip_local_1.setAlignment(QtCore.Qt.AlignCenter)
-        self.lineEdit_ip_local_1.setObjectName("lineEdit_ip_local_1")
-        self.gridLayout_9.addWidget(self.lineEdit_ip_local_1, 0, 0, 1, 1)
-        self.lineEdit_ip_local_4 = QtWidgets.QLineEdit(self.groupBox_plc_connection)
-        self.lineEdit_ip_local_4.setMaxLength(3)
-        self.lineEdit_ip_local_4.setAlignment(QtCore.Qt.AlignCenter)
-        self.lineEdit_ip_local_4.setObjectName("lineEdit_ip_local_4")
-        self.gridLayout_9.addWidget(self.lineEdit_ip_local_4, 0, 6, 1, 1)
-        self.gridLayout_7.addLayout(self.gridLayout_9, 6, 1, 1, 1)
-        self.gridLayout_4.addWidget(self.groupBox_plc_connection, 0, 0, 1, 1)
+        self.lineEdit_local_ip_2 = QtWidgets.QLineEdit(self.groupBox_plc_connection)
+        self.lineEdit_local_ip_2.setObjectName("lineEdit_local_ip_2")
+        self.gridLayout_7.addWidget(self.lineEdit_local_ip_2, 6, 1, 1, 1)
+        self.pushButton_get_local_ip_2 = QtWidgets.QPushButton(self.groupBox_plc_connection)
+        self.pushButton_get_local_ip_2.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.pushButton_get_local_ip_2.setObjectName("pushButton_get_local_ip_2")
+        self.gridLayout_7.addWidget(self.pushButton_get_local_ip_2, 6, 2, 1, 2)
+        self.label_sec_plc_behaviour = QtWidgets.QLabel(self.groupBox_plc_connection)
+        self.label_sec_plc_behaviour.setObjectName("label_sec_plc_behaviour")
+        self.gridLayout_7.addWidget(self.label_sec_plc_behaviour, 7, 0, 1, 4)
+        self.label_14 = QtWidgets.QLabel(self.groupBox_plc_connection)
+        self.label_14.setMinimumSize(QtCore.QSize(118, 0))
+        self.label_14.setObjectName("label_14")
+        self.gridLayout_7.addWidget(self.label_14, 8, 0, 1, 1)
+        self.spinBox_2 = QtWidgets.QSpinBox(self.groupBox_plc_connection)
+        self.spinBox_2.setButtonSymbols(QtWidgets.QAbstractSpinBox.NoButtons)
+        self.spinBox_2.setObjectName("spinBox_2")
+        self.gridLayout_7.addWidget(self.spinBox_2, 8, 1, 1, 1)
+        self.checkBox_2 = QtWidgets.QCheckBox(self.groupBox_plc_connection)
+        self.checkBox_2.setObjectName("checkBox_2")
+        self.gridLayout_7.addWidget(self.checkBox_2, 9, 1, 1, 3)
+        self.widget_3 = QtWidgets.QWidget(self.groupBox_plc_connection)
+        self.widget_3.setMinimumSize(QtCore.QSize(0, 44))
+        self.widget_3.setMaximumSize(QtCore.QSize(16777215, 48))
+        self.widget_3.setObjectName("widget_3")
+        self.gridLayout_6 = QtWidgets.QGridLayout(self.widget_3)
+        self.gridLayout_6.setContentsMargins(0, 0, 0, 0)
+        self.gridLayout_6.setHorizontalSpacing(10)
+        self.gridLayout_6.setObjectName("gridLayout_6")
+        spacerItem8 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_6.addItem(spacerItem8, 0, 0, 1, 1)
+        self.pushButton_apply_ip_add_setting_2 = QtWidgets.QPushButton(self.widget_3)
+        self.pushButton_apply_ip_add_setting_2.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.pushButton_apply_ip_add_setting_2.setObjectName("pushButton_apply_ip_add_setting_2")
+        self.gridLayout_6.addWidget(self.pushButton_apply_ip_add_setting_2, 0, 3, 1, 1)
+        self.pushButton_test_connection_3 = QtWidgets.QPushButton(self.widget_3)
+        self.pushButton_test_connection_3.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.pushButton_test_connection_3.setObjectName("pushButton_test_connection_3")
+        self.gridLayout_6.addWidget(self.pushButton_test_connection_3, 0, 2, 1, 1)
+        self.network_setting_advanced = QtWidgets.QPushButton(self.widget_3)
+        self.network_setting_advanced.setObjectName("network_setting_advanced")
+        self.gridLayout_6.addWidget(self.network_setting_advanced, 0, 1, 1, 1)
+        self.gridLayout_7.addWidget(self.widget_3, 10, 0, 1, 4)
+        self.gridLayout_7.setColumnStretch(1, 3)
+        self.gridLayout_7.setColumnStretch(3, 1)
+        self.gridLayout_4.addWidget(self.groupBox_plc_connection, 1, 0, 1, 1)
+        self.frame = QtWidgets.QFrame(self.tab_2)
+        self.frame.setMinimumSize(QtCore.QSize(250, 0))
+        self.frame.setMaximumSize(QtCore.QSize(290, 16777215))
+        self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame.setObjectName("frame")
+        self.verticalLayout_guide_plc = QtWidgets.QVBoxLayout(self.frame)
+        self.verticalLayout_guide_plc.setContentsMargins(16, 16, 16, 16)
+        self.verticalLayout_guide_plc.setSpacing(10)
+        self.verticalLayout_guide_plc.setObjectName("verticalLayout_guide_plc")
+        self.label_plc_guide_title = QtWidgets.QLabel(self.frame)
+        self.label_plc_guide_title.setObjectName("label_plc_guide_title")
+        self.verticalLayout_guide_plc.addWidget(self.label_plc_guide_title)
+        self.label_plc_guide_body = QtWidgets.QLabel(self.frame)
+        self.label_plc_guide_body.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.label_plc_guide_body.setWordWrap(True)
+        self.label_plc_guide_body.setObjectName("label_plc_guide_body")
+        self.verticalLayout_guide_plc.addWidget(self.label_plc_guide_body)
+        spacerItem9 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_guide_plc.addItem(spacerItem9)
+        self.gridLayout_4.addWidget(self.frame, 1, 1, 1, 1)
+        self.gridLayout_4.setColumnStretch(0, 1)
         self.tabWidget.addTab(self.tab_2, "")
-        self.gridLayout.addWidget(self.tabWidget, 0, 0, 1, 1)
+        self.tab_3 = QtWidgets.QWidget()
+        self.tab_3.setObjectName("tab_3")
+        self.verticalLayout_plc_test = QtWidgets.QVBoxLayout(self.tab_3)
+        self.verticalLayout_plc_test.setContentsMargins(16, 16, 16, 16)
+        self.verticalLayout_plc_test.setSpacing(14)
+        self.verticalLayout_plc_test.setObjectName("verticalLayout_plc_test")
+        self.frame_plc_test_header = QtWidgets.QFrame(self.tab_3)
+        self.frame_plc_test_header.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.frame_plc_test_header.setObjectName("frame_plc_test_header")
+        self.horizontalLayout_plc_header = QtWidgets.QHBoxLayout(self.frame_plc_test_header)
+        self.horizontalLayout_plc_header.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_plc_header.setSpacing(12)
+        self.horizontalLayout_plc_header.setObjectName("horizontalLayout_plc_header")
+        self.verticalLayout_plc_header_text = QtWidgets.QVBoxLayout()
+        self.verticalLayout_plc_header_text.setSpacing(2)
+        self.verticalLayout_plc_header_text.setObjectName("verticalLayout_plc_header_text")
+        self.label_plc_test_title = QtWidgets.QLabel(self.frame_plc_test_header)
+        self.label_plc_test_title.setObjectName("label_plc_test_title")
+        self.verticalLayout_plc_header_text.addWidget(self.label_plc_test_title)
+        self.label_plc_test_subtitle = QtWidgets.QLabel(self.frame_plc_test_header)
+        self.label_plc_test_subtitle.setObjectName("label_plc_test_subtitle")
+        self.verticalLayout_plc_header_text.addWidget(self.label_plc_test_subtitle)
+        self.horizontalLayout_plc_header.addLayout(self.verticalLayout_plc_header_text)
+        spacerItem10 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_plc_header.addItem(spacerItem10)
+        self.verticalLayout_plc_header_status = QtWidgets.QVBoxLayout()
+        self.verticalLayout_plc_header_status.setSpacing(6)
+        self.verticalLayout_plc_header_status.setObjectName("verticalLayout_plc_header_status")
+        self.label_plc_conn_status = QtWidgets.QLabel(self.frame_plc_test_header)
+        self.label_plc_conn_status.setMaximumSize(QtCore.QSize(16777215, 28))
+        self.label_plc_conn_status.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_plc_conn_status.setObjectName("label_plc_conn_status")
+        self.verticalLayout_plc_header_status.addWidget(self.label_plc_conn_status, 0, QtCore.Qt.AlignRight)
+        self.label_plc_conn_target = QtWidgets.QLabel(self.frame_plc_test_header)
+        self.label_plc_conn_target.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.label_plc_conn_target.setObjectName("label_plc_conn_target")
+        self.verticalLayout_plc_header_status.addWidget(self.label_plc_conn_target, 0, QtCore.Qt.AlignRight)
+        self.horizontalLayout_plc_header.addLayout(self.verticalLayout_plc_header_status)
+        self.verticalLayout_plc_test.addWidget(self.frame_plc_test_header)
+        self.horizontalLayout_plc_forms = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_plc_forms.setSpacing(14)
+        self.horizontalLayout_plc_forms.setObjectName("horizontalLayout_plc_forms")
+        self.groupBox_plc_read = QtWidgets.QGroupBox(self.tab_3)
+        self.groupBox_plc_read.setMinimumSize(QtCore.QSize(0, 300))
+        self.groupBox_plc_read.setObjectName("groupBox_plc_read")
+        self.gridLayout_plc_read = QtWidgets.QGridLayout(self.groupBox_plc_read)
+        self.gridLayout_plc_read.setSpacing(12)
+        self.gridLayout_plc_read.setObjectName("gridLayout_plc_read")
+        self.label_read_register = QtWidgets.QLabel(self.groupBox_plc_read)
+        self.label_read_register.setMinimumSize(QtCore.QSize(84, 0))
+        self.label_read_register.setObjectName("label_read_register")
+        self.gridLayout_plc_read.addWidget(self.label_read_register, 0, 0, 1, 1)
+        self.lineEdit_read_register = QtWidgets.QLineEdit(self.groupBox_plc_read)
+        self.lineEdit_read_register.setObjectName("lineEdit_read_register")
+        self.gridLayout_plc_read.addWidget(self.lineEdit_read_register, 0, 1, 1, 1)
+        self.label_read_type = QtWidgets.QLabel(self.groupBox_plc_read)
+        self.label_read_type.setObjectName("label_read_type")
+        self.gridLayout_plc_read.addWidget(self.label_read_type, 1, 0, 1, 1)
+        self.comboBox_read_data_type = QtWidgets.QComboBox(self.groupBox_plc_read)
+        self.comboBox_read_data_type.setObjectName("comboBox_read_data_type")
+        self.comboBox_read_data_type.addItem("")
+        self.comboBox_read_data_type.addItem("")
+        self.comboBox_read_data_type.addItem("")
+        self.comboBox_read_data_type.addItem("")
+        self.comboBox_read_data_type.addItem("")
+        self.comboBox_read_data_type.addItem("")
+        self.gridLayout_plc_read.addWidget(self.comboBox_read_data_type, 1, 1, 1, 1)
+        self.label_read_value = QtWidgets.QLabel(self.groupBox_plc_read)
+        self.label_read_value.setObjectName("label_read_value")
+        self.gridLayout_plc_read.addWidget(self.label_read_value, 2, 0, 1, 1)
+        self.lineEdit_read_value = QtWidgets.QLineEdit(self.groupBox_plc_read)
+        self.lineEdit_read_value.setMinimumSize(QtCore.QSize(0, 48))
+        self.lineEdit_read_value.setReadOnly(True)
+        self.lineEdit_read_value.setObjectName("lineEdit_read_value")
+        self.gridLayout_plc_read.addWidget(self.lineEdit_read_value, 2, 1, 1, 1)
+        self.label_read_status_caption = QtWidgets.QLabel(self.groupBox_plc_read)
+        self.label_read_status_caption.setObjectName("label_read_status_caption")
+        self.gridLayout_plc_read.addWidget(self.label_read_status_caption, 3, 0, 1, 1)
+        self.label_read_status = QtWidgets.QLabel(self.groupBox_plc_read)
+        self.label_read_status.setMaximumSize(QtCore.QSize(16777215, 36))
+        self.label_read_status.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_read_status.setObjectName("label_read_status")
+        self.gridLayout_plc_read.addWidget(self.label_read_status, 3, 1, 1, 1)
+        self.label_read_poll = QtWidgets.QLabel(self.groupBox_plc_read)
+        self.label_read_poll.setObjectName("label_read_poll")
+        self.gridLayout_plc_read.addWidget(self.label_read_poll, 4, 0, 1, 1)
+        self.horizontalLayout_plc_poll = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_plc_poll.setSpacing(10)
+        self.horizontalLayout_plc_poll.setObjectName("horizontalLayout_plc_poll")
+        self.checkBox_read_continuous = QtWidgets.QCheckBox(self.groupBox_plc_read)
+        self.checkBox_read_continuous.setObjectName("checkBox_read_continuous")
+        self.horizontalLayout_plc_poll.addWidget(self.checkBox_read_continuous)
+        self.spinBox_read_interval = QtWidgets.QSpinBox(self.groupBox_plc_read)
+        self.spinBox_read_interval.setButtonSymbols(QtWidgets.QAbstractSpinBox.NoButtons)
+        self.spinBox_read_interval.setMinimum(50)
+        self.spinBox_read_interval.setMaximum(60000)
+        self.spinBox_read_interval.setSingleStep(50)
+        self.spinBox_read_interval.setProperty("value", 500)
+        self.spinBox_read_interval.setObjectName("spinBox_read_interval")
+        self.horizontalLayout_plc_poll.addWidget(self.spinBox_read_interval)
+        self.gridLayout_plc_read.addLayout(self.horizontalLayout_plc_poll, 4, 1, 1, 1)
+        spacerItem11 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.gridLayout_plc_read.addItem(spacerItem11, 5, 0, 1, 2)
+        self.pushButton_plc_receive = QtWidgets.QPushButton(self.groupBox_plc_read)
+        self.pushButton_plc_receive.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.pushButton_plc_receive.setObjectName("pushButton_plc_receive")
+        self.gridLayout_plc_read.addWidget(self.pushButton_plc_receive, 6, 0, 1, 2)
+        self.gridLayout_plc_read.setColumnStretch(1, 1)
+        self.horizontalLayout_plc_forms.addWidget(self.groupBox_plc_read)
+        self.groupBox_plc_write = QtWidgets.QGroupBox(self.tab_3)
+        self.groupBox_plc_write.setObjectName("groupBox_plc_write")
+        self.gridLayout_plc_write = QtWidgets.QGridLayout(self.groupBox_plc_write)
+        self.gridLayout_plc_write.setSpacing(12)
+        self.gridLayout_plc_write.setObjectName("gridLayout_plc_write")
+        self.label_write_register = QtWidgets.QLabel(self.groupBox_plc_write)
+        self.label_write_register.setMinimumSize(QtCore.QSize(84, 0))
+        self.label_write_register.setObjectName("label_write_register")
+        self.gridLayout_plc_write.addWidget(self.label_write_register, 0, 0, 1, 1)
+        self.lineEdit_write_register = QtWidgets.QLineEdit(self.groupBox_plc_write)
+        self.lineEdit_write_register.setObjectName("lineEdit_write_register")
+        self.gridLayout_plc_write.addWidget(self.lineEdit_write_register, 0, 1, 1, 1)
+        self.label_write_type = QtWidgets.QLabel(self.groupBox_plc_write)
+        self.label_write_type.setObjectName("label_write_type")
+        self.gridLayout_plc_write.addWidget(self.label_write_type, 1, 0, 1, 1)
+        self.comboBox_write_data_type = QtWidgets.QComboBox(self.groupBox_plc_write)
+        self.comboBox_write_data_type.setObjectName("comboBox_write_data_type")
+        self.comboBox_write_data_type.addItem("")
+        self.comboBox_write_data_type.addItem("")
+        self.comboBox_write_data_type.addItem("")
+        self.comboBox_write_data_type.addItem("")
+        self.comboBox_write_data_type.addItem("")
+        self.comboBox_write_data_type.addItem("")
+        self.gridLayout_plc_write.addWidget(self.comboBox_write_data_type, 1, 1, 1, 1)
+        self.label_write_value_caption = QtWidgets.QLabel(self.groupBox_plc_write)
+        self.label_write_value_caption.setObjectName("label_write_value_caption")
+        self.gridLayout_plc_write.addWidget(self.label_write_value_caption, 2, 0, 1, 1)
+        self.lineEdit_write_value = QtWidgets.QLineEdit(self.groupBox_plc_write)
+        self.lineEdit_write_value.setObjectName("lineEdit_write_value")
+        self.gridLayout_plc_write.addWidget(self.lineEdit_write_value, 2, 1, 1, 1)
+        self.label_write_result_caption = QtWidgets.QLabel(self.groupBox_plc_write)
+        self.label_write_result_caption.setObjectName("label_write_result_caption")
+        self.gridLayout_plc_write.addWidget(self.label_write_result_caption, 3, 0, 1, 1)
+        self.label_write_result = QtWidgets.QLabel(self.groupBox_plc_write)
+        self.label_write_result.setMaximumSize(QtCore.QSize(16777215, 36))
+        self.label_write_result.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_write_result.setObjectName("label_write_result")
+        self.gridLayout_plc_write.addWidget(self.label_write_result, 3, 1, 1, 1)
+        self.label_write_options = QtWidgets.QLabel(self.groupBox_plc_write)
+        self.label_write_options.setObjectName("label_write_options")
+        self.gridLayout_plc_write.addWidget(self.label_write_options, 4, 0, 1, 1)
+        self.checkBox_write_verify = QtWidgets.QCheckBox(self.groupBox_plc_write)
+        self.checkBox_write_verify.setChecked(True)
+        self.checkBox_write_verify.setObjectName("checkBox_write_verify")
+        self.gridLayout_plc_write.addWidget(self.checkBox_write_verify, 4, 1, 1, 1)
+        spacerItem12 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.gridLayout_plc_write.addItem(spacerItem12, 5, 0, 1, 2)
+        self.pushButton_plc_send = QtWidgets.QPushButton(self.groupBox_plc_write)
+        self.pushButton_plc_send.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.pushButton_plc_send.setObjectName("pushButton_plc_send")
+        self.gridLayout_plc_write.addWidget(self.pushButton_plc_send, 6, 0, 1, 2)
+        self.gridLayout_plc_write.setColumnStretch(1, 1)
+        self.horizontalLayout_plc_forms.addWidget(self.groupBox_plc_write)
+        self.verticalLayout_plc_test.addLayout(self.horizontalLayout_plc_forms)
+        self.groupBox_plc_log = QtWidgets.QGroupBox(self.tab_3)
+        self.groupBox_plc_log.setMaximumSize(QtCore.QSize(16777215, 150))
+        self.groupBox_plc_log.setObjectName("groupBox_plc_log")
+        self.verticalLayout_plc_log = QtWidgets.QVBoxLayout(self.groupBox_plc_log)
+        self.verticalLayout_plc_log.setSpacing(10)
+        self.verticalLayout_plc_log.setObjectName("verticalLayout_plc_log")
+        self.textEdit_plc_log = QtWidgets.QTextEdit(self.groupBox_plc_log)
+        self.textEdit_plc_log.setMinimumSize(QtCore.QSize(0, 90))
+        self.textEdit_plc_log.setReadOnly(True)
+        self.textEdit_plc_log.setObjectName("textEdit_plc_log")
+        self.verticalLayout_plc_log.addWidget(self.textEdit_plc_log)
+        self.horizontalLayout_plc_log_buttons = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_plc_log_buttons.setSpacing(8)
+        self.horizontalLayout_plc_log_buttons.setObjectName("horizontalLayout_plc_log_buttons")
+        spacerItem13 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_plc_log_buttons.addItem(spacerItem13)
+        self.pushButton_plc_copy_log = QtWidgets.QPushButton(self.groupBox_plc_log)
+        self.pushButton_plc_copy_log.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.pushButton_plc_copy_log.setObjectName("pushButton_plc_copy_log")
+        self.horizontalLayout_plc_log_buttons.addWidget(self.pushButton_plc_copy_log)
+        self.pushButton_plc_clear_log = QtWidgets.QPushButton(self.groupBox_plc_log)
+        self.pushButton_plc_clear_log.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.pushButton_plc_clear_log.setObjectName("pushButton_plc_clear_log")
+        self.horizontalLayout_plc_log_buttons.addWidget(self.pushButton_plc_clear_log)
+        self.verticalLayout_plc_log.addLayout(self.horizontalLayout_plc_log_buttons)
+        self.verticalLayout_plc_test.addWidget(self.groupBox_plc_log)
+        self.tabWidget.addTab(self.tab_3, "")
+        self.gridLayout.addWidget(self.tabWidget, 1, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 700, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1000, 21))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -554,50 +797,143 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Auto Initialization"))
-        self.groupBox_auto_login.setTitle(_translate("MainWindow", "MySQL Connection (Auto Select Item Code )"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "MBC Vision Inspector"))
+        self.label_app_logo.setText(_translate("MainWindow", "MBC"))
+        self.label_app_title.setText(_translate("MainWindow", "MBC VISION INSPECTOR"))
+        self.label_app_subtitle.setText(_translate("MainWindow", "System configuration  ·  Database & PLC"))
+        self.label_status_mysql.setText(_translate("MainWindow", "●  MYSQL  OFFLINE"))
+        self.label_status_mysql.setProperty("state", _translate("MainWindow", "offline"))
+        self.label_status_plc.setText(_translate("MainWindow", "●  PLC  OFFLINE"))
+        self.label_status_plc.setProperty("state", _translate("MainWindow", "offline"))
+        self.groupBox_auto_login.setTitle(_translate("MainWindow", "MySQL Connection"))
+        self.label_sec_mysql_mode.setText(_translate("MainWindow", "⬢ MODE"))
+        self.label_sec_mysql_mode.setProperty("role", _translate("MainWindow", "section"))
+        self.label.setText(_translate("MainWindow", "Login Mode:"))
+        self.radioButton_manual_login.setText(_translate("MainWindow", "Manual "))
+        self.radioButton_automatic_login.setText(_translate("MainWindow", "Auto"))
+        self.radioButton_user_manual_login.setText(_translate("MainWindow", "User Manual"))
+        self.label_sec_mysql_server.setText(_translate("MainWindow", "⬢ SERVER"))
+        self.label_sec_mysql_server.setProperty("role", _translate("MainWindow", "section"))
+        self.label_3.setText(_translate("MainWindow", "Host Name:"))
+        self.lineEdit_Host_name.setText(_translate("MainWindow", "127.0.0.1"))
+        self.label_4.setText(_translate("MainWindow", "Port:"))
+        self.lineEdit_port.setText(_translate("MainWindow", "3306"))
+        self.label_sec_mysql_credentials.setText(_translate("MainWindow", "⬢ CREDENTIALS"))
+        self.label_sec_mysql_credentials.setProperty("role", _translate("MainWindow", "section"))
+        self.label_2.setText(_translate("MainWindow", "User Name:"))
         self.lineEdit_UserName.setText(_translate("MainWindow", "root"))
         self.label_5.setText(_translate("MainWindow", "Password:"))
+        self.label_sec_mysql_behaviour.setText(_translate("MainWindow", "⬢ BEHAVIOUR"))
+        self.label_sec_mysql_behaviour.setProperty("role", _translate("MainWindow", "section"))
+        self.label_6.setText(_translate("MainWindow", "Retry Attemps:"))
+        self.checkBox_remember_credentials.setText(_translate("MainWindow", "Remenber Credentials"))
+        self.checkBox_auto_connect_on_disconnect.setText(_translate("MainWindow", "Auto Reconnect on Disconnect"))
         self.pushButton_test_connection.setText(_translate("MainWindow", "Test Connection"))
         self.pushButton_apply_login_setting.setText(_translate("MainWindow", "Apply Login Settings"))
-        self.radioButton_manual_login.setText(_translate("MainWindow", "Manual "))
-        self.radioButton_automatic_login.setText(_translate("MainWindow", "Automatic"))
-        self.label_4.setText(_translate("MainWindow", "Port:"))
-        self.lineEdit_Host_name.setText(_translate("MainWindow", "127.0.0.1"))
-        self.label_6.setText(_translate("MainWindow", "Retry Attemps:"))
-        self.label.setText(_translate("MainWindow", "Login Mode:"))
-        self.label_2.setText(_translate("MainWindow", "User Name:"))
-        self.lineEdit_port.setText(_translate("MainWindow", "3306"))
-        self.label_3.setText(_translate("MainWindow", "Host Name:"))
-        self.radioButton_user_manual_login.setText(_translate("MainWindow", "User Manual"))
-        self.checkBox_auto_connect_on_disconnect.setText(_translate("MainWindow", "Auto Reconnect"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Auto Login MySQL"))
-        self.groupBox_plc_connection.setTitle(_translate("MainWindow", "PLC Connection(Auto connect PLC from mode init )"))
-        self.comboBox_connection_type_2.setItemText(0, _translate("MainWindow", "ENTHERNET"))
-        self.pushButton_apply_ip_add_setting_2.setText(_translate("MainWindow", "Apply Login Settings"))
-        self.pushButton_test_connection_3.setText(_translate("MainWindow", "Test Connection"))
-        self.pushButton.setText(_translate("MainWindow", "Advanced Network Settings"))
-        self.label_17.setText(_translate("MainWindow", "PORT:"))
-        self.pushButton_get_local_ip_2.setText(_translate("MainWindow", "Get Address"))
-        self.radioButton_automatic_plc_2.setText(_translate("MainWindow", "Automatic"))
+        self.label_mysql_guide_title.setText(_translate("MainWindow", "QUICK GUIDE"))
+        self.label_mysql_guide_body.setText(_translate("MainWindow", "1.  Choose “User Manual” to edit the fields and enable Test Connection.\n"
+"\n"
+"2.  Enter the host, port and credentials.\n"
+"\n"
+"3.  Run Test Connection, then Apply Login Settings.\n"
+"\n"
+" "))
+        self.label_page_title_mysql.setText(_translate("MainWindow", "Database Login"))
+        self.label_page_sub_mysql.setText(_translate("MainWindow", "Credentials used to auto-select the item code from MySQL"))
+        self.label_mysql_state.setText(_translate("MainWindow", "●  NOT CONNECTED"))
+        self.label_mysql_state.setProperty("state", _translate("MainWindow", "disconnected"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "   Autologon   "))
+        self.label_page_title_plc.setText(_translate("MainWindow", "PLC Connection"))
+        self.label_page_sub_plc.setText(_translate("MainWindow", "Link the inspector to the PLC that controls the line"))
+        self.label_plc_state.setText(_translate("MainWindow", "●  NOT CONNECTED"))
+        self.label_plc_state.setProperty("state", _translate("MainWindow", "disconnected"))
+        self.groupBox_plc_connection.setTitle(_translate("MainWindow", "PLC Connection"))
+        self.label_sec_plc_device.setText(_translate("MainWindow", "⬢ DEVICE"))
+        self.label_sec_plc_device.setProperty("role", _translate("MainWindow", "section"))
+        self.label_15.setText(_translate("MainWindow", "Connect Mode:"))
+        self.radioButton_manul_plc_2.setText(_translate("MainWindow", "Manual"))
+        self.radioButton_automatic_plc_2.setText(_translate("MainWindow", "Auto"))
+        self.label_7.setText(_translate("MainWindow", "PLC Module:"))
         self.comboBox.setItemText(0, _translate("MainWindow", "KEYENCE"))
         self.comboBox.setItemText(1, _translate("MainWindow", "OMRON"))
         self.comboBox.setItemText(2, _translate("MainWindow", "MITSHUBISHI"))
-        self.label_14.setText(_translate("MainWindow", "Retry Attemps:"))
-        self.checkBox_2.setText(_translate("MainWindow", "Auto Reconnect"))
-        self.label_16.setText(_translate("MainWindow", "IP Address:"))
         self.label_18.setText(_translate("MainWindow", "Connection Type:"))
-        self.radioButton_manul_plc_2.setText(_translate("MainWindow", "Manual"))
-        self.label_7.setText(_translate("MainWindow", "PLC Module:"))
-        self.label_8.setText(_translate("MainWindow", "."))
-        self.label_9.setText(_translate("MainWindow", "."))
-        self.label_10.setText(_translate("MainWindow", "."))
+        self.comboBox_connection_type_2.setItemText(0, _translate("MainWindow", "Enthernet"))
+        self.label_sec_plc_network.setText(_translate("MainWindow", "⬢ NETWORK"))
+        self.label_sec_plc_network.setProperty("role", _translate("MainWindow", "section"))
+        self.label_16.setText(_translate("MainWindow", "IP Address:"))
+        self.lineEdit_ip_address_2.setText(_translate("MainWindow", "192.168.*.*"))
+        self.label_17.setText(_translate("MainWindow", "PORT:"))
+        self.lineEdit_port_3.setText(_translate("MainWindow", "8051"))
         self.label_13.setText(_translate("MainWindow", "Local IP Address:"))
-        self.label_15.setText(_translate("MainWindow", "Connection  Mode:"))
-        self.label_20.setText(_translate("MainWindow", "."))
-        self.label_21.setText(_translate("MainWindow", "."))
-        self.label_22.setText(_translate("MainWindow", "."))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Auto Connect PLC"))
+        self.pushButton_get_local_ip_2.setText(_translate("MainWindow", "Get Local IP"))
+        self.label_sec_plc_behaviour.setText(_translate("MainWindow", "⬢ BEHAVIOUR"))
+        self.label_sec_plc_behaviour.setProperty("role", _translate("MainWindow", "section"))
+        self.label_14.setText(_translate("MainWindow", "Retry Attemps:"))
+        self.checkBox_2.setText(_translate("MainWindow", "Auto Reconnect on Disconnect"))
+        self.pushButton_apply_ip_add_setting_2.setText(_translate("MainWindow", "Apply Login Settings"))
+        self.pushButton_test_connection_3.setText(_translate("MainWindow", "Test Connection"))
+        self.network_setting_advanced.setText(_translate("MainWindow", "Advanced Network Settings"))
+        self.label_plc_guide_title.setText(_translate("MainWindow", "QUICK GUIDE"))
+        self.label_plc_guide_body.setText(_translate("MainWindow", "1.  Pick the PLC module and connection type.\n"
+"\n"
+"2.  Enter the PLC IP address and port.\n"
+"\n"
+"3.  Run Test Connection, then Apply.\n"
+"\n"
+"4.  Open “PLC Signal Test” to read and write registers."))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "   Auto Connect PLC   "))
+        self.label_plc_test_title.setText(_translate("MainWindow", "PLC Signal Test"))
+        self.label_plc_test_subtitle.setText(_translate("MainWindow", "Verify the PLC link by reading and writing device registers"))
+        self.label_plc_conn_status.setText(_translate("MainWindow", "●  DISCONNECTED"))
+        self.label_plc_conn_status.setProperty("state", _translate("MainWindow", "disconnected"))
+        self.label_plc_conn_target.setText(_translate("MainWindow", "Connect a PLC in “Auto Connect Device Control” first"))
+        self.groupBox_plc_read.setTitle(_translate("MainWindow", "READ PLC"))
+        self.label_read_register.setText(_translate("MainWindow", "Register"))
+        self.lineEdit_read_register.setToolTip(_translate("MainWindow", "KEYENCE: DM100, R000, MR100   |   OMRON: D100, W0, CIO10   |   MITSUBISHI: D100, M0, X0"))
+        self.lineEdit_read_register.setPlaceholderText(_translate("MainWindow", "e.g. DM100"))
+        self.label_read_type.setText(_translate("MainWindow", "Data Type"))
+        self.comboBox_read_data_type.setItemText(0, _translate("MainWindow", "UINT16"))
+        self.comboBox_read_data_type.setItemText(1, _translate("MainWindow", "INT16"))
+        self.comboBox_read_data_type.setItemText(2, _translate("MainWindow", "UINT32"))
+        self.comboBox_read_data_type.setItemText(3, _translate("MainWindow", "INT32"))
+        self.comboBox_read_data_type.setItemText(4, _translate("MainWindow", "FLOAT32"))
+        self.comboBox_read_data_type.setItemText(5, _translate("MainWindow", "BOOL"))
+        self.label_read_value.setText(_translate("MainWindow", "Value"))
+        self.lineEdit_read_value.setPlaceholderText(_translate("MainWindow", "—"))
+        self.label_read_status_caption.setText(_translate("MainWindow", "Status"))
+        self.label_read_status.setText(_translate("MainWindow", "WAITING FOR COMMAND"))
+        self.label_read_status.setProperty("state", _translate("MainWindow", "idle"))
+        self.label_read_poll.setText(_translate("MainWindow", "Polling"))
+        self.checkBox_read_continuous.setText(_translate("MainWindow", "Continuous read"))
+        self.spinBox_read_interval.setSuffix(_translate("MainWindow", " ms"))
+        self.pushButton_plc_receive.setToolTip(_translate("MainWindow", "Read the register and show its value"))
+        self.pushButton_plc_receive.setText(_translate("MainWindow", "Receive"))
+        self.groupBox_plc_write.setTitle(_translate("MainWindow", "WRITE PLC"))
+        self.label_write_register.setText(_translate("MainWindow", "Register"))
+        self.lineEdit_write_register.setToolTip(_translate("MainWindow", "KEYENCE: DM100, R000, MR100   |   OMRON: D100, W0, CIO10   |   MITSUBISHI: D100, M0, X0"))
+        self.lineEdit_write_register.setPlaceholderText(_translate("MainWindow", "e.g. DM200"))
+        self.label_write_type.setText(_translate("MainWindow", "Data Type"))
+        self.comboBox_write_data_type.setItemText(0, _translate("MainWindow", "UINT16"))
+        self.comboBox_write_data_type.setItemText(1, _translate("MainWindow", "INT16"))
+        self.comboBox_write_data_type.setItemText(2, _translate("MainWindow", "UINT32"))
+        self.comboBox_write_data_type.setItemText(3, _translate("MainWindow", "INT32"))
+        self.comboBox_write_data_type.setItemText(4, _translate("MainWindow", "FLOAT32"))
+        self.comboBox_write_data_type.setItemText(5, _translate("MainWindow", "BOOL"))
+        self.label_write_value_caption.setText(_translate("MainWindow", "Value"))
+        self.lineEdit_write_value.setPlaceholderText(_translate("MainWindow", "Value to send (e.g. 1234, 0x1F, 3.14)"))
+        self.label_write_result_caption.setText(_translate("MainWindow", "Result"))
+        self.label_write_result.setText(_translate("MainWindow", "NOT SENT"))
+        self.label_write_result.setProperty("state", _translate("MainWindow", "idle"))
+        self.label_write_options.setText(_translate("MainWindow", "Options"))
+        self.checkBox_write_verify.setText(_translate("MainWindow", "Read back to verify"))
+        self.pushButton_plc_send.setToolTip(_translate("MainWindow", "Write the value to the register"))
+        self.pushButton_plc_send.setText(_translate("MainWindow", "Send to PLC"))
+        self.groupBox_plc_log.setTitle(_translate("MainWindow", "COMMUNICATION LOG"))
+        self.textEdit_plc_log.setPlaceholderText(_translate("MainWindow", "Transmit / receive history will appear here…"))
+        self.pushButton_plc_copy_log.setText(_translate("MainWindow", "Copy"))
+        self.pushButton_plc_clear_log.setText(_translate("MainWindow", "Clear"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("MainWindow", "   PLC Signal Test   "))
 
 
 if __name__ == "__main__":

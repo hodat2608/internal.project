@@ -25,6 +25,7 @@ class Ui_MainWindow(object):
         self.list_item_code={}
 
     def setupUi(self, MainWindow):
+        self.MainWindow = MainWindow
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(779, 572)
         MainWindow.setMinimumSize(QtCore.QSize(560, 400))
@@ -162,6 +163,7 @@ class Ui_MainWindow(object):
         self.cancel_btn.setMinimumSize(QtCore.QSize(138, 44))
         self.cancel_btn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.cancel_btn.setObjectName("cancel_btn")
+        self.cancel_btn.clicked.connect(MainWindow.close)
         self.buttonLayout.addWidget(self.cancel_btn)
         self.mainLayout.addLayout(self.buttonLayout)
         MainWindow.setCentralWidget(self.centralwidget)
@@ -177,19 +179,19 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Thông tin máy"))
-        self.labelTitle.setText(_translate("MainWindow", "THÔNG TIN MÁY:"))
+        self.labelTitle.setText(_translate("MainWindow", "THÔNG TIN CẤU HÌNH THIẾT BỊ: "))
         self.tab_certain.setTabText(self.tab_certain.indexOf(self.tab1), _translate("MainWindow", "Tab 1"))
         self.tab_certain.setTabText(self.tab_certain.indexOf(self.tab2), _translate("MainWindow", "Tab 2"))
         self.confirm_btn.setText(_translate("MainWindow", "Xác nhận"))
         self.cancel_btn.setText(_translate("MainWindow", "Cancel"))
-
 
     def _set_text(self):
         if self.list_item_code == None:
             QMessageBox.warning(None, "Thông báo", "Vui lòng lưu cấu hình trước khi xem trước!")
             return
         _translate = QtCore.QCoreApplication.translate
-        self.labelTitle.setText(_translate("MainWindow", f"THÔNG TIN CẤU HÌNH THIẾT BỊ: {self.ui.lineEdit_name_devic.text()}"))
+        dev_name = self.ui.lineEdit_name_devic.text() if (self.ui and hasattr(self.ui, 'lineEdit_name_devic')) else ""
+        self.labelTitle.setText(_translate("MainWindow", f"THÔNG TIN CẤU HÌNH THIẾT BỊ: {dev_name}"))
         for device_name, device_data in self.list_item_code.items():
             product_tab = QtWidgets.QWidget()
             product_layout = QtWidgets.QVBoxLayout(product_tab)
@@ -262,3 +264,7 @@ class Ui_MainWindow(object):
             self.tab_certain.clear()
             self.tab_certain.setTabText(0, "")
             QMessageBox.information(None, "Thông báo", "Đã xóa tất cả dữ liệu!")
+
+    def close(self):
+        if hasattr(self, 'MainWindow') and self.MainWindow:
+            self.MainWindow.close()

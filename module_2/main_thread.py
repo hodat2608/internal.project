@@ -29,7 +29,450 @@ from Administrator.database.main_core import DataExport,DataImport
 from Administrator.admin_config import AdminPasswordDialog
 from Administrator.modify_ip_address_by_admin import MainWindow, QSS
 
-class main_thread():
+import math
+import random
+
+from PyQt5.QtCore import QElapsedTimer, QRectF, Qt, QTimer
+from PyQt5.QtGui import (QBrush, QColor, QConicalGradient, QFont,
+                         QLinearGradient, QPainter, QPainterPath, QPen,
+                         QRadialGradient)
+from PyQt5.QtWidgets import (QGraphicsDropShadowEffect, QGraphicsEllipseItem,
+                             QGraphicsLineItem, QGraphicsPathItem,
+                             QGraphicsRectItem, QGraphicsScene,
+                             QGraphicsSimpleTextItem, QGraphicsView)
+
+# ----------------------------------------------------------------- bảng màu
+ACCENT = "#38BDF8"       # xanh sky - màu nhấn chính
+ACCENT_DARK = "#0284C7"
+MUTED = "#94A3B8"
+OK_COLOR = "#34D399"     # xanh lá - sản phẩm đạt
+WARN_COLOR = "#FBBF24"   # vàng - cảnh báo / NG
+BG_DEEP = "#020617"
+
+RADAR_R = 350            # bán kính vòng ngoài của radar
+SWEEP_SPEED = 72.0       # độ/giây (1 vòng = 5 giây)
+
+
+# ------------------------------------------------------------------ helpers
+def _c(hex_color, alpha=255):
+    col = QColor(hex_color)
+    col.setAlpha(alpha)
+    return col
+
+
+def _mix(h1, h2, k):
+    a, b = QColor(h1), QColor(h2)
+    return QColor(int(a.red() + (b.red() - a.red()) * k),
+                  int(a.green() + (b.green() - a.green()) * k),
+                  int(a.blue() + (b.blue() - a.blue()) * k))
+
+
+def _clamp01(v):
+    return max(0.0, min(1.0, v))
+
+
+def _ease_out(p):
+    return 1 - (1 - p) ** 3
+
+
+def _glow(color, blur):
+    fx = QGraphicsDropShadowEffect()
+    fx.setBlurRadius(blur)
+    fx.setColor(QColor(color))
+    fx.setOffset(0, 0)
+    return fx
+
+
+class HomeScreenMixin:
+    _default_instance = None
+
+    # ------------------------------------------------------------------ setup
+    def setup_home_screen(self, graphicsView=None):
+        if graphicsView is None:
+            if HomeScreenMixin._default_instance is None:
+                HomeScreenMixin._default_instance = HomeScreenMixin()
+            return HomeScreenMixin._default_instance.setup_home_screen(self)
+
+        self.stop_home_animation()          # an toàn nếu gọi lại nhiều lần
+
+        scene = QGraphicsScene()
+        scene.setSceneRect(-1600, -1000, 3200, 2000)
+
+        graphicsView.setStyleSheet("""
+            QGraphicsView {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                            stop:0 #0F172A, stop:1 #020617);
+                border: none;
+            }
+        """)
+        graphicsView.setRenderHints(QPainter.Antialiasing
+                                    | QPainter.TextAntialiasing
+                                    | QPainter.SmoothPixmapTransform)
+        graphicsView.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        graphicsView.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        graphicsView.setViewportUpdateMode(QGraphicsView.FullViewportUpdate)
+        graphicsView.setResizeAnchor(QGraphicsView.AnchorViewCenter)
+        graphicsView.setScene(scene)
+        graphicsView.centerOn(0, 0)
+        QTimer.singleShot(0, lambda: graphicsView.centerOn(0, 0))
+
+        self._build_background(scene)
+        self._build_radar(scene)
+        self._build_overlay(scene)
+        self._build_text_block(scene)
+
+        # ---- trạng thái animation
+        self.anim_angle = 0.0
+        self.glow_increasing = True          # giữ lại cho tương thích code cũ
+        self._clock = QElapsedTimer()
+        self._clock.start()
+        self._last_t = 0.0
+
+        self.anim_timer = QTimer(graphicsView)
+        self.anim_timer.timeout.connect(self.update_animation)
+        self.anim_timer.start(16)            # ~60 FPS (đổi 33 nếu máy yếu)
+
+    # ------------------------------------------------------------ nền + lưới
+    def _build_background(self, scene):
+        # Lưới kỹ thuật (blueprint) rất mờ
+        grid = QPainterPath()
+        step = 60
+        for x in range(-1500, 1501, step):
+            grid.moveTo(x, -1000)
+            grid.lineTo(x, 1000)
+        for y in range(-960, 961, step):
+            grid.moveTo(-1600, y)
+            grid.lineTo(1600, y)
+        grid_item = QGraphicsPathItem(grid)
+        pen = QPen(_c(ACCENT, 14))
+        pen.setWidth(1)
+        pen.setCosmetic(True)
+        grid_item.setPen(pen)
+        grid_item.setZValue(0)
+        scene.addItem(grid_item)
+
+        # Quầng sáng tâm
+        g = QRadialGradient(0, 0, 430)
+        g.setColorAt(0, _c(ACCENT_DARK, 75))
+        g.setColorAt(1, _c(ACCENT_DARK, 0))
+        halo = scene.addEllipse(-430, -430, 860, 860, QPen(Qt.NoPen), QBrush(g))
+        halo.setZValue(1)
+
+    # ------------------------------------------------------------------ radar
+    def _build_radar(self, scene):
+        R = RADAR_R
+
+        # Vòng trong (nét liền)
+        ring1 = QGraphicsEllipseItem(-200, -200, 400, 400)
+        pen1 = QPen(_c(ACCENT, 60))
+        pen1.setWidth(2)
+        ring1.setPen(pen1)
+        ring1.setZValue(2)
+        scene.addItem(ring1)
+
+        # Vòng ngoài (nét đứt, xoay ngược)
+        pen_dash = QPen(_c(ACCENT, 70))
+        pen_dash.setWidth(2)
+        pen_dash.setStyle(Qt.DashLine)
+        self.radar_circle = QGraphicsEllipseItem(-R, -R, 2 * R, 2 * R)
+        self.radar_circle.setPen(pen_dash)
+        self.radar_circle.setZValue(2)
+        scene.addItem(self.radar_circle)
+
+        # Vòng vạch chia (như thước đo), xoay chậm
+        ticks = QPainterPath()
+        for deg in range(0, 360, 3):
+            long_tick = deg % 15 == 0
+            r_out = 300
+            r_in = r_out - (14 if long_tick else 7)
+            a = math.radians(deg)
+            ticks.moveTo(r_in * math.cos(a), r_in * math.sin(a))
+            ticks.lineTo(r_out * math.cos(a), r_out * math.sin(a))
+        self.radar_ticks = QGraphicsPathItem(ticks)
+        pen_t = QPen(_c(ACCENT, 95))
+        pen_t.setWidth(2)
+        self.radar_ticks.setPen(pen_t)
+        self.radar_ticks.setZValue(2)
+        scene.addItem(self.radar_ticks)
+
+        # Vòng "ping" lan toả định kỳ
+        self.radar_ping = QGraphicsEllipseItem(-100, -100, 200, 200)
+        pen_p = QPen(_c(ACCENT, 255))
+        pen_p.setWidth(2)
+        pen_p.setCosmetic(True)
+        self.radar_ping.setPen(pen_p)
+        self.radar_ping.setZValue(2)
+        scene.addItem(self.radar_ping)
+
+        # Vệt quét mờ dần phía sau tia radar
+        wedge = QPainterPath()
+        wedge.moveTo(0, 0)
+        wedge.arcTo(QRectF(-R, -R, 2 * R, 2 * R), 90, 70)
+        wedge.closeSubpath()
+        cg = QConicalGradient(0, 0, 90)
+        cg.setColorAt(0.0, _c(ACCENT, 120))
+        cg.setColorAt(0.19, _c(ACCENT, 0))
+        cg.setColorAt(1.0, _c(ACCENT, 0))
+        self.radar_sweep = QGraphicsPathItem(wedge)
+        self.radar_sweep.setPen(QPen(Qt.NoPen))
+        self.radar_sweep.setBrush(QBrush(cg))
+        self.radar_sweep.setZValue(3)
+        scene.addItem(self.radar_sweep)
+
+        # Tia radar
+        self.radar_line = QGraphicsLineItem(0, 0, 0, -R)
+        pen_sweep = QPen(_c(ACCENT, 235))
+        pen_sweep.setWidth(2)
+        self.radar_line.setPen(pen_sweep)
+        self.radar_line.setGraphicsEffect(_glow(ACCENT, 14))
+        self.radar_line.setZValue(3)
+        scene.addItem(self.radar_line)
+
+        # Các điểm phát hiện (blip) - sáng lên khi tia quét đi qua
+        rnd = random.Random(7)
+        self.blips = []
+        for _ in range(14):
+            ang = rnd.uniform(0, 360)
+            rad = rnd.uniform(90, 330)
+            x = rad * math.sin(math.radians(ang))
+            y = -rad * math.cos(math.radians(ang))
+            col = rnd.choice([ACCENT, ACCENT, OK_COLOR, OK_COLOR, WARN_COLOR])
+            dot = scene.addEllipse(-4, -4, 8, 8, QPen(Qt.NoPen), QBrush(QColor(col)))
+            dot.setPos(x, y)
+            dot.setZValue(4)
+            dot.setOpacity(0.0)
+            halo = QGraphicsEllipseItem(-11, -11, 22, 22, dot)
+            halo.setPen(QPen(_c(col, 160), 1.5))
+            halo.setBrush(QBrush(Qt.NoBrush))
+            self.blips.append((ang, dot))
+
+    # ------------------------------------------------------- vignette + brackets
+    def _build_overlay(self, scene):
+        # Vignette: tối dần ra mép để tập trung vào trung tâm
+        vg = QRadialGradient(0, 0, 1100)
+        vg.setColorAt(0.0, _c(BG_DEEP, 0))
+        vg.setColorAt(0.45, _c(BG_DEEP, 0))
+        vg.setColorAt(1.0, _c(BG_DEEP, 235))
+        vignette = QGraphicsRectItem(-1600, -1000, 3200, 2000)
+        vignette.setPen(QPen(Qt.NoPen))
+        vignette.setBrush(QBrush(vg))
+        vignette.setZValue(5)
+        scene.addItem(vignette)
+
+    # ----------------------------------------------------------------- chữ
+    def _build_text_block(self, scene):
+        # --- tiêu đề chính
+        title = QGraphicsSimpleTextItem("MBC VISION INSPECTOR")
+        f1 = QFont("Segoe UI", 44, QFont.Bold)
+        f1.setLetterSpacing(QFont.AbsoluteSpacing, 6)
+        title.setFont(f1)
+        title.setBrush(QBrush(QColor(ACCENT)))
+        self.title_glow = _glow(ACCENT_DARK, 30)
+        title.setGraphicsEffect(self.title_glow)
+        tw = title.boundingRect().width()
+        th = title.boundingRect().height()
+        self._title_w = tw
+        self.title_item = title
+
+        # --- tagline
+        tag = QGraphicsSimpleTextItem("AI VISION FOR MANUFACTURING")
+        f2 = QFont("Segoe UI", 18, QFont.DemiBold)
+        f2.setLetterSpacing(QFont.AbsoluteSpacing, 8)
+        tag.setFont(f2)
+        tag.setBrush(QBrush(QColor(ACCENT)))
+        self.title_glow_2 = _glow(ACCENT_DARK, 18)
+        tag.setGraphicsEffect(self.title_glow_2)
+        tagw, tagh = tag.boundingRect().width(), tag.boundingRect().height()
+
+        # --- phụ đề
+        sub = QGraphicsSimpleTextItem("ADVANCED MACHINE VISION SYSTEM")
+        f3 = QFont("Segoe UI", 12)
+        f3.setLetterSpacing(QFont.AbsoluteSpacing, 10)
+        sub.setFont(f3)
+        sub.setBrush(QBrush(QColor(MUTED)))
+        subw, subh = sub.boundingRect().width(), sub.boundingRect().height()
+
+        # --- trạng thái hệ thống
+        status = QGraphicsSimpleTextItem("SYSTEM READY")
+        f4 = QFont("Segoe UI", 10, QFont.DemiBold)
+        f4.setLetterSpacing(QFont.AbsoluteSpacing, 4)
+        status.setFont(f4)
+        status.setBrush(QBrush(QColor(OK_COLOR)))
+        stw, sth = status.boundingRect().width(), status.boundingRect().height()
+
+        # --- xếp dọc theo chiều cao thật của từng dòng, rồi căn giữa cả khối
+        y = 0
+        title_y = y;  y += th + 8
+        div_y = y;    y += 2 + 18
+        tag_y = y;    y += tagh + 6
+        sub_y = y;    y += subh + 34
+        st_y = y;     y += sth
+        off = -y / 2
+
+        title.setPos(-tw / 2, title_y + off)
+        tag.setPos(-tagw / 2, tag_y + off)
+        sub.setPos(-subw / 2, sub_y + off)
+
+        # đường kẻ phân cách có gradient mờ hai đầu
+        lg = QLinearGradient(0, 0, tw, 0)
+        lg.setColorAt(0.0, _c(ACCENT, 0))
+        lg.setColorAt(0.5, _c(ACCENT, 255))
+        lg.setColorAt(1.0, _c(ACCENT, 0))
+        divider = QGraphicsRectItem(0, 0, tw, 2)
+        divider.setPen(QPen(Qt.NoPen))
+        divider.setBrush(QBrush(lg))
+        divider.setPos(-tw / 2, div_y + off)
+
+        # chấm sáng chạy dọc đường kẻ
+        self.div_dot = QGraphicsEllipseItem(-4, -4, 8, 8)
+        self.div_dot.setPen(QPen(Qt.NoPen))
+        self.div_dot.setBrush(QBrush(QColor("#E0F2FE")))
+        self.div_dot.setGraphicsEffect(_glow(ACCENT, 18))
+        self.div_dot.setPos(0, div_y + off + 1)
+
+        # trạng thái: chấm xanh nhấp nháy + chữ
+        total = 18 + stw
+        status.setPos(-total / 2 + 18, st_y + off)
+        self.status_dot = QGraphicsEllipseItem(-4, -4, 8, 8)
+        self.status_dot.setPen(QPen(Qt.NoPen))
+        self.status_dot.setBrush(QBrush(QColor(OK_COLOR)))
+        self.status_dot.setGraphicsEffect(_glow(OK_COLOR, 14))
+        self.status_dot.setPos(-total / 2 + 4, st_y + off + sth / 2)
+
+        for it in (title, divider, tag, sub, status,
+                   self.div_dot, self.status_dot):
+            it.setZValue(10)
+            scene.addItem(it)
+
+        # (item, y gốc, độ trễ xuất hiện) -> hiệu ứng fade-in + trượt lên lần lượt
+        self._intro_items = [
+            (title, title.y(), 0.0),
+            (divider, divider.y(), 0.45),
+            (tag, tag.y(), 0.7),
+            (sub, sub.y(), 1.0),
+            (status, status.y(), 1.35),
+        ]
+        self._status_delay = 1.35
+        self._div_delay = 0.45
+
+        # --- khung ngắm 4 góc (viewfinder)
+        left, right = -tw / 2 - 50, tw / 2 + 50
+        top, bottom = off - 34, off + y + 34
+        size = 30
+        pen_b = QPen(QColor(ACCENT))
+        pen_b.setWidth(3)
+        pen_b.setCapStyle(Qt.SquareCap)
+        pen_b.setJoinStyle(Qt.MiterJoin)
+        self._brackets = []
+        for (cx, cy, dx, dy) in ((left, top, 1, 1), (right, top, -1, 1),
+                                 (left, bottom, 1, -1), (right, bottom, -1, -1)):
+            p = QPainterPath()
+            p.moveTo(cx + dx * size, cy)
+            p.lineTo(cx, cy)
+            p.lineTo(cx, cy + dy * size)
+            br = QGraphicsPathItem(p)
+            br.setPen(pen_b)
+            br.setZValue(10)
+            br.setOpacity(0.0)
+            scene.addItem(br)
+            self._brackets.append(br)
+
+    # -------------------------------------------------------------- animation
+    def update_animation(self):
+        t = self._clock.elapsed() / 1000.0
+        dt = min(t - self._last_t, 0.1)
+        self._last_t = t
+
+        # ---- radar
+        self.anim_angle = (self.anim_angle + SWEEP_SPEED * dt) % 360
+        a = self.anim_angle
+        self.radar_line.setRotation(a)
+        self.radar_sweep.setRotation(a)
+        self.radar_circle.setRotation(-a * 0.5)
+        self.radar_ticks.setRotation(t * 4.0)
+
+        # vòng ping lan toả mỗi 3.2 giây
+        p = (t % 3.2) / 3.2
+        self.radar_ping.setScale(0.02 + p * 3.5)
+        self.radar_ping.setOpacity((1 - p) ** 1.5 * 0.55)
+
+        # blip: bật sáng khi tia quét đi qua rồi mờ dần
+        window = SWEEP_SPEED * dt * 1.5 + 1.0
+        for ang, dot in self.blips:
+            op = max(0.0, dot.opacity() - dt * 0.45)
+            if (a - ang) % 360 < window:
+                op = 1.0
+            dot.setOpacity(op)
+
+        # ---- fade-in lần lượt khi mở màn hình
+        for item, base_y, delay in self._intro_items:
+            e = _ease_out(_clamp01((t - delay) / 0.9))
+            item.setOpacity(e)
+            item.setY(base_y + (1 - e) * 14)
+
+        # chấm chạy trên đường kẻ (mờ dần ở hai đầu)
+        e_div = _ease_out(_clamp01((t - self._div_delay) / 0.9))
+        s = math.sin(t * 0.9)
+        self.div_dot.setX(s * self._title_w * 0.5)
+        self.div_dot.setOpacity(e_div * (1 - abs(s) ** 3))
+
+        # chấm trạng thái nhấp nháy nhẹ
+        e_st = _ease_out(_clamp01((t - self._status_delay) / 0.9))
+        self.status_dot.setOpacity(e_st * (0.45 + 0.55 * (0.5 + 0.5 * math.sin(t * 3.0))))
+
+        # khung ngắm: hiện ra rồi "thở" nhẹ
+        e_br = _ease_out(_clamp01((t - 0.2) / 0.9))
+        pulse = 0.75 + 0.25 * math.sin(t * 2.0)
+        for br in self._brackets:
+            br.setOpacity(e_br * pulse)
+
+        # ---- ánh sáng "thở" quanh chữ
+        breathe = 0.5 + 0.5 * math.sin(t * 1.6)
+        self.title_glow.setBlurRadius(22 + 20 * breathe)
+        self.title_glow_2.setBlurRadius(12 + 10 * breathe)
+
+        # ---- hiệu ứng ánh sáng lướt qua tiêu đề (mỗi 6 giây)
+        self._update_title_shimmer(t)
+
+    def _update_title_shimmer(self, t):
+        left_c, right_c = "#E0F2FE", ACCENT
+        grad = QLinearGradient(0, 0, self._title_w, 0)
+        grad.setColorAt(0.0, _mix(left_c, right_c, 0.0))
+        grad.setColorAt(1.0, _mix(left_c, right_c, 1.0))
+
+        cycle = t % 6.0
+        if cycle < 3.0 and t > 1.0:
+            center = -0.2 + 1.4 * (cycle / 3.0)
+            width = 0.12
+            for pos, col in ((center - width, _mix(left_c, right_c, center - width)),
+                             (center, QColor("#FFFFFF")),
+                             (center + width, _mix(left_c, right_c, center + width))):
+                if 0.0 < pos < 1.0:
+                    grad.setColorAt(pos, col)
+        self.title_item.setBrush(QBrush(grad))
+
+    # ------------------------------------------------------------ điều khiển
+    def stop_home_animation(self=None):
+        if self is None or not isinstance(self, HomeScreenMixin):
+            if HomeScreenMixin._default_instance is not None:
+                return HomeScreenMixin._default_instance.stop_home_animation()
+            return
+        timer = getattr(self, "anim_timer", None)
+        if timer is not None:
+            timer.stop()
+
+    def start_home_animation(self=None):
+        if self is None or not isinstance(self, HomeScreenMixin):
+            if HomeScreenMixin._default_instance is not None:
+                return HomeScreenMixin._default_instance.start_home_animation()
+            return
+        timer = getattr(self, "anim_timer", None)
+        if timer is not None and not timer.isActive():
+            self._last_t = self._clock.elapsed() / 1000.0
+            timer.start(16)
+
+
+class main_thread(HomeScreenMixin):
     def __init__(self,ui,main_core_connection,main_core):
         self.ui = ui
         self.main_core_connection = main_core_connection
@@ -99,7 +542,7 @@ class main_thread():
         self.ui_sub.pushButton_apply_login_setting.clicked.connect(lambda _ , u=self.core: u.save_data_login())
         self.ui_sub.pushButton_test_connection_3.clicked.connect(lambda _ , u=self.controller: u.TestConnection())
         self.ui_sub.pushButton_apply_ip_add_setting_2.clicked.connect(lambda _ , u=self.controller: u.save_ip_address())
-        self.ui_sub.pushButton.clicked.connect(lambda _ , u=self: u.open_modify_ip_address())
+        self.ui_sub.network_setting_advanced.clicked.connect(lambda _ , u=self: u.open_modify_ip_address())
         self.sub.show()
 
     def open_modify_ip_address(self):
@@ -149,110 +592,6 @@ class main_thread():
             self._scripts_window = open_scripts_editor(cursor, db, self.main_core.connection)
 
 
-    def setup_home_screen(self, graphicsView):
-        from PyQt5.QtWidgets import QGraphicsScene, QGraphicsTextItem, QGraphicsDropShadowEffect, QGraphicsEllipseItem, QGraphicsLineItem
-        from PyQt5.QtGui import QFont, QColor, QPen, QPainter
-        from PyQt5.QtCore import Qt, QTimer
-        
-        scene = QGraphicsScene()
-        graphicsView.setStyleSheet("""
-            QGraphicsView {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #0F172A, stop:1 #020617);
-                border: none;
-            }
-        """)
-        graphicsView.setRenderHint(QPainter.Antialiasing)
-        graphicsView.setScene(scene)
-
-        pen_solid = QPen(QColor("#1E293B"))
-        pen_solid.setWidth(2)
-        circle1 = QGraphicsEllipseItem(-200, -200, 400, 400)
-        circle1.setPen(pen_solid)
-        scene.addItem(circle1)
-
-        pen_dash = QPen(QColor("#334155"))
-        pen_dash.setWidth(2)
-        pen_dash.setStyle(Qt.DashLine)
-        self.radar_circle = QGraphicsEllipseItem(-350, -350, 700, 700)
-        self.radar_circle.setPen(pen_dash)
-        scene.addItem(self.radar_circle)
-        
-        self.radar_line = QGraphicsLineItem(0, 0, 0, -350)
-        pen_sweep = QPen(QColor("#0284C7"))
-        pen_sweep.setWidth(3)
-        self.radar_line.setPen(pen_sweep)
-        scene.addItem(self.radar_line)
-
-        text_item = QGraphicsTextItem("MBC VISION INSPECTOR")
-        font = QFont("Segoe UI", 56, QFont.Bold)
-        font.setLetterSpacing(QFont.AbsoluteSpacing, 5)
-        text_item.setFont(font)
-        text_item.setDefaultTextColor(QColor("#38BDF8"))
-        
-        self.title_glow = QGraphicsDropShadowEffect()
-        self.title_glow.setBlurRadius(30)
-        self.title_glow.setColor(QColor("#0284C7"))
-        self.title_glow.setOffset(0, 0)
-        text_item.setGraphicsEffect(self.title_glow)
-        
-        text_width = text_item.boundingRect().width()
-        text_item.setPos(-text_width / 2, -130)  # Nâng title chính lên cao
-        scene.addItem(text_item)
-
-        # Dòng 2: AI VISION FOR MANUFACTURING
-        text_item_2 = QGraphicsTextItem("AI VISION FOR MANUFACTURING")
-        font_2 = QFont("Segoe UI", 20, QFont.Bold)
-        font_2.setLetterSpacing(QFont.AbsoluteSpacing, 5)
-        text_item_2.setFont(font_2)
-        text_item_2.setDefaultTextColor(QColor("#38BDF8"))
-        
-        self.title_glow_2 = QGraphicsDropShadowEffect()
-        self.title_glow_2.setBlurRadius(30)
-        self.title_glow_2.setColor(QColor("#0284C7"))
-        self.title_glow_2.setOffset(0, 0)
-        text_item_2.setGraphicsEffect(self.title_glow_2)
-        
-        text_width_2 = text_item_2.boundingRect().width()
-        text_item_2.setPos(-text_width_2 / 2, -30)  # Đặt ở giữa
-        scene.addItem(text_item_2)
-
-        # Dòng 3: SUBTITLE
-        subtitle = QGraphicsTextItem("ADVANCED MACHINE VISION SYSTEM")
-        sub_font = QFont("Segoe UI", 16)
-        sub_font.setLetterSpacing(QFont.AbsoluteSpacing, 10)
-        subtitle.setFont(sub_font)
-        subtitle.setDefaultTextColor(QColor("#94A3B8"))
-        
-        sub_width = subtitle.boundingRect().width()
-        subtitle.setPos(-sub_width / 2, 20)  # Đặt thấp xuống
-        scene.addItem(subtitle)
-
-        self.anim_angle = 0
-        self.glow_increasing = True
-
-        self.anim_timer = QTimer()
-        self.anim_timer.timeout.connect(self.update_animation)
-        self.anim_timer.start(30)
-
-    def update_animation(self):
-        self.anim_angle = (self.anim_angle + 2) % 360
-        self.radar_line.setRotation(self.anim_angle)
-        
-        self.radar_circle.setRotation(-self.anim_angle * 0.5)
-        
-        radius = self.title_glow.blurRadius()
-        if self.glow_increasing:
-            radius += 1.5
-            if radius >= 60:
-                self.glow_increasing = False
-        else:
-            radius -= 1.5
-            if radius <= 15:
-                self.glow_increasing = True
-                
-        # Update cả 2 glow
-        self.title_glow.setBlurRadius(radius)
-        self.title_glow_2.setBlurRadius(radius)
 
     def closeEvent(self, event, main_core_ref=None):
         if QtWidgets.QApplication.instance().property("is_exiting"):

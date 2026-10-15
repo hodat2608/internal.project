@@ -31,7 +31,7 @@ from Administrator.create_user import open_create_user
 from Administrator.remove_user import open_remove_user
 from Administrator.hardware_key import open_hardware_key
 from module_2.home_main import Ui_MainWindow as MainWindowUI
-from module_2.main_thread import main_thread
+from module_2.main_thread import main_thread,HomeScreenMixin
 _log = _get_logger('module_2.run')
 
 

@@ -271,7 +271,7 @@ class Ui_MainWindow(object):
         self.tableWidget.setGridStyle(QtCore.Qt.DashLine)
         self.tableWidget.setRowCount(1)
         self.tableWidget.setObjectName("tableWidget")
-        self.tableWidget.setColumnCount(8)
+        self.tableWidget.setColumnCount(9)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
         self.tableWidget.setHorizontalHeaderItem(0, item)
@@ -296,6 +296,9 @@ class Ui_MainWindow(object):
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
         self.tableWidget.setHorizontalHeaderItem(7, item)
+        item = QtWidgets.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
+        self.tableWidget.setHorizontalHeaderItem(8, item)
         self.tableWidget.horizontalHeader().setCascadingSectionResizes(True)
         self.tableWidget.horizontalHeader().setDefaultSectionSize(150)
         self.tableWidget.horizontalHeader().setMinimumSectionSize(50)
@@ -351,7 +354,9 @@ class Ui_MainWindow(object):
         item = self.tableWidget.horizontalHeaderItem(6)
         item.setText(_translate("MainWindow", "Register"))
         item = self.tableWidget.horizontalHeaderItem(7)
-        item.setText(_translate("MainWindow", "Value"))
+        item.setText(_translate("MainWindow", "Value ON"))
+        item = self.tableWidget.horizontalHeaderItem(8)
+        item.setText(_translate("MainWindow", "Value OFF"))
 
 
 if __name__ == "__main__":

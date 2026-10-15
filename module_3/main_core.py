@@ -155,9 +155,10 @@ class ReadWriteLock:
 # ---------------------------------------------------------------------------
 
 class UISignals(QObject):
-    update_display = pyqtSignal(list, str)
-    show_warning   = pyqtSignal(str, str)
-    set_user_index = pyqtSignal(object, object, str, str)
+    update_display   = pyqtSignal(list, str)
+    show_warning     = pyqtSignal(str, str)
+    set_user_index   = pyqtSignal(object, object, str, str)
+    load_mode_params = pyqtSignal(str)
 
 
 # ---------------------------------------------------------------------------
@@ -231,6 +232,8 @@ class PLCHandler:
         self.executor       = ThreadPoolExecutor(max_workers=max_workers)
         self.model_executor = ThreadPoolExecutor(max_workers=4)
         self.processor      = processor
+        if self.processor is not None:
+            self.processor.plc_handler = self
 
         self._counters: defaultdict[str, int]                 = defaultdict(int)
         self._counter_locks: defaultdict[str, threading.Lock] = defaultdict(threading.Lock)
@@ -251,6 +254,7 @@ class PLCHandler:
         self.signals.update_display.connect(self.update_ui_slot)
         self.signals.show_warning.connect(self._show_warning_slot)
         self.signals.set_user_index.connect(self._on_set_user_index)
+        self.signals.load_mode_params.connect(self._on_load_mode_params)
 
         self.worker_thread    = PLCWorkerModeAuto1(self)
         self.built_in_objects = {}
@@ -259,6 +263,7 @@ class PLCHandler:
         self.mode_kick        = None  # được set từ mapping 'automatic' trong set_built_in_mapping_mode
 
         self._label_sizes: dict = {}
+        self._last_results_map: dict = {}
         self._active_triggers   = []
         self._active_reg        = []
         
@@ -310,13 +315,36 @@ class PLCHandler:
     # Safe PLC I/O helpers
     # -----------------------------------------------------------------------
 
+    def _safe_read_plc(self, register: str):
+        """Đọc PLC, log lỗi thay vì để exception âm thầm."""
+        if self.layer_core.driver_loader is None:
+            # _log.error("[PLCHandler] _safe_read_plc failed for register: %s", register)
+            return
+        try:
+            return self.layer_core.driver_loader.read_plc(register)
+        except Exception:
+            # _log.exception("[PLCHandler] _safe_read_plc failed for register: %s", register)
+            return
+
+    def _safe_write_plc(self, register: str, value):
+        """Ghi PLC, log lỗi thay vì để exception âm thầm."""
+        if self.layer_core.driver_loader is None:
+            # _log.error("[PLCHandler] _safe_write_plc failed for register: %s", register)
+            return
+        try:
+            self.layer_core.driver_loader.write_plc(register, value)
+        except Exception:
+            # _log.exception("[PLCHandler] _safe_write_plc failed: register=%s value=%s", register, value)
+            return 
+
+
     # def _safe_read_plc(self, register: str):
     #     """Đọc PLC, log lỗi thay vì để exception âm thầm."""
     #     if self.layer_core.driver_loader is None:
     #         # _log.error("[PLCHandler] _safe_read_plc failed for register: %s", register)
     #         return
     #     try:
-    #         return self.layer_core.driver_loader.read_plc(register)
+    #         return self.layer_core.driver_loader.read_plc_log(register)
     #     except Exception:
     #         # _log.exception("[PLCHandler] _safe_read_plc failed for register: %s", register)
     #         return
@@ -327,33 +355,10 @@ class PLCHandler:
     #         _log.error("[PLCHandler] _safe_write_plc failed for register: %s", register)
     #         return
     #     try:
-    #         self.layer_core.driver_loader.write_plc(register, value)
+    #         self.layer_core.driver_loader.write_plc_log(register, value)
     #     except Exception:
     #         _log.exception("[PLCHandler] _safe_write_plc failed: register=%s value=%s", register, value)
     #         return 
-
-
-    def _safe_read_plc(self, register: str):
-        """Đọc PLC, log lỗi thay vì để exception âm thầm."""
-        if self.layer_core.driver_loader is None:
-            # _log.error("[PLCHandler] _safe_read_plc failed for register: %s", register)
-            return
-        try:
-            return self.layer_core.driver_loader.read_plc_log(register)
-        except Exception:
-            # _log.exception("[PLCHandler] _safe_read_plc failed for register: %s", register)
-            return
-
-    def _safe_write_plc(self, register: str, value):
-        """Ghi PLC, log lỗi thay vì để exception âm thầm."""
-        if self.layer_core.driver_loader is None:
-            _log.error("[PLCHandler] _safe_write_plc failed for register: %s", register)
-            return
-        try:
-            self.layer_core.driver_loader.write_plc_log(register, value)
-        except Exception:
-            _log.exception("[PLCHandler] _safe_write_plc failed: register=%s value=%s", register, value)
-            return 
 
 
     # -----------------------------------------------------------------------
@@ -468,11 +473,11 @@ class PLCHandler:
         if self.mode_kick is None:
             # Mặc định: mode đang map cho 'automatic' (lấy từ camera đầu tiên có cấu hình)
             self.mode_kick = next(
-                (m for cam in mapping.values()
-                 if (m := cam.get('mapping', {}).get('automatic', {}).get('mapping_mode'))),
+                (cam.get('mapping', {}).get('automatic', {}).get('mapping_mode')
+                 for cam in mapping.values()
+                 if cam.get('mapping', {}).get('automatic', {}).get('mapping_mode')),
                 None
             )
-            print("Mode Kick: ", self.mode_kick)
         self._update_trigger_cache()
         self._set_mode_reg_process()
         # self._update_counter_settings()
@@ -510,7 +515,7 @@ class PLCHandler:
                     
                     if self._safe_read_plc(reg) != 0 :
                         self._reset_counter(key)
-                        _log.info("[PLCHandler] Reset counter %s", key)
+                        # _log.info("[PLCHandler] Reset counter %s", key)
                         self._safe_write_plc(reg, 0)
 
     # -----------------------------------------------------------------------
@@ -694,12 +699,85 @@ class PLCHandler:
                         self._update_trigger_cache(triggers)
                         self._set_mode_reg_process()
                         self.load_user_set_selector_from_mode()
+                        self.load_params_from_activated_mode(mode_key)
                         self._safe_write_plc(str(register), value_bit_off)
                     except (TypeError, ValueError) as e:
                         _log.debug("[PLCHandler] _activate_mode value error for register %s: %s", register, e)
                         continue
         except Exception:
             _log.exception("[PLCHandler] _activate_mode unexpected error")
+
+    def load_params_from_activated_mode(self, mode_name=None):
+        with self._mode_lock:
+            current_mode = mode_name or self.mode_kick
+        if current_mode:
+            if threading.current_thread() is threading.main_thread():
+                self._load_params_signals_mode(current_mode)
+            else:
+                self.signals.load_mode_params.emit(current_mode)
+
+    def _on_load_mode_params(self, mode_name: str):
+        self._load_params_signals_mode(mode_name)
+
+    def _load_params_signals_mode(self, mode_name: str):
+        if not mode_name or not self.built_in_objects:
+            return
+
+        cursor = None
+        connect_db = None
+        if self.processor and hasattr(self.processor, 'db_manager') and self.processor.db_manager:
+            cursor = self.processor.db_manager.cursor
+            connect_db = self.processor.db_manager.connect_db
+
+        if cursor is None:
+            _log.warning("[PLCHandler] Cannot load params for mode %s: db_manager cursor is None", mode_name)
+            return
+
+        for key, values in self.built_in_objects.items():
+            automation_ui = values.get('automation_ui')
+            signals_processor = values.get('signals_processor') or getattr(automation_ui, 'signals_processor', None)
+            camera_id = values.get('camera_id') or getattr(automation_ui, 'camera_id', None)
+            item_code_id = values.get('item_code_id') or getattr(automation_ui, 'item_code_id', None)
+            models = values.get('models') or getattr(automation_ui, 'models', None)
+
+            if not signals_processor:
+                continue
+
+            try:
+                mode_auto_id = signals_processor.load_params_signals_from_gui_mapping_db(
+                    cursor, camera_id, mode_name=mode_name, show_message=False
+                )
+                if mode_auto_id:
+                    if connect_db:
+                        num_models_str = str(len(models)) if models else "0"
+                        signals_processor.load_shotxmodel_from_db(
+                            cursor, connect_db, mode_auto_id, num_models_str
+                        )
+                    shot_complete, dict_shot = signals_processor.dict_shotxmodel()
+                    values['shot'] = dict_shot
+                    values['shot_complete'] = shot_complete
+                    _log.info("[%s] Auto-loaded mode '%s' from PLC: %s shots, mapping=%s", key, mode_name, shot_complete, dict_shot)
+
+                if hasattr(signals_processor, 'get_table_params'):
+                    tbl_params = signals_processor.get_table_params()
+                    if tbl_params:
+                        signals_dict = values.setdefault('signals', {})
+                        signals_dict.setdefault(mode_name, {})['values_signals'] = tbl_params
+
+                if hasattr(automation_ui, 'config_logger') and automation_ui.config_logger:
+                    item_code_text = automation_ui.comboBox_Itemcode.currentText() if hasattr(automation_ui, 'comboBox_Itemcode') else ""
+                    automation_ui.config_logger.check_initial_db(
+                        cursor,
+                        camera_id,
+                        item_code_id,
+                        mode_name,
+                        item_code_text
+                    )
+            except Exception:
+                _log.exception("[%s] Failed to load params for mode %s from PLC", key, mode_name)
+
+        self._update_trigger_cache()
+        self._set_mode_reg_process()
 
     def load_user_set_selector_from_mode(self):
         with self._mode_lock:
@@ -1288,12 +1366,14 @@ class PLCHandler:
                 chk = container.findChild(QCheckBox)
                 if chk and chk.isChecked():
                     reg_item = table_logging.item(row, 6)
-                    val_item = table_logging.item(row, 7)
+                    val_on_item = table_logging.item(row, 7)
+                    val_off_item = table_logging.item(row, 8)
                     path_item = table_logging.item(row, 1)
                     desc_item = table_logging.item(row, 2)
                     
                     register = reg_item.text().strip() if reg_item else ""
-                    value = val_item.text().strip() if val_item else ""
+                    val_on = val_on_item.text().strip() if val_on_item else ""
+                    val_off = val_off_item.text().strip() if val_off_item else ""
                     path = path_item.text().strip() if path_item else ""
                     desc = desc_item.text().strip() if desc_item else ""
                     
@@ -1309,11 +1389,12 @@ class PLCHandler:
                             'description': desc,
                             'selected_camera': sel_cam,
                             'selected_model': sel_model,
-                            'value': value,
-                            'values':values,
-                            'key':key
+                            'value_on': val_on,
+                            'value_off': val_off,
+                            'values': values,
+                            'key': key
                         }
-                    print("self.register_table_logging",self.register_table_logging)
+                    print("self.register_table_logging", self.register_table_logging)
 
     def handle_auto_logging_process_image(self):
         if not getattr(self, 'register_table_logging', None):
@@ -1322,7 +1403,8 @@ class PLCHandler:
         for register, data_info in self.register_table_logging.items():
             try:
                 plc_val = int(self._safe_read_plc(register))
-                target_val = int(data_info['value'])
+                target_val = int(data_info.get('value_on', data_info.get('value', 1)))
+                value_off = int(data_info.get('value_off', 0))
             except (ValueError, TypeError):
                 continue
             
@@ -1376,7 +1458,7 @@ class PLCHandler:
                         for reg in all_registers:
                             self._safe_write_plc(str(reg), 1)
 
-                    self._safe_write_plc(register, 0)
+                    self._safe_write_plc(register, value_off)
 
                     self.signals.update_display.emit(
                         [(key_model, pyuic, result_img, flag, list_register, "Logging (Model Representation Mapping)")],
@@ -1409,61 +1491,87 @@ class PLCHandler:
     # UI update slot (main thread)
     # -----------------------------------------------------------------------
 
+    def clear_ui_caches(self):
+        """Xóa cache kích thước label và pixmap khi thay đổi layout mode."""
+        self._label_sizes.clear()
+        with self._pixmap_cache_lock:
+            self._pixmap_cache.clear()
+
+    def re_render_latest_ui(self):
+        """Hiển thị lại ảnh kết quả gần nhất khớp với kích thước layout mới."""
+        if not getattr(self, '_last_results_map', None):
+            return
+        for key_model, (item, time_str) in list(self._last_results_map.items()):
+            self.update_ui_slot([item], time_str)
+
     def update_ui_slot(self, results, time_str):
-        for key_model, _pyuic5, result_img, flag, list_register,logo_text in results:
+        if not hasattr(self, '_last_results_map'):
+            self._last_results_map = {}
+        for key_model, _pyuic5, result_img, flag, list_register, logo_text in results:
             try:
                 set_style = 'background-color:#2e7d32; color:white' if flag else 'background-color:#c62828; color:white'
                 result_text = "OK" if flag else "NG"
                 
                 # --- Watermark Logic ---
-                font = cv2.FONT_HERSHEY_DUPLEX
-                font_scale = 1.5
-                thickness = 2
-                (tw, th), _ = cv2.getTextSize(logo_text, font, font_scale, thickness)
-                margin = 30
-                img_h, img_w = result_img.shape[:2]
-                
-                x_text = img_w - tw - margin
-                y_text = img_h - margin
-                
-                x1 = max(0, x_text - 15)
-                y1 = max(0, y_text - th - 15)
-                x2 = min(img_w, x_text + tw + 15)
-                y2 = min(img_h, y_text + 15)
-                
-                if x2 > x1 and y2 > y1:
-                    roi = result_img[y1:y2, x1:x2]
-                    overlay_roi = roi.copy()
+                if logo_text:
+                    font = cv2.FONT_HERSHEY_DUPLEX
+                    font_scale = 1.5
+                    thickness = 2
+                    (tw, th), _ = cv2.getTextSize(logo_text, font, font_scale, thickness)
+                    margin = 30
+                    img_h, img_w = result_img.shape[:2]
                     
-                    # Nền đen bán trong suốt cho watermark
-                    cv2.rectangle(overlay_roi, (0, 0), (x2 - x1, y2 - y1), (30, 30, 30), -1)
-                    # Chữ watermark màu xám nhạt
-                    cv2.putText(overlay_roi, logo_text, (15, y2 - y1 - 15), font, font_scale, (220, 220, 220), thickness, cv2.LINE_AA)
+                    x_text = img_w - tw - margin
+                    y_text = img_h - margin
                     
-                    # Blend overlay với ROI gốc (60% độ đậm cho chữ, 40% giữ lại nền ảnh)
-                    cv2.addWeighted(overlay_roi, 0.6, roi, 0.4, 0, roi)
-                    result_img[y1:y2, x1:x2] = roi
+                    x1 = max(0, x_text - 15)
+                    y1 = max(0, y_text - th - 15)
+                    x2 = min(img_w, x_text + tw + 15)
+                    y2 = min(img_h, y_text + 15)
+                    
+                    if x2 > x1 and y2 > y1:
+                        roi = result_img[y1:y2, x1:x2]
+                        overlay_roi = roi.copy()
+                        
+                        # Nền đen bán trong suốt cho watermark
+                        cv2.rectangle(overlay_roi, (0, 0), (x2 - x1, y2 - y1), (30, 30, 30), -1)
+                        # Chữ watermark màu xám nhạt
+                        cv2.putText(overlay_roi, logo_text, (15, y2 - y1 - 15), font, font_scale, (220, 220, 220), thickness, cv2.LINE_AA)
+                        
+                        # Blend overlay với ROI gốc (60% độ đậm cho chữ, 40% giữ lại nền ảnh)
+                        cv2.addWeighted(overlay_roi, 0.6, roi, 0.4, 0, roi)
+                        result_img[y1:y2, x1:x2] = roi
                 # -----------------------
                 
-                child       = self.processor.dict_child[key_model]
+                # Lưu lại kết quả gần nhất (đã có watermark, để rỗng logo_text tránh vẽ lặp khi re-render)
+                self._last_results_map[key_model] = (
+                    (key_model, _pyuic5, result_img, flag, list_register, ""),
+                    time_str
+                )
+                
+                child = self.processor.dict_child.get(key_model) if self.processor and hasattr(self.processor, 'dict_child') else None
+                if not child:
+                    continue
                 label_image = child['ldi']
                 label_okng  = child['ldr']
                 label_time  = child['ldt']
 
-                if key_model not in self._label_sizes:
-                    w, h = label_image.width(), label_image.height()
-                    if w > 0 and h > 0:
-                        self._label_sizes[key_model] = (w, h)
+                # Lấy kích thước thực tế hiện tại của label_image (thay đổi theo layout mode)
+                w, h = label_image.width(), label_image.height()
+                if w > 10 and h > 10:
+                    self._label_sizes[key_model] = (w, h)
 
-                target_w, target_h = self._label_sizes.get(key_model, (0, 0))
+                target_w, target_h = self._label_sizes.get(key_model, (w, h))
 
                 h_img, w_img = result_img.shape[:2]
                 if target_w > 0 and target_h > 0:
                     aspect = w_img / h_img
                     if target_w / target_h > aspect:
-                        new_h = target_h;            new_w = int(new_h * aspect)
+                        new_h = target_h
+                        new_w = int(new_h * aspect)
                     else:
-                        new_w = target_w;            new_h = int(new_w / aspect)
+                        new_w = target_w
+                        new_h = int(new_w / aspect)
                     resized = cv2.resize(result_img, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
                 else:
                     resized = result_img
@@ -1715,6 +1823,7 @@ class CameraTabManager:
             
         self.frame_count = 0
         self.dict_camera_ui = {}
+        self.dict_child.clear()
         
         unique_cameras = list(set([k[0] for k in keys]))
         total_cameras = len(unique_cameras)
@@ -1732,6 +1841,12 @@ class CameraTabManager:
                 self.add_child_window_follow_on_models(self.ui_mother, camera_name, model_number, total_models)
             elif layout_mode == 'Layout Camera':
                 self.add_child_window_follow_on_cameras(self.ui_mother, camera_name, model_number, total_cameras)
+
+        QtWidgets.QApplication.processEvents()
+
+        if hasattr(self, 'plc_handler') and self.plc_handler:
+            self.plc_handler.clear_ui_caches()
+            QtCore.QTimer.singleShot(60, self.plc_handler.re_render_latest_ui)
 
     
     def add_child_window_follow_on_models(self,ui_mother,camera_id,model_id,total_models):
@@ -1924,6 +2039,11 @@ class CameraTabManager:
         tab_widget_2.addTab(automation_tab, "PLC Settings")
         
         _signals_processor = signals(self.automation_ui)
+        self.automation_ui.signals_processor = _signals_processor
+        self.automation_ui.camera_id = camera_id
+        self.automation_ui.camera_name = camera_name
+        self.automation_ui.item_code_id = item_code_id
+        self.automation_ui.models = models
         _automation_ui = self.automation_ui
         _automation_ui.comboBox_camera.setItemText(0, _translate("MainWindow", str(camera_name)))
         _automation_ui.comboBox_n_model.setItemText(0, _translate("MainWindow", str(len(models))))
@@ -1940,16 +2060,26 @@ class CameraTabManager:
         self.automation_ui.pushButton_applysignalplc.clicked.connect(lambda _: _signals_processor.save_values_signal_to_db_from_gui(self.db_manager.cursor, self.db_manager.connect_db, item_code_id))
         self.automation_ui.pushButton_set_save_mode.clicked.connect(lambda _: _signals_processor.save_mode_auto(self.db_manager.cursor, self.db_manager.connect_db, item_code_id))
         def _on_load_mode(_):
-            mode_auto_id = _signals_processor.load_params_signals_from_gui_mapping_db(self.db_manager.cursor, camera_id)
+            mode_name = _automation_ui.comboBox_mode_auto.currentText()
+            mode_auto_id = _signals_processor.load_params_signals_from_gui_mapping_db(
+                self.db_manager.cursor, camera_id, mode_name=mode_name, show_message=True
+            )
             if mode_auto_id:
-                _signals_processor.load_shotxmodel_from_db(self.db_manager.cursor, self.db_manager.connect_db, mode_auto_id,str(len(models)))
-            if hasattr(self.automation_ui, 'config_logger') and self.automation_ui.config_logger:
-                self.automation_ui.config_logger.check_initial_db(
+                _signals_processor.load_shotxmodel_from_db(
+                    self.db_manager.cursor, self.db_manager.connect_db, mode_auto_id, str(len(models))
+                )
+                shot_complete, dict_shot = _signals_processor.dict_shotxmodel()
+                cam_key = f'built-in-camera-{camera_name}'
+                if hasattr(self, 'built_in_objects') and cam_key in self.built_in_objects:
+                    self.built_in_objects[cam_key]['shot'] = dict_shot
+                    self.built_in_objects[cam_key]['shot_complete'] = shot_complete
+            if hasattr(_automation_ui, 'config_logger') and _automation_ui.config_logger:
+                _automation_ui.config_logger.check_initial_db(
                     self.db_manager.cursor,
                     camera_id,
                     item_code_id,
-                    self.automation_ui.comboBox_mode_auto.currentText(),
-                    self.automation_ui.comboBox_Itemcode.currentText()
+                    _automation_ui.comboBox_mode_auto.currentText(),
+                    _automation_ui.comboBox_Itemcode.currentText()
                 )
         self.automation_ui.pushButton_load_params_from_mode.clicked.connect(_on_load_mode)
         self.automation_ui.pushButton_apply_itemcode_assign.clicked.connect(lambda _: _signals_processor.save_register_name_line_code(self.db_manager.cursor, self.db_manager.connect_db))
@@ -2126,21 +2256,14 @@ class CameraTabManager:
                         plc.write_plc(str(plc_signals['busy']['reg']),   int(plc_signals['busy']['off']))
                     _log.info("[Camera %s] Thử lại sau %s giây...", camera_name, retry_interval)
                     time.sleep(retry_interval)
-                    if attempt == 1:
+                    if attempt == 3:
                         _log.error("[Camera %s] Kết nối thất bại sau %s lần thử!", camera_name, attempt)
                         return
             else:
                 _log.warning("[Camera %s] PLC Driver chưa sẵn sàng...", camera_name)
                 if progress_callback:
                     progress_callback(None, f"PLC Driver chưa sẵn sàng (Lần {attempt}). Đang đợi...")
-                time.sleep(1)
-                if plc_signals['ready']['reg'] and plc_signals['ready']['off']:
-                    plc.write_plc(str(plc_signals['ready']['reg']), int(plc_signals['ready']['off']))
-                if plc_signals['run']['reg'] and plc_signals['run']['off']:
-                    plc.write_plc(str(plc_signals['run']['reg']),   int(plc_signals['run']['off']))
-                if plc_signals['busy']['reg'] and plc_signals['busy']['off']:
-                    plc.write_plc(str(plc_signals['busy']['reg']),   int(plc_signals['busy']['off']))
-                if attempt == 1:
+                if attempt == 3:
                     _log.error("[Camera %s] PLC Driver chưa sẵn sàng sau %s lần thử!", camera_name, attempt)
                     return
     
@@ -2186,9 +2309,14 @@ class CameraTabManager:
             'shot_complete': shot_complete,
             'parameter_models_x': parameter_models,
             'device': device,
-            'automation_ui' :automation_ui,
-            'mirror_dev':dev,
-            'auto_logging_ui': auto_logging_ui
+            'automation_ui': automation_ui,
+            'mirror_dev': dev,
+            'auto_logging_ui': auto_logging_ui,
+            'signals_processor': getattr(automation_ui, 'signals_processor', None),
+            'camera_id': getattr(automation_ui, 'camera_id', None),
+            'camera_name': camera_name,
+            'item_code_id': getattr(automation_ui, 'item_code_id', None),
+            'models': getattr(automation_ui, 'models', None),
         }
 
     def set_signals_device_camera(self, camera_name,dict_signals):

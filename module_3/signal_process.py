@@ -479,8 +479,18 @@ class DataProcessSignal:
                 
                 return mode_auto_id
             
-    def load_params_signals_from_gui_mapping_db(self,cursor,camera_id):
-        mode_name = self.uic.comboBox_mode_auto.currentText()
+    def load_params_signals_from_gui_mapping_db(self, cursor, camera_id, mode_name=None, show_message=True):
+        if mode_name is None:
+            mode_name = self.uic.comboBox_mode_auto.currentText()
+        else:
+            index = self.uic.comboBox_mode_auto.findText(str(mode_name))
+            if index >= 0:
+                self.uic.comboBox_mode_auto.blockSignals(True)
+                self.uic.comboBox_mode_auto.setCurrentIndex(index)
+                self.uic.comboBox_mode_auto.blockSignals(False)
+            else:
+                self.uic.comboBox_mode_auto.setCurrentText(str(mode_name))
+
         cursor.execute("""
                 SELECT id, assign_register,value_bit_on,value_bit_off FROM MODE_AUTO
                 WHERE mode_name = %s AND camera_id = %s
@@ -532,7 +542,10 @@ class DataProcessSignal:
 
             return mode_auto_id if result else None
         else: 
-            QMessageBox.information(None, "Information", f"Mode {mode_name} is not exists ")
+            if show_message:
+                QMessageBox.information(None, "Information", f"Mode {mode_name} is not exists ")
+            else:
+                _log.warning("Mode %s does not exist in MODE_AUTO for camera %s", mode_name, camera_id)
             return
         
 

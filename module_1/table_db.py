@@ -161,7 +161,8 @@ TABLES = [
         select_camera VARCHAR(255) NOT NULL,
         select_model VARCHAR(255) NOT NULL,
         register VARCHAR(255) NOT NULL,
-        value VARCHAR(255) NOT NULL,
+        value_on VARCHAR(255) NOT NULL,
+        value_off VARCHAR(255) NOT NULL,
         camera_id INT NOT NULL,
         FOREIGN KEY (camera_id) REFERENCES NUMS_CAMERA(id) ON DELETE CASCADE  
         )

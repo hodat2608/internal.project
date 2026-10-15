@@ -674,7 +674,15 @@ QGroupBox::title {
              </column>
              <column>
               <property name="text">
-               <string>Value</string>
+               <string>Value ON</string>
+              </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Value OFF</string>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>

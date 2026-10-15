@@ -36,6 +36,8 @@ from concurrent.futures import ThreadPoolExecutor
 import queue
 from module_3.main_core import *
 from module_1.root_path import resource_path
+# Import QTimer
+from PyQt5.QtCore import QTimer
 DICT_DEVICE = {
    'HIK - MVS' : Initial_Device_MVS
 }
@@ -49,6 +51,7 @@ class Ui_MainWindow(object):
         self.mode_init = mode_init
         self.connect_plc = connect_db
         self.plc_handler = PLCHandler(max_workers=4,processor=self.camera_manager,layer_core=connect_db)
+        self.camera_manager.plc_handler = self.plc_handler
         
         self.product_code_forms = []
         self.tabWidget = None
@@ -209,39 +212,50 @@ class Ui_MainWindow(object):
                 self.progress_callback(base_progress + int(step_progress * 0.7), f"Đang kiểm tra kết nối Camera {camera_name} và PLC...")
             self.camera_manager.set_signals_device_camera(camera_name, dict_signals)
             self.device = self.camera_manager.auto_initial_device(camera_id, camera_name, item_code_id, self.tabWidget_2, self.product_code_forms, dict_signals, progress_callback=self.progress_callback)
-            is_connected = self.camera_manager.connect_plc.driver_loader and self.camera_manager.connect_plc.driver_loader.connect()
-            
-            adapter_name, adapter_desc, ipv4, ipv6 = self.camera_manager.connect_plc.driver_loader.get_network_adapter_info()
-            if adapter_name:
-                automation_ui.labelAdapterName_2.setText(f"{adapter_name}")
-                automation_ui.labelModuleAdapter.setText(f"{adapter_desc}")
-                automation_ui.labelIPv4_2.setText(f"{ipv4}")
-                automation_ui.labelIPv6_2.setText(f"{ipv6}")
-                
-            from PyQt5.QtCore import QTimer
-            
-            # Khởi tạo QTimer và gắn nó vào automation_ui để chạy nền liên tục
+            # --- Khởi tạo và kiểm tra kết nối PLC ---
+            plc_driver = getattr(self.camera_manager.connect_plc, 'driver_loader', None)
+            is_connected = bool(plc_driver and plc_driver.connect())
+
+            # Cập nhật trạng thái kết nối PLC
+            status_text, status_color = ("🟢 Connected", "color: green;") if is_connected else ("🔴 Disconnected", "color: red;")
+            automation_ui.labelConnStatus.setText(status_text)
+            automation_ui.labelConnStatus.setStyleSheet(status_color)
+
+            # Cập nhật thông tin Card mạng
+            adapter_info = plc_driver.get_network_adapter_info() if is_connected else None
+            adapter_name, adapter_desc, ipv4, ipv6 = adapter_info if (adapter_info and adapter_info[0]) else ("❌ #N/A", "❌ #N/A", "❌ #N/A", "❌ #N/A")
+            automation_ui.labelAdapterName_2.setText(str(adapter_name))
+            automation_ui.labelModuleAdapter.setText(str(adapter_desc))
+            automation_ui.labelIPv4_2.setText(str(ipv4))
+            automation_ui.labelIPv6_2.setText(str(ipv6))
+
+            # --- Giám sát tốc độ mạng qua QTimer ---
             automation_ui.network_speed_timer = QTimer()
-            
+
             def update_network_speed_ui():
-                try:
-                    # Gọi hàm lấy tốc độ ngầm
-                    recv_spd, sent_spd = self.camera_manager.connect_plc.driver_loader.get_network_speed()
-                    automation_ui.labelSendValue_2.setText(f"{sent_spd} Kbps")
-                    automation_ui.labelRecvValue_2.setText(f"{recv_spd} Kbps")
-                except Exception as e:
-                    pass
-                    
-            automation_ui.network_speed_timer.timeout.connect(update_network_speed_ui)
-            automation_ui.network_speed_timer.start(1000) # Cập nhật mỗi 1000ms (1 giây)
-            
-            
-            if is_connected:
-                automation_ui.labelConnStatus.setText("🟢 Connected")
-                automation_ui.labelConnStatus.setStyleSheet("color: green;")
-            else:
+                if plc_driver and getattr(plc_driver, 'sock', None):
+                    try:
+                        recv_spd, sent_spd = plc_driver.get_network_speed()
+                        automation_ui.labelSendValue_2.setText(f"{sent_spd} Kbps")
+                        automation_ui.labelRecvValue_2.setText(f"{recv_spd} Kbps")
+                        return
+                    except Exception:
+                        pass
+                
+                # Khi mất kết nối: cập nhật UI và tạm dừng timer
+                automation_ui.labelSendValue_2.setText("❌ #N/A")
+                automation_ui.labelRecvValue_2.setText("❌ #N/A")
                 automation_ui.labelConnStatus.setText("🔴 Disconnected")
                 automation_ui.labelConnStatus.setStyleSheet("color: red;")
+                automation_ui.network_speed_timer.stop()
+
+            automation_ui.network_speed_timer.timeout.connect(update_network_speed_ui)
+
+            if is_connected:
+                automation_ui.network_speed_timer.start(1000)
+            else:
+                automation_ui.labelSendValue_2.setText("❌ #N/A")
+                automation_ui.labelRecvValue_2.setText("❌ #N/A")
 
         if self.progress_callback:
             self.progress_callback(base_progress + int(step_progress * 0.8), f"Đang khởi tạo lịch sử lỗi (Log tab) camera {camera_name}...")

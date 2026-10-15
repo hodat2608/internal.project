@@ -57,6 +57,9 @@ class AutoLoggingProcess:
 
             shot_item = QTableWidgetItem(file_path)
             self.ui_logging.tableWidget.setItem(row, 1, shot_item)
+
+            desc_item = QTableWidgetItem("")
+            self.ui_logging.tableWidget.setItem(row, 2, desc_item)
             
             combo_cam = QtWidgets.QComboBox()
             combo_cam.addItems(list(total_cam))
@@ -73,13 +76,17 @@ class AutoLoggingProcess:
             self.ui_logging.tableWidget.setCellWidget(row, 5, detect_button)
             
             from PyQt5.QtCore import Qt
-            item_col5 = QTableWidgetItem("")
-            item_col5.setTextAlignment(Qt.AlignCenter)
-            self.ui_logging.tableWidget.setItem(row, 6, item_col5)
-            
             item_col6 = QTableWidgetItem("")
             item_col6.setTextAlignment(Qt.AlignCenter)
-            self.ui_logging.tableWidget.setItem(row, 7, item_col6)
+            self.ui_logging.tableWidget.setItem(row, 6, item_col6)
+            
+            item_col7 = QTableWidgetItem("")
+            item_col7.setTextAlignment(Qt.AlignCenter)
+            self.ui_logging.tableWidget.setItem(row, 7, item_col7)
+
+            item_col8 = QTableWidgetItem("")
+            item_col8.setTextAlignment(Qt.AlignCenter)
+            self.ui_logging.tableWidget.setItem(row, 8, item_col8)
             
         header = self.ui_logging.tableWidget.horizontalHeader()
         header.setCascadingSectionResizes(False) 
@@ -190,8 +197,8 @@ class AutoLoggingProcess:
                 query = """
                     INSERT INTO auto_logging (
                         folder_path, join_state, image_path, description_image, 
-                        select_camera, select_model, register, value, camera_id
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        select_camera, select_model, register, value_on, value_off, camera_id
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
                 
                 for item in list_insert:
@@ -201,7 +208,8 @@ class AutoLoggingProcess:
                     select_camera = str(item.get(3, ""))
                     select_model = str(item.get(4, ""))
                     register_val = str(item.get(6, ""))
-                    value_val = str(item.get(7, ""))
+                    value_on_val = str(item.get(7, ""))
+                    value_off_val = str(item.get(8, ""))
                     
                     cursor.execute(query, (
                         folder_path, 
@@ -211,7 +219,8 @@ class AutoLoggingProcess:
                         select_camera, 
                         select_model, 
                         register_val, 
-                        value_val, 
+                        value_on_val, 
+                        value_off_val, 
                         camera_id
                     ))
                     
@@ -237,7 +246,11 @@ class AutoLoggingProcess:
         
         cursor = connection.cursor()
         cursor.execute(
-            f"SELECT * FROM auto_logging WHERE camera_id = %s",
+            """
+            SELECT id, folder_path, join_state, image_path, description_image,
+                   select_camera, select_model, register, value_on, value_off, camera_id
+            FROM auto_logging WHERE camera_id = %s
+            """,
             (camera_id,),
         )
         result = cursor.fetchall()
@@ -250,11 +263,22 @@ class AutoLoggingProcess:
         self.ui_logging.lineEdit_folder_path.setText(str(result[0][1]))
         
         self.ui_logging.tableWidget.setRowCount(len(result))
+
+        total_cam = set()
+        total_model = set()
+        if hasattr(self, 'built_in_objects') and self.built_in_objects:
+            for k, v in self.built_in_objects.items():
+                c_name = k.removeprefix('built-in-camera-').removeprefix('built-in-')
+                total_cam.add(c_name)
+                if 'model_loader' in v and isinstance(v['model_loader'], dict):
+                    for m_tuple in v['model_loader'].keys():
+                        if isinstance(m_tuple, tuple) and len(m_tuple) > 1:
+                            total_model.add(m_tuple[1])
         
         for row, row_data in enumerate(result):
-            # Mapping cột trong DB (dựa theo thứ tự CREATE TABLE)
-            # 0: id, 1: folder_path, 2: join_state, 3: image_path, 4: discrption_image
-            # 5: select_camera, 6: select_model, 7: register, 8: value, 9: item_code_id
+            # Mapping cột trong DB (dựa theo thứ tự SELECT):
+            # 0: id, 1: folder_path, 2: join_state, 3: image_path, 4: description_image
+            # 5: select_camera, 6: select_model, 7: register, 8: value_on, 9: value_off, 10: camera_id
             
             join_val = row_data[2]
             image_path_val = str(row_data[3])
@@ -262,7 +286,8 @@ class AutoLoggingProcess:
             camera_val = str(row_data[5])
             model_val = str(row_data[6])
             register_val = str(row_data[7])
-            value_val = str(row_data[8])
+            value_on_val = str(row_data[8])
+            value_off_val = str(row_data[9])
             
             # Cột 0: Join State (QCheckBox nằm giữa)
             from PyQt5.QtWidgets import QWidget, QHBoxLayout
@@ -281,18 +306,32 @@ class AutoLoggingProcess:
             shot_item = QTableWidgetItem(image_path_val)
             self.ui_logging.tableWidget.setItem(row, 1, shot_item)
             
-            # Cột 2: Discription
+            # Cột 2: Description
             desc_item = QTableWidgetItem(desc_val)
             self.ui_logging.tableWidget.setItem(row, 2, desc_item)
             
             # Cột 3: Select Camera (QComboBox)
             combo_cam = QComboBox()
-            combo_cam.addItem(camera_val)
+            row_cam_options = set(total_cam)
+            if camera_val:
+                row_cam_options.add(camera_val)
+            if row_cam_options:
+                combo_cam.addItems(list(row_cam_options))
+                combo_cam.setCurrentText(camera_val)
+            else:
+                combo_cam.addItem(camera_val)
             self.ui_logging.tableWidget.setCellWidget(row, 3, combo_cam)
             
             # Cột 4: Select Model (QComboBox)
             combo_key = QComboBox()
-            combo_key.addItem(model_val)
+            row_model_options = set(total_model)
+            if model_val:
+                row_model_options.add(model_val)
+            if row_model_options:
+                combo_key.addItems(list(row_model_options))
+                combo_key.setCurrentText(model_val)
+            else:
+                combo_key.addItem(model_val)
             self.ui_logging.tableWidget.setCellWidget(row, 4, combo_key)
             
             # Cột 5: View Detection (QPushButton)
@@ -306,10 +345,15 @@ class AutoLoggingProcess:
             item_col6.setTextAlignment(Qt.AlignCenter)
             self.ui_logging.tableWidget.setItem(row, 6, item_col6)
             
-            # Cột 7: Value (Căn giữa)
-            item_col7 = QTableWidgetItem(value_val)
+            # Cột 7: Value ON (Căn giữa)
+            item_col7 = QTableWidgetItem(value_on_val)
             item_col7.setTextAlignment(Qt.AlignCenter)
             self.ui_logging.tableWidget.setItem(row, 7, item_col7)
+            
+            # Cột 8: Value OFF (Căn giữa)
+            item_col8 = QTableWidgetItem(value_off_val)
+            item_col8.setTextAlignment(Qt.AlignCenter)
+            self.ui_logging.tableWidget.setItem(row, 8, item_col8)
             
         # -- CẤU HÌNH LẠI ĐỘ RỘNG CÁC CỘT GIỐNG HÀM GENERATE --
         header = self.ui_logging.tableWidget.horizontalHeader()
