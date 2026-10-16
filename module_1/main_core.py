@@ -83,10 +83,13 @@ class core:
                     db_submenu.addMenu(item_code_submenu)
         self.ui_db.actionDevice_Name.setMenu(db_submenu) 
 
-    def query_device(self,event):
+    def query_device(self, event=None):
         self.update_menu()
         if event is not None:
-            self.ui.closeEvent(event)
+            if hasattr(event, 'close'):
+                event.close()
+            elif hasattr(event, 'accept'):
+                event.accept()
 
     def delete_database(self, db):
         confirm = QtWidgets.QMessageBox.warning(None, "CẢNH BÁO NGUY HIỂM", 

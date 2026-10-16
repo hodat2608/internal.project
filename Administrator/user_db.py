@@ -68,31 +68,51 @@ def verify_password(password: str, password_hash: str) -> bool:
 
 
 # ─────────────────────────────────────────────
-#  ADMIN PASSWORD (hard-coded default)
+#  ADMIN PASSWORD (hard-coded default & AppData writable path)
 # ─────────────────────────────────────────────
 import os
+import sys
 import json
 
-_ADMIN_FILE = os.path.join(os.path.dirname(__file__), "admin_secret.json")
+if getattr(sys, 'frozen', False):
+    app_data = os.environ.get('LOCALAPPDATA') or os.environ.get('APPDATA') or os.path.expanduser('~')
+    _ADMIN_DIR = os.path.join(app_data, 'MBC_Vision_Inspector', 'Administrator')
+else:
+    _ADMIN_DIR = os.path.dirname(__file__)
+
+_ADMIN_FILE = os.path.join(_ADMIN_DIR, "admin_secret.json")
 _DEFAULT_ADMIN_PASS = "admin@2026"
 
 
 def get_admin_password_hash() -> str:
     """Đọc admin password hash từ file, nếu chưa có thì tạo mặc định"""
+    # 1. Kiểm tra file cấu hình người dùng (trong AppData khi đóng gói)
     if os.path.exists(_ADMIN_FILE):
         try:
-            with open(_ADMIN_FILE, 'r') as f:
+            with open(_ADMIN_FILE, 'r', encoding='utf-8') as f:
                 data = json.load(f)
                 return data.get("password_hash", hash_password(_DEFAULT_ADMIN_PASS))
         except Exception:
             pass
+
+    # 2. Kiểm tra file gốc đi kèm ứng dụng (_internal/Administrator/admin_secret.json)
+    bundled_file = os.path.join(os.path.dirname(__file__), "admin_secret.json")
+    if os.path.exists(bundled_file):
+        try:
+            with open(bundled_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                return data.get("password_hash", hash_password(_DEFAULT_ADMIN_PASS))
+        except Exception:
+            pass
+
     return hash_password(_DEFAULT_ADMIN_PASS)
 
 
 def save_admin_password_hash(new_hash: str):
-    """Lưu admin password hash mới vào file"""
-    with open(_ADMIN_FILE, 'w') as f:
-        json.dump({"password_hash": new_hash}, f)
+    """Lưu admin password hash mới vào file trong thư mục có quyền ghi (AppData)"""
+    os.makedirs(_ADMIN_DIR, exist_ok=True)
+    with open(_ADMIN_FILE, 'w', encoding='utf-8') as f:
+        json.dump({"password_hash": new_hash}, f, indent=4)
 
 
 def verify_admin_password(password: str) -> bool:

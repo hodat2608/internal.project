@@ -162,17 +162,19 @@ class PLC_Controler:
         label.style().polish(label)
 
     def load_ip_address(self):
-        if self.main_core.manual == 1:
+        manual = getattr(self.main_core, 'manual', 1)
+        automatic = getattr(self.main_core, 'automatic', 0)
+        if manual == 1:
             self.uicmin.radioButton_manul_plc_2.setChecked(True)
             self.uicmin.radioButton_automatic_plc_2.setChecked(False)
-        elif self.main_core.automatic == 1:
+        elif automatic == 1:
             self.uicmin.radioButton_automatic_plc_2.setChecked(True)
             self.uicmin.radioButton_manul_plc_2.setChecked(False)
 
-        ip_address = str(self.main_core.ip_address_plc)
+        ip_address = str(getattr(self.main_core, 'ip_address_plc', '192.168.0.10'))
         self.uicmin.lineEdit_ip_address_2.setText(ip_address)
-        self.uicmin.lineEdit_port_3.setText(str(self.main_core.port_plc))
-        self.uicmin.comboBox.setCurrentText(str(self.main_core.plc_module))
+        self.uicmin.lineEdit_port_3.setText(str(getattr(self.main_core, 'port_plc', 5000)))
+        self.uicmin.comboBox.setCurrentText(str(getattr(self.main_core, 'plc_module', 'KEYENCE')))
 
         is_connected = bool(getattr(self.main_core, 'driver_loader', None))
 

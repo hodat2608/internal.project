@@ -57,6 +57,14 @@ class core:
 
         self.connection    = None
         self.driver_loader = None
+
+        # Mặc định thông số PLC (phòng ngừa máy mới tinh chưa có cấu hình trong CSDL)
+        self.plc_module     = "KEYENCE"
+        self.ip_address_plc = "192.168.0.10"
+        self.port_plc       = 5000
+        self.manual         = 1
+        self.automatic      = 0
+
         _log.info("[core.__init__] Creating CoreWorker...")
         self.worker_thread = CoreWorker(self)
         _log.info("[core.__init__] CoreWorker created. Connecting to MySQL...")

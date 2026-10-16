@@ -204,6 +204,28 @@ TABLES = [
         FOREIGN KEY (item_code_id) REFERENCES ITEMS_CODE(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     """,
+    """
+    CREATE TABLE IF NOT EXISTS task_calculator (
+        id              INT AUTO_INCREMENT PRIMARY KEY,
+        task_name       VARCHAR(255) NOT NULL,
+        task_type       VARCHAR(255) NOT NULL,
+        datetime        DATETIME NOT NULL,
+        camera_id       INT NOT NULL,
+        FOREIGN KEY (camera_id) REFERENCES NUMS_CAMERA(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS task_calculator_data (
+        id              INT AUTO_INCREMENT PRIMARY KEY,
+        task_id         INT NOT NULL,
+        result_value    VARCHAR(255),
+        min_value       VARCHAR(255),
+        max_value       VARCHAR(255),
+        ...
+        status          VARCHAR(255),
+        FOREIGN KEY (task_id) REFERENCES task_calculator(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    """,
 ]
 
 
