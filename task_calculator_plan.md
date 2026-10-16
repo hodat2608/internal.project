@@ -6,43 +6,51 @@
 
 ## 1. Tổng quan & Luồng Dữ Liệu Toàn Hệ Thống
 
+*(Đã cập nhật theo góp ý: Thực hiện lọc Confidence, Width, Height, Số lượng nhãn trước rồi mới đưa các box đạt chuẩn sang tính toán hình học)*
+
 ```mermaid
 flowchart TD
     A["Camera Capture Image"] --> B["YOLO Inference Engine (V5 / V8 / TensorRT)"]
     B --> C["Raw Detection DataFrame<br/>(xmin, ymin, xmax, ymax, conf, class, name)"]
     
-    subgraph Pipeline_Hien_Tai["1. Đánh giá cấp độ Nhãn (Hiện có)"]
-        C --> D1["Lọc Confidence / Width / Height / Qty<br/>(Bảng PARAMETERSET)"]
+    subgraph Giai_Doan_1["GIAI ĐOẠN 1: LỌC BẬC 1 (CẤP ĐỘ NHÃN - HIỆN CÓ)"]
+        C --> D1["Lọc Confidence / Width / Height / Quantity<br/>(Theo bảng PARAMETERSET)"]
+        D1 --> D2{"Kiểm tra kết quả Lọc Bậc 1"}
+        D2 -- "Không đạt số lượng / size" --> FAIL_L1["Cờ NG Bậc 1 (Label Level)"]
+        D2 -- "Đạt chuẩn" --> PASS_L1["Danh sách Bounding Boxes Hợp Lệ (Valid Boxes)"]
     end
     
-    subgraph Pipeline_Moi["2. Đánh giá Quan hệ Tọa độ Hình học (Chức năng MỚI)"]
-        C --> E["Task Calculator Engine"]
-        DB[("MySQL Database<br/>task_calculator & task_calculator_rules")] -.->|"Load Active Tasks theo Camera"| E
+    subgraph Giai_Doan_2["GIAI ĐOẠN 2: LỌC BẬC 2 (TÍNH TOÁN QUAN HỆ HÌNH HỌC - MỚI)"]
+        PASS_L1 --> E["Task Calculator Engine<br/>(evaluate_task_calculator)"]
+        DB[("MySQL Database<br/>task_calculator & task_calculator_rules")] -.->|"Load Active Tasks & PLC Registers"| E
         E --> F1["Trích xuất Tọa độ & Đo đạc<br/>(Xmin, Xmax, Ymin, Ymax, W, H, Center)"]
         F1 --> F2["Đánh giá Biểu thức Quan hệ<br/>(VD: Ymin_F < Ymin_G + W_G / 3)"]
-        F2 --> F3["Xuất kết quả Task (OK / NG)<br/>& Dữ liệu Overlay trực quan (Lines, Arrows)"]
+        F2 --> F3{"Kết quả Task"}
+        F3 -- "Vi phạm Rule" --> FAIL_TASK["Cờ NG Task Calculator<br/>Kích hoạt PLC Register riêng của Task"]
+        F3 -- "Thỏa mãn Rule" --> PASS_TASK["Cờ OK Task Calculator"]
     end
     
-    D1 --> G["Bộ tổng hợp phán định (Master Decision Maker)"]
-    F3 --> G
+    FAIL_L1 --> G["Bộ tổng hợp phán định (Master Decision Maker)"]
+    FAIL_TASK --> G
+    PASS_TASK --> G
     
-    G --> H1["Gửi Tín hiệu PLC (Registers / Triggers)"]
+    G --> H1["Gửi Tín hiệu PLC (Register Tổng + Register Riêng từng Task)"]
     G --> H2["Lưu Lịch sử MySQL & Image Logging (OK/NG Folders)"]
-    G --> H3["Hiển thị Visual Overlay lên UI Camera"]
+    G --> H3["Hiển thị Visual Overlay (Vẽ Box + Đường đo sai lệch) lên UI"]
 ```
 
 ---
 
-## 2. Chi Tiết Từng Bước Triển Khai (Kèm Khu Vực Review & Góp Ý)
+## 2. Chi Tiết Từng Bước Triển Khai (Đã kết hợp góp ý của người dùng)
 
 ---
 
 ### 🟢 BƯỚC 1: Chuẩn hóa Cơ sở Dữ liệu (Database Schema)
 
-#### Vấn đề hiện tại:
-Tại file `c:\project_vision\intenal\module_1\table_db.py`, bảng `task_calculator` và `task_calculator_data` đang có lỗi cú pháp `...` (placeholder) và chưa đủ các trường để lưu các phép so sánh quan hệ phức tạp (như offset tỷ lệ $+ \text{Width}(G)/3$, loại toán tử, v.v.).
+#### Góp ý người dùng đã cập nhật:
+> *"Bắt buộc phải có trường PLC Register riêng cho từng task, nếu NG thì gửi biến đó, còn không thì thôi."*
 
-#### Đề xuất thiết kế bảng chuẩn:
+#### Thiết kế bảng chuẩn:
 ```sql
 -- 1. Bảng lưu danh sách Task của từng Camera
 CREATE TABLE IF NOT EXISTS task_calculator (
@@ -55,6 +63,12 @@ CREATE TABLE IF NOT EXISTS task_calculator (
                         -- ALL_PASS (tất cả rule đúng thì OK), ANY_PASS
     action_on_fail      VARCHAR(20) NOT NULL DEFAULT 'NG',
     enabled             TINYINT(1) NOT NULL DEFAULT 1,
+    
+    -- Cấu hình PLC Register riêng cho từng Task khi xảy ra lỗi NG:
+    assign_register     VARCHAR(255) DEFAULT '',       -- Địa chỉ thanh ghi PLC (VD: D100, M20...)
+    value_bit_on        INT DEFAULT 1,                 -- Giá trị ghi khi Task bị NG
+    value_bit_off       INT DEFAULT 0,                 -- Giá trị xóa/reset
+    
     created_at          DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at          DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (camera_id) REFERENCES NUMS_CAMERA(id) ON DELETE CASCADE
@@ -107,10 +121,6 @@ CREATE TABLE IF NOT EXISTS task_calculator_rules (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
-> 💬 **Góp ý / Đánh giá của bạn cho Bước 1:**
-> *(Bạn có thể bổ sung cột nào khác cần lưu trữ ở đây không, ví dụ PLC Register riêng cho từng task nếu có)*
-> ...
-
 ---
 
 ### 🟢 BƯỚC 2: Giao diện Quản lý Task Workspace (`TaskWorkspaceDialog`)
@@ -125,9 +135,10 @@ Nhấn nút `pushButton_add_tasks` (Tooltip: *"Tasks Resolve"*) tại `module_3/
   - Cột 2: `Tên Task` (VD: *Kiểm tra lệch mép linh kiện A & B*)
   - Cột 3: `Loại Task` (*Tọa độ quan hệ*, *Khoảng cách*, *Biểu thức*)
   - Cột 4: `Số lượng Rule` (VD: *2 rules*)
-  - Cột 5: `Đánh giá khi vi phạm` (Badge đỏ: *NG* / Badge xanh: *OK*)
-  - Cột 6: `Kích hoạt` (Checkbox có thể bật/tắt trực tiếp)
-  - Cột 7: `Thao tác` (Nút *Sửa*, *Xóa*, *Nhân bản*)
+  - Cột 5: `PLC Register NG` (VD: `D105` - Giá trị: `1`)
+  - Cột 6: `Đánh giá khi vi phạm` (Badge đỏ: *NG* / Badge xanh: *OK*)
+  - Cột 7: `Kích hoạt` (Checkbox có thể bật/tắt trực tiếp)
+  - Cột 8: `Thao tác` (Nút *Sửa*, *Xóa*, *Nhân bản*)
 - **Thanh công cụ (Toolbar Buttons):**
   - `[+ Thêm Task Mới]`: Mở hộp thoại soạn thảo Task.
   - `[✏️ Chỉnh Sửa Task]`: Mở hộp thoại chỉnh sửa Task được chọn.
@@ -136,67 +147,65 @@ Nhấn nút `pushButton_add_tasks` (Tooltip: *"Tasks Resolve"*) tại `module_3/
   - `[▶️ Test Thử Nghiệm]`: Chạy thử tất cả Task trên khung hình hiện tại của Camera và hiển thị bảng kết quả đánh giá (PASS/FAIL từng rule kèm giá trị đo thực tế).
 
 ```text
-+---------------------------------------------------------------------------------------------------+
-|  TASK WORKSPACE MANAGER - Camera: Camera-01 [LINE_01]                                             |
-+---------------------------------------------------------------------------------------------------+
-|  [ + Thêm Task mới ]   [ ✏️ Sửa Task ]   [ 🗑️ Xóa ]   [ 📋 Nhân bản ]   [ ▶ Test với ảnh hiện tại ]      |
-+----+-----------------------+---------------------+---------+-------------+-----------+------------+
-| ID | Tên Task              | Loại Task           | Số Rule | Khi vi phạm | Kích hoạt | Thao tác   |
-+----+-----------------------+---------------------+---------+-------------+-----------+------------+
-| 1  | Ktra Lệch Nhãn A & B  | RELATION_COORDINATE | 2 Rules |   [ NG ]    |    [✓]    | [Sửa] [Xóa]|
-| 2  | Ktra Chiều Cao Nhãn C | RELATION_COORDINATE | 1 Rules |   [ NG ]    |    [✓]    | [Sửa] [Xóa]|
-| 3  | Ktra Khoảng Cách F-G  | DISTANCE_CALC       | 1 Rules |   [ NG ]    |    [ ]    | [Sửa] [Xóa]|
-+----+-----------------------+---------------------+---------+-------------+-----------+------------+
-| Tổng cộng: 3 tasks | Đang kích hoạt: 2 tasks                                  [ Đóng ] [ Áp dụng ]|
-+---------------------------------------------------------------------------------------------------+
++-----------------------------------------------------------------------------------------------------------------------+
+|  TASK WORKSPACE MANAGER - Camera: Camera-01 [LINE_01]                                                                 |
++-----------------------------------------------------------------------------------------------------------------------+
+|  [ + Thêm Task mới ]   [ ✏️ Sửa Task ]   [ 🗑️ Xóa ]   [ 📋 Nhân bản ]   [ ▶ Test với ảnh hiện tại ]                  |
++----+-----------------------+---------------------+---------+-------------+-------------+-----------+------------------+
+| ID | Tên Task              | Loại Task           | Số Rule | PLC Reg NG  | Khi vi phạm | Kích hoạt | Thao tác         |
++----+-----------------------+---------------------+---------+-------------+-------------+-----------+------------------+
+| 1  | Ktra Lệch Nhãn A & B  | RELATION_COORDINATE | 2 Rules | D105 (val=1)|   [ NG ]    |    [✓]    | [✏️ Sửa] [🗑️ Xóa]|
+| 2  | Ktra Chiều Cao Nhãn C | RELATION_COORDINATE | 1 Rules | D106 (val=1)|   [ NG ]    |    [✓]    | [✏️ Sửa] [🗑️ Xóa]|
+| 3  | Ktra Khoảng Cách F-G  | DISTANCE_CALC       | 1 Rules | --          |   [ NG ]    |    [ ]    | [✏️ Sửa] [🗑️ Xóa]|
++----+-----------------------+---------------------+---------+-------------+-------------+-----------+------------------+
+| Tổng cộng: 3 tasks | Đang kích hoạt: 2 tasks                                                      [ Đóng ] [ Áp dụng ]|
++-----------------------------------------------------------------------------------------------------------------------+
 ```
-
-> 💬 **Góp ý / Đánh giá của bạn cho Bước 2:**
-> *(Bạn muốn giao diện hiển thị thêm thông tin gì trên bảng Task này không?)*
-> ...
 
 ---
 
-### 🟢 BƯỚC 3: Giao diện Soạn thảo Luật & Mô hình Đồ họa 2 Nhãn (`TaskRuleEditorDialog`)
+### 🟢 BƯỚC 3: Tính Năng Chọn Nhãn Trực Tiếp Từ `tableView` & Giao Diện Rule Editor
 
-Đây là phần hiện thực hóa ý tưởng của bạn: **Low-Code + Visual Graphic Canvas** để người dùng không cần gõ công thức phức tạp mà chỉ cần click vào cạnh tương ứng của 2 hộp nhãn!
+#### 1. Cơ chế Chọn Nhiều Dòng Trên `tableView` (Góp ý quan trọng của bạn):
+- Trong bảng `tableView` (`layout_option_model.py`):
+  1. Người dùng dùng chuột chọn 1 hoặc nhiều dòng (hỗ trợ chọn nhiều dòng qua Multi-selection / Drag / Ctrl+Click).
+  2. Click chuột phải (Context Menu) hoặc xuất hiện thanh nút popup nổi: **"➕ Thêm vào Task"**.
+  3. Khi nhấn **"Thêm vào Task"** $\to$ Hiển thị Dialog:
+     - Chọn Task đích (Dropdown các Task hiện có của Camera, hoặc chọn `[ + Tạo Task Mới ]`).
+     - Bấm **Xác nhận** $\to$ Hệ thống nạp danh sách nhãn đã chọn vào Task đó và mở thẳng giao diện Rule Editor với các nhãn đã được chọn sẵn, chỉ cần click cạnh là xong!
 
-#### Cấu trúc Dialog:
-1. **Thông tin chung Task:**
-   - Tên Task (QLineEdit)
-   - Loại Task (QComboBox: So sánh tọa độ, Khoảng cách tâm, Tỷ lệ kích thước)
-   - Kết luận tổng: `AND` (Tất cả Rule phải đạt) hoặc `OR` (Một trong các Rule vi phạm)
+```mermaid
+flowchart LR
+    A["Bảng tableView<br/>(Danh sách tham số nhãn)"] 
+    -->|"Chọn nhiều dòng nhãn A, B, C...<br/>& Click 'Thêm vào Task'"| B["Popup: Chọn Task Đích"]
+    B -->|"Chọn Task có sẵn HOẶC Tạo mới"| C["Lưu nhãn vào Task<br/>Mở TaskRuleEditorDialog với các nhãn đã chọn"]
+```
 
-2. **Khu vực Đồ họa Trực quan (Visual Bounding Box Graphic Canvas):**
-   - Vẽ 2 hình chữ nhật tượng trưng cho **Nhãn A (Màu xanh dương)** và **Nhãn B (Màu cam)**.
-   - Mỗi hình chữ nhật có các điểm neo (Hotspots) tương tác:
-     - Cạnh Trên: $Y_{\min}$
-     - Cạnh Dưới: $Y_{\max}$
-     - Cạnh Trái: $X_{\min}$
-     - Cạnh Phải: $X_{\max}$
-     - Tâm: $\text{Center}(X, Y)$
-     - Chiều rộng: $\text{Width}$
-     - Chiều cao: $\text{Height}$
-   - **Tương tác trực quan:**
-     - Người dùng click vào **Cạnh Trái** của Nhãn A $\to$ Tự động chọn vế trái là `Xmin(Label A)`.
-     - Người dùng click vào **Cạnh Trái** của Nhãn B $\to$ Tự động chọn vế phải là `Xmin(Label B)`.
-
-3. **Thanh dựng công thức (Rule Formula Builder):**
-   - Vế trái (LHS): `[ Nhãn A ]` `[ Tham số: Xmin / Ymin / ... ]`
-   - Toán tử: `[ < / <= / > / >= / == / != / BETWEEN ]`
-   - Vế phải (RHS): `[ Nhãn B ]` `[ Tham số: Xmin / Ymin / ... ]` (hoặc chuyển sang nhập Số cố định)
-   - Bổ trợ toán học (Offset / Factor):
-     - Dạng cộng/trừ cố định: `+ [ 0.0 ] pixel`
-     - Dạng công thức tỷ lệ như ví dụ của bạn: `+ [ Width(B) ] / [ 3 ]`
-   - Điều kiện kết luận: `Nếu điều kiện đúng thì:` `[ Đánh giá NG / Đánh giá OK ]`
-   - Nút: `[ + Thêm Rule vào Task ]`
+#### 2. Cấu trúc Giao diện Soạn thảo Luật & Mô hình Đồ họa 2 Nhãn (`TaskRuleEditorDialog`):
+- **Cấu hình Task & PLC:**
+  - Tên Task
+  - Loại Task (Tọa độ quan hệ, Khoảng cách, Biểu thức)
+  - Thanh ghi PLC: Địa chỉ (VD: `D105`), Giá trị gửi khi NG (`1`)
+- **Mô hình Đồ họa 2 Bounding Box Trực quan (Visual Canvas):**
+  - Vẽ 2 hình chữ nhật đại diện cho Nhãn 1 và Nhãn 2 lấy từ danh sách nhãn người dùng đã chọn.
+  - Người dùng chạm/click vào:
+    - Cạnh Trái $\implies X_{\min}$
+    - Cạnh Phải $\implies X_{\max}$
+    - Cạnh Trên $\implies Y_{\min}$
+    - Cạnh Dưới $\implies Y_{\max}$
+    - Tâm $\implies \text{Center}$
+- **Thanh Thiết Lập Công Thức:**
+  - Tự động điền vế trái (LHS) và vế phải (RHS) khi người dùng click vào cạnh trên Canvas.
+  - Hỗ trợ công thức mở rộng như ví dụ của bạn:
+    $$\text{LHS} < \text{RHS} + \frac{\text{Width}}{3}$$
+  - Kết luận: Khi điều kiện thỏa mãn $\to$ `[ Đánh giá NG ]` (hoặc OK).
 
 ```text
 +---------------------------------------------------------------------------------------------------+
 |  CHỈNH SỬA TASK: Ktra Lệch Nhãn A & B                                                             |
 +---------------------------------------------------------------------------------------------------+
 | Tên Task: [ Ktra Lệch Nhãn A & B        ]   Loại: [ Tọa độ quan hệ (Relation) ▼ ]                 |
-| Đánh giá tổng thể: [ Tất cả Rule phải thỏa mãn (AND) ▼ ]   Kết luận khi vi phạm: [ NG ▼ ]         |
+| PLC Register khi NG: [ D105        ]   Giá trị gửi: [ 1    ]   Đánh giá tổng: [ AND (Tất cả) ▼ ]  |
 +---------------------------------------------------------------------------------------------------+
 | 💡 CHỌN CẠNH / TỌA ĐỘ TRỰC QUAN (Visual Graphic Selector):                                        |
 |                                                                                                   |
@@ -225,70 +234,56 @@ Nhấn nút `pushButton_add_tasks` (Tooltip: *"Tasks Resolve"*) tại `module_3/
 +---------------------------------------------------------------------------------------------------+
 ```
 
-> 💬 **Góp ý / Đánh giá của bạn cho Bước 3:**
-> *(Mô hình 2 ô nhãn đồ họa và thanh công thức như trên đã thỏa mãn đúng ý tưởng bạn mong muốn chưa?)*
-> ...
-
 ---
 
 ### 🟢 BƯỚC 4: Engine Đánh Giá Hình Học (`TaskCalculatorEngine`)
 
-Tạo module độc lập `module_3/task_calculator_engine.py` để thực hiện tính toán với các tiêu chí kỹ thuật:
-
-#### 1. Chiến lược xử lý Đa nhãn (Multi-Instance Strategy):
-Trong thực tế, 1 ảnh có thể có nhiều nhãn A hoặc nhiều nhãn B. Engine hỗ trợ các cơ chế:
-- **`BEST_CONF` (Mặc định):** Lấy bounding box có độ tin cậy cao nhất của nhãn đó.
-- **`LEFTMOST` / `RIGHTMOST`:** Lấy box nằm ngoài cùng bên trái hoặc bên phải.
-- **`ALL_PAIRS`:** Kiểm tra tất cả các cặp có thể có giữa các nhãn A và nhãn B.
-
-#### 2. Cơ chế Safe Evaluator (Đảm bảo an toàn và tốc độ cao):
-- Tuyệt đối **không dùng `eval()` nguyên thủy của Python** (tránh nguy cơ injection và chậm).
-- Dùng bộ parser phân tích biểu thức số học toán tử:
-  $$\text{LHS} = \text{GetParam}(\text{Label}_A, \text{Param}_1)$$
-  $$\text{RHS} = \text{GetParam}(\text{Label}_B, \text{Param}_2) \times \text{Factor} + \text{Offset}$$
-  So sánh: $\text{Result} = \text{Compare}(\text{LHS}, \text{Operator}, \text{RHS})$
-
-#### 3. Xử lý trường hợp thiếu nhãn (Missing Label Handling):
-- Nếu ảnh không nhận diện được nhãn A hoặc nhãn B cần cho phép cấu hình:
-  - Lựa chọn 1: Báo lỗi NG ngay lập tức vì thiếu linh kiện.
-  - Lựa chọn 2: Bỏ qua (SKIP) nếu task đó là tùy chọn.
-
-#### 4. Dữ liệu Visual Overlay:
-- Trả về danh sách các điểm, mũi tên và text đo khoảng cách để vẽ trực tiếp lên ảnh hiển thị (viền đỏ nếu vi phạm, viền xanh nếu hợp lệ), giúp kỹ sư và người vận hành nhìn thấy ngay sai lệch ở đâu trên màn hình.
-
-> 💬 **Góp ý / Đánh giá của bạn cho Bước 4:**
-> *(Về mặt thuật toán, bạn có cần bổ sung phép toán nào khác không, ví dụ góc nghiêng Angle, diện tích Area, hoặc khoảng cách Euclidean $\sqrt{\Delta x^2 + \Delta y^2}$?)*
-> ...
+Tạo module độc lập `module_3/task_calculator_engine.py`:
+1. **Đầu vào:** Nhận danh sách các `valid_boxes` (những bounding boxes đã vượt qua bước lọc cơ bản Confidence, Width, Height, Qty).
+2. **Chiến lược chọn Box:** Nếu có nhiều box cùng 1 nhãn $\to$ hỗ trợ lấy theo `BEST_CONF` (độ tin cậy cao nhất), `LEFTMOST` (trái nhất), hoặc kiểm tra toàn bộ.
+3. **Safe Evaluator:** Tính toán vế trái và vế phải biểu thức hình học, so sánh bằng toán tử an toàn (không dùng `eval()` nguyên thủy).
+4. **Visual Overlay:** Trích xuất tọa độ 2 cạnh đang so sánh, vẽ đường gióng hoặc mũi tên đỏ (nếu NG) / xanh (nếu OK) lên ảnh để kỹ sư vận hành nhận biết tức thì.
 
 ---
 
-### 🟢 BƯỚC 5: Tích hợp Pipeline & Điều Khiển PLC
+### 🟢 BƯỚC 5: Tách Hàm Riêng Trong `_source/v5/v5.py` & `_source/v8/v8.py`
 
-#### Vị trí tích hợp:
-- Gọi `TaskCalculatorEngine` ngay sau khi hàm `run_model()` trong `_source/v5/v5.py` hoặc `_source/v8/v8.py` hoàn thành inference.
-- Kết hợp cờ kết quả của Task Calculator vào biến cờ phán định `flag` tổng:
-  $$\text{Final Flag} = \text{Label Flag (Hiện tại)} \land \text{Task Calculator Flag}$$
-- Nếu có cấu hình thanh ghi PLC riêng cho Task lỗi, gửi giá trị tương ứng vào thanh ghi PLC để máy gắp/đẩy phế phẩm hoạt động.
+#### Góp ý người dùng đã cập nhật:
+> *"Sau khi load lên thì sẽ được add vào hàm run_model() để xử lý, cũng phải tạo 1 hàm riêng biệt trong `_source/v5/v5.py` hoặc `_source/v8/v8.py` để xử lý các phần tính toán đó."*
 
-> 💬 **Góp ý / Đánh giá của bạn cho Bước 5:**
-> *(Bạn có cần gán Register PLC riêng cho từng Task không, hay chỉ cần dùng chung cờ NG tổng hiện tại?)*
-> ...
+#### Thiết kế hàm riêng biệt:
+- Viết hàm chuyên trách `evaluate_task_calculator(...)` đặt trong class xử lý của `v5.py` và `v8.py`:
+```python
+def evaluate_task_calculator(self, image_bgr, valid_detections, tasks_config, plc_registers_to_send):
+    """
+    Hàm riêng biệt thực hiện kiểm tra các Task quan hệ tọa độ & kích thước hình học.
+    - image_bgr: Ảnh để vẽ overlay đường đo sai lệch
+    - valid_detections: Bounding boxes đã qua lọc conf/size ở Bước 1
+    - tasks_config: Danh sách Task & Rules đã nạp từ MySQL
+    - plc_registers_to_send: List các thanh ghi PLC cần kích hoạt nếu có Task bị NG
+    
+    Trả về:
+    - image_bgr: Ảnh đã vẽ thêm overlay đường đo
+    - task_all_pass: True/False
+    - failed_tasks: Danh sách các task bị NG kèm thanh ghi PLC tương ứng
+    """
+```
+- Gọi hàm này trong `run_model()` ngay sau khi xong bước lọc nhãn thông thường. Nếu có Task bị NG $\to$ nạp thanh ghi `assign_register` của Task đó vào danh sách gửi PLC!
 
 ---
 
-## 3. Lộ Trình Triển Khai Đề Xuất (Action Checklist)
+## 3. Lộ Trình Triển Khai Cụ Thể (Action Checklist)
 
-- [ ] **Giai đoạn 1: Chuẩn hóa Database**
-  - Sửa lỗi cú pháp tại `module_1/table_db.py`.
-  - Thêm bảng `task_calculator` và `task_calculator_rules`.
-- [ ] **Giai đoạn 2: Xây dựng UI Task Workspace**
-  - Thiết kế dialog `TaskWorkspaceDialog` hiển thị danh sách task của camera hiện tại.
-  - Kết nối sự kiện `clicked` của nút `self.pushButton_add_tasks` trong `layout_option_model.py`.
-- [ ] **Giai đoạn 3: Xây dựng UI Rule Editor & Visual Graphic Canvas**
-  - Tạo widget vẽ 2 hộp nhãn Bounding Box với các điểm neo (hotspots) để người dùng click chọn cạnh.
-  - Xây dựng thanh công cụ tạo công thức so sánh.
-- [ ] **Giai đoạn 4: Viết Engine Tính toán Hình học**
-  - Viết module `TaskCalculatorEngine` có test kiểm thử độc lập (Unit Test) cho mọi trường hợp so sánh.
-- [ ] **Giai đoạn 5: Tích hợp Runtime & Hiển thị Trực quan**
-  - Ghép engine vào luồng kiểm tra chính của camera.
-  - Vẽ overlay các đường đo và thông báo kết quả trực tiếp lên khung hình camera.
+- [x] **Giai đoạn 1: Chuẩn hóa Database**
+  - Cập nhật câu lệnh `CREATE TABLE` trong `module_1/table_db.py` với trường PLC register.
+- [x] **Giai đoạn 2: Tính năng Chọn nhãn trên `tableView` & Dialog Quản lý Task**
+  - Bổ sung menu chuột phải / action "Thêm vào Task" khi chọn các dòng trên `tableView`.
+  - Xây dựng `TaskWorkspaceDialog` mở từ `pushButton_add_tasks`.
+- [x] **Giai đoạn 3: Xây dựng UI Rule Editor & Visual Graphic Canvas**
+  - Widget tương tác 2 Bounding Box (click vào cạnh để gán tọa độ $X_{\min}, X_{\max}, Y_{\min}, Y_{\max}$).
+  - Bộ dựng biểu thức so sánh + công thức bù trừ.
+- [x] **Giai đoạn 4: Module Engine Độc Lập `task_calculator_engine.py`**
+  - Viết engine tính toán, thuật toán đo đạc và unit test kiểm tra logic.
+- [x] **Giai đoạn 5: Tách Hàm Trong `_source/v5/v5.py` và `_source/v8/v8.py`**
+  - Viết hàm `evaluate_task_calculator()` độc lập và tích hợp vào `run_model()`.
+  - Kết nối tín hiệu thanh ghi PLC của từng Task khi có lỗi NG.

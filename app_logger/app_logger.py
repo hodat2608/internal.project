@@ -10,7 +10,6 @@ Sử dụng:
 
 Cửa sổ log được tự động mở khi gọi open_log_window() từ entry point.
 """
-
 import logging
 import sys
 from datetime import datetime

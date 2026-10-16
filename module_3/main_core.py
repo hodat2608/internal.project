@@ -315,36 +315,13 @@ class PLCHandler:
     # Safe PLC I/O helpers
     # -----------------------------------------------------------------------
 
-    def _safe_read_plc(self, register: str):
-        """Đọc PLC, log lỗi thay vì để exception âm thầm."""
-        if self.layer_core.driver_loader is None:
-            # _log.error("[PLCHandler] _safe_read_plc failed for register: %s", register)
-            return
-        try:
-            return self.layer_core.driver_loader.read_plc(register)
-        except Exception:
-            # _log.exception("[PLCHandler] _safe_read_plc failed for register: %s", register)
-            return
-
-    def _safe_write_plc(self, register: str, value):
-        """Ghi PLC, log lỗi thay vì để exception âm thầm."""
-        if self.layer_core.driver_loader is None:
-            # _log.error("[PLCHandler] _safe_write_plc failed for register: %s", register)
-            return
-        try:
-            self.layer_core.driver_loader.write_plc(register, value)
-        except Exception:
-            # _log.exception("[PLCHandler] _safe_write_plc failed: register=%s value=%s", register, value)
-            return 
-
-
     # def _safe_read_plc(self, register: str):
     #     """Đọc PLC, log lỗi thay vì để exception âm thầm."""
     #     if self.layer_core.driver_loader is None:
     #         # _log.error("[PLCHandler] _safe_read_plc failed for register: %s", register)
     #         return
     #     try:
-    #         return self.layer_core.driver_loader.read_plc_log(register)
+    #         return self.layer_core.driver_loader.read_plc(register)
     #     except Exception:
     #         # _log.exception("[PLCHandler] _safe_read_plc failed for register: %s", register)
     #         return
@@ -352,13 +329,36 @@ class PLCHandler:
     # def _safe_write_plc(self, register: str, value):
     #     """Ghi PLC, log lỗi thay vì để exception âm thầm."""
     #     if self.layer_core.driver_loader is None:
-    #         _log.error("[PLCHandler] _safe_write_plc failed for register: %s", register)
+    #         # _log.error("[PLCHandler] _safe_write_plc failed for register: %s", register)
     #         return
     #     try:
-    #         self.layer_core.driver_loader.write_plc_log(register, value)
+    #         self.layer_core.driver_loader.write_plc(register, value)
     #     except Exception:
-    #         _log.exception("[PLCHandler] _safe_write_plc failed: register=%s value=%s", register, value)
+    #         # _log.exception("[PLCHandler] _safe_write_plc failed: register=%s value=%s", register, value)
     #         return 
+
+
+    def _safe_read_plc(self, register: str):
+        """Đọc PLC, log lỗi thay vì để exception âm thầm."""
+        if self.layer_core.driver_loader is None:
+            # _log.error("[PLCHandler] _safe_read_plc failed for register: %s", register)
+            return
+        try:
+            return self.layer_core.driver_loader.read_plc_log(register)
+        except Exception:
+            # _log.exception("[PLCHandler] _safe_read_plc failed for register: %s", register)
+            return
+
+    def _safe_write_plc(self, register: str, value):
+        """Ghi PLC, log lỗi thay vì để exception âm thầm."""
+        if self.layer_core.driver_loader is None:
+            _log.error("[PLCHandler] _safe_write_plc failed for register: %s", register)
+            return
+        try:
+            self.layer_core.driver_loader.write_plc_log(register, value)
+        except Exception:
+            _log.exception("[PLCHandler] _safe_write_plc failed: register=%s value=%s", register, value)
+            return 
 
 
     # -----------------------------------------------------------------------
@@ -869,7 +869,7 @@ class PLCHandler:
 
                     handler = None
                     if current_mode == automatic_mode:
-                        handler = self.handle_result_mode_auto
+                        handler = self.handle_result_mode_auto_manual
                     elif current_mode == mirror_mode:
                         handler = self.handle_result_mode_geji
 
@@ -1106,10 +1106,8 @@ class PLCHandler:
         read = self._safe_read_plc
         signals = dict(self.dict_signal_complete.get(key, {}))
         current_count = 0
-        print('counter_mode',counter_mode)
         if counter_mode == 'PC':
             current_count = self._increment_counter(key)
-            print('current_count',current_count)
         elif counter_mode == 'PLC':
             reg = signals.get(automation_ui.comboBox_increment_counter_signal_selected.currentText(), {}).get('reg')
             if reg:
@@ -1280,6 +1278,120 @@ class PLCHandler:
         )
 
     # -----------------------------------------------------------------------
+    # Mode handlers mode manual
+    # -----------------------------------------------------------------------
+
+    def handle_result_mode_auto_manual(self, key: str, values: dict) -> None:
+        time_start = time.perf_counter()
+        start_time    = time.perf_counter()
+
+        automation_ui = values.get('automation_ui')
+
+        current_count = self.counter_shot(key, automation_ui)
+        
+        num_model = values.get('shot', {}).get(str(current_count))
+        if not num_model:
+            _log.debug('[%s] No model for shot %s — skipping', key, current_count)
+            return
+
+        camera        = key.removeprefix('built-in-')
+        key_model     = (camera, f'model-{num_model}')
+        model_loader  = values.get('model_loader', {}).get(key_model)
+        pyuic         = values.get('pyuic', {}).get(key_model)
+        
+        if not model_loader:
+            _log.error('[%s] model_loader missing for key_model=%s', key, key_model)
+            return
+        if not pyuic:
+            _log.error('[%s] pyuic missing for key_model=%s', key, key_model)
+            return
+        if not automation_ui:
+            _log.error('[%s] automation_ui missing', key)
+            return
+
+        # Snapshot UI state trên main thread trước khi chuyển sang background thread
+        capture_cfg = self.snapshot_capture_config(automation_ui)
+        # time.sleep(30)
+        import random
+        raw_image = random.choice([r"C:\Users\VDM\Pictures\2025-11-14_09-07-50-870878.jpg", 
+        r"C:\Users\VDM\Pictures\2025-11-14_09-12-28-422929.jpg",
+        r"C:\Users\VDM\Pictures\2025-11-14_09-12-40-051502.jpg",
+        r"C:\Users\VDM\Pictures\2025-11-14_09-15-53-422959.jpg",
+        r"C:\Users\VDM\Pictures\2025-11-14_09-16-10-488588.jpg",
+        r"C:\Users\VDM\Pictures\2025-12-02_04-29-31-875402.jpg"])
+        
+        raw_image = cv2.imread(raw_image)
+
+        try:
+            model_processor = self.processor.dict_processors.get(key_model)
+            if not model_processor or not model_processor.process_image_func:
+                _log.error('[%s] process_image_func is missing for key_model=%s', key, key_model)
+                return
+            result_img, flag, list_register,logo_text = model_processor.process_image_func(
+                raw_image, model_loader, pyuic, camera, key_model, current_count,
+                mode_load_jumper=self.mode_load_jumper,
+            )
+        except Exception:
+            _log.exception('[%s] process_image_func failed at shot %s', key, current_count)
+            return
+
+        elapsed = (time.perf_counter() - start_time) * 1000
+
+        self._accumulate_registers(key, list_register or [])
+
+        shot_complete = values.get('shot_complete', 0)
+        if current_count >= shot_complete:
+            all_registers = self._pop_registers(key)
+
+            try:
+                with self._signal_rwlock.read():
+                    comp_sig  = dict(self.dict_signal_complete[key]['complete'])
+                    reset_sig = dict(self.dict_signal_complete[key]['reset_ok'])
+            except KeyError:
+                _log.exception('[%s] Missing complete/reset signal in dict_signal_complete', key)
+                self._reset_counter(key)
+                return
+
+            if all_registers:
+                _log.info('[%s] NG registers: %s', key, all_registers)
+                for reg in all_registers:
+                    self._safe_write_plc(str(reg), 1)
+            else:
+                self._safe_write_plc(str(reset_sig['reg']), int(reset_sig['on']))
+
+            self._safe_write_plc(str(comp_sig['reg']), int(comp_sig['on']))
+            self._reset_counter(key)
+            _log.info('[%s] Complete shot %s | registers: %s | %.2fms',
+                      key, current_count, len(all_registers), elapsed)
+
+        state_str = 'OK' if flag else 'NG'
+        chk_orig = pyuic.checkBox_OK_image_original if flag else pyuic.checkBox_NG_image_original
+        
+        if chk_orig.isChecked():
+            path_save = (pyuic.lineEdit_OK_image_original if flag else pyuic.lineEdit_NG_image_original).text().strip()
+            if path_save:
+                chk_det = pyuic.checkBox_OK_image_detected if flag else pyuic.checkBox_NG_image_detected
+                save_det = chk_det.isChecked()
+                
+                self.executor.submit(
+                    self._save_ng_image, 
+                    raw_image.copy(), 
+                    path_save, 
+                    key, 
+                    state_str, 
+                    result_img.copy() if save_det else None, 
+                    save_det
+                )
+        
+        self.signals.update_display.emit(
+            [(key_model, pyuic, result_img, flag, list_register,logo_text)],
+            f"⏱️: {elapsed:.2f} ms",
+        )
+        time_end = time.perf_counter()
+        time_elapsed = (time_end - time_start) * 1000
+        time_str = f"⏱️: {time_elapsed:.2f} ms"
+
+    # -----------------------------------------------------------------------
     # Mode handlers mode_geji
     # -----------------------------------------------------------------------
     def handle_result_mode_geji(self, key, values):
@@ -1332,10 +1444,8 @@ class PLCHandler:
 
         if reset_ok_sig:
             self._safe_write_plc(str(reset_ok_sig['reg']), int(reset_ok_sig['on']))
-            print(f'Send reset ok sig {reset_ok_sig}')
         if complete_sig:
             self._safe_write_plc(str(complete_sig['reg']), int(complete_sig['on']))
-            print(f'Send complete sig {complete_sig}')
 
         list_register = []
         elapsed       = (time.perf_counter() - start_time) * 1000
@@ -1394,7 +1504,6 @@ class PLCHandler:
                             'values': values,
                             'key': key
                         }
-                    print("self.register_table_logging", self.register_table_logging)
 
     def handle_auto_logging_process_image(self):
         if not getattr(self, 'register_table_logging', None):
@@ -1481,10 +1590,8 @@ class PLCHandler:
 
                 if reset_ok_sig:
                     self._safe_write_plc(str(reset_ok_sig['reg']), int(reset_ok_sig['on']))
-                    print(f'Send reset ok sig {reset_ok_sig}')
                 if complete_sig:
                     self._safe_write_plc(str(complete_sig['reg']), int(complete_sig['on']))
-                    print(f'Send complete sig {complete_sig}')
 
 
     # -----------------------------------------------------------------------
@@ -1628,7 +1735,6 @@ class PLCHandler:
                         if addr is not None and write_reg is not None and val_off is not None:
                             reg_addr = f"{addr}{write_reg}"
                             _log.info("Cleanup PLC: writing OFF to %s signal %s on reg %s value %s", camera_name, sig, reg_addr, val_off)
-                            print('int(val_off)',int(val_off))
                             self._safe_write_plc(reg_addr, int(val_off))
                     except Exception:
                         _log.exception("Cleanup PLC: Error resetting signal %s for camera %s", sig, camera_name)
@@ -1805,7 +1911,6 @@ class CameraTabManager:
         display_mode = self.ui_mother.comboBox_display_mode.currentText()
         layout_mode = self.ui_mother.comboBox_layout_mode_by.currentText()
         show_layout = self.ui_mother.comboBox_show_ui.currentText()
-        print(f'display_mode:{display_mode},layout_mode:{layout_mode},show_layout:{show_layout}')
         self.processor.save_display_mode(self.db_manager.cursor, self.db_manager.connect_db, self.item_code_id, display_mode, layout_mode,show_layout)
         keys = list(self.dict_child.keys())
         if not keys: return
@@ -2005,6 +2110,10 @@ class CameraTabManager:
         ui_child.pushButton_OK_image_original.clicked.connect(lambda _: processor.browse_folder_ok_img_original())
         ui_child.pushButton_OK_image_detected.clicked.connect(lambda _: processor.browse_folder_ok_img_detected())
         ui_child.pushButton_logging_image.clicked.connect(lambda _: processor.browse_folder_image_logging())
+        if hasattr(ui_child, 'pushButton_add_tasks'):
+            ui_child.pushButton_add_tasks.clicked.connect(lambda _: processor.open_task_workspace())
+        if hasattr(ui_child, 'pushButton_data_calculator'):
+            ui_child.pushButton_data_calculator.clicked.connect(lambda _: processor.open_task_workspace())
         
         def _update_runtime_ui(text):
             if text == 'PyTorch':

@@ -56,13 +56,23 @@
 # }
 
 
-built_in_mapping_mode=  {'built-in-camera-1': {'mapping': {'automatic': {'mapping_mode': 'Auto 1', 'trigger_selected': 'trigger', 'component': 'reset_ok', 'completed': 'complete'}, 'mirror': {'mapping_mode': 'Auto 2', 'trigger_selected': 'trigger', 'component': 'None', 'completed': 'complete'}, 'logging': {'mapping_mode': 'Auto 3', 'trigger_selected': 'trigger', 'component': 'None', 'completed': 'None'}}}, 'built-in-camera-2': {'mapping': {'automatic': {'mapping_mode': None, 'trigger_selected': None, 'component': None, 'completed': None}, 'mirror': {'mapping_mode': None, 'trigger_selected': None, 'component': None, 'completed': None}, 'logging': {'mapping_mode': None, 'trigger_selected': None, 'component': None, 'completed': None}}}, 'built-in-camera-3': {'mapping': {'automatic': {'mapping_mode': None, 'trigger_selected': None, 'component': None, 'completed': None}, 'mirror': {'mapping_mode': None, 'trigger_selected': None, 'component': None, 'completed': None}, 'logging': {'mapping_mode': None, 'trigger_selected': None, 'component': None, 'completed': None}}}}
-key = 'built-in-camera-1'
-mode = 'Auto 1'
+# built_in_mapping_mode=  {'built-in-camera-1': {'mapping': {'automatic': {'mapping_mode': 'Auto 1', 'trigger_selected': 'trigger', 'component': 'reset_ok', 'completed': 'complete'}, 'mirror': {'mapping_mode': 'Auto 2', 'trigger_selected': 'trigger', 'component': 'None', 'completed': 'complete'}, 'logging': {'mapping_mode': 'Auto 3', 'trigger_selected': 'trigger', 'component': 'None', 'completed': 'None'}}}, 'built-in-camera-2': {'mapping': {'automatic': {'mapping_mode': None, 'trigger_selected': None, 'component': None, 'completed': None}, 'mirror': {'mapping_mode': None, 'trigger_selected': None, 'component': None, 'completed': None}, 'logging': {'mapping_mode': None, 'trigger_selected': None, 'component': None, 'completed': None}}}, 'built-in-camera-3': {'mapping': {'automatic': {'mapping_mode': None, 'trigger_selected': None, 'component': None, 'completed': None}, 'mirror': {'mapping_mode': None, 'trigger_selected': None, 'component': None, 'completed': None}, 'logging': {'mapping_mode': None, 'trigger_selected': None, 'component': None, 'completed': None}}}}
+# key = 'built-in-camera-1'
+# mode = 'Auto 1'
 
-component = next(
-    (cfg['component'] for cfg in built_in_mapping_mode[key]['mapping'].values()
-     if cfg['mapping_mode'] == mode),
-    None,
-)
-print(component)
+# component = next(
+#     (cfg['component'] for cfg in built_in_mapping_mode[key]['mapping'].values()
+#      if cfg['mapping_mode'] == mode),
+#     None,
+# )
+# print(component)
+
+
+import random
+raw_image = random.choice([r"C:\Users\VDM\Pictures\2025-11-14_09-07-50-870878.jpg", 
+ r"C:\Users\VDM\Pictures\2025-11-14_09-12-28-422929.jpg",
+ r"C:\Users\VDM\Pictures\2025-11-14_09-12-40-051502.jpg",
+ r"C:\Users\VDM\Pictures\2025-11-14_09-15-53-422959.jpg",
+ r"C:\Users\VDM\Pictures\2025-11-14_09-16-10-488588.jpg",
+ r"C:\Users\VDM\Pictures\2025-12-02_04-29-31-875402.jpg"])
+print(a)        

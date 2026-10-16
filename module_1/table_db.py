@@ -207,22 +207,40 @@ TABLES = [
     """
     CREATE TABLE IF NOT EXISTS task_calculator (
         id              INT AUTO_INCREMENT PRIMARY KEY,
-        task_name       VARCHAR(255) NOT NULL,
-        task_type       VARCHAR(255) NOT NULL,
-        datetime        DATETIME NOT NULL,
         camera_id       INT NOT NULL,
+        task_name       VARCHAR(255) NOT NULL,
+        task_type       VARCHAR(50) NOT NULL DEFAULT 'RELATION_COORDINATE',
+        logic_mode      VARCHAR(20) NOT NULL DEFAULT 'ALL_PASS',
+        action_on_fail  VARCHAR(20) NOT NULL DEFAULT 'NG',
+        enabled         TINYINT(1) NOT NULL DEFAULT 1,
+        assign_register VARCHAR(255) DEFAULT '',
+        value_bit_on    INT DEFAULT 1,
+        value_bit_off   INT DEFAULT 0,
+        datetime        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (camera_id) REFERENCES NUMS_CAMERA(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     """,
     """
-    CREATE TABLE IF NOT EXISTS task_calculator_data (
-        id              INT AUTO_INCREMENT PRIMARY KEY,
-        task_id         INT NOT NULL,
-        result_value    VARCHAR(255),
-        min_value       VARCHAR(255),
-        max_value       VARCHAR(255),
-        ...
-        status          VARCHAR(255),
+    CREATE TABLE IF NOT EXISTS task_calculator_rules (
+        id                      INT AUTO_INCREMENT PRIMARY KEY,
+        task_id                 INT NOT NULL,
+        rule_name               VARCHAR(255),
+        label_1                 VARCHAR(255) NOT NULL,
+        param_1                 VARCHAR(50) NOT NULL,
+        instance_select_1       VARCHAR(50) NOT NULL DEFAULT 'BEST_CONF',
+        operator                VARCHAR(20) NOT NULL,
+        target_type             VARCHAR(50) NOT NULL DEFAULT 'LABEL',
+        label_2                 VARCHAR(255),
+        param_2                 VARCHAR(50),
+        instance_select_2       VARCHAR(50) NOT NULL DEFAULT 'BEST_CONF',
+        math_op                 VARCHAR(10) DEFAULT 'NONE',
+        math_operand_type       VARCHAR(50) DEFAULT 'CONSTANT',
+        math_operand_val        VARCHAR(255) DEFAULT '0',
+        min_value               DOUBLE DEFAULT 0,
+        max_value               DOUBLE DEFAULT 0,
+        condition_true_result   VARCHAR(10) NOT NULL DEFAULT 'NG',
+        enabled                 TINYINT(1) NOT NULL DEFAULT 1,
+        description             TEXT,
         FOREIGN KEY (task_id) REFERENCES task_calculator(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     """,

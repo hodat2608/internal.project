@@ -366,22 +366,6 @@ class v5s:
         )
         detections = result_model.pandas().xyxy[0]
 
-        print('detections',detections) 
-        
-        #kết quả in được:
-        # detections           xmin        ymin         xmax         ymax  confidence  class  \
-        #                         0   602.493469  478.628723   951.800842  1133.484131    0.989803      3
-        #                         1  1568.607178  471.846497  1927.765503  1146.963501    0.965890      3
-        #                         2  1437.095947  881.444458  2058.440186  1113.431152    0.956838      5
-        #                         3   914.232727  920.124695  1038.723267  1136.530151    0.947967      0
-
-        #                                 name
-        #                         0  chan_comi
-        #                         1  chan_comi
-        #                         2     jumper
-        #                         3   chay_day
-                                
- 
         cfg_rows = _read_model_config(pyuic.model, pyuic.model_column, self.keys_mapping)
  
         label_cfg: dict[str, dict] = {}
@@ -450,7 +434,67 @@ class v5s:
 
         result_image_rgb = draw_detections(image, draw_candidates, fail_labels)
 
+        # ── Hàm riêng biệt kiểm tra Task Calculator đa nhãn hình học ──────────
+        print("flag",flag)
+        result_image_rgb, flag, list_register = self.evaluate_task_calculator(
+            result_image_rgb, draw_candidates, pyuic, flag, list_register
+        )
+
         return result_image_rgb, flag, list_register,LOGO_WATERMARK
+
+    def evaluate_task_calculator(
+        self,
+        image_rgb: np.ndarray,
+        draw_candidates: list,
+        pyuic,
+        flag: bool,
+        list_register: list
+    ):
+        """
+        Hàm riêng biệt thực hiện kiểm tra các Task quan hệ tọa độ & kích thước hình học đa nhãn.
+        - draw_candidates: danh sách các box hợp lệ (đã qua lọc conf & size ở Bước 1)
+        - pyuic: UI object chứa danh sách active_tasks
+        - flag: cờ phán định hiện tại (từ lọc nhãn thông thường)
+        - list_register: danh sách thanh ghi PLC cần gửi
+        """
+        processor = getattr(pyuic, 'processor', None)
+        active_tasks = getattr(processor, 'active_tasks', []) if processor else []
+        if not active_tasks:
+            print("flag",flag)
+            return image_rgb, flag, list_register
+
+        try:
+            from module_3.task_calculator_engine import evaluate_task_calculator as _eval_engine
+            valid_boxes = []
+            for d in draw_candidates:
+                valid_boxes.append({
+                    'xmin': d['x1'],
+                    'ymin': d['y1'],
+                    'xmax': d['x2'],
+                    'ymax': d['y2'],
+                    'name': d['label'],
+                    'confidence': d.get('conf', 1.0)
+                })
+
+            res_img, task_all_pass, task_results, plc_to_send = _eval_engine(
+                image_bgr=image_rgb,
+                valid_detections=valid_boxes,
+                tasks_config=active_tasks,
+                draw_overlay=True
+            )
+
+            if res_img is not None:
+                image_rgb = res_img
+
+            if not task_all_pass:
+                flag = False
+                for reg, val in plc_to_send:
+                    if reg and reg not in list_register:
+                        list_register.append(reg)
+        except Exception as e:
+            print("Error in evaluate_task_calculator (v5):", e)
+
+        return image_rgb, flag, list_register
 
     # ── Per-detection hooks ──────────────────────────────────────────────────
 

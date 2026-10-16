@@ -105,4 +105,62 @@ class v8s(v5s):
 
         result_image_rgb = draw_detections(image, draw_candidates, fail_labels)
 
+        # ── Hàm riêng biệt kiểm tra Task Calculator đa nhãn hình học ──────────
+        result_image_rgb, flag, list_register = self.evaluate_task_calculator(
+            result_image_rgb, draw_candidates, pyuic, flag, list_register
+        )
+
         return result_image_rgb, flag, list_register,LOGO_WATERMARK
+
+    def evaluate_task_calculator(
+        self,
+        image_rgb: np.ndarray,
+        draw_candidates: list,
+        pyuic,
+        flag: bool,
+        list_register: list
+    ):
+        """
+        Hàm riêng biệt thực hiện kiểm tra các Task quan hệ tọa độ & kích thước hình học đa nhãn.
+        - draw_candidates: danh sách các box hợp lệ (đã qua lọc conf & size ở Bước 1)
+        - pyuic: UI object chứa danh sách active_tasks
+        - flag: cờ phán định hiện tại (từ lọc nhãn thông thường)
+        - list_register: danh sách thanh ghi PLC cần gửi
+        """
+        processor = getattr(pyuic, 'processor', None)
+        active_tasks = getattr(processor, 'active_tasks', []) if processor else []
+        if not active_tasks:
+            return image_rgb, flag, list_register
+
+        try:
+            from module_3.task_calculator_engine import evaluate_task_calculator as _eval_engine
+            valid_boxes = []
+            for d in draw_candidates:
+                valid_boxes.append({
+                    'xmin': d['x1'],
+                    'ymin': d['y1'],
+                    'xmax': d['x2'],
+                    'ymax': d['y2'],
+                    'name': d['label'],
+                    'confidence': d.get('conf', 1.0)
+                })
+
+            res_img, task_all_pass, task_results, plc_to_send = _eval_engine(
+                image_bgr=image_rgb,
+                valid_detections=valid_boxes,
+                tasks_config=active_tasks,
+                draw_overlay=True
+            )
+
+            if res_img is not None:
+                image_rgb = res_img
+
+            if not task_all_pass:
+                flag = False
+                for reg, val in plc_to_send:
+                    if reg and reg not in list_register:
+                        list_register.append(reg)
+        except Exception as e:
+            print("Error in evaluate_task_calculator (v8):", e)
+
+        return image_rgb, flag, list_register

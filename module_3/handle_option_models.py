@@ -98,8 +98,15 @@ class Process_Model:
         self.process_image_func = None
         
         self.is_unlocked = False
+        self.camera_id = None
+        self.camera_name = ""
+        self.item_code = ""
+        self.cursor = None
+        self.connect_db = None
+        self.active_tasks = []
         
         # Inject standard properties into the generated UI object
+        self.uic.processor = self
         self.uic.ui_child = None 
         self.uic.i_code = None
         self.uic.db = None
@@ -110,6 +117,8 @@ class Process_Model:
         self.uic.model.setHorizontalHeaderLabels(self.uic.model_column)
         if hasattr(self.uic, 'tableView'):
             self.uic.tableView.setModel(self.uic.model)
+            self.uic.tableView.setContextMenuPolicy(Qt.CustomContextMenu)
+            self.uic.tableView.customContextMenuRequested.connect(self.show_table_context_menu)
             header = self.uic.tableView.horizontalHeader()
             for i in range(len(self.uic.model_column)):
                 if i == 0:
@@ -120,6 +129,123 @@ class Process_Model:
         self.uic.is_unlocked = False
 
         self.set_ui_enabled(False)
+
+    def show_table_context_menu(self, pos):
+        """Hiển thị menu ngữ cảnh chuột phải khi chọn các dòng trên tableView."""
+        selected_indexes = self.uic.tableView.selectionModel().selectedRows()
+        if not selected_indexes:
+            return
+
+        selected_labels = []
+        for idx in selected_indexes:
+            row = idx.row()
+            item = self.uic.model.item(row, 0)
+            if item:
+                lbl_name = item.text().strip()
+                if lbl_name and lbl_name not in selected_labels:
+                    selected_labels.append(lbl_name)
+
+        if not selected_labels:
+            return
+
+        menu = QtWidgets.QMenu(self.uic.tableView)
+        menu.setStyleSheet("""
+            QMenu {
+                background-color: #313244;
+                color: #cdd6f4;
+                border: 1px solid #45475a;
+                border-radius: 6px;
+                padding: 4px;
+                font-family: 'Segoe UI', Arial, sans-serif;
+            }
+            QMenu::item {
+                padding: 6px 20px;
+                border-radius: 4px;
+            }
+            QMenu::item:selected {
+                background-color: #89b4fa;
+                color: #11111b;
+                font-weight: bold;
+            }
+        """)
+
+        action_add_task = menu.addAction(f"➕ Thêm {len(selected_labels)} nhãn đã chọn vào Task Calculator...")
+        action = menu.exec_(self.uic.tableView.viewport().mapToGlobal(pos))
+        if action == action_add_task:
+            self.add_selected_labels_to_task(selected_labels)
+
+    def add_selected_labels_to_task(self, selected_labels: list):
+        """Mở popup chọn Task đích để nạp các nhãn đã chọn."""
+        if not self.camera_id:
+            if self.cursor and self.camera_name:
+                try:
+                    self.cursor.execute("SELECT id FROM NUMS_CAMERA WHERE nums_camera = %s LIMIT 1", (self.camera_name,))
+                    r = self.cursor.fetchone()
+                    if r:
+                        self.camera_id = r[0]
+                except Exception:
+                    pass
+
+        if not self.camera_id:
+            QMessageBox.warning(None, "Chưa chọn Camera", "Không tìm thấy thông tin Camera ID. Vui lòng kiểm tra lại cấu hình Camera!")
+            return
+
+        from module_3.select_task_dialog import SelectTaskForLabelsDialog
+        dlg = SelectTaskForLabelsDialog(
+            camera_id=self.camera_id,
+            selected_labels=selected_labels,
+            cursor=self.cursor,
+            connection=self.connect_db,
+            parent=None
+        )
+        dlg.exec_()
+        self.load_task_calculator_config()
+
+    def open_task_workspace(self):
+        """Mở Task Workspace Dialog quản lý các task tính toán của camera."""
+        if not self.camera_id:
+            if self.cursor and self.camera_name:
+                try:
+                    self.cursor.execute("SELECT id FROM NUMS_CAMERA WHERE nums_camera = %s LIMIT 1", (self.camera_name,))
+                    r = self.cursor.fetchone()
+                    if r:
+                        self.camera_id = r[0]
+                except Exception:
+                    pass
+
+        if not self.camera_id:
+            QMessageBox.warning(None, "Chưa chọn Camera", "Không tìm thấy thông tin Camera ID. Vui lòng kiểm tra lại cấu hình Camera!")
+            return
+
+        from module_3.task_workspace_dialog import TaskWorkspaceDialog
+        dlg = TaskWorkspaceDialog(
+            camera_id=self.camera_id,
+            camera_name=self.camera_name,
+            item_code=self.item_code,
+            cursor=self.cursor,
+            connection=self.connect_db,
+            parent=None
+        )
+        dlg.exec_()
+        self.load_task_calculator_config()
+
+    def load_task_calculator_config(self):
+        """Tải cấu hình các task còn hiệu lực của camera vào bộ nhớ để inference sử dụng."""
+        if not self.cursor or not self.camera_id:
+            return
+        try:
+            from module_3.task_calculator_db import ensure_task_calculator_tables, get_tasks_by_camera, get_task_rules
+            ensure_task_calculator_tables(self.cursor, self.connect_db)
+            all_tasks = get_tasks_by_camera(self.cursor, self.camera_id)
+            self.active_tasks = []
+            for t in all_tasks:
+                if t.get('enabled'):
+                    t['rules'] = get_task_rules(self.cursor, t['id'])
+                    if t['rules']:
+                        self.active_tasks.append(t)
+            _log.info("Loaded %d active geometric tasks for camera_id=%s", len(self.active_tasks), self.camera_id)
+        except Exception as e:
+            _log.error("Error loading task calculator config: %s", e)
 
     def toggle_lock(self, cursor, connect_db):
         if getattr(self, 'is_unlocked', False):
@@ -629,6 +755,8 @@ class Process_Model:
         _log.info("Load parameter successfully")
             
     def assign_values(self,model,camera,code):  
+        self.camera_name = str(camera)
+        self.item_code = str(code)
         self.uic.comboBox_line_code_id.clear()
         self.uic.comboBox_camera_id.clear()
         self.uic.comboBox_model_id.clear()
@@ -652,6 +780,12 @@ class Process_Model:
         
     def load_parameter_injection_safe(self, camera_id, model, cursor, connect_db, tabWidget, ui_instances):
         try:
+            self.camera_id = camera_id
+            self.model_number = model
+            self.cursor = cursor
+            self.connect_db = connect_db
+            self.load_task_calculator_config()
+
             weight_path = None
             cursor.execute("""
                 SELECT Weight_Path, Activity_History_Path ,Conf_Value, Size_Value, Device,Source,Task,
