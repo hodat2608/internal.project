@@ -31,9 +31,11 @@ _log = get_logger('module_3.task_workspace_dialog')
 
 class TaskWorkspaceDialog(QtWidgets.QDialog):
     def __init__(self, camera_id: int, camera_name: str = "", item_code: str = "",
-                 cursor=None, connection=None, parent=None):
+                 cursor=None, connection=None, parent=None,
+                 model_id: Optional[int] = None, **kwargs):
         super().__init__(parent)
         self.camera_id = camera_id
+        self.model_id = model_id if model_id is not None else kwargs.get('model_id', None)
         self.camera_name = camera_name or f"Camera-{camera_id}"
         self.item_code = item_code or "N/A"
         self.cursor = cursor
@@ -139,7 +141,7 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
         header_frame.setStyleSheet("background-color: #252538; border-radius: 8px; padding: 10px;")
         header_layout = QtWidgets.QHBoxLayout(header_frame)
         
-        lbl_title = QtWidgets.QLabel(f"📷 <b>Camera:</b> <font color='#89b4fa'>{self.camera_name}</font> (ID: {self.camera_id}) &nbsp;|&nbsp; 🏷️ <b>Mã Hàng:</b> <font color='#a6e3a1'>{self.item_code}</font>")
+        lbl_title = QtWidgets.QLabel(f"📷 <b>Camera:</b> <font color='#89b4fa'>{self.camera_name}</font> (ID: {self.camera_id}) &nbsp;|&nbsp; 🧩 <b>Model:</b> <font color='#fab387'>{self.model_id}</font> &nbsp;|&nbsp; 🏷️ <b>Mã Hàng:</b> <font color='#a6e3a1'>{self.item_code}</font>")
         lbl_title.setFont(QFont("Segoe UI", 12))
         header_layout.addWidget(lbl_title)
         header_layout.addStretch()
@@ -211,7 +213,7 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
     def load_tasks(self):
         """Tải danh sách các task từ Database và đổ lên bảng."""
         ensure_task_calculator_tables(self.cursor, self.connection)
-        self.tasks = get_tasks_by_camera(self.cursor, self.camera_id)
+        self.tasks = get_tasks_by_camera(self.cursor, self.camera_id, self.model_id)
         
         self.table_tasks.setRowCount(len(self.tasks))
         active_count = 0
@@ -300,10 +302,24 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
 
     def add_task(self, preselected_labels: Optional[List[str]] = None):
         """Mở dialog tạo task mới."""
-        avail_labels = get_available_labels_for_camera(self.cursor, self.camera_id)
+        avail_labels = get_available_labels_for_camera(self.cursor, self.camera_id, self.model_id)
+        task_data = {
+            'id': None,
+            'camera_id': self.camera_id,
+            'model_id': self.model_id,
+            'task_name': 'Task Mới',
+            'task_type': 'RELATION_COORDINATE',
+            'logic_mode': 'ALL_PASS',
+            'action_on_fail': 'NG',
+            'enabled': True,
+            'assign_register': '',
+            'value_bit_on': 1,
+            'value_bit_off': 0,
+        }
         dlg = TaskRuleEditorDialog(
             camera_id=self.camera_id,
-            task_data=None,
+            model_id=self.model_id,
+            task_data=task_data,
             rules_data=None,
             available_labels=avail_labels,
             preselected_labels=preselected_labels,
@@ -326,10 +342,11 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
         if not task_info:
             return
         rules = get_task_rules(self.cursor, task_id)
-        avail_labels = get_available_labels_for_camera(self.cursor, self.camera_id)
+        avail_labels = get_available_labels_for_camera(self.cursor, self.camera_id, self.model_id)
 
         dlg = TaskRuleEditorDialog(
             camera_id=self.camera_id,
+            model_id=self.model_id,
             task_data=task_info,
             rules_data=rules,
             available_labels=avail_labels,
@@ -349,6 +366,7 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
 
             clone_data = dict(original)
             clone_data['id'] = None
+            clone_data['model_id'] = self.model_id
             clone_data['task_name'] = f"{original['task_name']} (Bản sao)"
             
             saved_id = save_task_and_rules(self.cursor, self.connection, clone_data, rules)

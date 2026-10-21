@@ -29,7 +29,6 @@ COLUMN_MAPPING: Final[dict[str, str]] = {
     "Confidence":     "`Confidence`",
 }
 import time
-from _source.v5.v5 import v5s
 from module_3.yolo_factory import YoloFactory
 
 from app_logger.app_logger import get_logger as _get_logger
@@ -82,6 +81,7 @@ class CheckboxDelegate(QStyledItemDelegate):
     
     
 class Process_Model:
+    dict_active_tasks = {}
 
     def __init__(self,uic):
         self.model = None
@@ -101,9 +101,11 @@ class Process_Model:
         self.camera_id = None
         self.camera_name = ""
         self.item_code = ""
+        self.model_number = None
+        self.model_id = None
         self.cursor = None
         self.connect_db = None
-        self.active_tasks = []
+        self.active_tasks = {}
         
         # Inject standard properties into the generated UI object
         self.uic.processor = self
@@ -129,6 +131,45 @@ class Process_Model:
         self.uic.is_unlocked = False
 
         self.set_ui_enabled(False)
+
+    def get_current_camera_id(self):
+        """Lấy camera_id từ thuộc tính hoặc từ comboBox_camera_id."""
+        if getattr(self, 'camera_id', None) is not None:
+            return self.camera_id
+        if hasattr(self, 'uic') and hasattr(self.uic, 'comboBox_camera_id'):
+            txt = self.uic.comboBox_camera_id.currentText().strip()
+            if txt.isdigit():
+                self.camera_id = int(txt)
+                return self.camera_id
+        if self.cursor and getattr(self, 'camera_name', None):
+            try:
+                self.cursor.execute("SELECT id FROM NUMS_CAMERA WHERE nums_camera = %s LIMIT 1", (self.camera_name,))
+                r = self.cursor.fetchone()
+                if r:
+                    self.camera_id = r[0]
+                    return self.camera_id
+            except Exception:
+                pass
+        return getattr(self, 'camera_id', None)
+
+    def get_current_model_id(self):
+        """Lấy model_id từ model_number, comboBox_model_id hoặc model_id của tab hiện tại."""
+        if getattr(self, 'model_number', None) is not None:
+            try:
+                mod_str = str(self.model_number).removeprefix('model-').strip()
+                if mod_str.isdigit():
+                    self.model_id = int(mod_str)
+                    return self.model_id
+            except (ValueError, TypeError):
+                pass
+        if hasattr(self, 'uic') and hasattr(self.uic, 'comboBox_model_id'):
+            txt = getattr(self.uic.comboBox_model_id, 'currentText', lambda: "")()
+            if isinstance(txt, str) and txt.strip().isdigit():
+                self.model_id = int(txt.strip())
+                return self.model_id
+        if getattr(self, 'model_id', None) is not None:
+            return self.model_id
+        return 1
 
     def show_table_context_menu(self, pos):
         """Hiển thị menu ngữ cảnh chuột phải khi chọn các dòng trên tableView."""
@@ -176,23 +217,16 @@ class Process_Model:
 
     def add_selected_labels_to_task(self, selected_labels: list):
         """Mở popup chọn Task đích để nạp các nhãn đã chọn."""
-        if not self.camera_id:
-            if self.cursor and self.camera_name:
-                try:
-                    self.cursor.execute("SELECT id FROM NUMS_CAMERA WHERE nums_camera = %s LIMIT 1", (self.camera_name,))
-                    r = self.cursor.fetchone()
-                    if r:
-                        self.camera_id = r[0]
-                except Exception:
-                    pass
-
-        if not self.camera_id:
+        cam_id = self.get_current_camera_id()
+        mod_id = self.get_current_model_id()
+        if not cam_id:
             QMessageBox.warning(None, "Chưa chọn Camera", "Không tìm thấy thông tin Camera ID. Vui lòng kiểm tra lại cấu hình Camera!")
             return
 
         from module_3.select_task_dialog import SelectTaskForLabelsDialog
         dlg = SelectTaskForLabelsDialog(
-            camera_id=self.camera_id,
+            camera_id=cam_id,
+            model_id=mod_id,
             selected_labels=selected_labels,
             cursor=self.cursor,
             connection=self.connect_db,
@@ -202,25 +236,18 @@ class Process_Model:
         self.load_task_calculator_config()
 
     def open_task_workspace(self):
-        """Mở Task Workspace Dialog quản lý các task tính toán của camera."""
-        if not self.camera_id:
-            if self.cursor and self.camera_name:
-                try:
-                    self.cursor.execute("SELECT id FROM NUMS_CAMERA WHERE nums_camera = %s LIMIT 1", (self.camera_name,))
-                    r = self.cursor.fetchone()
-                    if r:
-                        self.camera_id = r[0]
-                except Exception:
-                    pass
-
-        if not self.camera_id:
+        """Mở Task Workspace Dialog quản lý các task tính toán của tab model hiện tại."""
+        cam_id = self.get_current_camera_id()
+        mod_id = self.get_current_model_id()
+        if not cam_id:
             QMessageBox.warning(None, "Chưa chọn Camera", "Không tìm thấy thông tin Camera ID. Vui lòng kiểm tra lại cấu hình Camera!")
             return
 
         from module_3.task_workspace_dialog import TaskWorkspaceDialog
         dlg = TaskWorkspaceDialog(
-            camera_id=self.camera_id,
+            camera_id=cam_id,
             camera_name=self.camera_name,
+            model_id=mod_id,
             item_code=self.item_code,
             cursor=self.cursor,
             connection=self.connect_db,
@@ -229,21 +256,46 @@ class Process_Model:
         dlg.exec_()
         self.load_task_calculator_config()
 
+    def get_key_model(self):
+        """Trả về tuple key_model dạng ('camera-X', 'model-Y')."""
+        cam_str = str(self.camera_name) if getattr(self, 'camera_name', None) else ""
+        if not cam_str and getattr(self, 'camera_id', None):
+            cam_str = str(self.camera_id)
+        if not cam_str:
+            cam_str = "1"
+        cam_num = cam_str.removeprefix("camera-").removeprefix("built-in-")
+        cam_key = f"camera-{cam_num}"
+
+        mod_num = self.get_current_model_id()
+        mod_key = f"model-{str(mod_num).removeprefix('model-')}"
+
+        return (cam_key, mod_key)
+
     def load_task_calculator_config(self):
-        """Tải cấu hình các task còn hiệu lực của camera vào bộ nhớ để inference sử dụng."""
-        if not self.cursor or not self.camera_id:
+        """Tải cấu hình các task còn hiệu lực của camera và tab model này vào bộ nhớ để inference sử dụng."""
+        cam_id = self.get_current_camera_id()
+        mod_id = self.get_current_model_id()
+        if not self.cursor or not cam_id:
             return
         try:
             from module_3.task_calculator_db import ensure_task_calculator_tables, get_tasks_by_camera, get_task_rules
             ensure_task_calculator_tables(self.cursor, self.connect_db)
-            all_tasks = get_tasks_by_camera(self.cursor, self.camera_id)
-            self.active_tasks = []
+            all_tasks = get_tasks_by_camera(self.cursor, cam_id, mod_id)
+            
+            key_model = self.get_key_model()
+            tasks_list = []
             for t in all_tasks:
                 if t.get('enabled'):
                     t['rules'] = get_task_rules(self.cursor, t['id'])
                     if t['rules']:
-                        self.active_tasks.append(t)
-            _log.info("Loaded %d active geometric tasks for camera_id=%s", len(self.active_tasks), self.camera_id)
+                        tasks_list.append(t)
+            
+            if not isinstance(self.active_tasks, dict):
+                self.active_tasks = {}
+            self.active_tasks[key_model] = tasks_list
+            Process_Model.dict_active_tasks[key_model] = tasks_list
+            _log.info("Loaded %d active geometric tasks for key_model=%s (camera_id=%s, model_id=%s)", 
+                      len(tasks_list), key_model, cam_id, mod_id)
         except Exception as e:
             _log.error("Error loading task calculator config: %s", e)
 
@@ -757,6 +809,7 @@ class Process_Model:
     def assign_values(self,model,camera,code):  
         self.camera_name = str(camera)
         self.item_code = str(code)
+        self.model_number = model
         self.uic.comboBox_line_code_id.clear()
         self.uic.comboBox_camera_id.clear()
         self.uic.comboBox_model_id.clear()
@@ -784,6 +837,7 @@ class Process_Model:
             self.model_number = model
             self.cursor = cursor
             self.connect_db = connect_db
+            self.model_id = self.get_current_model_id()
             self.load_task_calculator_config()
 
             weight_path = None

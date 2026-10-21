@@ -564,12 +564,15 @@ class PLCHandler:
         new_dict: dict = {}
         try:
             for key, values in self.built_in_objects.items():
-                signals = values.get('signals') or {}
-                if not signals or self.mode_kick not in signals:
-                    _log.warning("[PLCHandler] Signals not found for mode: %s", self.mode_kick)
+                signals = values.get('signals')
+                if not isinstance(signals, dict) or not isinstance(signals.get(self.mode_kick), dict):
+                    _log.warning("[PLCHandler] Signals not found or invalid for mode: %s", self.mode_kick)
                     continue
-                
-                values_signals = signals[self.mode_kick].get('values_signals', {})
+
+                values_signals = signals[self.mode_kick].get('values_signals')
+                if not isinstance(values_signals, dict):
+                    _log.warning("[PLCHandler] values_signals is missing or invalid for mode: %s", self.mode_kick)
+                    continue
                 for reg, target_reg in values_signals.items():
                     if target_reg.get('read_register'):
                         mode_reg = 'read'
@@ -621,9 +624,9 @@ class PLCHandler:
             if self.built_in_objects and mode_kick:
                 for key, values in self.built_in_objects.items():
                     signals = values.get('signals')
-                    mode_signals = signals.get(mode_kick) if signals else None
-                    if not mode_signals:
-                        _log.warning("[PLCHandler] Signals not found for mode: %s", mode_kick)
+                    mode_signals = signals.get(mode_kick) if isinstance(signals, dict) else None
+                    if not isinstance(mode_signals, dict):
+                        _log.warning("[PLCHandler] Signals not found or invalid for mode: %s", mode_kick)
                         continue
 
                     if trigger_selected is None:
@@ -631,7 +634,8 @@ class PLCHandler:
                     else:
                         trigger = trigger_selected.get(key)
 
-                    target_reg = mode_signals.get('values_signals', {}).get(trigger)
+                    vals_sig = mode_signals.get('values_signals')
+                    target_reg = vals_sig.get(trigger) if isinstance(vals_sig, dict) else None
                     if not target_reg:
                         _log.warning("[PLCHandler] Target register not found for trigger: %s", trigger)
                         continue
@@ -744,6 +748,7 @@ class PLCHandler:
                 continue
 
             try:
+                # 1. Tải mapping thông số tín hiệu của mode từ Database
                 mode_auto_id = signals_processor.load_params_signals_from_gui_mapping_db(
                     cursor, camera_id, mode_name=mode_name, show_message=False
                 )
@@ -756,14 +761,26 @@ class PLCHandler:
                     shot_complete, dict_shot = signals_processor.dict_shotxmodel()
                     values['shot'] = dict_shot
                     values['shot_complete'] = shot_complete
-                    _log.info("[%s] Auto-loaded mode '%s' from PLC: %s shots, mapping=%s", key, mode_name, shot_complete, dict_shot)
+                    _log.info("[%s] Tải thành công mode '%s': %s shots, mapping=%s", key, mode_name, shot_complete, dict_shot)
+                else:
+                    _log.warning("[%s] Chế độ '%s' chưa được cấu hình tín hiệu trong CSDL cho camera_id=%s", key, mode_name, camera_id)
 
+                # 2. Lưu bảng thông số tín hiệu an toàn vào dictionary 'signals'
                 if hasattr(signals_processor, 'get_table_params'):
                     tbl_params = signals_processor.get_table_params()
                     if tbl_params:
-                        signals_dict = values.setdefault('signals', {})
-                        signals_dict.setdefault(mode_name, {})['values_signals'] = tbl_params
+                        if not isinstance(values.get('signals'), dict):
+                            values['signals'] = {}
+                        signals_dict = values['signals']
 
+                        if not isinstance(signals_dict.get(mode_name), dict):
+                            signals_dict[mode_name] = {}
+                        signals_dict[mode_name]['values_signals'] = tbl_params
+                        _log.debug("[%s] Đã cập nhật bảng thông số tín hiệu cho mode '%s'", key, mode_name)
+                    else:
+                        _log.warning("[%s] Bảng thông số tín hiệu (table_params) trống hoặc chưa cấu hình cho mode '%s'", key, mode_name)
+
+                # 3. Kiểm tra Logger ban đầu
                 if hasattr(automation_ui, 'config_logger') and automation_ui.config_logger:
                     item_code_text = automation_ui.comboBox_Itemcode.currentText() if hasattr(automation_ui, 'comboBox_Itemcode') else ""
                     automation_ui.config_logger.check_initial_db(
@@ -773,8 +790,8 @@ class PLCHandler:
                         mode_name,
                         item_code_text
                     )
-            except Exception:
-                _log.exception("[%s] Failed to load params for mode %s from PLC", key, mode_name)
+            except Exception as e:
+                _log.warning("[%s] Không thể tải đầy đủ thông số cho mode '%s' (camera_id=%s): %s", key, mode_name, camera_id, e)
 
         self._update_trigger_cache()
         self._set_mode_reg_process()
@@ -1313,13 +1330,13 @@ class PLCHandler:
         capture_cfg = self.snapshot_capture_config(automation_ui)
         # time.sleep(30)
         import random
-        raw_image = random.choice([r"C:\Users\VDM\Pictures\2025-11-14_09-07-50-870878.jpg", 
-        r"C:\Users\VDM\Pictures\2025-11-14_09-12-28-422929.jpg",
-        r"C:\Users\VDM\Pictures\2025-11-14_09-12-40-051502.jpg",
-        r"C:\Users\VDM\Pictures\2025-11-14_09-15-53-422959.jpg",
-        r"C:\Users\VDM\Pictures\2025-11-14_09-16-10-488588.jpg",
-        r"C:\Users\VDM\Pictures\2025-12-02_04-29-31-875402.jpg"])
-        
+        folder_path = r'C:\Users\VDM\Documents\New folder'
+        image_extensions = ('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp')
+        images = [f for f in os.listdir(folder_path) if f.lower().endswith(image_extensions)]
+        if images:
+            random_image_name = random.choice(images)
+            raw_image = os.path.join(folder_path, random_image_name) 
+                
         raw_image = cv2.imread(raw_image)
 
         try:
@@ -2413,7 +2430,7 @@ class CameraTabManager:
             'pyuic': ui_instances,
             'model_loader': ui_modelloader,
             'path_instances': path_instances,
-            'signals': dict_signals,
+            'signals': dict_signals if isinstance(dict_signals, dict) else {},
             'shot': dict_shot,
             'shot_complete': shot_complete,
             'parameter_models_x': parameter_models,

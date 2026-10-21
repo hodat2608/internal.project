@@ -9,7 +9,7 @@ from ultralytics import YOLO
 import numpy as np
 import cv2,time
 
-from _source.v5.v5 import v5s, _read_model_config, COLOR_OK, COLOR_NG, draw_detections
+from _source.v5.v5 import v5s, _read_model_config, COLOR_OK, COLOR_NG, draw_detections, _normalize_key_model
 from module_3.handle_option_models import COLUMN_MAPPING
 
 LOGO_WATERMARK = "Detected by YOLO V8 Architecture"
@@ -105,10 +105,35 @@ class v8s(v5s):
 
         result_image_rgb = draw_detections(image, draw_candidates, fail_labels)
 
-        # ── Hàm riêng biệt kiểm tra Task Calculator đa nhãn hình học ──────────
-        result_image_rgb, flag, list_register = self.evaluate_task_calculator(
-            result_image_rgb, draw_candidates, pyuic, flag, list_register
-        )
+        # ── Kiểm tra điều kiện Task Calculator đa nhãn theo key_model ─────────
+        processor = getattr(pyuic, 'processor', None)
+        active_tasks_dict = getattr(processor, 'active_tasks', {}) if processor else {}
+        if not isinstance(active_tasks_dict, dict) and hasattr(processor, 'dict_active_tasks'):
+            active_tasks_dict = getattr(processor, 'dict_active_tasks', {})
+
+        tasks_for_model = []
+        if isinstance(active_tasks_dict, dict):
+            # 1. So sánh trực tiếp key_model: ('camera-1', 'model-1')
+            if key_model in active_tasks_dict:
+                tasks_for_model = active_tasks_dict[key_model]
+            else:
+                # 2. So sánh chuẩn hoá tuple ('camera-X', 'model-Y')
+                target_norm = _normalize_key_model(key_model)
+                if target_norm:
+                    for k, v in active_tasks_dict.items():
+                        if _normalize_key_model(k) == target_norm:
+                            tasks_for_model = v
+                            break
+        elif isinstance(active_tasks_dict, list):
+            tasks_for_model = active_tasks_dict
+
+        # Chỉ khi trùng key_model và có task cấu hình thì mới thực thi evaluate_task_calculator
+        if tasks_for_model:
+            result_image_rgb, flag, list_register = self.evaluate_task_calculator(
+                result_image_rgb, draw_candidates, pyuic, flag, list_register,
+                tasks_config=tasks_for_model,
+                key_model=key_model
+            )
 
         return result_image_rgb, flag, list_register,LOGO_WATERMARK
 
@@ -118,7 +143,9 @@ class v8s(v5s):
         draw_candidates: list,
         pyuic,
         flag: bool,
-        list_register: list
+        list_register: list,
+        tasks_config: list = None,
+        key_model: tuple = None,
     ):
         """
         Hàm riêng biệt thực hiện kiểm tra các Task quan hệ tọa độ & kích thước hình học đa nhãn.
@@ -126,10 +153,29 @@ class v8s(v5s):
         - pyuic: UI object chứa danh sách active_tasks
         - flag: cờ phán định hiện tại (từ lọc nhãn thông thường)
         - list_register: danh sách thanh ghi PLC cần gửi
+        - tasks_config: danh sách task đã được phân định theo đúng key_model
+        - key_model: tuple định danh (camera, model), ví dụ ('camera-1', 'model-1')
         """
-        processor = getattr(pyuic, 'processor', None)
-        active_tasks = getattr(processor, 'active_tasks', []) if processor else []
-        if not active_tasks:
+        if tasks_config is None:
+            processor = getattr(pyuic, 'processor', None)
+            active_tasks_dict = getattr(processor, 'active_tasks', {}) if processor else {}
+            if not isinstance(active_tasks_dict, dict) and hasattr(processor, 'dict_active_tasks'):
+                active_tasks_dict = getattr(processor, 'dict_active_tasks', {})
+
+            if isinstance(active_tasks_dict, dict):
+                if key_model in active_tasks_dict:
+                    tasks_config = active_tasks_dict[key_model]
+                elif key_model:
+                    target_norm = _normalize_key_model(key_model)
+                    if target_norm:
+                        for k, v in active_tasks_dict.items():
+                            if _normalize_key_model(k) == target_norm:
+                                tasks_config = v
+                                break
+            elif isinstance(active_tasks_dict, list):
+                tasks_config = active_tasks_dict
+
+        if not tasks_config:
             return image_rgb, flag, list_register
 
         try:
@@ -148,7 +194,7 @@ class v8s(v5s):
             res_img, task_all_pass, task_results, plc_to_send = _eval_engine(
                 image_bgr=image_rgb,
                 valid_detections=valid_boxes,
-                tasks_config=active_tasks,
+                tasks_config=tasks_config,
                 draw_overlay=True
             )
 

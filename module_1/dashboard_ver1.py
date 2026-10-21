@@ -110,7 +110,7 @@ class Ui_MainWindow(object):
         self.groupBox_namedevice_itemcode.setMaximumSize(QtCore.QSize(16777215, 160))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(-1)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_namedevice_itemcode.setFont(font)

@@ -16,9 +16,10 @@ from module_3.task_rule_editor_dialog import TaskRuleEditorDialog
 
 
 class SelectTaskForLabelsDialog(QtWidgets.QDialog):
-    def __init__(self, camera_id: int, selected_labels: List[str], cursor=None, connection=None, parent=None):
+    def __init__(self, camera_id: int, model_id: int, selected_labels: List[str], cursor=None, connection=None, parent=None):
         super().__init__(parent)
         self.camera_id = camera_id
+        self.model_id = model_id
         self.selected_labels = selected_labels
         self.cursor = cursor
         self.connection = connection
@@ -145,7 +146,7 @@ class SelectTaskForLabelsDialog(QtWidgets.QDialog):
         layout.addLayout(btn_layout)
 
     def load_camera_tasks(self):
-        self.tasks = get_tasks_by_camera(self.cursor, self.camera_id)
+        self.tasks = get_tasks_by_camera(self.cursor, self.camera_id, self.model_id)
         self.combo_tasks.clear()
         if self.tasks:
             for t in self.tasks:
@@ -160,7 +161,7 @@ class SelectTaskForLabelsDialog(QtWidgets.QDialog):
         self.line_new_task_name.setEnabled(not is_existing)
 
     def confirm_and_open_editor(self):
-        avail_labels = get_available_labels_for_camera(self.cursor, self.camera_id)
+        avail_labels = get_available_labels_for_camera(self.cursor, self.camera_id, self.model_id)
         # Bổ sung các nhãn vừa chọn vào danh sách nếu chưa có
         for lbl in self.selected_labels:
             if lbl not in avail_labels:
@@ -171,6 +172,7 @@ class SelectTaskForLabelsDialog(QtWidgets.QDialog):
             task_data = {
                 'id': None,
                 'camera_id': self.camera_id,
+                'model_id': self.model_id,
                 'task_name': task_name,
                 'task_type': 'RELATION_COORDINATE',
                 'logic_mode': 'ALL_PASS',
@@ -194,6 +196,7 @@ class SelectTaskForLabelsDialog(QtWidgets.QDialog):
         # Mở TaskRuleEditorDialog với nhãn đã chọn
         editor = TaskRuleEditorDialog(
             camera_id=self.camera_id,
+            model_id=self.model_id,
             task_data=task_data,
             rules_data=rules_data,
             available_labels=avail_labels,

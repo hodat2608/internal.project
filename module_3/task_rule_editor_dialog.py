@@ -50,7 +50,7 @@ class VisualBoxCanvas(QtWidgets.QWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setMinimumHeight(300)
+        self.setMinimumHeight(500)
         self.setMouseTracking(True)
         
         self.label_1_name = "Nhãn 1 (Label A)"
@@ -100,9 +100,10 @@ class VisualBoxCanvas(QtWidgets.QWidget):
     def reset_positions(self):
         """Khôi phục vị trí mặc định nằm cân đối 2 bên."""
         w = max(400, self.width())
+        h = max(300, self.height())
         box_w = 180.0
         box_h = 130.0
-        y = 55.0
+        y = max(50.0, (h - box_h) / 2 - 20)
         self.box1_rect = QRectF(w * 0.25 - box_w / 2, y, box_w, box_h)
         self.box2_rect = QRectF(w * 0.75 - box_w / 2, y, box_w, box_h)
         self.update()
@@ -606,21 +607,42 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
                  rules_data: Optional[List[Dict[str, Any]]] = None,
                  available_labels: Optional[List[str]] = None,
                  preselected_labels: Optional[List[str]] = None,
-                 cursor=None, connection=None, parent=None):
+                 cursor=None, connection=None, parent=None,
+                 model_id: Optional[int] = None, **kwargs):
         super().__init__(parent)
         self.camera_id = camera_id
-        self.task_data = task_data or {}
+        self.model_id = model_id if model_id is not None else kwargs.get('model_id', None)
+        self.task_data = task_data or kwargs.get('task_data') or {}
         self.rules_list: List[Dict[str, Any]] = list(rules_data) if rules_data else []
         self.available_labels = available_labels or []
         self.preselected_labels = preselected_labels or []
         self.cursor = cursor
         self.connection = connection
 
+        # Đảm bảo danh sách nhãn chỉ chứa nhãn thuộc tab model hiện tại
+        if (not self.available_labels or self.model_id is not None) and self.cursor and self.camera_id:
+            try:
+                from module_3.task_calculator_db import get_available_labels_for_camera
+                model_labels = get_available_labels_for_camera(self.cursor, self.camera_id, self.model_id)
+                if model_labels:
+                    self.available_labels = model_labels
+            except Exception:
+                pass
+
         self.editing_rule_index: Optional[int] = None  # None = Tạo mới, int = Đang sửa rule index
         self._is_populating = False
 
-        self.setWindowTitle("Chỉnh Sửa Task & Quy Tắc Tính Toán Tọa Độ (Geometric Task Editor)")
-        self.resize(980, 780)
+        title_suffix = f" [Model ID: {self.model_id}]" if self.model_id else ""
+        self.setWindowTitle(f"Chỉnh Sửa Task & Quy Tắc Tính Toán Tọa Độ (Geometric Task Editor){title_suffix}")
+        self.resize(1100, 800)
+
+        # Cấu hình hiển thị ở chế độ mở rộng (Maximized) kèm đầy đủ nút Phóng to / Thu nhỏ / Đóng
+        self.setWindowFlags(
+            self.windowFlags()
+            | Qt.WindowMinMaxButtonsHint
+            | Qt.WindowCloseButtonHint
+        )
+        self.setWindowState(Qt.WindowMaximized)
         self.setStyleSheet("""
             QDialog {
                 background-color: #1e1e2e;
@@ -719,9 +741,50 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         self.populate_data()
 
     def init_ui(self):
+        # Layout chính của Dialog
         main_layout = QtWidgets.QVBoxLayout(self)
-        main_layout.setSpacing(12)
-        main_layout.setContentsMargins(16, 16, 16, 16)
+        main_layout.setSpacing(6)
+        main_layout.setContentsMargins(6, 6, 6, 6)
+
+        # Scroll Area bao bọc toàn bộ nội dung cấu hình
+        self.scroll_area = QtWidgets.QScrollArea(self)
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.scroll_area.setStyleSheet("""
+            QScrollArea {
+                background-color: transparent;
+                border: none;
+            }
+            QScrollArea > QWidget > QWidget {
+                background-color: transparent;
+            }
+            QScrollBar:vertical {
+                background-color: #181825;
+                width: 12px;
+                border-radius: 6px;
+                margin: 0px;
+            }
+            QScrollBar::handle:vertical {
+                background-color: #45475a;
+                min-height: 30px;
+                border-radius: 6px;
+            }
+            QScrollBar::handle:vertical:hover {
+                background-color: #585b70;
+            }
+            QScrollBar::sub-line:vertical, QScrollBar::add-line:vertical {
+                height: 0px;
+            }
+            QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+                background: none;
+            }
+        """)
+
+        # Container chứa toàn bộ GroupBox 1, 2, 3 bên trong ScrollArea
+        scroll_content = QtWidgets.QWidget()
+        content_layout = QtWidgets.QVBoxLayout(scroll_content)
+        content_layout.setSpacing(14)
+        content_layout.setContentsMargins(8, 8, 14, 8)
 
         # 1. GROUPBOX THÔNG TIN CHUNG TASK & PLC
         group_task = QtWidgets.QGroupBox("1. Cấu hình Task & Tín hiệu PLC")
@@ -747,6 +810,30 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         self.combo_task_type.addItem("So sánh Tọa độ Quan hệ (RELATION_COORDINATE)", "RELATION_COORDINATE")
         self.combo_task_type.addItem("Đo Khoảng cách (DISTANCE_CALC)", "DISTANCE")
         self.combo_task_type.addItem("Biểu thức Tùy chỉnh (CUSTOM_EXPRESSION)", "CUSTOM_EXPRESSION")
+        self.combo_task_type.setStyleSheet("""
+            QComboBox {
+                background-color: #313244;
+                border: 1px solid #45475a;
+                border-radius: 5px;
+                padding: 5px 8px;
+                color: #ffffff;
+                font-size: 13px;
+            }
+            QComboBox:focus {
+                border: 1px solid #89b4fa;
+            }
+            QComboBox:hover {
+                border: 1px solid #89b4fa;
+                background-color: white;
+                color: black;
+            }
+            QComboBox::drop-down {
+                border: none;
+            }
+            QComboBox::down-arrow {
+                image: url(images/down_arrow.png);
+            }
+        """)
         grid_task.addWidget(self.combo_task_type, 0, 3)
 
         # Thanh ghi PLC khi vi phạm NG
@@ -779,7 +866,7 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         layout_logic.addWidget(self.combo_logic)
         grid_task.addLayout(layout_logic, 1, 3)
 
-        main_layout.addWidget(group_task)
+        content_layout.addWidget(group_task)
 
         # 2. GROUPBOX MÔ HÌNH ĐỒ HỌA TRỰC QUAN & SOẠN THẢO LUẬT
         group_rule = QtWidgets.QGroupBox("2. Bộ Soạn Thảo Luật & Mô Hình Đồ Họa 2 Nhãn (Interactive Canvas)")
@@ -912,7 +999,7 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         grid_expr.addLayout(layout_rule_actions, 1, 6)
 
         vlayout_rule.addWidget(expr_frame)
-        main_layout.addWidget(group_rule)
+        content_layout.addWidget(group_rule)
 
         # 3. BẢNG DANH SÁCH RULES CỦA TASK
         group_table = QtWidgets.QGroupBox("3. Danh sách các Quy Tắc (Rules) trong Task này (Nhấp vào dòng để chỉnh sửa)")
@@ -924,12 +1011,20 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         self.table_rules.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
         self.table_rules.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.table_rules.setAlternatingRowColors(True)
+        self.table_rules.setMinimumHeight(300)
         vlayout_table.addWidget(self.table_rules)
 
-        main_layout.addWidget(group_table)
+        content_layout.addWidget(group_table)
 
-        # 4. ACTION BUTTONS BOTTOM
-        layout_bottom = QtWidgets.QHBoxLayout()
+        self.scroll_area.setWidget(scroll_content)
+        main_layout.addWidget(self.scroll_area, 1)
+
+        # 4. ACTION BUTTONS BOTTOM (Ghim cố định ở đáy dialog để luôn nhìn thấy và thao tác được)
+        bottom_frame = QtWidgets.QFrame()
+        bottom_frame.setStyleSheet("background-color: #181825; border-radius: 6px; padding: 4px;")
+        layout_bottom = QtWidgets.QHBoxLayout(bottom_frame)
+        layout_bottom.setContentsMargins(8, 4, 8, 4)
+
         self.btn_delete_rule = QtWidgets.QPushButton("🗑️ Xóa Rule đã chọn")
         self.btn_delete_rule.setObjectName("btnDeleteRule")
         layout_bottom.addWidget(self.btn_delete_rule)
@@ -945,7 +1040,7 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         self.btn_save.clicked.connect(self.save_task)
         layout_bottom.addWidget(self.btn_save)
 
-        main_layout.addLayout(layout_bottom)
+        main_layout.addWidget(bottom_frame)
 
         # KẾT NỐI SIGNALS
         self.visual_canvas.hotspot_clicked.connect(self.on_canvas_hotspot_clicked)
@@ -966,6 +1061,12 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         # Bắt sự kiện chọn dòng trong bảng rules để load lên form và canvas
         self.table_rules.cellClicked.connect(self.on_rule_row_clicked)
         self.table_rules.itemSelectionChanged.connect(self.on_rule_selection_changed)
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        if not hasattr(self, '_initial_canvas_positioned'):
+            self._initial_canvas_positioned = True
+            QtCore.QTimer.singleShot(80, self.visual_canvas.reset_positions)
 
     def populate_data(self):
         """Đổ toàn bộ dữ liệu từ Database vào Form và Canvas chuẩn xác."""
@@ -1314,6 +1415,7 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         task_data = {
             'id': self.task_data.get('id'),
             'camera_id': self.camera_id,
+            'model_id': self.model_id or self.task_data.get('model_id', 1),
             'task_name': task_name,
             'task_type': self.combo_task_type.currentData(),
             'logic_mode': self.combo_logic.currentData(),

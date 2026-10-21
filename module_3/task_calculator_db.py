@@ -16,6 +16,7 @@ SQL_CREATE_TASK_CALCULATOR = """
 CREATE TABLE IF NOT EXISTS task_calculator (
     id              INT AUTO_INCREMENT PRIMARY KEY,
     camera_id       INT NOT NULL,
+    model_id        INT NOT NULL DEFAULT 1,
     task_name       VARCHAR(255) NOT NULL,
     task_type       VARCHAR(50) NOT NULL DEFAULT 'RELATION_COORDINATE',
     logic_mode      VARCHAR(20) NOT NULL DEFAULT 'ALL_PASS',
@@ -112,6 +113,12 @@ def ensure_task_calculator_tables(cursor, connection) -> bool:
             cursor.execute("ALTER TABLE task_calculator ADD COLUMN action_on_fail VARCHAR(20) DEFAULT 'NG'")
             cursor.execute("ALTER TABLE task_calculator ADD COLUMN enabled TINYINT(1) DEFAULT 1")
 
+        # Kiểm tra và migrate tự động cột model_id nếu bảng cũ chưa có
+        cursor.execute("SHOW COLUMNS FROM task_calculator LIKE 'model_id'")
+        if not cursor.fetchone():
+            _log.info("Migrating task_calculator: thêm cột model_id")
+            cursor.execute("ALTER TABLE task_calculator ADD COLUMN model_id INT NOT NULL DEFAULT 1 AFTER camera_id")
+
         safe_commit(connection)
         return True
     except Exception as e:
@@ -120,43 +127,58 @@ def ensure_task_calculator_tables(cursor, connection) -> bool:
         return False
 
 
-def get_tasks_by_camera(cursor, camera_id: int) -> List[Dict[str, Any]]:
-    """Lấy danh sách tất cả các task thuộc camera_id kèm số lượng rule con."""
+def get_tasks_by_camera(cursor, camera_id: int, model_id: Optional[int] = None) -> List[Dict[str, Any]]:
+    """Lấy danh sách tất cả các task thuộc camera_id (và model_id nếu có) kèm số lượng rule con."""
     if not cursor:
         return []
     try:
-        query = """
-            SELECT t.id, t.camera_id, t.task_name, t.task_type, t.logic_mode, 
-                   t.action_on_fail, t.enabled, t.assign_register, t.value_bit_on, 
-                   t.value_bit_off, t.datetime,
-                   COUNT(r.id) AS rule_count
-            FROM task_calculator t
-            LEFT JOIN task_calculator_rules r ON t.id = r.task_id
-            WHERE t.camera_id = %s
-            GROUP BY t.id
-            ORDER BY t.id ASC
-        """
-        cursor.execute(query, (camera_id,))
+        if model_id is not None:
+            query = """
+                SELECT t.id, t.camera_id, t.model_id, t.task_name, t.task_type, t.logic_mode, 
+                       t.action_on_fail, t.enabled, t.assign_register, t.value_bit_on, 
+                       t.value_bit_off, t.datetime,
+                       COUNT(r.id) AS rule_count
+                FROM task_calculator t
+                LEFT JOIN task_calculator_rules r ON t.id = r.task_id
+                WHERE t.camera_id = %s AND t.model_id = %s
+                GROUP BY t.id
+                ORDER BY t.id ASC
+            """
+            cursor.execute(query, (camera_id, model_id))
+        else:
+            query = """
+                SELECT t.id, t.camera_id, t.model_id, t.task_name, t.task_type, t.logic_mode, 
+                       t.action_on_fail, t.enabled, t.assign_register, t.value_bit_on, 
+                       t.value_bit_off, t.datetime,
+                       COUNT(r.id) AS rule_count
+                FROM task_calculator t
+                LEFT JOIN task_calculator_rules r ON t.id = r.task_id
+                WHERE t.camera_id = %s
+                GROUP BY t.id
+                ORDER BY t.id ASC
+            """
+            cursor.execute(query, (camera_id,))
         rows = cursor.fetchall()
         tasks = []
         for r in rows:
             tasks.append({
                 'id': r[0],
                 'camera_id': r[1],
-                'task_name': r[2],
-                'task_type': r[3],
-                'logic_mode': r[4],
-                'action_on_fail': r[5],
-                'enabled': bool(r[6]),
-                'assign_register': r[7] or '',
-                'value_bit_on': r[8] if r[8] is not None else 1,
-                'value_bit_off': r[9] if r[9] is not None else 0,
-                'datetime': r[10],
-                'rule_count': r[11]
+                'model_id': r[2],
+                'task_name': r[3],
+                'task_type': r[4],
+                'logic_mode': r[5],
+                'action_on_fail': r[6],
+                'enabled': bool(r[7]),
+                'assign_register': r[8] or '',
+                'value_bit_on': r[9] if r[9] is not None else 1,
+                'value_bit_off': r[10] if r[10] is not None else 0,
+                'datetime': r[11],
+                'rule_count': r[12]
             })
         return tasks
     except Exception as e:
-        _log.error("Lỗi get_tasks_by_camera (camera_id=%s): %s", camera_id, e)
+        _log.error("Lỗi get_tasks_by_camera (camera_id=%s, model_id=%s): %s", camera_id, model_id, e)
         return []
 
 
@@ -166,7 +188,7 @@ def get_task_by_id(cursor, task_id: int) -> Optional[Dict[str, Any]]:
         return None
     try:
         query = """
-            SELECT id, camera_id, task_name, task_type, logic_mode, 
+            SELECT id, camera_id, model_id, task_name, task_type, logic_mode, 
                    action_on_fail, enabled, assign_register, value_bit_on, 
                    value_bit_off, datetime
             FROM task_calculator
@@ -179,15 +201,16 @@ def get_task_by_id(cursor, task_id: int) -> Optional[Dict[str, Any]]:
         return {
             'id': r[0],
             'camera_id': r[1],
-            'task_name': r[2],
-            'task_type': r[3],
-            'logic_mode': r[4],
-            'action_on_fail': r[5],
-            'enabled': bool(r[6]),
-            'assign_register': r[7] or '',
-            'value_bit_on': r[8] if r[8] is not None else 1,
-            'value_bit_off': r[9] if r[9] is not None else 0,
-            'datetime': r[10]
+            'model_id': r[2],
+            'task_name': r[3],
+            'task_type': r[4],
+            'logic_mode': r[5],
+            'action_on_fail': r[6],
+            'enabled': bool(r[7]),
+            'assign_register': r[8] or '',
+            'value_bit_on': r[9] if r[9] is not None else 1,
+            'value_bit_off': r[10] if r[10] is not None else 0,
+            'datetime': r[11]
         }
     except Exception as e:
         _log.error("Lỗi get_task_by_id (task_id=%s): %s", task_id, e)
@@ -248,7 +271,8 @@ def save_task_and_rules(cursor, connection, task_data: Dict[str, Any], rules: Li
         return None
     try:
         task_id = task_data.get('id')
-        camera_id = task_data['camera_id']
+        camera_id = int(task_data['camera_id'])
+        model_id = int(task_data.get('model_id') or 1)
         task_name = task_data.get('task_name', 'Task Mới')
         task_type = task_data.get('task_type', 'RELATION_COORDINATE')
         logic_mode = task_data.get('logic_mode', 'ALL_PASS')
@@ -263,10 +287,11 @@ def save_task_and_rules(cursor, connection, task_data: Dict[str, Any], rules: Li
             cursor.execute("""
                 UPDATE task_calculator
                 SET task_name = %s, task_type = %s, logic_mode = %s, action_on_fail = %s,
-                    enabled = %s, assign_register = %s, value_bit_on = %s, value_bit_off = %s
+                    enabled = %s, assign_register = %s, value_bit_on = %s, value_bit_off = %s,
+                    model_id = %s
                 WHERE id = %s AND camera_id = %s
             """, (task_name, task_type, logic_mode, action_on_fail, enabled,
-                  assign_register, value_bit_on, value_bit_off, task_id, camera_id))
+                  assign_register, value_bit_on, value_bit_off, model_id, task_id, camera_id))
             
             # Xóa các rules cũ để ghi lại danh sách mới
             cursor.execute("DELETE FROM task_calculator_rules WHERE task_id = %s", (task_id,))
@@ -274,10 +299,10 @@ def save_task_and_rules(cursor, connection, task_data: Dict[str, Any], rules: Li
             # Insert Task
             cursor.execute("""
                 INSERT INTO task_calculator
-                (camera_id, task_name, task_type, logic_mode, action_on_fail, enabled,
+                (camera_id, model_id, task_name, task_type, logic_mode, action_on_fail, enabled,
                  assign_register, value_bit_on, value_bit_off)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """, (camera_id, task_name, task_type, logic_mode, action_on_fail, enabled,
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, (camera_id, model_id, task_name, task_type, logic_mode, action_on_fail, enabled,
                   assign_register, value_bit_on, value_bit_off))
             task_id = cursor.lastrowid
 
@@ -312,10 +337,10 @@ def save_task_and_rules(cursor, connection, task_data: Dict[str, Any], rules: Li
             ))
 
         safe_commit(connection)
-        _log.info("Lưu thành công Task id=%s (gồm %s rules) cho camera_id=%s", task_id, len(rules), camera_id)
+        _log.info("Saved Task id=%s (%s rules) for camera_id=%s, model_id=%s", task_id, len(rules), camera_id, model_id)
         return task_id
     except Exception as e:
-        _log.error("Lỗi khi lưu Task và Rules: %s", e)
+        _log.error("Error saving Task and Rules: %s", e)
         safe_rollback(connection)
         return None
 
@@ -327,10 +352,10 @@ def delete_task(cursor, connection, task_id: int) -> bool:
     try:
         cursor.execute("DELETE FROM task_calculator WHERE id = %s", (task_id,))
         safe_commit(connection)
-        _log.info("Đã xóa Task id=%s", task_id)
+        _log.info("Deleted Task id=%s", task_id)
         return True
     except Exception as e:
-        _log.error("Lỗi khi xóa Task id=%s: %s", task_id, e)
+        _log.error("Error deleting Task id=%s: %s", task_id, e)
         safe_rollback(connection)
         return False
 
@@ -349,25 +374,38 @@ def toggle_task_enabled(cursor, connection, task_id: int, enabled: bool) -> bool
         return False
 
 
-def get_available_labels_for_camera(cursor, camera_id: int) -> List[str]:
+def get_available_labels_for_camera(cursor, camera_id: int, model_id: Optional[int] = None) -> List[str]:
     """
-    Lấy danh sách các nhãn đã cấu hình trong bảng PARAMETERSET của camera này,
+    Lấy danh sách các nhãn đã cấu hình trong bảng PARAMETERSET của model / camera này,
     phục vụ việc đổ dữ liệu vào combobox chọn nhãn.
+    Nếu có model_id, chỉ lọc đúng các nhãn thuộc tab model đó.
     """
     if not cursor:
         return []
     try:
-        query = """
-            SELECT DISTINCT p.Label_Name
-            FROM PARAMETERSET p
-            JOIN NUMS_MODEL m ON p.model_id = m.id
-            WHERE m.camera_id = %s
-            ORDER BY p.Label_Name ASC
-        """
-        cursor.execute(query, (camera_id,))
+        if model_id is not None:
+            # model_id có thể là NUMS_MODEL.id hoặc nums_model
+            query = """
+                SELECT DISTINCT p.Label_Name
+                FROM PARAMETERSET p
+                JOIN NUMS_MODEL m ON p.model_id = m.id
+                WHERE (p.model_id = %s OR (m.camera_id = %s AND m.nums_model = %s))
+                ORDER BY p.Label_Name ASC
+            """
+            cursor.execute(query, (model_id, camera_id, model_id))
+        else:
+            query = """
+                SELECT DISTINCT p.Label_Name
+                FROM PARAMETERSET p
+                JOIN NUMS_MODEL m ON p.model_id = m.id
+                WHERE m.camera_id = %s
+                ORDER BY p.Label_Name ASC
+            """
+            cursor.execute(query, (camera_id,))
+            
         rows = cursor.fetchall()
         labels = [r[0] for r in rows if r[0] and str(r[0]).strip()]
         return labels
     except Exception as e:
-        _log.error("Lỗi khi lấy danh sách nhãn của camera_id=%s: %s", camera_id, e)
+        _log.error("Lỗi khi lấy danh sách nhãn của camera_id=%s, model_id=%s: %s", camera_id, model_id, e)
         return []

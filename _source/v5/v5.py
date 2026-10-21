@@ -6,87 +6,23 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Optional
 from PyQt5.QtCore import Qt
-from module_3.handle_option_models import COLUMN_MAPPING
 import os,datetime
 from module_1.root_path import resource_path
-
+from module_3.handle_option_models import COLUMN_MAPPING
 LOGO_WATERMARK = "Detected by YOLO V5 Architecture"
-
-# ── Config dataclasses (declared at module level for type-checker clarity) ──
-
-@dataclass(frozen=True)
-class _PosTrackCfg:
-    """Describes one set_dict_positive call: which label to capture into which dict."""
-    camera:     str
-    model:      str
-    attr:       str   # instance attribute that holds the bbox dict
-    compare:    str   # label name whose bbox should be stored
-
-@dataclass(frozen=True)
-class _SpatialCheckCfg:
-    """Describes one set_dict_positive_calculator call."""
-    camera:     str
-    model:      str
-    attr:       str
-    parent:     str          # key in bbox dict for the reference label
-    child:      str          # key in bbox dict for the measured label
-    calculator: str
-    param:      str          # 'xmax' / 'xmin' / 'ymax' / 'ymin'
-    register:   str          # PLC register to flag on failure
-    task:       'v5s.CheckTask'
-
-@dataclass(frozen=True)
-class _CountCheckCfg:
-    """Describes one processing_returned_quantity_intit_list call."""
-    camera:       str
-    model:        str
-    attr:         str    # accumulator list attribute
-    num_count:    int    # frame count at which the check fires
-    num_condition: int   # expected length of the accumulator
-    register:     str
 
 
 COLOR_OK = (0, 255, 0)   
 COLOR_NG = (255, 0, 0)   
+
+def _normalize_key_model(k):
+    """Chuẩn hoá key_model về tuple dạng ('camera-X', 'model-Y')."""
+    if not isinstance(k, (tuple, list)) or len(k) < 2:
+        return None
+    cam_str = str(k[0]).removeprefix("built-in-").removeprefix("camera-")
+    mod_str = str(k[1]).removeprefix("model-")
+    return (f"camera-{cam_str}", f"model-{mod_str}")
  
-# def draw_detections(image_rgb: np.ndarray, draw_list: list, fail_labels) -> np.ndarray:
-#     out = image_rgb.copy()
-
-#     # ── Bounding boxes ───────────────────────────────────────────────────
-#     for d in draw_list:
-#         x1, y1, x2, y2, color = d['x1'], d['y1'], d['x2'], d['y2'], d['color']
-#         text = f"{d['label']} {d['conf']:.2f} {x2-x1} {y2-y1}"
-
-#         cv2.rectangle(out, (x1, y1), (x2, y2), color, 5)
-
-#         (tw, th), _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 2, 5)
-#         ty = max(y1 - 5, th + 2)
-#         cv2.rectangle(out, (x1, ty - th - 2), (x1 + tw + 2, ty + 2), color, -1)
-#         cv2.putText(out, text, (x1 + 1, ty), cv2.FONT_HERSHEY_SIMPLEX, 2, (0,0,0), 5, cv2.LINE_AA)
-
-#     # ── Fail labels (bottom-left, stacked upward) ────────────────────────
-#     if not fail_labels:
-#         return out
-
-#     img_h, img_w = out.shape[:2]
-#     font       = cv2.FONT_HERSHEY_SIMPLEX
-#     font_scale = max(1.0, img_w / 1000)
-#     thickness  = max(2, int(font_scale * 2))
-#     pad        = int(img_w * 0.015)
-#     (_, lh), bl = cv2.getTextSize("A", font, font_scale, thickness)
-#     step       = lh + bl + pad
-
-#     for i, label in enumerate(sorted(fail_labels)):
-#         color        = COLOR_NG if 'LECH' in label else COLOR_OK
-#         display_text = f'{i+1}. {label}'
-#         (tw, th), bl = cv2.getTextSize(display_text, font, font_scale, thickness)
-#         y = img_h - pad - i * step
-#         cv2.rectangle(out, (pad - 4, y - th - 4), (pad + tw + 4, y + bl + 2), color, -1)
-#         cv2.putText(out, display_text, (pad, y), font, font_scale, (0,0,0), thickness, cv2.LINE_AA)
-
-#     return out
-
-
 
 def draw_detections(image_rgb: np.ndarray, draw_list: list, fail_labels) -> np.ndarray:
     out = image_rgb.copy()
@@ -277,51 +213,6 @@ def _read_model_config(model, model_column: list, keys_mapping: list) -> list:
 
 class v5s:
 
-    # ── Class-level check configuration tables ─────────────────────────────
-    # Edit these tables to add / remove spatial checks or count checks.
-    # Do NOT touch run_model logic for routine configuration changes.
-
-    # Labels whose bounding boxes are tracked per-detection (jumper mode only)
-    _JUMPER_TRACK_CFG: tuple[_PosTrackCfg, ...] = (
-        _PosTrackCfg(camera='camera-3', model='model-1', attr='positive_jumper', compare='chan_comi'),
-        _PosTrackCfg(camera='camera-3', model='model-1', attr='positive_jumper', compare='day_jumper'),
-        _PosTrackCfg(camera='camera-3', model='model-1', attr='positive_jumper', compare='dap_day_jumper'),
-    )
-
-    # Spatial relationship checks executed after all detections are processed
-    # (jumper mode only — ordered, SHIFT_RIGHT always last to reset the dict)
-    _SPATIAL_CHECK_CFG: tuple[_SpatialCheckCfg, ...] = ()
-    # Populated in __init_subclass__ or lazily on first access to allow
-    # forward-referencing CheckTask. See _build_spatial_cfg().
-
-    # Count-consistency checks (some jumper-only, some always active)
-    _COUNT_CHECK_CFG: tuple[_CountCheckCfg, ...] = (
-        # jumper_only=True  → checked only when mode_load_jumper is False
-        _CountCheckCfg(camera='camera-2', model='model-2', attr='list_jumper',       num_count=12, num_condition=3, register='DM1608'),
-        # jumper_only=False → always checked
-        _CountCheckCfg(camera='camera-2', model='model-2', attr='list_can_dien_cuc', num_count=12, num_condition=1, register='DM1601'),
-    )
-    # Which entries in _COUNT_CHECK_CFG are jumper-only (by index)
-    _COUNT_JUMPER_ONLY_INDICES: frozenset[int] = frozenset({0})
-
-    @classmethod
-    def _build_spatial_cfg(cls) -> tuple:
-        """Build _SPATIAL_CHECK_CFG once, after CheckTask is defined."""
-        T = cls.CheckTask
-        return (
-            # ── chan_comi vs day_jumper ──────────────────────────────────────
-            _SpatialCheckCfg('camera-3','model-1','positive_jumper','chan_comi','day_jumper',    'minus','xmax','DM1910', T.SHIFT_LEFT),
-            _SpatialCheckCfg('camera-3','model-1','positive_jumper','chan_comi','day_jumper',    'minus','ymax','DM1911', T.SHIFT_BELOW),
-            _SpatialCheckCfg('camera-3','model-1','positive_jumper','chan_comi','day_jumper',    'minus','xmax','DM1912', T.SHIFT_RIGHT),
-            # ── chan_comi vs dap_day_jumper ──────────────────────────────────
-            _SpatialCheckCfg('camera-3','model-1','positive_jumper','chan_comi','dap_day_jumper','minus','xmax','DM1912', T.CHILD_UNDER_XMAX),
-            _SpatialCheckCfg('camera-3','model-1','positive_jumper','chan_comi','dap_day_jumper','minus','xmin','DM1910', T.CHILD_OVER_XMIN),
-            _SpatialCheckCfg('camera-3','model-1','positive_jumper','chan_comi','dap_day_jumper','minus','ymax','DM1911', T.CHILD_OVER_YMAX),
-            _SpatialCheckCfg('camera-3','model-1','positive_jumper','chan_comi','dap_day_jumper','minus','ymin','DM1911', T.CHILD_RIGHT_HALF),
-        )
-
-    # ── Initialiser ────────────────────────────────────────────────────────
-
     def __init__(self, path_pt: str, device: str = 'cpu'):
         self.keys_mapping = list(COLUMN_MAPPING.keys())
         self.source_model = (
@@ -338,9 +229,7 @@ class v5s:
 
         self.list_image_array :list[np.ndarray] = []
 
-        # Finalise spatial config now that CheckTask is available
-        if not v5s._SPATIAL_CHECK_CFG:
-            v5s._SPATIAL_CHECK_CFG = v5s._build_spatial_cfg()
+
 
     def run_model(self, image: np.ndarray, model_loader, pyuic,camera,key_model,current_count,mode_load_jumper=False):
         """
@@ -358,7 +247,7 @@ class v5s:
         """
         if camera:
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) 
-        self.add_image_array(image_array=image,key_model=key_model, num_camera="camera-2", num_model= "model-2",)
+
         result_model = model_loader(
             image,
             size=int(pyuic.comboBox_imgsz.currentText()),
@@ -434,11 +323,35 @@ class v5s:
 
         result_image_rgb = draw_detections(image, draw_candidates, fail_labels)
 
-        # ── Hàm riêng biệt kiểm tra Task Calculator đa nhãn hình học ──────────
-        print("flag",flag)
-        result_image_rgb, flag, list_register = self.evaluate_task_calculator(
-            result_image_rgb, draw_candidates, pyuic, flag, list_register
-        )
+        # ── Kiểm tra điều kiện Task Calculator đa nhãn theo key_model ─────────
+        processor = getattr(pyuic, 'processor', None)
+        active_tasks_dict = getattr(processor, 'active_tasks', {}) if processor else {}
+        if not isinstance(active_tasks_dict, dict) and hasattr(processor, 'dict_active_tasks'):
+            active_tasks_dict = getattr(processor, 'dict_active_tasks', {})
+
+        tasks_for_model = []
+        if isinstance(active_tasks_dict, dict):
+            # 1. So sánh trực tiếp key_model: ('camera-1', 'model-1')
+            if key_model in active_tasks_dict:
+                tasks_for_model = active_tasks_dict[key_model]
+            else:
+                # 2. So sánh chuẩn hoá tuple ('camera-X', 'model-Y')
+                target_norm = _normalize_key_model(key_model)
+                if target_norm:
+                    for k, v in active_tasks_dict.items():
+                        if _normalize_key_model(k) == target_norm:
+                            tasks_for_model = v
+                            break
+        elif isinstance(active_tasks_dict, list):
+            tasks_for_model = active_tasks_dict
+
+        # Chỉ khi trùng key_model và có task cấu hình thì mới thực thi evaluate_task_calculator
+        if tasks_for_model:
+            result_image_rgb, flag, list_register = self.evaluate_task_calculator(
+                result_image_rgb, draw_candidates, pyuic, flag, list_register,
+                tasks_config=tasks_for_model,
+                key_model=key_model
+            )
 
         return result_image_rgb, flag, list_register,LOGO_WATERMARK
 
@@ -448,7 +361,9 @@ class v5s:
         draw_candidates: list,
         pyuic,
         flag: bool,
-        list_register: list
+        list_register: list,
+        tasks_config: list = None,
+        key_model: tuple = None,
     ):
         """
         Hàm riêng biệt thực hiện kiểm tra các Task quan hệ tọa độ & kích thước hình học đa nhãn.
@@ -456,11 +371,29 @@ class v5s:
         - pyuic: UI object chứa danh sách active_tasks
         - flag: cờ phán định hiện tại (từ lọc nhãn thông thường)
         - list_register: danh sách thanh ghi PLC cần gửi
+        - tasks_config: danh sách task đã được phân định theo đúng key_model
+        - key_model: tuple định danh (camera, model), ví dụ ('camera-1', 'model-1')
         """
-        processor = getattr(pyuic, 'processor', None)
-        active_tasks = getattr(processor, 'active_tasks', []) if processor else []
-        if not active_tasks:
-            print("flag",flag)
+        if tasks_config is None:
+            processor = getattr(pyuic, 'processor', None)
+            active_tasks_dict = getattr(processor, 'active_tasks', {}) if processor else {}
+            if not isinstance(active_tasks_dict, dict) and hasattr(processor, 'dict_active_tasks'):
+                active_tasks_dict = getattr(processor, 'dict_active_tasks', {})
+
+            if isinstance(active_tasks_dict, dict):
+                if key_model in active_tasks_dict:
+                    tasks_config = active_tasks_dict[key_model]
+                elif key_model:
+                    target_norm = _normalize_key_model(key_model)
+                    if target_norm:
+                        for k, v in active_tasks_dict.items():
+                            if _normalize_key_model(k) == target_norm:
+                                tasks_config = v
+                                break
+            elif isinstance(active_tasks_dict, list):
+                tasks_config = active_tasks_dict
+
+        if not tasks_config:
             return image_rgb, flag, list_register
 
         try:
@@ -479,7 +412,7 @@ class v5s:
             res_img, task_all_pass, task_results, plc_to_send = _eval_engine(
                 image_bgr=image_rgb,
                 valid_detections=valid_boxes,
-                tasks_config=active_tasks,
+                tasks_config=tasks_config,
                 draw_overlay=True
             )
 
@@ -496,423 +429,7 @@ class v5s:
 
         return image_rgb, flag, list_register
 
-    # ── Per-detection hooks ──────────────────────────────────────────────────
-
-    def _run_per_detection_hooks(
-        self,
-        key_model,
-        label_name: str,
-        det,
-        mode_load_jumper: bool,
-    ) -> None:
-        """Update accumulator dicts / lists for a single accepted detection."""
-        if not mode_load_jumper:
-            for cfg in self._JUMPER_TRACK_CFG:
-                self.set_dict_positive(
-                    key_model, cfg.camera, cfg.model,
-                    cfg.attr, label_name, cfg.compare, det,
-                )
-            self.append_labelname_to_init_list(
-                key_model, "camera-2", "model-2",
-                "list_jumper", label_name, "jumper",
-            )
-
-        self.append_labelname_to_init_list(
-            key_model, "camera-2", "model-2",
-            "list_can_dien_cuc", label_name, "can_dien_cuc",
-        )
-
-    # ── Post-detection spatial & count checks ────────────────────────────────
-
-    def _run_spatial_checks(
-        self,
-        key_model,
-        current_count: int,
-        flag: bool,
-        fail_labels: set,
-        list_register: list,
-        mode_load_jumper: bool,
-        pyuic,
-    ) -> bool:
-        """Execute all spatial-relationship and count-consistency checks
-        defined in the class-level config tables.
-        """
-        if not mode_load_jumper:
-            for sc in self._SPATIAL_CHECK_CFG:
-                flag = self.set_dict_positive_calculator(
-                    key_model, sc.camera, sc.model,
-                    sc.attr, sc.parent, sc.child,
-                    sc.calculator, sc.param,
-                    flag, list_register, fail_labels,
-                    sc.register, task=sc.task,
-                )
-
-        for i, cc in enumerate(self._COUNT_CHECK_CFG):
-            if i in self._COUNT_JUMPER_ONLY_INDICES and mode_load_jumper:
-                continue
-            flag = self.processing_returned_quantity_intit_list(
-                key_model, cc.camera, cc.model,
-                current_count, cc.num_count,
-                cc.attr, cc.num_condition,
-                flag, list_register, fail_labels, cc.register,
-                pyuic,
-            )
-        return flag
-
-    def append_labelname_to_init_list(
-        self,
-        key_model: tuple,
-        num_camera: str,
-        num_model: str,
-        attr_name: str,
-        label_name: str,
-        compare_labelname: str,
-    ) -> None:
-        if key_model != (num_camera, num_model):
-            return
-            
-        if label_name != compare_labelname:
-            return
-            
-        if not hasattr(self, attr_name):
-            setattr(self, attr_name, [])
-            
-        current_list = getattr(self, attr_name)
-        current_list.append(label_name)
-
-    def processing_returned_quantity_intit_list(
-        self,
-        key_model: tuple,
-        num_camera: str,
-        num_model: str,
-        current_count: int,
-        num_count: int,
-        attr_name: str,
-        num_condition: int,
-        flag: bool,
-        list_register: list,
-        fail_labels: set,
-        to_register: str,
-        pyuic,
-    ) -> bool:
-        if key_model != (num_camera, num_model):
-            return flag
-            
-        if current_count != num_count:
-            return flag
-            
-        name_list = getattr(self, attr_name, [])
-        list_len = len(name_list)
-        
-        if list_len != num_condition:
-            fail_labels.add(f'* NG: {attr_name} | nums item: {list_len}')
-            flag = False
-            list_register.append(to_register)
-            self.check_and_save_image_array(pyuic)
-        else:
-            fail_labels.add(f'OK: {attr_name} | nums item: {list_len}')
-            self.clear_image_array()
-            
-        setattr(self, attr_name, [])
-        return flag
-    
-    def set_dict_positive(
-        self,
-        key_model: tuple,
-        num_camera: str,
-        num_model: str,
-        attr_name: str,
-        label_name: str,
-        compare_labelname: str,
-        det,
-    ) -> None:
-       
-        if key_model != (num_camera, num_model):
-            return
-            
-        if label_name != compare_labelname:
-            return
-            
-        if not hasattr(self, attr_name):
-            setattr(self, attr_name, {})
-            
-        current_dict = getattr(self, attr_name)
-        
-        if label_name not in current_dict:
-            current_dict[label_name] = {}
-            
-        for param in self.params:
-            current_dict[label_name][param] = int(det[param])
-
-    # ──────────────────────────────────────────────────────────────────────
-    # Spatial-check dispatcher
-    # ──────────────────────────────────────────────────────────────────────
-
-    class CheckTask(Enum):
-        """Describes *which* spatial relationship to validate between
-        a parent bbox coordinate and a child bbox coordinate."""
-        SHIFT_LEFT        = 1   # child is to the LEFT  of centre (x-axis)
-        SHIFT_BELOW       = 2   # child is BELOW parent (y-axis)
-        SHIFT_RIGHT       = 3   # child is to the RIGHT of centre (x-axis, resets dict)
-        CHILD_UNDER_XMAX  = 4   # child.x must not exceed parent.xmax
-        CHILD_OVER_XMIN   = 5   # child.x must not fall below parent.xmin
-        CHILD_OVER_YMAX   = 6   # child.y must not exceed parent.ymax - offset
-        CHILD_RIGHT_HALF  = 7   # child.x must be in the right half of parent (height-derived)
-
-    # -- internal helpers --------------------------------------------------
-
-    @staticmethod
-    def _record_fail(
-        flag: bool,
-        list_register: list,
-        fail_labels: set,
-        register: str,
-        message: str,
-    ) -> bool:
-        """Mark a failure: append register, add NG label, set flag=False."""
-        list_register.append(register)
-        fail_labels.add(message)
-        return False
-
-    def _check_shift_left(
-        self, pbox: dict, parent: int, child: int,
-        calculator: str, attr_name: str,
-        flag: bool, list_register: list, fail_labels: set, to_register: str,
-    ) -> bool:
-        """Task SHIFT_LEFT — child is shifted left of parent centre."""
-        width     = pbox['xmax'] - pbox['xmin']
-        threshold = width / 2
-        if calculator == 'minus' and parent > child:
-            total = parent - child
-            if total > threshold:
-                return self._record_fail(
-                    flag, list_register, fail_labels, to_register,
-                    f'* LECH DAY JUMPER TRAI: {total} > {threshold}',
-                )
-            fail_labels.add(f'DAY JUMPER TRAI: {total} < {threshold}')
-        else:
-            fail_labels.add(f'DAY JUMPER TRAI: N/A')
-        return flag
-
-    def _check_shift_below(
-        self, parent: int, child: int, attr_name: str,
-        flag: bool, list_register: list, fail_labels: set, to_register: str,
-    ) -> bool:
-        """Task SHIFT_BELOW — child.y must not exceed parent.y."""
-        if child > parent:
-            return self._record_fail(
-                flag, list_register, fail_labels, to_register,
-                f'* LECH DAY JUMPER PHIA DUOI: {child} > {parent}',
-            )
-        fail_labels.add(f'DAY JUMPER PHIA DUOI: {child} < {parent}')
-        return flag
-
-    def _check_shift_right(
-        self, pbox: dict, parent: int, child: int,
-        calculator: str, attr_name: str,
-        flag: bool, list_register: list, fail_labels: set, to_register: str,
-    ) -> bool:
-        """Task SHIFT_RIGHT — child is shifted right of parent centre (resets dict after)."""
-        width     = pbox['xmax'] - pbox['xmin']
-        threshold = width / 2
-        if calculator == 'minus' and parent < child:
-            total = child - parent
-            if total > threshold:
-                return self._record_fail(
-                    flag, list_register, fail_labels, to_register,
-                    f'* LECH DAY JUMPER PHAI: {total} > {threshold}',
-                )
-            fail_labels.add(f'DAY JUMPER PHAI: {total} < {threshold}')
-        else:
-            fail_labels.add(f'DAY JUMPER PHAI: N/A')
-        return flag
-
-    def _check_child_under_xmax(
-        self, parent: int, child: int, attr_name: str,
-        flag: bool, list_register: list, fail_labels: set, to_register: str,
-    ) -> bool:
-        """Task CHILD_UNDER_XMAX — child.x must not be less than parent.x."""
-        if child > parent+100:
-            return self._record_fail(
-                flag, list_register, fail_labels, to_register,
-                f'* LECH PHAN DAP DAY JUMPER PHAI: {child} > {parent+100}',
-            )
-        fail_labels.add(f'PHAN DAP DAY JUMPER PHAI: {child} < {parent+100}')
-        return flag
-
-    def _check_child_over_xmin(
-        self, parent: int, child: int, attr_name: str,
-        flag: bool, list_register: list, fail_labels: set, to_register: str,
-    ) -> bool:
-        """Task CHILD_OVER_XMIN — child.x must not exceed parent.x."""
-        if child < parent-100:
-            return self._record_fail(
-                flag, list_register, fail_labels, to_register,
-                f'* LECH PHAN DAP DAY JUMPER TRAI: {child} < {parent-100}',
-            )
-        fail_labels.add(f'PHAN DAP DAY JUMPER TRAI: {child} > {parent-100}')
-        return flag
-
-    def _check_child_over_ymax(
-        self, parent: int, child: int, attr_name: str,
-        flag: bool, list_register: list, fail_labels: set, to_register: str,
-        offset: int = 30,
-    ) -> bool:
-        """Task CHILD_OVER_YMAX — child.y must not exceed parent.y minus `offset`."""
-        adjusted = parent - offset
-        if child > adjusted:
-            return self._record_fail(
-                flag, list_register, fail_labels, to_register,
-                f'* LECH PHAN DAP DAY JUMPER DUOI: {child} > {adjusted}',
-            )
-        fail_labels.add(f'PHAN DAP DAY JUMPER DUOI: {child} < {adjusted}')
-        return flag
-
-    def _check_child_right_half(
-        self, pbox: dict, child: int, attr_name: str,
-        flag: bool, list_register: list, fail_labels: set, to_register: str,
-    ) -> bool:
-        """Task CHILD_RIGHT_HALF — child.x must lie in parent's right half
-        (centre derived from parent height, anchored at xmin)."""
-        height    = pbox['ymax'] - pbox['ymin']
-        threshold = pbox['ymin'] + height / 2
-        if child < threshold:
-            return self._record_fail(
-                flag, list_register, fail_labels, to_register,
-                f'* LECH PHAN DAP DAY JUMPER TREN: {child} < {threshold}',
-            )
-        fail_labels.add(f'PHAN DAP DAY JUMPER TREN: {child} > {threshold}')
-        return flag
-
-    # -- public interface --------------------------------------------------
-
-    def set_dict_positive_calculator(
-        self,
-        key_model,
-        num_camera,
-        num_model,
-        attr_name: str,
-        labelname_parent: str,
-        labelname_child: str,
-        calculator: str,
-        param: str,
-        flag: bool,
-        list_register: list,
-        fail_labels: set,
-        to_register: str,
-        task: 'v5s.CheckTask' = None,   # replaces num_task
-        num_task: int = 1,              # legacy fallback
-    ) -> bool:
-        """
-        Evaluate a spatial relationship between two detected bounding boxes
-        and update the pass/fail state accordingly.
-
-        Parameters
-        ----------
-        task          : CheckTask  – preferred; describes which check to run.
-        num_task      : int        – legacy integer alias (1-7), used when
-                                    `task` is None for backwards compatibility.
-        """
-        if task is None:
-            task = v5s.CheckTask(num_task)   # convert legacy int → Enum
-
-        if key_model != (num_camera, num_model):
-            return flag
-
-        positive_dict: dict = getattr(self, attr_name, {})
-
-        if labelname_parent in positive_dict and labelname_child in positive_dict:
-            parent = positive_dict[labelname_parent][param]
-            child  = positive_dict[labelname_child][param]
-            pbox   = positive_dict[labelname_parent]   # parent bounding-box dict
-
-            dispatch = {
-                v5s.CheckTask.SHIFT_LEFT: lambda: self._check_shift_left(
-                    pbox, parent, child, calculator, attr_name,
-                    flag, list_register, fail_labels, to_register,
-                ),
-                v5s.CheckTask.SHIFT_BELOW: lambda: self._check_shift_below(
-                    parent, child, attr_name,
-                    flag, list_register, fail_labels, to_register,
-                ),
-                v5s.CheckTask.SHIFT_RIGHT: lambda: self._check_shift_right(
-                    pbox, parent, child, calculator, attr_name,
-                    flag, list_register, fail_labels, to_register,
-                ),
-                v5s.CheckTask.CHILD_UNDER_XMAX: lambda: self._check_child_under_xmax(
-                    parent, child, attr_name,
-                    flag, list_register, fail_labels, to_register,
-                ),
-                v5s.CheckTask.CHILD_OVER_XMIN: lambda: self._check_child_over_xmin(
-                    parent, child, attr_name,
-                    flag, list_register, fail_labels, to_register,
-                ),
-                v5s.CheckTask.CHILD_OVER_YMAX: lambda: self._check_child_over_ymax(
-                    parent, child, attr_name,
-                    flag, list_register, fail_labels, to_register,
-                ),
-                v5s.CheckTask.CHILD_RIGHT_HALF: lambda: self._check_child_right_half(
-                    pbox, child, attr_name,
-                    flag, list_register, fail_labels, to_register,
-                ),
-            }
-
-            flag = dispatch[task]()
-
-        # Task SHIFT_RIGHT must clear the dict after evaluation
-        if task == v5s.CheckTask.CHILD_RIGHT_HALF:
-            setattr(self, attr_name, {})
-
-        return flag
-
-    # ──────────────────────────────────────────────────────────────────────
-
-    def check_out_position(self, key_model, num_camera, num_model, x_min: int) -> bool:
-        if key_model == (num_camera, num_model):
-            return x_min < 1700
-
-    def check_item_option(self,image_array,pyuic,list_item):
-        if 'day_jumper' not in list_item or 'dap_day_jumper' not in list_item:
-            path_save_image = pyuic.lineEdit_4.text().strip()
-            self._save_ng_image(image_array, path_save_image, state="NG")
-
-    def time_to_name_file_image(self):
-        return str(datetime.datetime.now()).replace(':', '-').replace(' ', '_').replace('.', '-')
-
-    def _save_ng_image(self, image: np.ndarray, path_save_image: str,state: str) -> None:
-        if not path_save_image:
-            return
-
-        try:
-            today                = datetime.datetime.now().strftime('%Y-%m-%d')
-            folder               = os.path.join(path_save_image, state, today)
-            os.makedirs(folder,              exist_ok=True)
-            name_file            = self.time_to_name_file_image()
-            filename             = f'{name_file}_can_dien_cuc_or_day_jumper.jpg'
-            filepath             = os.path.join(folder, filename)
-            bgr        = cv2.cvtColor(image,        cv2.COLOR_RGB2BGR)
-            cv2.imwrite(filepath,        bgr)
-
-        except Exception:
-            pass
-
-    def add_image_array(self, image_array : np.ndarray,
-        key_model: tuple,
-        num_camera: str,
-        num_model: str,):
-        if key_model != (num_camera, num_model):
-            return
-        self.list_image_array.append(image_array)
-
-    def clear_image_array(self):
-        self.list_image_array.clear()
-    
-    def check_and_save_image_array(self,pyuic) -> bool:
-        path_save_image = pyuic.lineEdit_4.text().strip()
-        for i, image_array in enumerate(self.list_image_array):
-            self._save_ng_image(image_array, path_save_image, state="NG")
-        self.clear_image_array()
-            
+ 
 #!/usr/bin/env python3
 
 # ════════════════════════════════════════════════════════════

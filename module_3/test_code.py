@@ -66,13 +66,13 @@
 #     None,
 # )
 # print(component)
-
-
 import random
-raw_image = random.choice([r"C:\Users\VDM\Pictures\2025-11-14_09-07-50-870878.jpg", 
- r"C:\Users\VDM\Pictures\2025-11-14_09-12-28-422929.jpg",
- r"C:\Users\VDM\Pictures\2025-11-14_09-12-40-051502.jpg",
- r"C:\Users\VDM\Pictures\2025-11-14_09-15-53-422959.jpg",
- r"C:\Users\VDM\Pictures\2025-11-14_09-16-10-488588.jpg",
- r"C:\Users\VDM\Pictures\2025-12-02_04-29-31-875402.jpg"])
-print(a)        
+import os
+
+folder_path = r'C:\Users\VDM\Documents\New folder'
+image_extensions = ('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp')
+images = [f for f in os.listdir(folder_path) if f.lower().endswith(image_extensions)]
+if images:
+    random_image_name = random.choice(images)
+    raw_image = os.path.join(folder_path, random_image_name)  
+    print(raw_image)
