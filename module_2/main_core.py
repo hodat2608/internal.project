@@ -59,11 +59,17 @@ class core:
         self.driver_loader = None
 
         # Mặc định thông số PLC (phòng ngừa máy mới tinh chưa có cấu hình trong CSDL)
-        self.plc_module     = "KEYENCE"
-        self.ip_address_plc = "192.168.0.10"
-        self.port_plc       = 5000
-        self.manual         = 1
-        self.automatic      = 0
+        self.plc_module                  = "KEYENCE"
+        self.connection_port             = "Enthernet"
+        self.ip_address_plc              = "192.168.0.10"
+        self.port_plc                    = 5000
+        self.manual                      = 1
+        self.automatic                   = 0
+        self.local_ip                    = ""
+        self.retry_attempts              = 0
+        self.auto_reconnect_on_disconnect = False
+        self.direct_to_plc               = True
+        self.indirect_from_log           = False
 
         _log.info("[core.__init__] Creating CoreWorker...")
         self.worker_thread = CoreWorker(self)
@@ -135,7 +141,8 @@ class core:
                 user     = config.get('user', 'root'),
                 password = config.get('password', ''),
                 port     = int(config.get('port', 3306)),
-                use_pure = True
+                use_pure = True,
+                ssl_disabled=True
             )
             _log.info('[connect_mysql_from_log] Success to connect mysql')
             return connection
@@ -239,7 +246,31 @@ class core:
         try:
             cursor = self.connection.cursor()
             cursor.execute("USE DATA_IP_ADDRESS")
-            cursor.execute("SELECT * FROM INFOR_ADDRESS")
+
+            # Đảm bảo các cột mới tồn tại trong CSDL MySQL
+            columns_to_check = [
+                ("connection_port", "VARCHAR(255) DEFAULT 'Enthernet' AFTER plc_module"),
+                ("local_ip", "VARCHAR(255) DEFAULT '' AFTER automatic"),
+                ("retry_attempts", "INT NOT NULL DEFAULT 0 AFTER local_ip"),
+                ("auto_reconnect_on_disconnect", "BOOLEAN DEFAULT FALSE AFTER retry_attempts"),
+                ("direct_to_plc", "BOOLEAN DEFAULT TRUE AFTER auto_reconnect_on_disconnect"),
+                ("indirect_from_log", "BOOLEAN DEFAULT FALSE AFTER direct_to_plc"),
+            ]
+            for col_name, col_def in columns_to_check:
+                try:
+                    cursor.execute(f"SHOW COLUMNS FROM INFOR_ADDRESS LIKE '{col_name}'")
+                    if not cursor.fetchone():
+                        cursor.execute(f"ALTER TABLE INFOR_ADDRESS ADD COLUMN {col_name} {col_def}")
+                except Exception as col_err:
+                    _log.debug("Column check error for %s: %s", col_name, col_err)
+            self.connection.commit()
+
+            cursor.execute("""
+                SELECT plc_module, connection_port, ip_address_plc, port_plc,
+                       manual, automatic, local_ip, retry_attempts,
+                       auto_reconnect_on_disconnect, direct_to_plc, indirect_from_log
+                FROM INFOR_ADDRESS
+            """)
             result = cursor.fetchall()
             cursor.close()
 
@@ -247,28 +278,53 @@ class core:
                 _log.warning("No PLC info found in DATA_IP_ADDRESS.INFOR_ADDRESS")
                 return
 
-            entry            = result[0]
-            plc_module       = entry[1]
-            ip_address_plc   = entry[2]
-            port_plc         = entry[3]
-            manual           = entry[4]
-            automatic        = entry[5]
+            row = result[0]
+            plc_module       = str(row[0] or "KEYENCE")
+            connection_port  = str(row[1] or "Enthernet")
+            ip_address_plc   = str(row[2] or "192.168.0.10")
+            port_plc         = int(row[3] or 5000)
+            manual           = bool(row[4])
+            automatic        = bool(row[5])
+            local_ip         = str(row[6] or "")
+            retry_attempts   = int(row[7] or 0)
+            auto_reconnect   = bool(row[8])
+            direct_to_plc    = bool(row[9])
+            indirect_from_log = bool(row[10])
 
-            self.plc_module     = plc_module
-            self.ip_address_plc = ip_address_plc
-            self.port_plc       = port_plc
-            self.manual         = manual
-            self.automatic      = automatic
+            self.plc_module                  = plc_module
+            self.connection_port             = connection_port
+            self.ip_address_plc              = ip_address_plc
+            self.port_plc                    = port_plc
+            self.manual                      = manual
+            self.automatic                   = automatic
+            self.local_ip                    = local_ip
+            self.retry_attempts              = retry_attempts
+            self.auto_reconnect_on_disconnect = auto_reconnect
+            self.direct_to_plc               = direct_to_plc
+            self.indirect_from_log           = indirect_from_log
 
-            if not manual and automatic:
-                plc_instance = PLC_COLLECT[plc_module](ip_address_plc, port_plc)
+            # -------------------------------------------------------------
+            # Lựa chọn giữa kết nối trực tiếp PLC thật hoặc mô phỏng qua LOG
+            # -------------------------------------------------------------
+            plc_cls = PLC_COLLECT.get(plc_module, Keyence_Socket_Client)
+
+            if indirect_from_log:
+                # Chế độ mô phỏng qua file log (không cần thiết bị PLC vật lý)
+                plc_instance = plc_cls(ip_address_plc, port_plc)
+                self.driver_loader = plc_instance
+                self.mode_init_plc = 1
+                _log.info('PLC Simulation via Log Mode ACTIVE [indirect_from_log=True] for %s (%s:%s)', plc_module, ip_address_plc, port_plc)
+            elif not manual and automatic:
+                # Chế độ kết nối trực tiếp đến PLC thật
+                plc_instance = plc_cls(ip_address_plc, port_plc)
                 if plc_instance.connect():
                     self.driver_loader = plc_instance
                     self.mode_init_plc = 1
-                    _log.info('Success to connect PLC %s at %s:%s', plc_module, ip_address_plc, port_plc)
+                    _log.info('Success to connect real PLC %s at %s:%s', plc_module, ip_address_plc, port_plc)
                 else:
-                    _log.warning('Failed to connect PLC %s at %s:%s', plc_module, ip_address_plc, port_plc)
-                    QMessageBox.warning(None, "Warning", "Failed to connect PLC, Please check connection")
+                    self.mode_init_plc = 0
+                    _log.warning('Failed to connect real PLC %s at %s:%s', plc_module, ip_address_plc, port_plc)
+                    QMessageBox.warning(None, "Warning", "Failed to connect PLC, Please check connection or switch to Log Mode")
             else:
                 _log.warning('PLC connection disabled in settings (Manual mode active)')
 

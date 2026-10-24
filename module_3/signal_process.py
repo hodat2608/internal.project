@@ -837,22 +837,25 @@ class DataProcessSignal:
             QMessageBox.critical(None, "Infor", f"Vui lòng test kết nối đến thiết bị PLC")
             return 
         
-    def load_data_plc(self,cursor):
-        cursor.execute("SELECT * FROM DATA_IP_ADDRESS.INFOR_ADDRESS")
-        result = cursor.fetchall()
-        if not result:
-            _log.warning("No PLC info found in DATA_IP_ADDRESS.INFOR_ADDRESS")
-            return
+    def load_data_plc(self, cursor):
+        try:
+            cursor.execute("SELECT plc_module, ip_address_plc, port_plc, manual, automatic FROM DATA_IP_ADDRESS.INFOR_ADDRESS")
+            result = cursor.fetchall()
+            if not result:
+                _log.warning("No PLC info found in DATA_IP_ADDRESS.INFOR_ADDRESS")
+                return
 
-        entry            = result[0]
-        plc_module       = entry[1]
-        ip_address_plc   = entry[2]
-        port_plc         = entry[3]
-        manual           = entry[4]
-        automatic        = entry[5]
-        self.uic.IPV4_PLC.setText(str(ip_address_plc))
-        self.uic.comboBox_type_dev.setCurrentText(str(plc_module))
-        self.uic.comboBox_protocol.setCurrentText(str(manual))
+            entry            = result[0]
+            plc_module       = entry[0]
+            ip_address_plc   = entry[1]
+            port_plc         = entry[2]
+            manual           = entry[3]
+            automatic        = entry[4]
+            self.uic.IPV4_PLC.setText(str(ip_address_plc))
+            self.uic.comboBox_type_dev.setCurrentText(str(plc_module))
+            self.uic.comboBox_protocol.setCurrentText(str(manual))
+        except Exception as e:
+            _log.error("Error in load_data_plc: %s", e)
 
 
     def save_all_data(self,cursor,connect_db,camera_id):

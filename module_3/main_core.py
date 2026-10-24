@@ -312,53 +312,138 @@ class PLCHandler:
         return future
 
     # -----------------------------------------------------------------------
-    # Safe PLC I/O helpers
+    # -----------------------------------------------------------------------
+    # Safe PLC I/O helpers (Direct to PLC vs Indirect from Log Mode)
     # -----------------------------------------------------------------------
 
-    # def _safe_read_plc(self, register: str):
-    #     """Đọc PLC, log lỗi thay vì để exception âm thầm."""
-    #     if self.layer_core.driver_loader is None:
-    #         # _log.error("[PLCHandler] _safe_read_plc failed for register: %s", register)
-    #         return
-    #     try:
-    #         return self.layer_core.driver_loader.read_plc(register)
-    #     except Exception:
-    #         # _log.exception("[PLCHandler] _safe_read_plc failed for register: %s", register)
-    #         return
+    def is_indirect_log_mode(self) -> bool:
+        """
+        Kiểm tra chế độ giao tiếp PLC được cấu hình:
+        - True: Chế độ mô phỏng qua LOG (indirect_from_log = True hoặc direct_to_plc = False)
+        - False: Chế độ kết nối trực tiếp thiết bị PLC (direct_to_plc = True)
+        """
+        # 1. Kiểm tra cấu hình lưu trên layer_core (module_2.main_core)
+        if self.layer_core is not None:
+            # Nếu chỉ định rõ direct_to_plc = True và indirect_from_log = False
+            if bool(getattr(self.layer_core, 'direct_to_plc', False)) is True and not bool(getattr(self.layer_core, 'indirect_from_log', False)):
+                return False
+            if bool(getattr(self.layer_core, 'indirect_from_log', False)) is True:
+                return True
+            if hasattr(self.layer_core, 'direct_to_plc') and bool(getattr(self.layer_core, 'direct_to_plc')) is False:
+                return True
 
-    # def _safe_write_plc(self, register: str, value):
-    #     """Ghi PLC, log lỗi thay vì để exception âm thầm."""
-    #     if self.layer_core.driver_loader is None:
-    #         # _log.error("[PLCHandler] _safe_write_plc failed for register: %s", register)
-    #         return
-    #     try:
-    #         self.layer_core.driver_loader.write_plc(register, value)
-    #     except Exception:
-    #         # _log.exception("[PLCHandler] _safe_write_plc failed: register=%s value=%s", register, value)
-    #         return 
+        # 2. Kiểm tra từ CSDL DATA_IP_ADDRESS.INFOR_ADDRESS nếu có db_manager hoặc connection
+        try:
+            conn = getattr(self.layer_core, 'connection', None)
+            if conn and hasattr(conn, 'cursor') and callable(conn.cursor):
+                cursor = conn.cursor()
+                cursor.execute("SELECT direct_to_plc, indirect_from_log FROM DATA_IP_ADDRESS.INFOR_ADDRESS LIMIT 1")
+                row = cursor.fetchone()
+                cursor.close()
+                if row:
+                    direct_to_plc, indirect_from_log = bool(row[0]), bool(row[1])
+                    return indirect_from_log or (not direct_to_plc)
+        except Exception:
+            pass
 
+        return False
 
     def _safe_read_plc(self, register: str):
-        """Đọc PLC, log lỗi thay vì để exception âm thầm."""
-        if self.layer_core.driver_loader is None:
+        """
+        Đọc PLC an toàn:
+        - Nếu user chọn indirect_from_log: Sử dụng _safe_read_plc_log để đọc từ log mô phỏng.
+        - Nếu user chọn direct_to_plc: Sử dụng đọc trực tiếp từ thiết bị PLC.
+        """
+        if self.is_indirect_log_mode():
+            return self._safe_read_plc_log(register)
+
+        if self.layer_core is None or self.layer_core.driver_loader is None:
             # _log.error("[PLCHandler] _safe_read_plc failed for register: %s", register)
-            return
+            return None
         try:
-            return self.layer_core.driver_loader.read_plc_log(register)
+            return self.layer_core.driver_loader.read_plc(register)
         except Exception:
             # _log.exception("[PLCHandler] _safe_read_plc failed for register: %s", register)
-            return
+            return None
 
     def _safe_write_plc(self, register: str, value):
-        """Ghi PLC, log lỗi thay vì để exception âm thầm."""
-        if self.layer_core.driver_loader is None:
-            _log.error("[PLCHandler] _safe_write_plc failed for register: %s", register)
-            return
+        """
+        Ghi PLC an toàn:
+        - Nếu value là None hoặc để trống (""): bỏ qua không ghi (thanh ghi chỉ đọc không cần ghi).
+        - Nếu user chọn indirect_from_log: Sử dụng _safe_write_plc_log để ghi vào log mô phỏng.
+        - Nếu user chọn direct_to_plc: Sử dụng ghi trực tiếp xuống thiết bị PLC.
+        """
+        if value is None:
+            return None
+        val_str = str(value).strip()
+        if val_str == "" or val_str.lower() == "none":
+            return None
+
+        if self.is_indirect_log_mode():
+            return self._safe_write_plc_log(register, value)
+
+        if self.layer_core is None or self.layer_core.driver_loader is None:
+            # _log.error("[PLCHandler] _safe_write_plc failed for register: %s", register)
+            return None
         try:
-            self.layer_core.driver_loader.write_plc_log(register, value)
+            return self.layer_core.driver_loader.write_plc(register, value)
         except Exception:
-            _log.exception("[PLCHandler] _safe_write_plc failed: register=%s value=%s", register, value)
-            return 
+            # _log.exception("[PLCHandler] _safe_write_plc failed: register=%s value=%s", register, value)
+            return None
+
+    def _safe_read_plc_log(self, register: str):
+        """Đọc PLC từ file log mô phỏng (trigger_{register}.txt), log lỗi thay vì để exception âm thầm."""
+        # 1. Nếu driver_loader có hàm read_plc_log thì ưu tiên gọi
+        if self.layer_core is not None and self.layer_core.driver_loader is not None:
+            if hasattr(self.layer_core.driver_loader, 'read_plc_log'):
+                try:
+                    return self.layer_core.driver_loader.read_plc_log(register)
+                except Exception:
+                    pass
+
+        # 2. Fallback đọc trực tiếp file trigger_{register}.txt trong thư mục module_3
+        try:
+            file_name = f"trigger_{register}.txt"
+            module_dir = os.path.dirname(os.path.abspath(__file__))
+            file_path = os.path.join(module_dir, file_name)
+            if os.path.exists(file_path):
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    line = f.readline().strip()
+                    if '=' in line:
+                        reg, val = line.split('=')
+                        if reg.strip().upper() == register.strip().upper():
+                            return int(val.strip())
+            return 0
+        except Exception:
+            return 0
+
+    def _safe_write_plc_log(self, register: str, value):
+        """Ghi PLC vào file log mô phỏng (trigger_{register}.txt), log lỗi thay vì để exception âm thầm."""
+        if value is None:
+            return False
+        val_str = str(value).strip()
+        if val_str == "" or val_str.lower() == "none":
+            return False
+
+        # 1. Nếu driver_loader có hàm write_plc_log thì ưu tiên gọi
+        if self.layer_core is not None and self.layer_core.driver_loader is not None:
+            if hasattr(self.layer_core.driver_loader, 'write_plc_log'):
+                try:
+                    return self.layer_core.driver_loader.write_plc_log(register, value)
+                except Exception:
+                    pass
+
+        # 2. Fallback ghi trực tiếp file trigger_{register}.txt trong thư mục module_3
+        try:
+            file_name = f"trigger_{register}.txt"
+            module_dir = os.path.dirname(os.path.abspath(__file__))
+            file_path = os.path.join(module_dir, file_name)
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(f"{register} = {value}\n")
+            return True
+        except Exception as e:
+            _log.exception("[PLCHandler] _safe_write_plc_log fallback failed: register=%s value=%s: %s", register, value, e)
+            return False
 
 
     # -----------------------------------------------------------------------
@@ -516,7 +601,9 @@ class PLCHandler:
                     if self._safe_read_plc(reg) != 0 :
                         self._reset_counter(key)
                         # _log.info("[PLCHandler] Reset counter %s", key)
-                        self._safe_write_plc(reg, 0)
+                        off_val = signals.get(signals_selected, {}).get('off')
+                        if off_val is not None and str(off_val).strip() != "" and str(off_val).strip().lower() != 'none':
+                            self._safe_write_plc(reg, int(off_val))
 
     # -----------------------------------------------------------------------
     # Load mã hàng
@@ -640,16 +727,24 @@ class PLCHandler:
                         _log.warning("[PLCHandler] Target register not found for trigger: %s", trigger)
                         continue
 
-                    read_value_on  = target_reg['read_value_on']
-                    read_value_off = target_reg['read_value_off']
-                    if not read_value_on or not read_value_off:
-                        _log.warning("[PLCHandler] Target register not found for key: %s", trigger)
+                    read_value_on  = target_reg.get('read_value_on')
+                    read_value_off = target_reg.get('read_value_off')
+                    if read_value_on is None or str(read_value_on).strip() == "" or str(read_value_on).strip().lower() == 'none':
+                        _log.warning("[PLCHandler] Target register ON value not found for key: %s", trigger)
                         continue
+
+                    # Nếu read_value_off khác trống (có số) thì lưu int, nếu để trống thì lưu None (chỉ đọc không cần ghi)
+                    off_val = None
+                    if read_value_off is not None and str(read_value_off).strip() != "" and str(read_value_off).strip().lower() != 'none':
+                        try:
+                            off_val = int(read_value_off)
+                        except (ValueError, TypeError):
+                            off_val = None
 
                     new_triggers.append({
                         'reg' : f"{target_reg['address']}{target_reg['read_register']}",
                         'on'  : int(read_value_on),
-                        'off' : int(read_value_off),
+                        'off' : off_val,
                         'key' : key,
                         'data': values,
                     })
@@ -704,7 +799,8 @@ class PLCHandler:
                         self._set_mode_reg_process()
                         self.load_user_set_selector_from_mode()
                         self.load_params_from_activated_mode(mode_key)
-                        self._safe_write_plc(str(register), value_bit_off)
+                        if value_bit_off is not None and str(value_bit_off).strip() != "" and str(value_bit_off).strip().lower() != 'none':
+                            self._safe_write_plc(str(register), int(value_bit_off))
                     except (TypeError, ValueError) as e:
                         _log.debug("[PLCHandler] _activate_mode value error for register %s: %s", register, e)
                         continue
@@ -870,7 +966,9 @@ class PLCHandler:
                     continue
 
                 if int(current_value) == item['on']:
-                    self._safe_write_plc(str(item['reg']),item['off'])
+                    off_val = item.get('off')
+                    if off_val is not None and str(off_val).strip() != "" and str(off_val).strip().lower() != 'none':
+                        self._safe_write_plc(str(item['reg']), int(off_val))
                     
                     mapping = self.built_in_mapping_mode.get(key, {}).get('mapping', {})
                     automatic_mode = mapping.get('automatic', {}).get('mapping_mode')
@@ -1087,9 +1185,11 @@ class PLCHandler:
                 time.sleep(delay)
             return None
 
-        if 'gate'  in signals: write(str(signals['gate']['reg']),  int(signals['gate']['on']))
-        if 'busy'  in signals: write(str(signals['busy']['reg']),  int(signals['busy']['on']))
-        if 'ready' in signals: write(str(signals['ready']['reg']), int(signals['ready']['off']))
+        for sig_name, val_key in [('gate', 'on'), ('busy', 'on'), ('ready', 'off')]:
+            if sig_name in signals:
+                val = signals[sig_name].get(val_key)
+                if val is not None and str(val).strip() != '' and str(val).strip().lower() != 'none':
+                    write(str(signals[sig_name]['reg']), int(val))
 
         time.sleep(timer)
         raw_image_rgb = grab_with_retry()
@@ -1106,9 +1206,11 @@ class PLCHandler:
                 
             raw_image_rgb = grab_with_retry()
 
-        if 'gate'  in signals: write(str(signals['gate']['reg']),  int(signals['gate']['off']))
-        if 'busy'  in signals: write(str(signals['busy']['reg']),  int(signals['busy']['off']))
-        if 'ready' in signals: write(str(signals['ready']['reg']), int(signals['ready']['on']))
+        for sig_name, val_key in [('gate', 'off'), ('busy', 'off'), ('ready', 'on')]:
+            if sig_name in signals:
+                val = signals[sig_name].get(val_key)
+                if val is not None and str(val).strip() != '' and str(val).strip().lower() != 'none':
+                    write(str(signals[sig_name]['reg']), int(val))
 
         time.sleep(timer1)
         

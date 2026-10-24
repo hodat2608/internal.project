@@ -273,10 +273,16 @@ TABLES_SQL_DATA_IP_ADDRESS = [
     """CREATE TABLE IF NOT EXISTS DATA_IP_ADDRESS.INFOR_ADDRESS (
         id INT AUTO_INCREMENT PRIMARY KEY,
         plc_module VARCHAR(255),
+        connection_port VARCHAR(255),
         ip_address_plc VARCHAR(255),
         port_plc INT,
         manual BOOLEAN DEFAULT FALSE,
-        automatic BOOLEAN DEFAULT FALSE
+        automatic BOOLEAN DEFAULT FALSE,
+        local_ip VARCHAR(255),
+        retry_attempts INT NOT NULL DEFAULT 0,
+        auto_reconnect_on_disconnect BOOLEAN DEFAULT FALSE,
+        direct_to_plc BOOLEAN DEFAULT FALSE,
+        indirect_from_log BOOLEAN DEFAULT FALSE
     )""",
 ]
 

@@ -181,7 +181,7 @@ class KeyenceClient:
                 if i < 2:
                     time.sleep(1)
         _log.error(f"Connection failed after 3 attempts to Keyence PLC {self.ip}:{self.port}")
-        return True
+        return False
 
     def read_plc_log(self, register_trigger):
         import time

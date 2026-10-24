@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1000</width>
-    <height>791</height>
+    <width>1100</width>
+    <height>873</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -216,6 +216,13 @@ QTextEdit#textEdit_plc_log {
         <height>68</height>
        </size>
       </property>
+      <property name="font">
+       <font>
+        <family>Segoe UI</family>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
       <property name="frameShape">
        <enum>QFrame::NoFrame</enum>
       </property>
@@ -340,7 +347,7 @@ QTextEdit#textEdit_plc_log {
       <property name="maximumSize">
        <size>
         <width>16777215</width>
-        <height>650</height>
+        <height>720</height>
        </size>
       </property>
       <property name="tabPosition">
@@ -943,13 +950,99 @@ QTextEdit#textEdit_plc_log {
           <property name="enabled">
            <bool>true</bool>
           </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>600</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <family>Segoe UI</family>
+            <pointsize>9</pointsize>
+            <weight>87</weight>
+            <bold>true</bold>
+           </font>
+          </property>
           <property name="title">
            <string>PLC Connection</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_7" columnstretch="0,3,0,1">
+          <layout class="QGridLayout" name="gridLayout_7" columnstretch="0,0,0,0">
            <property name="spacing">
             <number>12</number>
            </property>
+           <item row="6" column="0">
+            <widget class="QLabel" name="label_13">
+             <property name="minimumSize">
+              <size>
+               <width>118</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Local IP Address:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="3">
+            <widget class="QLineEdit" name="lineEdit_port_3">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="placeholderText">
+              <string>8501</string>
+             </property>
+             <property name="clearButtonEnabled">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="1">
+            <widget class="QLineEdit" name="lineEdit_ip_address_2">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="placeholderText">
+              <string>192.168.1.1</string>
+             </property>
+             <property name="clearButtonEnabled">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="1">
+            <widget class="QSpinBox" name="spinBox_2">
+             <property name="buttonSymbols">
+              <enum>QAbstractSpinBox::NoButtons</enum>
+             </property>
+             <property name="value">
+              <number>1</number>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0" colspan="4">
+            <widget class="QLabel" name="label_sec_plc_network">
+             <property name="text">
+              <string>⬢ NETWORK</string>
+             </property>
+             <property name="role" stdset="0">
+              <string>section</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="label_16">
+             <property name="minimumSize">
+              <size>
+               <width>118</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>IP Address:</string>
+             </property>
+            </widget>
+           </item>
            <item row="0" column="0" colspan="4">
             <widget class="QLabel" name="label_sec_plc_device">
              <property name="text">
@@ -1016,183 +1109,7 @@ QTextEdit#textEdit_plc_log {
              </item>
             </layout>
            </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_7">
-             <property name="minimumSize">
-              <size>
-               <width>118</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>PLC Module:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1" colspan="3">
-            <widget class="QComboBox" name="comboBox">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <item>
-              <property name="text">
-               <string>KEYENCE</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>OMRON</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>MITSHUBISHI</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_18">
-             <property name="minimumSize">
-              <size>
-               <width>118</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Connection Type:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1" colspan="3">
-            <widget class="QComboBox" name="comboBox_connection_type_2">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <item>
-              <property name="text">
-               <string>Enthernet</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item row="4" column="0" colspan="4">
-            <widget class="QLabel" name="label_sec_plc_network">
-             <property name="text">
-              <string>⬢ NETWORK</string>
-             </property>
-             <property name="role" stdset="0">
-              <string>section</string>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="0">
-            <widget class="QLabel" name="label_16">
-             <property name="minimumSize">
-              <size>
-               <width>118</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>IP Address:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="1">
-            <widget class="QLineEdit" name="lineEdit_ip_address_2">
-             <property name="text">
-              <string>192.168.*.*</string>
-             </property>
-             <property name="clearButtonEnabled">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="2">
-            <widget class="QLabel" name="label_17">
-             <property name="text">
-              <string>PORT:</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="3">
-            <widget class="QLineEdit" name="lineEdit_port_3">
-             <property name="text">
-              <string>8051</string>
-             </property>
-             <property name="clearButtonEnabled">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="0">
-            <widget class="QLabel" name="label_13">
-             <property name="minimumSize">
-              <size>
-               <width>118</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Local IP Address:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="1">
-            <widget class="QLineEdit" name="lineEdit_local_ip_2"/>
-           </item>
-           <item row="6" column="2" colspan="2">
-            <widget class="QPushButton" name="pushButton_get_local_ip_2">
-             <property name="cursor">
-              <cursorShape>PointingHandCursor</cursorShape>
-             </property>
-             <property name="text">
-              <string>Get Local IP</string>
-             </property>
-            </widget>
-           </item>
-           <item row="7" column="0" colspan="4">
-            <widget class="QLabel" name="label_sec_plc_behaviour">
-             <property name="text">
-              <string>⬢ BEHAVIOUR</string>
-             </property>
-             <property name="role" stdset="0">
-              <string>section</string>
-             </property>
-            </widget>
-           </item>
-           <item row="8" column="0">
-            <widget class="QLabel" name="label_14">
-             <property name="minimumSize">
-              <size>
-               <width>118</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Retry Attemps:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="8" column="1">
-            <widget class="QSpinBox" name="spinBox_2">
-             <property name="buttonSymbols">
-              <enum>QAbstractSpinBox::NoButtons</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="9" column="1" colspan="3">
-            <widget class="QCheckBox" name="checkBox_2">
-             <property name="text">
-              <string>Auto Reconnect on Disconnect</string>
-             </property>
-            </widget>
-           </item>
-           <item row="10" column="0" colspan="4">
+           <item row="11" column="0" colspan="4">
             <widget class="QWidget" name="widget_3" native="true">
              <property name="minimumSize">
               <size>
@@ -1222,7 +1139,34 @@ QTextEdit#textEdit_plc_log {
               <property name="horizontalSpacing">
                <number>10</number>
               </property>
-              <item row="0" column="0">
+              <item row="1" column="2">
+               <widget class="QPushButton" name="pushButton_test_connection_3">
+                <property name="cursor">
+                 <cursorShape>PointingHandCursor</cursorShape>
+                </property>
+                <property name="text">
+                 <string>Test Connection</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QPushButton" name="network_setting_advanced">
+                <property name="text">
+                 <string>Advanced Network Settings</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="3">
+               <widget class="QPushButton" name="pushButton_apply_ip_add_setting_2">
+                <property name="cursor">
+                 <cursorShape>PointingHandCursor</cursorShape>
+                </property>
+                <property name="text">
+                 <string>Apply Login Settings</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
                <spacer name="horizontalSpacer_plc_buttons">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
@@ -1235,34 +1179,185 @@ QTextEdit#textEdit_plc_log {
                 </property>
                </spacer>
               </item>
-              <item row="0" column="3">
-               <widget class="QPushButton" name="pushButton_apply_ip_add_setting_2">
-                <property name="cursor">
-                 <cursorShape>PointingHandCursor</cursorShape>
-                </property>
+             </layout>
+            </widget>
+           </item>
+           <item row="7" column="0" colspan="4">
+            <widget class="QLabel" name="label_sec_plc_behaviour">
+             <property name="text">
+              <string>⬢ BEHAVIOUR</string>
+             </property>
+             <property name="role" stdset="0">
+              <string>section</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1" colspan="3">
+            <widget class="QComboBox" name="comboBox_connection_type_2">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <item>
+              <property name="text">
+               <string>Enthernet</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="10" column="0" colspan="4">
+            <widget class="QFrame" name="frame_3">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>50</height>
+              </size>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_5">
+              <item row="1" column="1">
+               <widget class="QRadioButton" name="direct_to_plc">
                 <property name="text">
-                 <string>Apply Login Settings</string>
+                 <string>DIRECT TO PLC</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
-              <item row="0" column="2">
-               <widget class="QPushButton" name="pushButton_test_connection_3">
-                <property name="cursor">
-                 <cursorShape>PointingHandCursor</cursorShape>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_8">
+                <property name="font">
+                 <font>
+                  <family>Segoe UI</family>
+                  <pointsize>9</pointsize>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
                 </property>
                 <property name="text">
-                 <string>Test Connection</string>
+                 <string>⬢ PLC SIMULATION MODE</string>
                 </property>
                </widget>
               </item>
-              <item row="0" column="1">
-               <widget class="QPushButton" name="network_setting_advanced">
+              <item row="1" column="2">
+               <widget class="QRadioButton" name="indirect_from_log">
+                <property name="font">
+                 <font>
+                  <family>Segoe UI</family>
+                  <pointsize>9</pointsize>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
                 <property name="text">
-                 <string>Advanced Network Settings</string>
+                 <string>INDIRECT FROM LOG</string>
                 </property>
                </widget>
               </item>
              </layout>
+            </widget>
+           </item>
+           <item row="9" column="1" colspan="3">
+            <widget class="QCheckBox" name="checkBox_2">
+             <property name="text">
+              <string>Auto Reconnect on Disconnect</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="0">
+            <widget class="QLabel" name="label_14">
+             <property name="minimumSize">
+              <size>
+               <width>118</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Retry Attemps:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_18">
+             <property name="minimumSize">
+              <size>
+               <width>118</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Connection Type:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1" colspan="3">
+            <widget class="QComboBox" name="comboBox">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <item>
+              <property name="text">
+               <string>KEYENCE</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>OMRON</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>MITSHUBISHI</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="6" column="2" colspan="2">
+            <widget class="QPushButton" name="pushButton_get_local_ip_2">
+             <property name="cursor">
+              <cursorShape>PointingHandCursor</cursorShape>
+             </property>
+             <property name="text">
+              <string>Get Local IP</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="QLineEdit" name="lineEdit_local_ip_2">
+             <property name="placeholderText">
+              <string>#N/A</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_7">
+             <property name="minimumSize">
+              <size>
+               <width>118</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>PLC Module:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="2">
+            <widget class="QLabel" name="label_17">
+             <property name="text">
+              <string>PORT:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
             </widget>
            </item>
           </layout>
@@ -1913,7 +2008,7 @@ QTextEdit#textEdit_plc_log {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1000</width>
+     <width>1100</width>
      <height>21</height>
     </rect>
    </property>
