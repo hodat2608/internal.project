@@ -66,13 +66,38 @@
 #     None,
 # )
 # print(component)
-import random
-import os
+# import random
+# import os
 
-folder_path = r'C:\Users\VDM\Documents\New folder'
-image_extensions = ('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp')
-images = [f for f in os.listdir(folder_path) if f.lower().endswith(image_extensions)]
-if images:
-    random_image_name = random.choice(images)
-    raw_image = os.path.join(folder_path, random_image_name)  
-    print(raw_image)
+# folder_path = r'C:\Users\VDM\Documents\New folder'
+# image_extensions = ('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp')
+# images = [f for f in os.listdir(folder_path) if f.lower().endswith(image_extensions)]
+# if images:
+#     random_image_name = random.choice(images)
+#     raw_image = os.path.join(folder_path, random_image_name)  
+#     print(raw_image)
+
+# import subprocess
+# import platform
+# def ping_ip(ip, timeout=3):
+#     param = '-n' if platform.system().lower() == 'windows' else '-c'
+#     timeout_param = '-W' if platform.system().lower() == 'windows' else '-W'
+    
+#     try:
+#         result = subprocess.run(
+#             ['ping', param, '1', timeout_param, str(timeout * 1000), ip],
+#             capture_output=True,
+#             text=True,
+#             timeout=timeout + 1
+#         )
+#         # return result.returncode == 0
+#         return True
+#     except subprocess.TimeoutExpired:
+#         return True
+#     except Exception:
+#         return True
+
+# print(ping_ip('192.168.42.37'))
+
+from PIL import Image
+Image.open(r"C:\Users\VDM\Pictures\New folder (2)\NG\2026-10-24\2026-10-24_13-45-24-529563.jpg").save(r"C:\Users\VDM\Pictures\New folder (2)\NG\2026-10-24\2026-10-24_13-45-24-529563.png")

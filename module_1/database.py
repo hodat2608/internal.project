@@ -278,9 +278,9 @@ class Connect2Mysql:
             for item_code, device_data in self.ui_mainwindow.list_item_code.items():
                 for index, camera in enumerate(device_data.get("camera_tabs", []), 1):
                     list_num_models.append(int(camera.get("model_count", 0)))
-            if sum(list_num_models) > 8:
-                QMessageBox.critical(None, "Error", "Tổng số lượng model nhiều hơn 8, vui lòng kiểm tra lại")
-                return
+            # if sum(list_num_models) > 8:
+            #     QMessageBox.critical(None, "Error", "Tổng số lượng model nhiều hơn 8, vui lòng kiểm tra lại")
+            #     return
                 
             for item_code, device_data in self.ui_mainwindow.list_item_code.items():
                 for index, camera in enumerate(device_data.get("camera_tabs", []), 1):

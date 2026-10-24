@@ -36,6 +36,7 @@ TABLES = [
         Classes_File_Path TEXT,
         IOU_Value INT DEFAULT 45,
         Max_Detections INT DEFAULT 100,
+        Image_format VARCHAR(255),
         Folder_NG_Original_Path TEXT,
         Save_NG_Original BOOLEAN DEFAULT FALSE,
         Folder_NG_Detected_Path TEXT,

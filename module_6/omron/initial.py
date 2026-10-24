@@ -10,7 +10,7 @@ class OmronClient:
         :param dst_node: Node number (thường trùng số cuối của IP, ví dụ 192.168.2.13 -> 13)
         """
         self.ip = ip_address
-        self.port = port
+        self.port = int(port)
         self.dst_node = dst_node
         self.fins = None
         self.connected = False

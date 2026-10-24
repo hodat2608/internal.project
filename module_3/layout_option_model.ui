@@ -94,9 +94,9 @@ QScrollBar::handle:vertical:hover {
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>-256</y>
-         <width>1668</width>
-         <height>1242</height>
+         <y>-302</y>
+         <width>1661</width>
+         <height>1280</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_scrollContents">
@@ -335,7 +335,7 @@ QGroupBox::title {
                          <property name="minimumSize">
                           <size>
                            <width>120</width>
-                           <height>28</height>
+                           <height>30</height>
                           </size>
                          </property>
                          <property name="font">
@@ -704,6 +704,9 @@ QLineEdit:focus {
 </string>
                      </property>
                      <property name="text">
+                      <string/>
+                     </property>
+                     <property name="placeholderText">
                       <string>.../*.pt</string>
                      </property>
                     </widget>
@@ -817,6 +820,9 @@ QLineEdit:focus {
 </string>
                      </property>
                      <property name="text">
+                      <string/>
+                     </property>
+                     <property name="placeholderText">
                       <string>.../*.engine</string>
                      </property>
                     </widget>
@@ -930,6 +936,9 @@ QLineEdit:focus {
 </string>
                      </property>
                      <property name="text">
+                      <string/>
+                     </property>
+                     <property name="placeholderText">
                       <string>.../*.txt</string>
                      </property>
                     </widget>
@@ -1560,7 +1569,7 @@ QGroupBox::title {
                      <property name="minimumSize">
                       <size>
                        <width>80</width>
-                       <height>28</height>
+                       <height>30</height>
                       </size>
                      </property>
                      <property name="font">
@@ -1711,7 +1720,7 @@ QComboBox::drop-down { border: none; }
                      </property>
                      <item>
                       <property name="text">
-                       <string>AWD189RT</string>
+                       <string>#N/A</string>
                       </property>
                      </item>
                     </widget>
@@ -1767,23 +1776,90 @@ QGroupBox::title {
                 <property name="title">
                  <string>Image Save Folders</string>
                 </property>
-                <layout class="QVBoxLayout" name="vlayout_group_folders">
-                 <property name="spacing">
-                  <number>6</number>
-                 </property>
-                 <property name="leftMargin">
-                  <number>14</number>
-                 </property>
-                 <property name="topMargin">
-                  <number>18</number>
-                 </property>
-                 <property name="rightMargin">
-                  <number>14</number>
-                 </property>
-                 <property name="bottomMargin">
-                  <number>14</number>
-                 </property>
-                 <item>
+                <layout class="QGridLayout" name="gridLayout">
+                 <item row="0" column="0">
+                  <layout class="QHBoxLayout" name="horizontalLayout_2">
+                   <item>
+                    <widget class="QLabel" name="label_29">
+                     <property name="minimumSize">
+                      <size>
+                       <width>150</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>150</width>
+                       <height>16777215</height>
+                      </size>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <family>Segoe UI</family>
+                       <pointsize>10</pointsize>
+                      </font>
+                     </property>
+                     <property name="text">
+                      <string>├── Image Format:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QComboBox" name="Image_format">
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>30</height>
+                      </size>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <family>Segoe UI</family>
+                       <pointsize>10</pointsize>
+                      </font>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true">QComboBox { border: 1px solid #ababab; border-radius: 6px; }
+QComboBox::drop-down { border: none; }
+</string>
+                     </property>
+                     <item>
+                      <property name="text">
+                       <string>BMP</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>JPG</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>PNG</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>RAW</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>TIFF</string>
+                      </property>
+                     </item>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_31">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item row="1" column="0">
                   <layout class="QHBoxLayout" name="hlayout_ng_orig">
                    <property name="spacing">
                     <number>6</number>
@@ -1811,7 +1887,7 @@ QGroupBox::title {
                      <property name="minimumSize">
                       <size>
                        <width>0</width>
-                       <height>28</height>
+                       <height>30</height>
                       </size>
                      </property>
                      <property name="font">
@@ -1834,7 +1910,10 @@ QLineEdit:focus {
 </string>
                      </property>
                      <property name="text">
-                      <string>...</string>
+                      <string/>
+                     </property>
+                     <property name="placeholderText">
+                      <string>C:/Image</string>
                      </property>
                     </widget>
                    </item>
@@ -1868,7 +1947,7 @@ QLineEdit:focus {
                    </item>
                   </layout>
                  </item>
-                 <item>
+                 <item row="3" column="0">
                   <layout class="QHBoxLayout" name="hlayout_ng_det">
                    <property name="spacing">
                     <number>6</number>
@@ -1896,7 +1975,7 @@ QLineEdit:focus {
                      <property name="minimumSize">
                       <size>
                        <width>0</width>
-                       <height>28</height>
+                       <height>30</height>
                       </size>
                      </property>
                      <property name="font">
@@ -1919,7 +1998,10 @@ QLineEdit:focus {
 </string>
                      </property>
                      <property name="text">
-                      <string>...</string>
+                      <string/>
+                     </property>
+                     <property name="placeholderText">
+                      <string>C:/Image</string>
                      </property>
                     </widget>
                    </item>
@@ -1953,7 +2035,7 @@ QLineEdit:focus {
                    </item>
                   </layout>
                  </item>
-                 <item>
+                 <item row="5" column="0">
                   <layout class="QHBoxLayout" name="hlayout_ok_orig">
                    <property name="spacing">
                     <number>6</number>
@@ -1981,7 +2063,7 @@ QLineEdit:focus {
                      <property name="minimumSize">
                       <size>
                        <width>0</width>
-                       <height>28</height>
+                       <height>30</height>
                       </size>
                      </property>
                      <property name="font">
@@ -2004,7 +2086,10 @@ QLineEdit:focus {
 </string>
                      </property>
                      <property name="text">
-                      <string>...</string>
+                      <string/>
+                     </property>
+                     <property name="placeholderText">
+                      <string>C:/Image</string>
                      </property>
                     </widget>
                    </item>
@@ -2038,7 +2123,7 @@ QLineEdit:focus {
                    </item>
                   </layout>
                  </item>
-                 <item>
+                 <item row="6" column="0">
                   <layout class="QHBoxLayout" name="hlayout_ok_det">
                    <property name="spacing">
                     <number>6</number>
@@ -2066,7 +2151,7 @@ QLineEdit:focus {
                      <property name="minimumSize">
                       <size>
                        <width>0</width>
-                       <height>28</height>
+                       <height>30</height>
                       </size>
                      </property>
                      <property name="font">
@@ -2089,7 +2174,10 @@ QLineEdit:focus {
 </string>
                      </property>
                      <property name="text">
-                      <string>...</string>
+                      <string/>
+                     </property>
+                     <property name="placeholderText">
+                      <string>C:/Image</string>
                      </property>
                     </widget>
                    </item>
@@ -2123,7 +2211,7 @@ QLineEdit:focus {
                    </item>
                   </layout>
                  </item>
-                 <item>
+                 <item row="7" column="0">
                   <layout class="QHBoxLayout" name="hlayout_log">
                    <property name="spacing">
                     <number>6</number>
@@ -2151,7 +2239,7 @@ QLineEdit:focus {
                      <property name="minimumSize">
                       <size>
                        <width>0</width>
-                       <height>28</height>
+                       <height>30</height>
                       </size>
                      </property>
                      <property name="font">
@@ -2174,7 +2262,10 @@ QLineEdit:focus {
 </string>
                      </property>
                      <property name="text">
-                      <string>...</string>
+                      <string/>
+                     </property>
+                     <property name="placeholderText">
+                      <string>C:/Image</string>
                      </property>
                     </widget>
                    </item>

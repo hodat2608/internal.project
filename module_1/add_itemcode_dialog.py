@@ -118,16 +118,31 @@ class _DeepCopier:
             self._copy_parameterset(old_model_id, new_model_id)
 
     def _copy_weights(self, old_model_id: int, new_model_id: int):
+        try:
+            self._cur.execute("SHOW COLUMNS FROM WEIGHTS LIKE 'Image_format'")
+            if not self._cur.fetchone():
+                self._cur.execute("ALTER TABLE WEIGHTS ADD COLUMN Image_format VARCHAR(255) DEFAULT 'PNG' AFTER Max_Detections")
+        except Exception:
+            pass
+
         self._cur.execute(
-            "SELECT Weight_Path, Activity_History_Path, Conf_Value, Size_Value, Device, Source, Task "
-            "FROM WEIGHTS WHERE model_id = %s",
+            """SELECT Weight_Path, Activity_History_Path, Conf_Value, Size_Value, Device, Source, Task,
+                      Model_Runtime, Weight_TensorRT_Path, Classes_File_Path, IOU_Value, Max_Detections,
+                      Image_format, Folder_NG_Original_Path, Save_NG_Original, Folder_NG_Detected_Path,
+                      Save_NG_Detected, Folder_OK_Original_Path, Save_OK_Original, Folder_OK_Detected_Path,
+                      Save_OK_Detected, Folder_Image_Logging
+               FROM WEIGHTS WHERE model_id = %s""",
             (old_model_id,)
         )
         for row in self._cur.fetchall():
             self._cur.execute(
                 """INSERT INTO WEIGHTS
-                   (Weight_Path, Activity_History_Path, Conf_Value, Size_Value, Device, Source, Task, model_id)
-                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
+                   (Weight_Path, Activity_History_Path, Conf_Value, Size_Value, Device, Source, Task,
+                    Model_Runtime, Weight_TensorRT_Path, Classes_File_Path, IOU_Value, Max_Detections,
+                    Image_format, Folder_NG_Original_Path, Save_NG_Original, Folder_NG_Detected_Path,
+                    Save_NG_Detected, Folder_OK_Original_Path, Save_OK_Original, Folder_OK_Detected_Path,
+                    Save_OK_Detected, Folder_Image_Logging, model_id)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
                 (*row, new_model_id)
             )
 

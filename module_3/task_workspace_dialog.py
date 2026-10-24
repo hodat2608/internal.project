@@ -71,7 +71,7 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
                 border: 1px solid #45475a;
                 border-radius: 6px;
                 padding: 7px 15px;
-                color: #cdd6f4;
+                color: #ffffff;
                 font-weight: bold;
                 font-size: 13px;
             }
@@ -80,44 +80,56 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
                 color: #ffffff;
             }
             QPushButton#btnAddTask {
-                background-color: #89b4fa;
-                color: #11111b;
-                border: none;
+                background-color: #2563eb;
+                color: #ffffff;
+                border: 1px solid #3b82f6;
             }
             QPushButton#btnAddTask:hover {
-                background-color: #b4befe;
+                background-color: #1d4ed8;
             }
             QPushButton#btnEditTask {
-                background-color: #f9e2af;
-                color: #11111b;
-                border: none;
+                background-color: #d97706;
+                color: #ffffff;
+                border: 1px solid #f59e0b;
             }
             QPushButton#btnEditTask:hover {
-                background-color: #f5e0dc;
+                background-color: #b45309;
             }
             QPushButton#btnDeleteTask {
-                background-color: #f38ba8;
-                color: #11111b;
-                border: none;
+                background-color: #dc2626;
+                color: #ffffff;
+                border: 1px solid #ef4444;
             }
             QPushButton#btnDeleteTask:hover {
-                background-color: #eba0ac;
+                background-color: #b91c1c;
             }
             QPushButton#btnCloneTask {
-                background-color: #cba6f7;
-                color: #11111b;
-                border: none;
+                background-color: #7c3aed;
+                color: #ffffff;
+                border: 1px solid #8b5cf6;
             }
             QPushButton#btnCloneTask:hover {
-                background-color: #dcd7ba;
+                background-color: #6d28d9;
             }
             QTableWidget {
                 background-color: #181825;
+                alternate-background-color: #212234;
                 border: 1px solid #313244;
                 gridline-color: #313244;
-                color: #cdd6f4;
+                color: #ffffff;
                 border-radius: 6px;
                 font-size: 13px;
+                selection-background-color: #2563eb;
+                selection-color: #ffffff;
+            }
+            QTableWidget::item:hover {
+                background-color: #383a52;
+                color: #ffffff;
+            }
+            QTableWidget::item:selected {
+                background-color: #2563eb;
+                color: #ffffff;
+                font-weight: bold;
             }
             QHeaderView::section {
                 background-color: #313244;

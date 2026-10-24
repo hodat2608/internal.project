@@ -13,7 +13,7 @@ from PyQt5.QtGui import QStandardItem
 from mysql.connector import Error
 import cv2, numpy as np
 from pathlib import Path
-from typing import Final
+from typing import Final, Any, Optional, Dict
 COLUMN_MAPPING: Final[dict[str, str]] = {
     "Label Name":     "`Label_Name`",
     "Enabled [✓]":        "`Join`",
@@ -27,6 +27,21 @@ COLUMN_MAPPING: Final[dict[str, str]] = {
     "Register": "`Assign_Value`",
     "Value": "`Value`",
     "Confidence":     "`Confidence`",
+}
+
+# CẤU HÌNH GIÁ TRỊ MẶC ĐỊNH CHO BẢNG THÔNG SỐ MODEL
+DEFAULT_ROW_VALUES: Final[dict[str, Any]] = {
+    "Enabled [✓]": True,       # Mặc định có tích vào ô
+    "OK [🟢]": False,          # Mặc định bỏ tích
+    "NG [🔴]": False,          # Mặc định bỏ tích
+    "Qty": "1",               # Mặc định là 1
+    "Min Width": "1",         # Mặc định là 1
+    "Max Width": "10000",     # Mặc định là 10000
+    "Min Height": "1",        # Mặc định là 1
+    "Max Height": "10000",    # Mặc định là 10000
+    "Register": "DM",         # Mặc định có 2 chữ cái đầu là DM
+    "Value": "1",             # Mặc định là 1
+    "Confidence": "30",       # Mặc định là 30
 }
 import time
 from module_3.yolo_factory import YoloFactory
@@ -78,6 +93,36 @@ class CheckboxDelegate(QStyledItemDelegate):
             new_value = Qt.Unchecked if current_value == Qt.Checked else Qt.Checked
             model.setData(index, new_value, Qt.CheckStateRole)
         return True
+
+
+class RegisterDelegate(QStyledItemDelegate):
+    """
+    Delegate cho cột Register (thanh ghi PLC).
+    Tự động chuẩn hóa tiền tố 'DM' để người dùng chỉ cần nhập tên/số thanh ghi (VD: nhập 1009 -> DM1009).
+    """
+    def createEditor(self, parent, option, index):
+        editor = QtWidgets.QLineEdit(parent)
+        editor.setPlaceholderText("VD: 1009 hoặc DM1009")
+        return editor
+
+    def setEditorData(self, editor, index):
+        val = str(index.data() or "").strip()
+        if not val:
+            val = "DM"
+        editor.setText(val)
+        editor.setCursorPosition(len(val))
+
+    def setModelData(self, editor, model, index):
+        raw = editor.text().strip()
+        if not raw:
+            formatted = "DM"
+        else:
+            upper = raw.upper()
+            if not upper.startswith("DM"):
+                formatted = f"DM{upper}"
+            else:
+                formatted = upper
+        model.setData(index, formatted, Qt.EditRole)
     
     
 class Process_Model:
@@ -128,9 +173,90 @@ class Process_Model:
                 else:
                     header.setSectionResizeMode(i, QtWidgets.QHeaderView.Stretch)
             
+            # Cài đặt Delegates mặc định cho Checkbox và Register
+            checkbox_delegate = CheckboxDelegate(self.uic.tableView)
+            for chk_col in [self.keys_mapping[1], self.keys_mapping[2], self.keys_mapping[3]]:
+                if chk_col in self.uic.model_column:
+                    self.uic.tableView.setItemDelegateForColumn(self.uic.model_column.index(chk_col), checkbox_delegate)
+            if "Register" in self.uic.model_column:
+                self.uic.tableView.setItemDelegateForColumn(
+                    self.uic.model_column.index("Register"),
+                    RegisterDelegate(self.uic.tableView)
+                )
+
+        self.uic.model.itemChanged.connect(self._on_table_item_changed)
         self.uic.is_unlocked = False
 
         self.set_ui_enabled(False)
+
+    def create_table_row_items(self, label_name: str, custom_values: Optional[dict] = None) -> list:
+        """
+        Tạo danh sách QStandardItem cho 1 hàng với các giá trị mặc định chuẩn xác:
+        - Max Width, Max Height: 10000
+        - Enabled [✓]: Có tích vào ô (Qt.Checked)
+        - Register: Bắt đầu bằng 'DM'
+        - Value: 1
+        - Confidence: 30
+        - Qty: 1
+        - Min Width, Min Height: 1
+        """
+        values_dict = custom_values or {}
+        row_items = []
+        for col_name in self.uic.model_column:
+            item = QStandardItem()
+            if col_name == self.keys_mapping[0]:  # "Label Name"
+                item.setText(str(label_name))
+                item.setTextAlignment(Qt.AlignCenter)
+            elif col_name in [self.keys_mapping[1], self.keys_mapping[2], self.keys_mapping[3]]:
+                item.setCheckable(True)
+                if col_name in values_dict and values_dict[col_name] is not None:
+                    is_chk = bool(values_dict[col_name])
+                else:
+                    is_chk = bool(DEFAULT_ROW_VALUES.get(col_name, False))
+                item.setCheckState(Qt.Checked if is_chk else Qt.Unchecked)
+            else:
+                val = values_dict.get(col_name)
+                # Nếu không có giá trị từ custom_values hoặc giá trị là 0 cho các cột cần mặc định khác 0
+                if val is None or str(val).strip() == "" or (str(val).strip() == "0" and col_name in (
+                    "Max Width", "Max Height", "Register", "Qty", "Value", "Confidence", "Min Width", "Min Height"
+                )):
+                    val_str = str(DEFAULT_ROW_VALUES.get(col_name, "0"))
+                else:
+                    val_str = str(val).strip()
+
+                if col_name == "Register":
+                    if not val_str or val_str == "0":
+                        val_str = "DM"
+                    elif not val_str.upper().startswith("DM"):
+                        val_str = f"DM{val_str.upper()}"
+                    else:
+                        val_str = val_str.upper()
+
+                item.setText(val_str)
+                item.setTextAlignment(Qt.AlignCenter)
+            row_items.append(item)
+        return row_items
+
+    def _on_table_item_changed(self, item):
+        """Đảm bảo cột Register luôn có tiền tố 'DM' kể cả khi nhập trực tiếp hoặc paste."""
+        if not hasattr(self.uic, 'model_column'):
+            return
+        if "Register" in self.uic.model_column:
+            reg_idx = self.uic.model_column.index("Register")
+            if item.column() == reg_idx:
+                txt = item.text().strip()
+                if not txt:
+                    self.uic.model.blockSignals(True)
+                    item.setText("DM")
+                    self.uic.model.blockSignals(False)
+                elif not txt.upper().startswith("DM"):
+                    self.uic.model.blockSignals(True)
+                    item.setText(f"DM{txt.upper()}")
+                    self.uic.model.blockSignals(False)
+                elif txt != txt.upper():
+                    self.uic.model.blockSignals(True)
+                    item.setText(txt.upper())
+                    self.uic.model.blockSignals(False)
 
     def get_current_camera_id(self):
         """Lấy camera_id từ thuộc tính hoặc từ comboBox_camera_id."""
@@ -303,13 +429,19 @@ class Process_Model:
         if getattr(self, 'is_unlocked', False):
             self.lock_gui(cursor, connect_db, method=False, boolen=False)
             self.is_unlocked = False
+            self.current_role = None
+            self.current_user = None
             self.uic.pushButton_edit_params.setText("Edit Parameters")
         else:
-            if self.lock_gui(cursor, connect_db, method=True, boolen=True):
-                self.is_unlocked = True
-                self.uic.pushButton_edit_params.setText("Lock Edit")
+            self.lock_gui(cursor, connect_db, method=True, boolen=True)
 
-    def set_ui_enabled(self, enabled=False):
+    def set_ui_enabled(self, enabled=False, role='full_control'):
+        """
+        Khóa hoặc mở khóa giao diện theo phân quyền:
+        - read_only / enabled=False: Khóa toàn bộ các đối tượng thao tác
+        - modify: Chỉ cho phép điều chỉnh bảng thông số (self.uic.tableView) và lưu bảng (pushButton_save_data)
+        - full_control / __ADMIN__: Mở toàn bộ đối tượng điều khiển
+        """
         widget_types = [
             QtWidgets.QPushButton, 
             QtWidgets.QLineEdit, 
@@ -320,81 +452,123 @@ class Process_Model:
             QtWidgets.QCheckBox, 
             QtWidgets.QRadioButton
         ]
-        for widget_type in widget_types:
-            for widget in self.uic.centralwidget.findChildren(widget_type):
-                if widget != self.uic.pushButton_edit_params:
-                    widget.setEnabled(enabled)
-        self.uic.pushButton_edit_params.setEnabled(True)
+
+        # 1. Nếu khóa toàn bộ (enabled=False) hoặc quyền read_only
+        if not enabled or role == 'read_only':
+            for widget_type in widget_types:
+                for widget in self.uic.centralwidget.findChildren(widget_type):
+                    if widget != self.uic.pushButton_edit_params:
+                        widget.setEnabled(False)
+            self.uic.pushButton_edit_params.setEnabled(True)
+            return
+
+        # 2. Nếu quyền modify: Chỉ thao tác điều chỉnh các thông số trong tableView và lưu dữ liệu
+        if role == 'modify':
+            # Khóa toàn bộ widget con trước
+            for widget_type in widget_types:
+                for widget in self.uic.centralwidget.findChildren(widget_type):
+                    if widget != self.uic.pushButton_edit_params:
+                        widget.setEnabled(False)
+
+            # Chỉ mở khóa TableView và nút Lưu dữ liệu bảng
+            if hasattr(self.uic, 'tableView'):
+                self.uic.tableView.setEnabled(True)
+            if hasattr(self.uic, 'pushButton_save_data'):
+                self.uic.pushButton_save_data.setEnabled(True)
+            if hasattr(self.uic, 'pushButton_load_parameters'):
+                self.uic.pushButton_load_parameters.setEnabled(True)
+            self.uic.pushButton_edit_params.setEnabled(True)
+            return
+
+        # 3. Nếu quyền full_control hoặc Administrator: Mở toàn bộ các đối tượng
+        if role in ('full_control', '__ADMIN__'):
+            for widget_type in widget_types:
+                for widget in self.uic.centralwidget.findChildren(widget_type):
+                    if widget != self.uic.pushButton_edit_params:
+                        widget.setEnabled(True)
+            self.uic.pushButton_edit_params.setEnabled(True)
+            return
 
     def lock_gui(self, cursor, connect_db, method=False, boolen=False):
-        if method:
-            dlg = QtWidgets.QDialog()
-            dlg.setWindowTitle("User Authentication")
-            dlg.setFixedSize(280, 160)
-            layout = QtWidgets.QVBoxLayout()
+        if not method:
+            self.set_ui_enabled(enabled=False, role='read_only')
+            self.is_unlocked = False
+            self.current_role = None
+            self.current_user = None
+            if hasattr(self.uic, 'pushButton_edit_params'):
+                self.uic.pushButton_edit_params.setText("Edit Parameters")
+            return True
 
-            user_combo = QtWidgets.QComboBox()
-            user_combo.addItem("Administrator (Master)", userData="__ADMIN__")
-            
-            try:
-                from Administrator.user_db import get_all_users
-                users = get_all_users(cursor)
-                if users:
-                    for u in users:
-                        user_id, username, role, is_active, *_ = u
-                        if is_active:
-                            user_combo.addItem(f"{username} (Role: {role})", userData=username)
-            except Exception as e:
-                print("Could not load users from DB:", e)
-
-            password_input = QtWidgets.QLineEdit()
-            password_input.setEchoMode(QtWidgets.QLineEdit.Password)
-            password_input.setPlaceholderText("Enter password")
-
-            button = QtWidgets.QPushButton("Unlock GUI")
-
-            def check_password():
-                selected_user = user_combo.currentData()
-                input_pass = password_input.text()
-                
-                if selected_user == "__ADMIN__":
-                    from Administrator.user_db import verify_admin_password
-                    if verify_admin_password(input_pass):
-                        dlg.accept()
-                    else:
-                        QtWidgets.QMessageBox.warning(dlg, "Sai mật khẩu", "Mật khẩu Admin không đúng!")
-                else:
-                    try:
-                        cursor.execute("SELECT password_hash, role FROM ADMINISTRATOR.ADMIN_USERS WHERE username = %s AND is_active = 1", (selected_user,))
-                        result = cursor.fetchone()
-                        if result:
-                            saved_hash, role = result
-                            from Administrator.user_db import verify_password
-                            if verify_password(input_pass, saved_hash):
-                                dlg.accept()
-                            else:
-                                QtWidgets.QMessageBox.warning(dlg, "Sai mật khẩu", "Mật khẩu không đúng!")
-                        else:
-                            QtWidgets.QMessageBox.warning(dlg, "Lỗi", "Tài khoản không tồn tại hoặc bị vô hiệu hóa!")
-                    except Exception as e:
-                        QtWidgets.QMessageBox.critical(dlg, "Lỗi CSDL", str(e))
-
-            button.clicked.connect(check_password)
-
-            layout.addWidget(QtWidgets.QLabel("Select User:"))
-            layout.addWidget(user_combo)
-            layout.addWidget(password_input)
-            layout.addWidget(button)
-            dlg.setLayout(layout)
-
+        try:
+            from module_3.auth_dialog import EnterpriseAuthDialog
+            dlg = EnterpriseAuthDialog(
+                cursor=cursor,
+                parent=getattr(self.uic, 'centralwidget', None),
+                system_context="Cấu Hình Tham Số Mô Hình (Model Options)"
+            )
             if dlg.exec_() == QtWidgets.QDialog.Accepted:
-                self.set_ui_enabled(enabled=boolen)
-                return True
+                is_auth, username, role = dlg.get_auth_result()
+                if not is_auth:
+                    return False
+
+                self.current_user = username
+                self.current_role = role
+
+                # ─────────────────────────────────────────────────────────────
+                # PHÂN QUYỀN HỆ THỐNG:
+                # ─────────────────────────────────────────────────────────────
+                # 1. Trường hợp read_only: Mặc dù đúng pass nhưng đối tượng vẫn bị khóa
+                if role == "read_only":
+                    self.set_ui_enabled(enabled=False, role="read_only")
+                    self.is_unlocked = False
+                    self.uic.pushButton_edit_params.setText("Edit Parameters")
+                    QtWidgets.QMessageBox.warning(
+                        self.uic.centralwidget,
+                        "Quyền hạn bị giới hạn (Read Only)",
+                        f"Tài khoản '{username}' có quyền hạn [read_only] (Chỉ xem).\n\n"
+                        "Hệ thống không cho phép thực hiện thao tác hay chỉnh sửa thông số!\n"
+                        "Tất cả các đối tượng tiếp tục được giữ ở trạng thái KHÓA."
+                    )
+                    return False
+
+                # 2. Trường hợp modify: Chỉ cho phép điều chỉnh bảng tableView và lưu bảng
+                elif role == "modify":
+                    self.set_ui_enabled(enabled=True, role="modify")
+                    self.is_unlocked = True
+                    self.uic.pushButton_edit_params.setText("Lock Edit")
+                    QtWidgets.QMessageBox.information(
+                        self.uic.centralwidget,
+                        "Mở khóa thành công (Quyền Modify)",
+                        f"Xác thực thành công cho tài khoản '{username}' [Quyền: Modify].\n\n"
+                        "Bạn chỉ được phép hiệu chỉnh các thông số trong Bảng thông số (TableView) và Lưu dữ liệu.\n"
+                        "Các nhóm cấu hình khác (Weights, Camera, Thư mục lưu ảnh...) vẫn được bảo vệ khóa an toàn."
+                    )
+                    return True
+
+                # 3. Trường hợp full_control hoặc Master Administrator: Mở toàn bộ
+                elif role in ("full_control", "__ADMIN__"):
+                    self.set_ui_enabled(enabled=True, role="full_control")
+                    self.is_unlocked = True
+                    self.uic.pushButton_edit_params.setText("Lock Edit")
+                    QtWidgets.QMessageBox.information(
+                        self.uic.centralwidget,
+                        "Mở khóa thành công (Full Control)",
+                        f"Xác thực thành công cho tài khoản '{username}' [Toàn quyền].\n\n"
+                        "Toàn bộ các đối tượng điều khiển và cấu hình hệ thống đã được MỞ KHÓA."
+                    )
+                    return True
+                else:
+                    self.set_ui_enabled(enabled=False, role="read_only")
+                    self.is_unlocked = False
+                    return False
             else:
                 return False
-        else:
-            self.set_ui_enabled(enabled=boolen)
-            return True
+        except Exception as e:
+            print("Error in lock_gui (handle_option_models):", e)
+            import traceback
+            traceback.print_exc()
+            QtWidgets.QMessageBox.critical(None, "Lỗi xác thực", str(e))
+            return False
 
     def browse_file(self):
             options = QtWidgets.QFileDialog.Options()
@@ -600,27 +774,19 @@ class Process_Model:
     def populateTable(self):
         self.uic.model.removeRows(0, self.uic.model.rowCount())
         if isinstance(self.model.names, list) or isinstance(self.model.names, dict):
-            for label in self.model.names if isinstance(self.model.names, list) else self.model.names.values():
-                row_items = []
-                checkbox_delegate = CheckboxDelegate(self.uic.tableView)
-                for col_name in [self.keys_mapping[1], self.keys_mapping[2], self.keys_mapping[3]]:
-                    col_index = self.uic.model_column.index(col_name)
-                    self.uic.tableView.setItemDelegateForColumn(col_index, checkbox_delegate)
+            # Cài đặt delegates cho cột Checkbox và Register
+            checkbox_delegate = CheckboxDelegate(self.uic.tableView)
+            for col_name in [self.keys_mapping[1], self.keys_mapping[2], self.keys_mapping[3]]:
+                col_index = self.uic.model_column.index(col_name)
+                self.uic.tableView.setItemDelegateForColumn(col_index, checkbox_delegate)
+            if "Register" in self.uic.model_column:
+                self.uic.tableView.setItemDelegateForColumn(
+                    self.uic.model_column.index("Register"),
+                    RegisterDelegate(self.uic.tableView)
+                )
 
-                for col in range(len(self.uic.model_column)): 
-                    item = QStandardItem()
-                    if col == self.uic.model_column.index(self.keys_mapping[0]): 
-                        item.setText(str(label))
-                        item.setTextAlignment(Qt.AlignCenter)
-                    elif col in [self.uic.model_column.index(self.keys_mapping[1]),\
-                                self.uic.model_column.index(self.keys_mapping[2]),\
-                                self.uic.model_column.index(self.keys_mapping[3])]:
-                        item.setCheckable(True)
-                        item.setCheckState(Qt.Unchecked)
-                    else:  
-                        item.setText("0")
-                        item.setTextAlignment(Qt.AlignCenter)
-                    row_items.append(item)
+            for label in (self.model.names if isinstance(self.model.names, list) else self.model.names.values()):
+                row_items = self.create_table_row_items(str(label))
                 self.uic.model.appendRow(row_items)
         _log.info("Populate table successfully")
         
@@ -700,6 +866,7 @@ class Process_Model:
             classes_file_path = self.uic.lineEdit_classes_txt.text().strip()
             iou_value = self.uic.spinBox_iou.value()
             max_detections = self.uic.spinBox_max_detection.value()
+            image_format = self.uic.Image_format.currentText().strip() if hasattr(self.uic, 'Image_format') else 'PNG'
             folder_ng_original_path = self.uic.lineEdit_NG_image_original.text().strip()
             save_ng_original = self.uic.checkBox_NG_image_original.isChecked()
             folder_ng_detected_path = self.uic.lineEdit_NG_image_detected.text().strip()
@@ -710,6 +877,13 @@ class Process_Model:
             save_ok_detected = self.uic.checkBox_OK_image_detected.isChecked()
             folder_image_logging = self.uic.lineEdit_logging_image.text().strip()
             
+            try:
+                cursor.execute("SHOW COLUMNS FROM WEIGHTS LIKE 'Image_format'")
+                if not cursor.fetchone():
+                    cursor.execute("ALTER TABLE WEIGHTS ADD COLUMN Image_format VARCHAR(255) DEFAULT 'PNG' AFTER Max_Detections")
+            except Exception:
+                pass
+
             cursor.execute(
                     f"DELETE FROM WEIGHTS WHERE model_id = %s",
                     (model_id,),
@@ -718,9 +892,9 @@ class Process_Model:
             if weight_filename_for_db and weight_filename_for_db.endswith('.pt'):
                 cursor.execute("""
                     INSERT IGNORE INTO WEIGHTS
-                    (Weight_Path, Activity_History_Path, Conf_Value, Size_Value, Device, Source, Task, Model_Runtime, Weight_TensorRT_Path, Classes_File_Path, IOU_Value, Max_Detections, Folder_NG_Original_Path, Save_NG_Original, Folder_NG_Detected_Path, Save_NG_Detected, Folder_OK_Original_Path, Save_OK_Original, Folder_OK_Detected_Path, Save_OK_Detected, Folder_Image_Logging, model_id)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """, (weight_filename_for_db, activity_history, conf, size, device_load_model, source_model, task_model,model_runtime, weight_tensorrt_path, classes_file_path, iou_value, max_detections, folder_ng_original_path, save_ng_original, folder_ng_detected_path, save_ng_detected, folder_ok_original_path, save_ok_original, folder_ok_detected_path, save_ok_detected, folder_image_logging, model_id))
+                    (Weight_Path, Activity_History_Path, Conf_Value, Size_Value, Device, Source, Task, Model_Runtime, Weight_TensorRT_Path, Classes_File_Path, IOU_Value, Max_Detections, Image_format, Folder_NG_Original_Path, Save_NG_Original, Folder_NG_Detected_Path, Save_NG_Detected, Folder_OK_Original_Path, Save_OK_Original, Folder_OK_Detected_Path, Save_OK_Detected, Folder_Image_Logging, model_id)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, (weight_filename_for_db, activity_history, conf, size, device_load_model, source_model, task_model, model_runtime, weight_tensorrt_path, classes_file_path, iou_value, max_detections, image_format, folder_ng_original_path, save_ng_original, folder_ng_detected_path, save_ng_detected, folder_ok_original_path, save_ok_original, folder_ok_detected_path, save_ok_detected, folder_image_logging, model_id))
 
             cursor.execute(
                     f"DELETE FROM PARAMETERSET WHERE model_id = %s",
@@ -732,7 +906,10 @@ class Process_Model:
                     if "Register" in row_dict:
                         val = row_dict["Register"]
                         if val is not None and str(val).strip() != "":
-                            row_dict["Register"] = str(val).upper()
+                            val_str = str(val).strip().upper()
+                            if not val_str.startswith("DM"):
+                                val_str = f"DM{val_str}"
+                            row_dict["Register"] = val_str
                     if "Value" in row_dict:
                         val = row_dict["Value"]
                         if val is not None and str(val).strip() != "":
@@ -790,18 +967,8 @@ class Process_Model:
             label_text = label_item.text().strip()
             for param_dict in self.list_layer:
                 if param_dict[self.keys_mapping[0]] == label_text:
-                    for col, col_name in enumerate(model_column):
-                        value = param_dict.get(col_name)
-                        item = QStandardItem()
-                        if col == label_col_index:
-                            item.setText(label_text)
-                            item.setTextAlignment(Qt.AlignCenter)
-                        elif col_name in [self.keys_mapping[1], self.keys_mapping[2], self.keys_mapping[3]]:
-                            item.setCheckable(True)
-                            item.setCheckState(Qt.Checked if value else Qt.Unchecked)
-                        else:
-                            item.setText(str(value))
-                            item.setTextAlignment(Qt.AlignCenter)
+                    row_items = self.create_table_row_items(label_text, param_dict)
+                    for col, item in enumerate(row_items):
                         model.setItem(row, col, item)
 
         _log.info("Load parameter successfully")
@@ -840,17 +1007,24 @@ class Process_Model:
             self.model_id = self.get_current_model_id()
             self.load_task_calculator_config()
 
+            try:
+                cursor.execute("SHOW COLUMNS FROM WEIGHTS LIKE 'Image_format'")
+                if not cursor.fetchone():
+                    cursor.execute("ALTER TABLE WEIGHTS ADD COLUMN Image_format VARCHAR(255) DEFAULT 'PNG' AFTER Max_Detections")
+            except Exception:
+                pass
+
             weight_path = None
             cursor.execute("""
                 SELECT Weight_Path, Activity_History_Path ,Conf_Value, Size_Value, Device,Source,Task,
-                Model_Runtime, Weight_TensorRT_Path, Classes_File_Path, IOU_Value, Max_Detections, Folder_NG_Original_Path, Save_NG_Original, Folder_NG_Detected_Path, Save_NG_Detected, Folder_OK_Original_Path, Save_OK_Original, Folder_OK_Detected_Path, Save_OK_Detected, Folder_Image_Logging
+                Model_Runtime, Weight_TensorRT_Path, Classes_File_Path, IOU_Value, Max_Detections, Image_format, Folder_NG_Original_Path, Save_NG_Original, Folder_NG_Detected_Path, Save_NG_Detected, Folder_OK_Original_Path, Save_OK_Original, Folder_OK_Detected_Path, Save_OK_Detected, Folder_Image_Logging
                 FROM WEIGHTS
                 WHERE model_id = (SELECT id FROM NUMS_MODEL WHERE camera_id = %s AND nums_model = %s)
             """, (camera_id, model))
             result = cursor.fetchall()
 
             if result:
-                weight_db_val, activity_history, conf_value, size_value, device, source, task, model_runtime, weight_tensorrt_path, classes_file_path, iou_value, max_detections, folder_ng_original_path, save_ng_original, folder_ng_detected_path, save_ng_detected, folder_ok_original_path, save_ok_original, folder_ok_detected_path, save_ok_detected, folder_image_logging = result[0]
+                weight_db_val, activity_history, conf_value, size_value, device, source, task, model_runtime, weight_tensorrt_path, classes_file_path, iou_value, max_detections, image_format, folder_ng_original_path, save_ng_original, folder_ng_detected_path, save_ng_detected, folder_ok_original_path, save_ok_original, folder_ok_detected_path, save_ok_detected, folder_image_logging = result[0]
                 
                 weight_path = ""
                 weight_filename = ""
@@ -876,6 +1050,8 @@ class Process_Model:
                 self.uic.lineEdit_classes_txt.setText(classes_file_path)
                 self.uic.spinBox_iou.setValue(iou_value)
                 self.uic.spinBox_max_detection.setValue(max_detections)
+                if image_format and hasattr(self.uic, 'Image_format'):
+                    self.uic.Image_format.setCurrentText(str(image_format))
                 self.uic.lineEdit_NG_image_original.setText(folder_ng_original_path)
                 self.uic.checkBox_NG_image_original.setChecked(save_ng_original)
                 self.uic.lineEdit_NG_image_detected.setText(folder_ng_detected_path)
@@ -921,27 +1097,12 @@ class Process_Model:
                     for label_name in (self.model_loader.names if isinstance(self.model_loader.names, list) else self.model_loader.names.values()):
                         for row_data in result:
                             if str(row_data[db_columns.index(list(COLUMN_MAPPING.values())[0])]) == str(label_name):
-                                row_items = []
-                                checkbox_delegate = CheckboxDelegate(self.uic.tableView)
-                                for col_name in [self.keys_mapping[1], self.keys_mapping[2], self.keys_mapping[3]]:
-                                    col_index = self.uic.model_column.index(col_name)
-                                    self.uic.tableView.setItemDelegateForColumn(col_index, checkbox_delegate)
-
+                                custom_vals = {}
                                 for ui_col in self.uic.model_column:
                                     db_col = COLUMN_MAPPING[ui_col]
                                     db_value = row_data[db_columns.index(db_col)]
-
-                                    item = QStandardItem()
-                                    if ui_col == self.keys_mapping[0]:
-                                        item.setText(str(label_name))
-                                        item.setTextAlignment(Qt.AlignCenter)
-                                    elif ui_col in [self.keys_mapping[1], self.keys_mapping[2], self.keys_mapping[3]]:
-                                        item.setCheckable(True)
-                                        item.setCheckState(Qt.Checked if db_value else Qt.Unchecked)
-                                    else:
-                                        item.setText(str(db_value))
-                                        item.setTextAlignment(Qt.AlignCenter)
-                                    row_items.append(item)
+                                    custom_vals[ui_col] = db_value
+                                row_items = self.create_table_row_items(str(label_name), custom_vals)
                                 self.uic.model.appendRow(row_items)   
                 else:
                     _log.warning("Not found label model data in database")  

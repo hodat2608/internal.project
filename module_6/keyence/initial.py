@@ -14,9 +14,9 @@ class KeyenceClient:
         """
         assert mode in ("ascii", "binary"), "Mode phải là 'ascii' hoặc 'binary'"
         self.ip = ip
-        self.port = port
+        self.port = int(port)
         self.mode = mode
-        self.timeout = timeout
+        self.timeout = float(timeout)
         self.sock = None
         self.locked = threading.Lock()
         self.trigger_file_path = resource_path("module_3\\trigger.txt")
@@ -177,10 +177,9 @@ class KeyenceClient:
                 _log.info(f"Connected to Keyence PLC ({self.mode} mode)")
                 return True
             except Exception as e:
+                _log.warning(f"Cannot connect to PLC {self.ip}:{self.port} (Attempt {i+1}/3) -> {e}")
                 if i < 2:
                     time.sleep(1)
-                _log.warning(f"Cannot connect to PLC {self.ip}:{self.port} (Attempt {i+1}/3) -> {e}")
-                return True
         _log.error(f"Connection failed after 3 attempts to Keyence PLC {self.ip}:{self.port}")
         return True
 

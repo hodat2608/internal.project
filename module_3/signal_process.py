@@ -241,6 +241,8 @@ class DataProcessSignal:
             raise   
 
     def save_register_name_line_code(self,cursor,connect_db):
+        if not self.check_permission_full_control():
+            return
         Itemcode = self.uic.comboBox_Itemcode.currentText()
         assign_register = self.uic.lineEdit_assign_itemcode_plc.text()
         value_bit_on = self.uic.comboBox_value_register_bit_on.currentText()
@@ -297,6 +299,8 @@ class DataProcessSignal:
                 connect_db.connection.commit()
 
     def save_mode_auto(self, cursor, connect_db, item_code_id):
+        if not self.check_permission_full_control():
+            return
         try:
             camera_name = self.uic.comboBox_camera.currentText()
             register_mode = self.uic.lineEdit_register_mode.text()
@@ -373,6 +377,8 @@ class DataProcessSignal:
         return result[0] if result else None
 
     def save_values_signal_to_db_from_gui(self, cursor,connect_db,item_code_id):
+        if not self.check_permission_full_control():
+            return
         mode_auto_id = self.produce_mode_auto_id(cursor,connect_db,item_code_id)
         if mode_auto_id:
             try:
@@ -636,6 +642,8 @@ class DataProcessSignal:
     
     
     def save_shotxmodel_to_db(self,cursor,connect_db,item_code_id):
+        if not self.check_permission_full_control():
+            return
         mode_auto_id = self.produce_mode_auto_id(cursor,connect_db,item_code_id)
         if mode_auto_id:
             try: 
@@ -848,6 +856,8 @@ class DataProcessSignal:
 
 
     def save_all_data(self,cursor,connect_db,camera_id):
+        if not self.check_permission_full_control():
+            return
         try:
             self.save_signal_transmission_and_reception(cursor,connect_db,camera_id)
             self.save_signal_timing_config(cursor,connect_db,camera_id)
@@ -1002,15 +1012,27 @@ class DataProcessSignal:
         
 
     
+    def check_permission_full_control(self) -> bool:
+        """Kiểm tra quyền bắt buộc full_control hoặc Administrator để chỉnh sửa signal_transmission."""
+        if not getattr(self, 'is_unlocked', False) or getattr(self, 'current_role', None) not in ('full_control', '__ADMIN__'):
+            QtWidgets.QMessageBox.warning(
+                getattr(self.uic, 'centralwidget', None),
+                "Từ chối quyền hạn",
+                "Giao diện Cài đặt Tín hiệu PLC (Signal Transmission) yêu cầu quyền [full_control] hoặc Quản trị viên (Administrator) mới được phép chỉnh sửa!\n\n"
+                "Vui lòng nhấn nút ADMIN để đăng nhập với tài khoản có đủ quyền hạn."
+            )
+            return False
+        return True
+
     def toggle_lock(self, cursor, connect_db):
         if getattr(self, 'is_unlocked', False):
             self.lock_gui(cursor, connect_db, method=False, boolen=False)
             self.is_unlocked = False
+            self.current_role = None
+            self.current_user = None
             self.uic.pushButton_admin.setText("ADMIN")
         else:
-            if self.lock_gui(cursor, connect_db, method=True, boolen=True):
-                self.is_unlocked = True
-                self.uic.pushButton_admin.setText("LOCK")
+            self.lock_gui(cursor, connect_db, method=True, boolen=True)
 
     def set_ui_enabled(self, enabled=False):
         widget_types = (
@@ -1027,79 +1049,62 @@ class DataProcessSignal:
 
     def lock_gui(self, cursor, connect_db, method=False, boolen=False):
         try:
-            if method:
-                dlg = QtWidgets.QDialog()
-                dlg.setWindowTitle("User Authentication")
-                dlg.setFixedSize(320, 180)
-                dlg.setWindowFlags(dlg.windowFlags() | QtCore.Qt.WindowStaysOnTopHint)
-                layout = QtWidgets.QVBoxLayout()
+            if not method:
+                self.set_ui_enabled(enabled=False)
+                self.is_unlocked = False
+                self.current_role = None
+                self.current_user = None
+                self.uic.pushButton_admin.setText("ADMIN")
+                return True
 
-                user_combo = QtWidgets.QComboBox()
-                user_combo.addItem("Administrator (Master)", userData="__ADMIN__")
-                
-                try:
-                    from Administrator.user_db import get_all_users
-                    users = get_all_users(cursor)
-                    if users:
-                        for u in users:
-                            user_id, username, role, is_active, *_ = u
-                            if is_active:
-                                user_combo.addItem(f"{username} (Role: {role})", userData=username)
-                except Exception as e:
-                    print("Could not load users from DB:", e)
+            from module_3.auth_dialog import EnterpriseAuthDialog
+            dlg = EnterpriseAuthDialog(
+                cursor=cursor,
+                parent=getattr(self.uic, 'centralwidget', None),
+                system_context="Cài Đặt Tín Hiệu PLC (Signal Transmission)"
+            )
+            if dlg.exec_() == QtWidgets.QDialog.Accepted:
+                is_auth, username, role = dlg.get_auth_result()
+                if not is_auth:
+                    return False
 
-                password_input = QtWidgets.QLineEdit()
-                password_input.setEchoMode(QtWidgets.QLineEdit.Password)
-                password_input.setPlaceholderText("Enter password")
-
-                button = QtWidgets.QPushButton("Unlock GUI")
-
-                def check_password():
-                    selected_user = user_combo.currentData()
-                    input_pass = password_input.text()
-                    
-                    if selected_user == "__ADMIN__":
-                        from Administrator.user_db import verify_admin_password
-                        if verify_admin_password(input_pass):
-                            dlg.accept()
-                        else:
-                            QtWidgets.QMessageBox.warning(dlg, "Sai mật khẩu", "Mật khẩu Admin không đúng!")
-                    else:
-                        try:
-                            cursor.execute("SELECT password_hash, role FROM ADMINISTRATOR.ADMIN_USERS WHERE username = %s AND is_active = 1", (selected_user,))
-                            result = cursor.fetchone()
-                            if result:
-                                saved_hash, role = result
-                                from Administrator.user_db import verify_password
-                                if verify_password(input_pass, saved_hash):
-                                    dlg.accept()
-                                else:
-                                    QtWidgets.QMessageBox.warning(dlg, "Sai mật khẩu", "Mật khẩu không đúng!")
-                            else:
-                                QtWidgets.QMessageBox.warning(dlg, "Lỗi", "Tài khoản không tồn tại hoặc bị vô hiệu hóa!")
-                        except Exception as e:
-                            QtWidgets.QMessageBox.critical(dlg, "Lỗi CSDL", str(e))
-
-                button.clicked.connect(check_password)
-                password_input.returnPressed.connect(check_password)
-
-                layout.addWidget(QtWidgets.QLabel("Select User:"))
-                layout.addWidget(user_combo)
-                layout.addWidget(password_input)
-                layout.addWidget(button)
-                dlg.setLayout(layout)
-
-                result = dlg.exec_()
-                if result == QtWidgets.QDialog.Accepted:
-                    QtCore.QTimer.singleShot(50, lambda: self.set_ui_enabled(enabled=boolen))
+                # ─────────────────────────────────────────────────────────────
+                # QUY ĐỊNH BẮT BUỘC:
+                # Đối với signal_transmission, bắt buộc user (ngoại trừ Administrator)
+                # phải có quyền full_control mới được chỉnh sửa.
+                # ─────────────────────────────────────────────────────────────
+                if username == "__ADMIN__" or role == "full_control":
+                    self.set_ui_enabled(enabled=True)
+                    self.is_unlocked = True
+                    self.current_user = username
+                    self.current_role = "full_control"
+                    self.uic.pushButton_admin.setText("LOCK")
+                    QtWidgets.QMessageBox.information(
+                        self.uic.centralwidget,
+                        "Mở khóa thành công (Full Control)",
+                        f"Xác thực thành công cho tài khoản '{username}' [Toàn quyền].\n\n"
+                        "Toàn bộ giao diện Cài đặt Tín hiệu PLC (Signal Transmission) đã được MỞ KHÓA."
+                    )
                     return True
                 else:
+                    # Trường hợp 'modify' hoặc 'read_only': Mặc dù đúng pass nhưng vẫn bị KHÓA
+                    self.set_ui_enabled(enabled=False)
+                    self.is_unlocked = False
+                    self.current_user = username
+                    self.current_role = role
+                    self.uic.pushButton_admin.setText("ADMIN")
+                    QtWidgets.QMessageBox.warning(
+                        self.uic.centralwidget,
+                        "Không đủ thẩm quyền chỉnh sửa",
+                        f"Tài khoản '{username}' có quyền hạn [{role}].\n\n"
+                        "LƯU Ý QUAN TRỌNG: Giao diện Cài đặt Tín hiệu PLC (Signal Transmission) bắt buộc phải có quyền [full_control] hoặc Quản trị viên (Administrator) mới được phép chỉnh sửa!\n\n"
+                        "Giao diện tiếp tục được giữ ở trạng thái KHÓA an toàn."
+                    )
                     return False
             else:
-                self.set_ui_enabled(enabled=boolen)
-                return True
+                return False
         except Exception as e:
-            print("Error in lock_gui:", e)
+            print("Error in lock_gui (signal_process):", e)
             import traceback
             traceback.print_exc()
             QtWidgets.QMessageBox.critical(None, "Lỗi khi mở form", str(e))
@@ -1123,6 +1128,8 @@ class DataProcessSignal:
 
 
     def setup_counter_shot(self, cursor, connect_db, camera_id):
+        if not self.check_permission_full_control():
+            return
         is_check_pc = self.uic.radioButton_counter_pc.isChecked()
         is_check_plc = self.uic.radioButton_counter_plc.isChecked()
         is_check_plc_to_pc = self.uic.radioButton_condition_plc_pc.isChecked()
@@ -1238,6 +1245,8 @@ class DataProcessSignal:
         }
 
     def save_mapping_mode(self, cursor, connect_db, camera_id):
+        if not self.check_permission_full_control():
+            return
         try:
             cursor.execute("DELETE FROM setup_mapping_mode WHERE camera_id = %s", (camera_id,))
             sql_command = """

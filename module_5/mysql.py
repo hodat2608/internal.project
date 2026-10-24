@@ -36,32 +36,6 @@ class MySQL_Core:
         )
         msg.setStandardButtons(QMessageBox.Ok)
         msg.exec_()
-
-    def make_sql_in4_login(self):
-        try:
-            self.cursor = self.connection.cursor()
-            name_database = 'DATA_AUTO_LOGIN'
-            self.cursor.execute(f"CREATE DATABASE IF NOT EXISTS {name_database}")
-            self.cursor.execute(f"USE {name_database}")
-            tables = [
-                """CREATE TABLE IF NOT EXISTS INFOR (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    hostname VARCHAR(255),
-                    username VARCHAR(255),
-                    password VARCHAR(255),
-                    port VARCHAR(255),
-                    manual BOOLEAN DEFAULT FALSE,
-                    automatic BOOLEAN DEFAULT FALSE,
-                    credential BOOLEAN DEFAULT FALSE,
-                    retry_attemps INT NOT NULL
-                )"""]
-            
-            self.cursor.execute(tables[0])
-        except mysql.connector.Error as error:
-                self.connection.rollback()
-                QMessageBox.critical(None, "Error", f"Lỗi query: {str(error)}")
-                logging.error(f"Lỗi {error}")
-                raise
         
     def save_data_login(self):
         layer = self.ui_connection_sql
@@ -136,12 +110,12 @@ class MySQL_Core:
             if self.connection.is_connected():
                 self.show_connection_success()
                 self.flag = True
-                layer.groupBox_plc_connection.setEnabled(True)
+                # layer.groupBox_plc_connection.setEnabled(True)
                 layer.pushButton_apply_login_setting.setEnabled(True)
                 self.update_mysql_badges(True)
             else:
                 self.flag = False
-                layer.groupBox_plc_connection.setEnabled(True)
+                # layer.groupBox_plc_connection.setEnabled(True)
                 layer.pushButton_apply_login_setting.setEnabled(True)
                 self.update_mysql_badges(False)
                 QMessageBox.warning(None, "Lỗi", "Không thể kết nối đến MySQL.")

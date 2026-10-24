@@ -1,0 +1,69 @@
+2026-10-21 13:00:46 [INFO] legion.module_2.main_core: [core.__init__] START
+2026-10-21 13:00:46 [INFO] legion.module_2.main_core: [core.__init__] Creating CoreWorker...
+2026-10-21 13:00:46 [INFO] legion.module_2.main_core: [core.__init__] CoreWorker created. Connecting to MySQL...
+2026-10-21 13:00:46 [INFO] legion.module_2.main_core: [connect_to_mysql] Calling connect_mysql_from_log...
+2026-10-21 13:00:46 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Reading config from C:\project_vision\intenal\module_2/mysql_config.log
+2026-10-21 13:00:46 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Attempting mysql.connector.connect with host=127.0.0.1, user=root, port=3306...
+2026-10-21 13:00:46 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Success to connect mysql
+2026-10-21 13:00:46 [INFO] legion.module_2.main_core: [connect_to_mysql] connect_mysql_from_log returned: <mysql.connector.connection.MySQLConnection object at 0x0000021C9CE66C00>
+2026-10-21 13:00:46 [INFO] legion.module_2.main_core: [connect_to_mysql] Creating default table...
+2026-10-21 13:00:46 [INFO] legion.module_2.main_core: [connect_to_mysql] Success to connect MySQL (Auto-login enabled)
+2026-10-21 13:00:46 [INFO] legion.module_2.main_core: [core.__init__] connect_to_mysql done. connect_result=<mysql.connector.connection.MySQLConnection object at 0x0000021C9CE66C00>
+2026-10-21 13:00:46 [INFO] legion.module_2.main_core: Success to initialize connections
+2026-10-21 13:00:46 [INFO] legion.module_2.main_core: [core.__init__] init_plc_data...
+2026-10-21 13:00:46 [INFO] legion.module_6.keyence.initial: [+] Kết nối tới Keyence PLC 192.168.42.36:8051 qua pymcprotocol
+2026-10-21 13:00:50 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.36:8051 (Attempt 1/3) -> timed out
+2026-10-21 13:00:50 [INFO] legion.module_2.main_core: Success to connect PLC KEYENCE at 192.168.42.36:8051
+2026-10-21 13:00:50 [INFO] legion.module_2.main_core: [core.__init__] Connecting trigger signal...
+2026-10-21 13:00:50 [INFO] legion.module_2.main_core: [core.__init__] collect_dict_item...
+2026-10-21 13:00:50 [INFO] legion.module_2.main_core: Mode Automatic Login in MySQL (Optimized)
+2026-10-21 13:00:50 [INFO] legion.module_2.main_core: Successfully loaded items from 5 databases
+2026-10-21 13:00:50 [INFO] legion.module_2.main_core: [core.__init__] DONE
+2026-10-21 13:00:51 [INFO] legion.module_2.main_core: Success to check hardware key
+2026-10-21 13:00:51 [INFO] legion.module_2.main_core: Success to start monitoring
+2026-10-21 13:00:51 [INFO] legion.module_2.main_core: [CoreWorker] Running in thread: Dummy-3
+2026-10-21 13:00:51 [INFO] legion.module_2.main_core: Auto-restoring from last saved state: calculator, test_engine (saved at 2026-10-20 07:35:42)
+2026-10-21 13:00:52 [INFO] legion.module_3.main_thread: Khởi động Legion Vision App - ItemCode: calculator
+2026-10-21 13:00:52 [INFO] legion.module_3.main_core: Select database: test_engine
+2026-10-21 13:00:52 [INFO] legion.module_3.main_core: Get item code id: calculator
+2026-10-21 13:00:52 [INFO] legion.module_3.main_core: Get camera records for item code: 1
+2026-10-21 13:00:52 [INFO] legion.module_3.main_thread: Found 1 cameras for item code: calculator
+2026-10-21 13:00:52 [INFO] legion.module_3.main_core: Get models for camera: 1
+2026-10-21 13:00:52 [INFO] legion.module_3.main_thread: Setting up camera: 1 (ID: 1)
+2026-10-21 13:00:52 [INFO] legion.module_3.main_core: Get models for camera: 1
+2026-10-21 13:00:52 [INFO] legion.module_3.main_thread: Found 2 models for camera 1
+2026-10-21 13:00:52 [INFO] legion.module_3.task_calculator_db: Migrating task_calculator_rules: thêm cột instance_scope
+2026-10-21 13:00:52 [INFO] legion.module_3.handle_option_models: Loaded 1 active geometric tasks for key_model=('camera-1', 'model-1') (camera_id=1, model_id=1)
+2026-10-21 13:00:52 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V5' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\e303ebf5_SPOT_RF370CB_CAM2_MODEL1_PEW_Line90_2026-02-03.pt' device='cuda:0-NVIDIA GeForce RTX 3080'
+2026-10-21 13:01:00 [INFO] legion.module_3.yolo_factory: Load model Yolo V5 (Normal Box / PyTorch) successfully from weight_path
+2026-10-21 13:01:00 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-21 13:01:00 [INFO] legion.module_3.handle_option_models: Loaded 0 active geometric tasks for key_model=('camera-1', 'model-2') (camera_id=1, model_id=2)
+2026-10-21 13:01:00 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V5' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\2d223075_SPOT_RF370CB_CAM1_MODEL1_PEW_768_Line90_2026-04-24.pt' device='cpu'
+2026-10-21 13:01:01 [INFO] legion.module_3.yolo_factory: Load model Yolo V5 (Normal Box / PyTorch) successfully from weight_path
+2026-10-21 13:01:01 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-10-21 13:01:01 [INFO] legion.module_3.main_core: [Camera 1] Lần thử 1: Đang kết nối (USB - DB2254101)...
+2026-10-21 13:01:01 [WARNING] legion.module_3.main_core: [Camera 1] ❌ Lần thử 1 thất bại: 'DB2254101'
+2026-10-21 13:01:18 [INFO] legion.module_3.main_core: [Camera 1] Thử lại sau 1 giây...
+2026-10-21 13:01:19 [INFO] legion.module_3.main_core: [Camera 1] Lần thử 2: Đang kết nối (USB - DB2254101)...
+2026-10-21 13:01:20 [WARNING] legion.module_3.main_core: [Camera 1] ❌ Lần thử 2 thất bại: 'DB2254101'
+2026-10-21 13:01:36 [INFO] legion.module_3.main_core: [Camera 1] Thử lại sau 1 giây...
+2026-10-21 13:01:37 [INFO] legion.module_3.main_core: [Camera 1] Lần thử 3: Đang kết nối (USB - DB2254101)...
+2026-10-21 13:01:38 [WARNING] legion.module_3.main_core: [Camera 1] ❌ Lần thử 3 thất bại: 'DB2254101'
+2026-10-21 13:01:51 [INFO] legion.module_3.main_core: [Camera 1] Thử lại sau 1 giây...
+2026-10-21 13:01:52 [ERROR] legion.module_3.main_core: [Camera 1] Kết nối thất bại sau 3 lần thử!
+2026-10-21 13:01:52 [INFO] legion.module_6.keyence.initial: [+] Kết nối tới Keyence PLC 192.168.42.36:8051 qua pymcprotocol
+2026-10-21 13:01:56 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.36:8051 (Attempt 1/3) -> timed out
+2026-10-21 13:01:57 [INFO] legion.module_3.main_thread: Camera 1 initialization completed
+2026-10-21 13:01:57 [INFO] legion.module_3.main_core: [PLCHandler] Trigger cache updated for mode: Auto 1 (Count: 1)
+2026-10-21 13:01:57 [INFO] legion.module_3.main_core: [PLCHandler] Updated dict_signal_complete for mode: Auto 1
+2026-10-21 13:01:57 [INFO] legion.module_3.main_core: [PLCWorkerModeAuto1] Running in thread: Dummy-4
+2026-10-21 13:03:22 [INFO] legion.module_3.handle_option_models: Loaded 1 active geometric tasks for key_model=('camera-1', 'model-1') (camera_id=1, model_id=1)
+2026-10-21 14:23:43 [INFO] legion.module_2.main_core: Stopping CoreWorker...
+2026-10-21 14:23:51 [INFO] legion.module_2.main_core: Reloading program: Closing existing instance for item code: None
+2026-10-21 14:23:51 [INFO] legion.module_3.main_thread: Closing window and cleaning up camera resources...
+2026-10-21 14:23:51 [INFO] legion.module_3.main_thread: Cleaning up resources...
+2026-10-21 14:23:51 [INFO] legion.module_3.main_core: [PLCHandler] Executors shut down.
+2026-10-21 14:23:51 [INFO] legion.module_3.main_core: Cleanup PLC: writing OFF to 1 signal run on reg DM1002 value 0
+2026-10-21 14:23:51 [INFO] legion.module_3.main_core: Cleanup PLC: writing OFF to 1 signal ready on reg DM1001 value 0
+2026-10-21 14:23:51 [INFO] legion.module_3.main_thread: Cleanup completed
+2026-10-21 14:23:51 [INFO] legion.module_2.main_core: Success to stop monitoring

@@ -268,6 +268,7 @@ class core:
                     _log.info('Success to connect PLC %s at %s:%s', plc_module, ip_address_plc, port_plc)
                 else:
                     _log.warning('Failed to connect PLC %s at %s:%s', plc_module, ip_address_plc, port_plc)
+                    QMessageBox.warning(None, "Warning", "Failed to connect PLC, Please check connection")
             else:
                 _log.warning('PLC connection disabled in settings (Manual mode active)')
 
@@ -327,7 +328,7 @@ class core:
                     current_value = self.driver_loader.read_plc(register)
                     if current_value is not None and int(current_value) == value_bit_on:
                         _log.info("PLC Trigger detected: %s = %d (Item: %s)", register, value_bit_on, item_code)
-                        self.driver_loader.write_plc_log(register, value_bit_off)
+                        self.driver_loader.write_plc(register, value_bit_off)
 
                         date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                         self.item_code = item_code

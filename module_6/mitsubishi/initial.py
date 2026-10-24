@@ -10,9 +10,9 @@ from module_1.root_path import resource_path
 class SocketClient:
     def __init__(self, ip_address, port):
         self.ipv4 = ip_address
-        self.port = port
+        self.port = int(port)
         self.client = None 
-        self.trigger_file_path = resource_path("module_3\trigger.txt")
+        self.trigger_file_path = resource_path("module_3\\trigger.txt")
         self.locked = threading.Lock()
 
     def test_connection(self, ip: str, port: int, timeout: float = 3.0) -> bool:

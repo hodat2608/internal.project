@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS task_calculator_rules (
     label_1                 VARCHAR(255) NOT NULL,
     param_1                 VARCHAR(50) NOT NULL,
     instance_select_1       VARCHAR(50) NOT NULL DEFAULT 'BEST_CONF',
+    instance_scope          VARCHAR(50) NOT NULL DEFAULT '1_VS_1',
     operator                VARCHAR(20) NOT NULL,
     target_type             VARCHAR(50) NOT NULL DEFAULT 'LABEL',
     label_2                 VARCHAR(255),
@@ -118,6 +119,12 @@ def ensure_task_calculator_tables(cursor, connection) -> bool:
         if not cursor.fetchone():
             _log.info("Migrating task_calculator: thêm cột model_id")
             cursor.execute("ALTER TABLE task_calculator ADD COLUMN model_id INT NOT NULL DEFAULT 1 AFTER camera_id")
+
+        # Kiểm tra và migrate tự động cột instance_scope nếu bảng cũ chưa có
+        cursor.execute("SHOW COLUMNS FROM task_calculator_rules LIKE 'instance_scope'")
+        if not cursor.fetchone():
+            _log.info("Migrating task_calculator_rules: thêm cột instance_scope")
+            cursor.execute("ALTER TABLE task_calculator_rules ADD COLUMN instance_scope VARCHAR(50) NOT NULL DEFAULT '1_VS_1' AFTER instance_select_1")
 
         safe_commit(connection)
         return True
@@ -222,11 +229,14 @@ def get_task_rules(cursor, task_id: int) -> List[Dict[str, Any]]:
     if not cursor:
         return []
     try:
-        query = """
+        cursor.execute("SHOW COLUMNS FROM task_calculator_rules LIKE 'instance_scope'")
+        has_scope = bool(cursor.fetchone())
+        scope_select = ", instance_scope" if has_scope else ""
+        query = f"""
             SELECT id, task_id, rule_name, label_1, param_1, instance_select_1,
                    operator, target_type, label_2, param_2, instance_select_2,
                    math_op, math_operand_type, math_operand_val, min_value, max_value,
-                   condition_true_result, enabled, description
+                   condition_true_result, enabled, description{scope_select}
             FROM task_calculator_rules
             WHERE task_id = %s
             ORDER BY id ASC
@@ -254,7 +264,8 @@ def get_task_rules(cursor, task_id: int) -> List[Dict[str, Any]]:
                 'max_value': float(r[15] or 0.0),
                 'condition_true_result': r[16] or 'NG',
                 'enabled': bool(r[17]),
-                'description': r[18] or ''
+                'description': r[18] or '',
+                'instance_scope': r[19] if (has_scope and len(r) > 19 and r[19]) else '1_VS_1'
             })
         return rules
     except Exception as e:
@@ -306,21 +317,27 @@ def save_task_and_rules(cursor, connection, task_data: Dict[str, Any], rules: Li
                   assign_register, value_bit_on, value_bit_off))
             task_id = cursor.lastrowid
 
+        # Đảm bảo cột instance_scope tồn tại
+        cursor.execute("SHOW COLUMNS FROM task_calculator_rules LIKE 'instance_scope'")
+        if not cursor.fetchone():
+            cursor.execute("ALTER TABLE task_calculator_rules ADD COLUMN instance_scope VARCHAR(50) NOT NULL DEFAULT '1_VS_1' AFTER instance_select_1")
+
         # Insert các Rules
         for r in rules:
             cursor.execute("""
                 INSERT INTO task_calculator_rules
-                (task_id, rule_name, label_1, param_1, instance_select_1,
+                (task_id, rule_name, label_1, param_1, instance_select_1, instance_scope,
                  operator, target_type, label_2, param_2, instance_select_2,
                  math_op, math_operand_type, math_operand_val, min_value, max_value,
                  condition_true_result, enabled, description)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """, (
                 task_id,
                 r.get('rule_name', ''),
                 r['label_1'],
                 r['param_1'],
                 r.get('instance_select_1', 'BEST_CONF'),
+                r.get('instance_scope', '1_VS_1'),
                 r['operator'],
                 r.get('target_type', 'LABEL'),
                 r.get('label_2', ''),

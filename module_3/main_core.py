@@ -886,7 +886,7 @@ class PLCHandler:
 
                     handler = None
                     if current_mode == automatic_mode:
-                        handler = self.handle_result_mode_auto_manual
+                        handler = self.handle_result_mode_auto
                     elif current_mode == mirror_mode:
                         handler = self.handle_result_mode_geji
 
@@ -1278,6 +1278,7 @@ class PLCHandler:
             if path_save:
                 chk_det = pyuic.checkBox_OK_image_detected if flag else pyuic.checkBox_NG_image_detected
                 save_det = chk_det.isChecked()
+                image_format = pyuic.Image_format.currentText().strip() if hasattr(pyuic, 'Image_format') else 'PNG'
                 
                 self.executor.submit(
                     self._save_ng_image, 
@@ -1286,7 +1287,8 @@ class PLCHandler:
                     key, 
                     state_str, 
                     result_img.copy() if save_det else None, 
-                    save_det
+                    save_det,
+                    image_format
                 )
         elapsed = (time.perf_counter() - start_time) * 1000
         self.signals.update_display.emit(
@@ -1389,6 +1391,7 @@ class PLCHandler:
             if path_save:
                 chk_det = pyuic.checkBox_OK_image_detected if flag else pyuic.checkBox_NG_image_detected
                 save_det = chk_det.isChecked()
+                image_format = pyuic.Image_format.currentText().strip() if hasattr(pyuic, 'Image_format') else 'PNG'
                 
                 self.executor.submit(
                     self._save_ng_image, 
@@ -1397,7 +1400,8 @@ class PLCHandler:
                     key, 
                     state_str, 
                     result_img.copy() if save_det else None, 
-                    save_det
+                    save_det,
+                    image_format
                 )
         
         self.signals.update_display.emit(
@@ -1484,8 +1488,18 @@ class PLCHandler:
 
         table_logging = auto_log_ui.tableWidget
         
-
         from PyQt5.QtWidgets import QCheckBox
+
+        if not hasattr(self, 'register_table_logging') or not isinstance(self.register_table_logging, dict):
+            self.register_table_logging = {}
+
+        # Dọn dẹp các cấu hình cũ của key này để tránh duplicate khi gọi lại hàm
+        for reg in list(self.register_table_logging.keys()):
+            self.register_table_logging[reg] = [
+                item for item in self.register_table_logging[reg] if item.get('key') != key
+            ]
+            if not self.register_table_logging[reg]:
+                del self.register_table_logging[reg]
 
         for row in range(table_logging.rowCount()):
             container = table_logging.cellWidget(row, 0)
@@ -1511,7 +1525,7 @@ class PLCHandler:
                     sel_model = model_combo.currentText() if model_combo else ""
 
                     if register:
-                        self.register_table_logging[register] = {
+                        self.register_table_logging.setdefault(register, []).append({
                             'path_image': path,
                             'description': desc,
                             'selected_camera': sel_cam,
@@ -1520,95 +1534,103 @@ class PLCHandler:
                             'value_off': val_off,
                             'values': values,
                             'key': key
-                        }
+                        })
 
     def handle_auto_logging_process_image(self):
         if not getattr(self, 'register_table_logging', None):
             return
 
-        for register, data_info in self.register_table_logging.items():
+        for register, list_configs in list(self.register_table_logging.items()):
             try:
-                plc_val = int(self._safe_read_plc(register))
-                target_val = int(data_info.get('value_on', data_info.get('value', 1)))
-                value_off = int(data_info.get('value_off', 0))
+                plc_raw = self._safe_read_plc(register)
+                if plc_raw is None or str(plc_raw).strip() == "":
+                    continue
+                plc_val = int(plc_raw)
             except (ValueError, TypeError):
                 continue
             
-            if plc_val == target_val:
-                key = data_info['key']
-                if self._flag_logging[key]:
-                    continue  # Already logging for this key
-                self._flag_logging[key] = True
-
+            for data_info in list_configs:
                 try:
-                    start_time = time.perf_counter()
-                    values = data_info['values']
-                    camera        = key.removeprefix('built-in-')
-                    key_model = (data_info['selected_camera'], data_info['selected_model'])
-                    path = data_info['path_image']
-                    model_loader  = values.get('model_loader', {}).get(key_model)
-                    pyuic         = values.get('pyuic', {}).get(key_model) 
-                    current_count = 1
+                    target_val = int(data_info.get('value_on', data_info.get('value', 1)))
+                    value_off = int(data_info.get('value_off', 0))
+                except (ValueError, TypeError):
+                    continue
+
+                if plc_val == target_val:
+                    key = data_info['key']
+                    if self._flag_logging[key]:
+                        continue  # Already logging for this key
+                    self._flag_logging[key] = True
+
+                    try:
+                        start_time = time.perf_counter()
+                        values = data_info['values']
+                        camera        = key.removeprefix('built-in-')
+                        key_model = (data_info['selected_camera'], data_info['selected_model'])
+                        path = data_info['path_image']
+                        model_loader  = values.get('model_loader', {}).get(key_model)
+                        pyuic         = values.get('pyuic', {}).get(key_model) 
+                        current_count = 1
+                        
+                        #kiểm tra xem đường dãn có tồn tại không
+                        if not os.path.exists(path):
+                            _log.error('[%s] Đường dẫn không tồn tại: %s', key, path)
+                            continue
+
+                        if not pyuic:
+                            _log.error('[%s] pyuic is None', key)
+                            continue
+                        
+                        if not model_loader:
+                            _log.error('[%s] model_loader is None', key)
+                            continue
+
+                        _log.info('[%s] handle_image_logging — processing %s images', key, path)
+                        raw_image = cv2.imread(path)
+                        if raw_image is None:
+                            _log.error('[%s] cv2.imread returned None for: %s', key, path)
+                            continue
+
+                        # raw_image = cv2.cvtColor(raw_image, cv2.COLOR_BGR2RGB)
+
+                        result_img, flag, list_register,_ = self.processor.processor.process_image_func(
+                            raw_image, model_loader, pyuic, camera, key_model, current_count,
+                        )
+                        elapsed     = (time.perf_counter() - start_time) * 1000
+
+                        self._accumulate_registers(key, list_register or [])
+                        all_registers = self._pop_registers(key)
+
+                        if all_registers:
+                            _log.info('[%s] NG registers: %s', key, all_registers)
+                            for reg in all_registers:
+                                self._safe_write_plc(str(reg), 1)
+
+                        self._safe_write_plc(register, value_off)
+
+                        self.signals.update_display.emit(
+                            [(key_model, pyuic, result_img, flag, list_register, "Logging (Model Representation Mapping)")],
+                            f"⏱️: {elapsed:.2f} ms",
+                        )
+
+                        if not flag:
+                            _log.info('[%s] NG detected for image: %s', key, path)
+                    finally:
+                        self._flag_logging[key] = False
                     
-                    #kiểm tra xem đường dãn có tồn tại không
-                    if not os.path.exists(path):
-                        _log.error('[%s] Đường dẫn không tồn tại: %s', key, path)
-                        continue
+                    # NOTE: PLC write PHẢI ngoài read-lock để tránh deadlock
+                    try:
+                        with self._signal_rwlock.read():
+                            reset_ok_sig = self._resolve_signal(key, 'component')
+                            complete_sig = self._resolve_signal(key, 'completed')
+                    except KeyError:
+                        _log.exception('[handle_result_mode_logging][%s] Missing signal config', key)
+                        return
 
-                    if not pyuic:
-                        _log.error('[%s] pyuic is None', key)
-                        continue
-                    
-                    if not model_loader:
-                        _log.error('[%s] model_loader is None', key)
-                        continue
-
-                    _log.info('[%s] handle_image_logging — processing %s images', key, path)
-                    raw_image = cv2.imread(path)
-                    if raw_image is None:
-                        _log.error('[%s] cv2.imread returned None for: %s', key, path)
-                        continue
-
-                    # raw_image = cv2.cvtColor(raw_image, cv2.COLOR_BGR2RGB)
-
-                    result_img, flag, list_register,_ = self.processor.processor.process_image_func(
-                        raw_image, model_loader, pyuic, camera, key_model, current_count,
-                    )
-                    elapsed     = (time.perf_counter() - start_time) * 1000
-
-                    self._accumulate_registers(key, list_register or [])
-                    all_registers = self._pop_registers(key)
-
-                    if all_registers:
-                        _log.info('[%s] NG registers: %s', key, all_registers)
-                        for reg in all_registers:
-                            self._safe_write_plc(str(reg), 1)
-
-                    self._safe_write_plc(register, value_off)
-
-                    self.signals.update_display.emit(
-                        [(key_model, pyuic, result_img, flag, list_register, "Logging (Model Representation Mapping)")],
-                        f"⏱️: {elapsed:.2f} ms",
-                    )
-
-                    if not flag:
-                        _log.info('[%s] NG detected for image: %s', key, path)
-                finally:
-                    self._flag_logging[key] = False
-                
-                # NOTE: PLC write PHẢI ngoài read-lock để tránh deadlock
-                try:
-                    with self._signal_rwlock.read():
-                        reset_ok_sig = self._resolve_signal(key, 'component')
-                        complete_sig = self._resolve_signal(key, 'completed')
-                except KeyError:
-                    _log.exception('[handle_result_mode_logging][%s] Missing signal config', key)
-                    return
-
-                if reset_ok_sig:
-                    self._safe_write_plc(str(reset_ok_sig['reg']), int(reset_ok_sig['on']))
-                if complete_sig:
-                    self._safe_write_plc(str(complete_sig['reg']), int(complete_sig['on']))
+                    if reset_ok_sig:
+                        self._safe_write_plc(str(reset_ok_sig['reg']), int(reset_ok_sig['on']))
+                    if complete_sig:
+                        self._safe_write_plc(str(complete_sig['reg']), int(complete_sig['on']))
 
 
     # -----------------------------------------------------------------------
@@ -1775,7 +1797,8 @@ class PLCHandler:
     # -----------------------------------------------------------------------
 
     def _save_ng_image(self, image: np.ndarray, path_save_image: str,
-                       key: str, state: str, image_result: np.ndarray, save_detected: bool) -> None:
+                       key: str, state: str, image_result: np.ndarray, save_detected: bool,
+                       image_format: str = 'PNG') -> None:
         if not path_save_image:
             _log.warning('[%s] path_save_image rỗng, bỏ qua lưu ảnh.', key)
             return
@@ -1785,16 +1808,26 @@ class PLCHandler:
             folder = os.path.join(path_save_image, state, today)
             os.makedirs(folder, exist_ok=True)
 
-            filename = f'{self.time_to_name_file_image()}.jpg'
+            fmt = (image_format or 'PNG').strip().lower()
+            ext = fmt if fmt in ['png', 'jpg', 'jpeg', 'bmp', 'tiff', 'tif', 'raw'] else 'png'
+            filename = f'{self.time_to_name_file_image()}.{ext}'
             filepath = os.path.join(folder, filename)
             
-            cv2.imwrite(filepath, cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
+            bgr_image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+            if ext == 'raw':
+                bgr_image.tofile(filepath)
+            else:
+                cv2.imwrite(filepath, bgr_image)
 
             if save_detected and image_result is not None:
                 folder_detect = os.path.join(folder, 'Image_Detect')
                 os.makedirs(folder_detect, exist_ok=True)
                 filepath_detect = os.path.join(folder_detect, filename)
-                cv2.imwrite(filepath_detect, cv2.cvtColor(image_result, cv2.COLOR_RGB2BGR))
+                bgr_detect = cv2.cvtColor(image_result, cv2.COLOR_RGB2BGR)
+                if ext == 'raw':
+                    bgr_detect.tofile(filepath_detect)
+                else:
+                    cv2.imwrite(filepath_detect, bgr_detect)
 
             _log.info('[%s] %s image saved: %s', key, state, filepath)
 
