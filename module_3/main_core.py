@@ -321,30 +321,16 @@ class PLCHandler:
         Kiểm tra chế độ giao tiếp PLC được cấu hình:
         - True: Chế độ mô phỏng qua LOG (indirect_from_log = True hoặc direct_to_plc = False)
         - False: Chế độ kết nối trực tiếp thiết bị PLC (direct_to_plc = True)
+        
+        LƯU Ý QUAN TRỌNG:
+        Tuyệt đối không query database trong hàm này vì hàm nằm trong vòng lặp thời gian thực 1ms
+        của luồng PLC. Tất cả cấu hình phải được đọc từ bộ nhớ (self.layer_core).
         """
-        # 1. Kiểm tra cấu hình lưu trên layer_core (module_2.main_core)
         if self.layer_core is not None:
-            # Nếu chỉ định rõ direct_to_plc = True và indirect_from_log = False
-            if bool(getattr(self.layer_core, 'direct_to_plc', False)) is True and not bool(getattr(self.layer_core, 'indirect_from_log', False)):
-                return False
             if bool(getattr(self.layer_core, 'indirect_from_log', False)) is True:
                 return True
-            if hasattr(self.layer_core, 'direct_to_plc') and bool(getattr(self.layer_core, 'direct_to_plc')) is False:
-                return True
-
-        # 2. Kiểm tra từ CSDL DATA_IP_ADDRESS.INFOR_ADDRESS nếu có db_manager hoặc connection
-        try:
-            conn = getattr(self.layer_core, 'connection', None)
-            if conn and hasattr(conn, 'cursor') and callable(conn.cursor):
-                cursor = conn.cursor()
-                cursor.execute("SELECT direct_to_plc, indirect_from_log FROM DATA_IP_ADDRESS.INFOR_ADDRESS LIMIT 1")
-                row = cursor.fetchone()
-                cursor.close()
-                if row:
-                    direct_to_plc, indirect_from_log = bool(row[0]), bool(row[1])
-                    return indirect_from_log or (not direct_to_plc)
-        except Exception:
-            pass
+            if hasattr(self.layer_core, 'direct_to_plc'):
+                return not bool(getattr(self.layer_core, 'direct_to_plc', True))
 
         return False
 
@@ -2171,11 +2157,22 @@ class CameraTabManager:
 
         if not hasattr(self, 'MainWindoww'):
             self.MainWindoww = QtWidgets.QMainWindow()
+            self.MainWindoww.setWindowFlags(self.MainWindoww.windowFlags() | QtCore.Qt.WindowStaysOnTopHint)
             self.ui_mother = Ui_MainWindow_mother()
             self.ui_mother.setupUi(self.MainWindoww)
             self.MainWindoww.showMaximized()
-            QtCore.QTimer.singleShot(0, self.MainWindoww.raise_)
-            QtCore.QTimer.singleShot(0, self.MainWindoww.activateWindow)
+
+            def _bring_to_front():
+                if hasattr(self, 'MainWindoww') and self.MainWindoww:
+                    self.MainWindoww.setWindowState(
+                        (self.MainWindoww.windowState() & ~QtCore.Qt.WindowMinimized) | QtCore.Qt.WindowActive
+                    )
+                    self.MainWindoww.showMaximized()
+                    self.MainWindoww.raise_()
+                    self.MainWindoww.activateWindow()
+
+            QtCore.QTimer.singleShot(200, _bring_to_front)
+            QtCore.QTimer.singleShot(600, _bring_to_front)
 
             self.db_manager.cursor.execute("SELECT display_mode, layout_mode, show_layout FROM mode_display WHERE item_code_id = %s", (item_code_id,))
             result_cursor = self.db_manager.cursor.fetchone()

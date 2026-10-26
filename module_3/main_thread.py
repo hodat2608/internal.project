@@ -295,8 +295,25 @@ class intermediate_layer:
 
     def show_window(self):
         self.MainWindow.showMaximized()
-        self.MainWindow.raise_()
-        self.MainWindow.activateWindow()
+        self.raise_display_window()
+
+    def raise_display_window(self):
+        def _do_raise():
+            try:
+                if hasattr(self.ui, 'camera_manager') and hasattr(self.ui.camera_manager, 'MainWindoww'):
+                    display_win = self.ui.camera_manager.MainWindoww
+                    if display_win:
+                        display_win.setWindowState(
+                            (display_win.windowState() & ~QtCore.Qt.WindowMinimized) | QtCore.Qt.WindowActive
+                        )
+                        display_win.showMaximized()
+                        display_win.raise_()
+                        display_win.activateWindow()
+            except Exception as e:
+                _log.error("Error raising display window: %s", e)
+
+        QtCore.QTimer.singleShot(200, _do_raise)
+        QtCore.QTimer.singleShot(600, _do_raise)
 
     def Close_window(self):
         _log.info("Closing window and cleaning up camera resources...")

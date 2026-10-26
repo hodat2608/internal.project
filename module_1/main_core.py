@@ -33,55 +33,85 @@ class core:
         self.ui_db = ui_db
         self.main_core = main_core
         self.ui = ui
-        self.mode_init = 0
+        self._mode_init = 0
+
+    @property
+    def connection(self):
+        """Lấy kết nối MySQL chuẩn trực tiếp từ main_core, fallback sang connect nếu có."""
+        if self.main_core and getattr(self.main_core, 'connection', None) is not None:
+            return self.main_core.connection
+        if self.connect and getattr(self.connect, 'connection', None) is not None:
+            return self.connect.connection
+        return None
+
+    @property
+    def mode_init(self):
+        if self.main_core and hasattr(self.main_core, 'mode_init'):
+            return self.main_core.mode_init
+        return self._mode_init
+
+    @mode_init.setter
+    def mode_init(self, value):
+        self._mode_init = value
 
     def update_menu(self):
-        if self.connect.connection is None:
+        if self.connection is None:
             _log.warning('[core.update_menu] Database connection is not connected')
             return
         db_submenu = QtWidgets.QMenu()
-        self.cursor = self.connect.connection.cursor()
-        self.cursor.execute("SHOW DATABASES") 
-        databases = self.cursor.fetchall()
-        for db_name in databases:
-            db_name_str = db_name[0]
-            QtWidgets.QAction(db_name_str, db_submenu)
-            self.cursor.execute(f"USE {db_name_str}")
-            self.cursor.execute(f"SHOW TABLES")
-            tables = self.cursor.fetchall()
-            for table in tables:
-                if 'items_code' == table[0]:
-                    self.cursor.execute(f"SELECT name_line_code FROM ITEMS_CODE")
-                    item_codes = self.cursor.fetchall()
-                    item_code_submenu = QtWidgets.QMenu(f"{db_name_str.upper()}", db_submenu)
-                    item_code_submenu.setIcon(QtGui.QIcon(QtGui.QPixmap(resource_path("module_3/assert/icon/server.png"))))
-                    delete_db_action = QtWidgets.QAction(f"Delete", item_code_submenu)
-                    delete_db_action.setIcon(QtGui.QIcon(QtGui.QPixmap(resource_path("module_3/assert/icon/garbage.png"))))
-                    delete_db_action.triggered.connect(lambda checked=False, db=db_name_str: self.delete_database(db))
-                    add_itemcode_db_action = QtWidgets.QAction(f"Add Item", item_code_submenu)
-                    add_itemcode_db_action.setIcon(QtGui.QIcon(QtGui.QPixmap(resource_path("module_3/assert/icon/add_database.png"))))
-                    add_itemcode_db_action.triggered.connect(lambda checked=False, db=db_name_str: self.add_itemcode(db))
-                    item_code_submenu.addAction(delete_db_action)
-                    item_code_submenu.addAction(add_itemcode_db_action)
-                    item_code_submenu.addSeparator()
-                    for item_code in item_codes:
-                        item_menu = QtWidgets.QMenu(f"{item_code[0]}", item_code_submenu)
-                        item_menu.setIcon(QtGui.QIcon(QtGui.QPixmap(resource_path("module_3/assert/icon/label.png"))))
-                        open_action = QtWidgets.QAction("Open", item_menu)
-                        open_action.setIcon(QtGui.QIcon(QtGui.QPixmap(resource_path("module_3/assert/icon/check.png"))))
-                        open_action.triggered.connect(lambda checked=False, code=item_code[0],db=db_name_str: self.open_pyuic6(code,db))
-                        item_menu.addAction(open_action)
-                        edit_action = QtWidgets.QAction("Edit Configuration", item_menu)
-                        edit_action.setIcon(QtGui.QIcon(QtGui.QPixmap(resource_path("module_3/assert/icon/edit.png"))))
-                        edit_action.triggered.connect(lambda checked=False, code=item_code[0],db=db_name_str: self.open_config_editor(code,db))
-                        item_menu.addAction(edit_action)
-                        delete_action = QtWidgets.QAction("Delete", item_menu)
-                        delete_action.setIcon(QtGui.QIcon(QtGui.QPixmap(resource_path("module_3/assert/icon/garbage.png"))))
-                        delete_action.triggered.connect(lambda checked=False, code=item_code[0],db=db_name_str: self.delete_item_code(code,db))
-                        item_menu.addAction(delete_action)
-                        item_code_submenu.addMenu(item_menu)
-                    db_submenu.addMenu(item_code_submenu)
-        self.ui_db.actionDevice_Name.setMenu(db_submenu) 
+        cursor = None
+        try:
+            cursor = self.connection.cursor(buffered=True)
+            self.cursor = cursor
+            query_find_dbs = "SELECT DISTINCT TABLE_SCHEMA FROM information_schema.TABLES WHERE LOWER(TABLE_NAME) = 'items_code'"
+            cursor.execute(query_find_dbs)
+            databases = [row[0] for row in cursor.fetchall()]
+
+            for db_name_str in databases:
+                QtWidgets.QAction(db_name_str, db_submenu)
+                query_get_items = f"SELECT name_line_code FROM `{db_name_str}`.ITEMS_CODE"
+                cursor.execute(query_get_items)
+                item_codes = cursor.fetchall()
+
+                item_code_submenu = QtWidgets.QMenu(f"{db_name_str.upper()}", db_submenu)
+                item_code_submenu.setIcon(QtGui.QIcon(QtGui.QPixmap(resource_path("module_3/assert/icon/server.png"))))
+                delete_db_action = QtWidgets.QAction(f"Delete", item_code_submenu)
+                delete_db_action.setIcon(QtGui.QIcon(QtGui.QPixmap(resource_path("module_3/assert/icon/garbage.png"))))
+                delete_db_action.triggered.connect(lambda checked=False, db=db_name_str: self.delete_database(db))
+                add_itemcode_db_action = QtWidgets.QAction(f"Add Item", item_code_submenu)
+                add_itemcode_db_action.setIcon(QtGui.QIcon(QtGui.QPixmap(resource_path("module_3/assert/icon/add_database.png"))))
+                add_itemcode_db_action.triggered.connect(lambda checked=False, db=db_name_str: self.add_itemcode(db))
+                item_code_submenu.addAction(delete_db_action)
+                item_code_submenu.addAction(add_itemcode_db_action)
+                item_code_submenu.addSeparator()
+
+                for item_code in item_codes:
+                    item_menu = QtWidgets.QMenu(f"{item_code[0]}", item_code_submenu)
+                    item_menu.setIcon(QtGui.QIcon(QtGui.QPixmap(resource_path("module_3/assert/icon/label.png"))))
+                    open_action = QtWidgets.QAction("Open", item_menu)
+                    open_action.setIcon(QtGui.QIcon(QtGui.QPixmap(resource_path("module_3/assert/icon/check.png"))))
+                    open_action.triggered.connect(lambda checked=False, code=item_code[0], db=db_name_str: self.open_pyuic6(code, db))
+                    item_menu.addAction(open_action)
+                    edit_action = QtWidgets.QAction("Edit Configuration", item_menu)
+                    edit_action.setIcon(QtGui.QIcon(QtGui.QPixmap(resource_path("module_3/assert/icon/edit.png"))))
+                    edit_action.triggered.connect(lambda checked=False, code=item_code[0], db=db_name_str: self.open_config_editor(code, db))
+                    item_menu.addAction(edit_action)
+                    delete_action = QtWidgets.QAction("Delete", item_menu)
+                    delete_action.setIcon(QtGui.QIcon(QtGui.QPixmap(resource_path("module_3/assert/icon/garbage.png"))))
+                    delete_action.triggered.connect(lambda checked=False, code=item_code[0], db=db_name_str: self.delete_item_code(code, db))
+                    item_menu.addAction(delete_action)
+                    item_code_submenu.addMenu(item_menu)
+
+                db_submenu.addMenu(item_code_submenu)
+            self.ui_db.actionDevice_Name.setMenu(db_submenu)
+        except Exception as e:
+            _log.error("Error in update_menu: %s", e)
+        finally:
+            if cursor:
+                try:
+                    cursor.close()
+                except Exception:
+                    pass
 
     def query_device(self, event=None):
         self.update_menu()
@@ -97,14 +127,21 @@ class core:
             QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         
         if confirm == QtWidgets.QMessageBox.Yes:
+            cursor = None
             try:
-                cursor = self.connect.connection.cursor()
-                cursor.execute(f"DROP DATABASE {db}")
-                self.connect.connection.commit()
+                cursor = self.connection.cursor()
+                cursor.execute(f"DROP DATABASE `{db}`")
+                self.connection.commit()
                 QtWidgets.QMessageBox.information(None, "Thành công", f"Đã xóa hoàn toàn Database '{db}'.")
                 self.update_menu()
             except Exception as e:
                 QtWidgets.QMessageBox.critical(None, "Lỗi", f"Không thể xóa Database: {e}")
+            finally:
+                if cursor:
+                    try:
+                        cursor.close()
+                    except Exception:
+                        pass
 
     def delete_item_code(self, code, db):
         confirm = QtWidgets.QMessageBox.question(None, "Xác nhận xóa", 
@@ -112,15 +149,21 @@ class core:
             QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         
         if confirm == QtWidgets.QMessageBox.Yes:
+            cursor = None
             try:
-                cursor = self.connect.connection.cursor()
-                cursor.execute(f"USE {db}")
-                cursor.execute("DELETE FROM ITEMS_CODE WHERE name_line_code = %s", (code,))
-                self.connect.connection.commit()
+                cursor = self.connection.cursor()
+                cursor.execute(f"DELETE FROM `{db}`.ITEMS_CODE WHERE name_line_code = %s", (code,))
+                self.connection.commit()
                 QtWidgets.QMessageBox.information(None, "Thành công", f"Đã xóa thành công mã hàng '{code}'.")
                 self.update_menu()
             except Exception as e:
                 QtWidgets.QMessageBox.critical(None, "Lỗi", f"Không thể xóa mã hàng: {e}")
+            finally:
+                if cursor:
+                    try:
+                        cursor.close()
+                    except Exception:
+                        pass
 
     def open_pyuic6(self,i_code,db):
         from app_utils.progress_bar import AppProgressBar
@@ -128,9 +171,13 @@ class core:
         progress = AppProgressBar(message="Đang khởi tạo giao diện...")
             
         date_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        self.main_core.write_data_save_default(date_time,i_code,db)
-        self.pyuic6_instance = intermediate_layer(i_code,db,self.connect,self.mode_init, progress_callback=progress.update_progress)
-        
+        if self.main_core and hasattr(self.main_core, 'write_data_save_default'):
+            self.main_core.write_data_save_default(date_time, i_code, db)
+            
+        if hasattr(self, 'pyuic6_instance') and self.pyuic6_instance:
+            self.pyuic6_instance.Close_window()
+            
+        self.pyuic6_instance = intermediate_layer(i_code, db, self.main_core, self.mode_init, progress_callback=progress.update_progress)
         progress.close()
 
     def open_config_editor(self, item_code: str, db_name: str):
@@ -141,7 +188,7 @@ class core:
                 self._config_editor_windows = []
 
             editor = ItemCodeConfigEditor(
-                connection=self.connect.connection,
+                connection=self.connection,
                 db_name=db_name,
                 item_code=item_code,
             )
@@ -161,7 +208,7 @@ class core:
         """Mở dialog thêm mã hàng mới (Custom hoặc Copy)."""
         try:
             dlg = AddItemCodeDialog(
-                connection=self.connect.connection,
+                connection=self.connection,
                 db_name=db_name,
                 parent=None,
             )

@@ -124,7 +124,7 @@ class main_pyuic(MainWindowUI):
         
         try:
             self.main_thread = main_thread(self.ui,self.main_core.connection,self.main_core)
-            # self.main_thread.setup_home_screen(self.ui.graphicsView)
+            self.main_thread.setup_home_screen(self.ui.graphicsView)
             _write_crash("STEP 8: self.main_thread OK")
         except Exception:
             _show_fatal("self.main_thread", traceback.format_exc())

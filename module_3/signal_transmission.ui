@@ -35,12 +35,13 @@
       <property name="font">
        <font>
         <family>Segoe UI</family>
+        <pointsize>11</pointsize>
        </font>
       </property>
       <property name="styleSheet">
        <string notr="true">/* Khung ngoài của ScrollArea */
 QScrollArea {
-    background-color: #FFFFF5; /* Màu vàng nhạt (Soft Yellow) */
+    background-color: #F1F5F9; /* Màu vàng nhạt (Soft Yellow) */
     border: 1px solid #c6c6c6;  /* Viền xám mảnh đồng bộ */
     border-radius: 4px;         /* Bo tròn góc 4px */
 }
@@ -85,9 +86,9 @@ QScrollBar::handle:vertical:hover {
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>-71</y>
-         <width>1781</width>
-         <height>1559</height>
+         <y>0</y>
+         <width>1788</width>
+         <height>1563</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_17">
@@ -135,7 +136,7 @@ QScrollBar::handle:vertical:hover {
               <property name="styleSheet">
                <string notr="true">/* Khung chính của GroupBox */
 QGroupBox {
-    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
+    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */
     border: 1px solid #000000; /* Viền xám mảnh để định hình khối */
     border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
     margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
@@ -173,7 +174,7 @@ QGroupBox::title {
                    <property name="font">
                     <font>
                      <family>Segoe UI</family>
-                     <pointsize>10</pointsize>
+                     <pointsize>11</pointsize>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -252,16 +253,34 @@ QTableView::item:selected {
                     <property name="text">
                      <string>Shot Reference</string>
                     </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>11</pointsize>
+                     </font>
+                    </property>
                    </column>
                    <column>
                     <property name="text">
                      <string>Model Link to Shot</string>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>11</pointsize>
+                     </font>
                     </property>
                    </column>
                   </widget>
                  </item>
                  <item>
                   <widget class="Line" name="line_12">
+                   <property name="font">
+                    <font>
+                     <family>Segoe UI</family>
+                     <pointsize>11</pointsize>
+                    </font>
+                   </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
                    </property>
@@ -291,7 +310,7 @@ QTableView::item:selected {
                    <property name="font">
                     <font>
                      <family>Segoe UI</family>
-                     <pointsize>10</pointsize>
+                     <pointsize>11</pointsize>
                      <weight>75</weight>
                      <bold>true</bold>
                     </font>
@@ -335,6 +354,12 @@ QPushButton:pressed {
                      <height>0</height>
                     </size>
                    </property>
+                   <property name="font">
+                    <font>
+                     <family>Segoe UI</family>
+                     <pointsize>11</pointsize>
+                    </font>
+                   </property>
                    <property name="text">
                     <string/>
                    </property>
@@ -342,6 +367,12 @@ QPushButton:pressed {
                  </item>
                  <item row="0" column="0">
                   <spacer name="horizontalSpacer_9">
+                   <property name="font">
+                    <font>
+                     <family>Segoe UI</family>
+                     <pointsize>11</pointsize>
+                    </font>
+                   </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
                    </property>
@@ -370,7 +401,7 @@ QPushButton:pressed {
                    <property name="font">
                     <font>
                      <family>Segoe UI</family>
-                     <pointsize>10</pointsize>
+                     <pointsize>11</pointsize>
                      <weight>75</weight>
                      <bold>true</bold>
                     </font>
@@ -414,6 +445,12 @@ QPushButton:pressed {
                      <height>0</height>
                     </size>
                    </property>
+                   <property name="font">
+                    <font>
+                     <family>Segoe UI</family>
+                     <pointsize>11</pointsize>
+                    </font>
+                   </property>
                    <property name="text">
                     <string/>
                    </property>
@@ -455,7 +492,7 @@ QPushButton:pressed {
               <property name="styleSheet">
                <string notr="true">/* Khung chính của GroupBox */
 QGroupBox {
-    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
+    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */
     border: 1px solid #000000; /* Viền xám mảnh để định hình khối */
     border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
     margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
@@ -523,7 +560,7 @@ QGroupBox::title {
                     <property name="font">
                      <font>
                       <family>Segoe UI</family>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                       <weight>75</weight>
                       <bold>true</bold>
                      </font>
@@ -544,7 +581,7 @@ QGroupBox::title {
                     <property name="font">
                      <font>
                       <family>Segoe UI</family>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                      </font>
                     </property>
                     <property name="styleSheet">
@@ -566,7 +603,7 @@ QGroupBox::title {
                     <property name="font">
                      <font>
                       <family>Segoe UI</family>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                       <weight>75</weight>
                       <bold>true</bold>
                      </font>
@@ -587,7 +624,7 @@ QGroupBox::title {
                     <property name="font">
                      <font>
                       <family>Segoe UI</family>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                       <weight>75</weight>
                       <bold>true</bold>
                      </font>
@@ -602,7 +639,7 @@ QGroupBox::title {
                     <property name="font">
                      <font>
                       <family>Segoe UI</family>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                       <weight>75</weight>
                       <bold>true</bold>
                      </font>
@@ -623,6 +660,12 @@ QGroupBox::title {
                       <height>16777215</height>
                      </size>
                     </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>11</pointsize>
+                     </font>
+                    </property>
                     <property name="text">
                      <string/>
                     </property>
@@ -630,6 +673,12 @@ QGroupBox::title {
                   </item>
                   <item row="1" column="5">
                    <widget class="Line" name="line_25">
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>11</pointsize>
+                     </font>
+                    </property>
                     <property name="orientation">
                      <enum>Qt::Vertical</enum>
                     </property>
@@ -660,7 +709,7 @@ QGroupBox::title {
                    <property name="font">
                     <font>
                      <family>Segoe UI</family>
-                     <pointsize>10</pointsize>
+                     <pointsize>11</pointsize>
                      <weight>75</weight>
                      <bold>true</bold>
                     </font>
@@ -704,6 +753,12 @@ QPushButton:pressed {
                      <height>0</height>
                     </size>
                    </property>
+                   <property name="font">
+                    <font>
+                     <family>Segoe UI</family>
+                     <pointsize>11</pointsize>
+                    </font>
+                   </property>
                    <property name="text">
                     <string/>
                    </property>
@@ -711,6 +766,12 @@ QPushButton:pressed {
                  </item>
                  <item row="0" column="0">
                   <spacer name="horizontalSpacer_7">
+                   <property name="font">
+                    <font>
+                     <family>Segoe UI</family>
+                     <pointsize>11</pointsize>
+                    </font>
+                   </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
                    </property>
@@ -739,7 +800,7 @@ QPushButton:pressed {
                    <property name="font">
                     <font>
                      <family>Segoe UI</family>
-                     <pointsize>10</pointsize>
+                     <pointsize>11</pointsize>
                      <weight>75</weight>
                      <bold>true</bold>
                     </font>
@@ -783,6 +844,12 @@ QPushButton:pressed {
                      <height>0</height>
                     </size>
                    </property>
+                   <property name="font">
+                    <font>
+                     <family>Segoe UI</family>
+                     <pointsize>11</pointsize>
+                    </font>
+                   </property>
                    <property name="text">
                     <string/>
                    </property>
@@ -792,6 +859,12 @@ QPushButton:pressed {
                </item>
                <item row="3" column="0" colspan="2">
                 <widget class="Line" name="line_14">
+                 <property name="font">
+                  <font>
+                   <family>Segoe UI</family>
+                   <pointsize>11</pointsize>
+                  </font>
+                 </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -843,7 +916,7 @@ QGroupBox::title {
                     <property name="font">
                      <font>
                       <family>Segoe UI</family>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                       <weight>75</weight>
                       <bold>true</bold>
                      </font>
@@ -864,6 +937,12 @@ QGroupBox::title {
                       <height>16777215</height>
                      </size>
                     </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>11</pointsize>
+                     </font>
+                    </property>
                     <property name="text">
                      <string/>
                     </property>
@@ -871,6 +950,12 @@ QGroupBox::title {
                   </item>
                   <item row="0" column="4">
                    <widget class="Line" name="line_26">
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>11</pointsize>
+                     </font>
+                    </property>
                     <property name="orientation">
                      <enum>Qt::Vertical</enum>
                     </property>
@@ -887,7 +972,7 @@ QGroupBox::title {
                     <property name="font">
                      <font>
                       <family>Segoe UI</family>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                      </font>
                     </property>
                     <property name="styleSheet">
@@ -915,7 +1000,7 @@ QGroupBox::title {
                     <property name="font">
                      <font>
                       <family>Segoe UI</family>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                       <weight>75</weight>
                       <bold>true</bold>
                      </font>
@@ -930,7 +1015,7 @@ QGroupBox::title {
                     <property name="font">
                      <font>
                       <family>Segoe UI</family>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                       <weight>75</weight>
                       <bold>true</bold>
                      </font>
@@ -945,7 +1030,7 @@ QGroupBox::title {
                     <property name="font">
                      <font>
                       <family>Segoe UI</family>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                       <weight>75</weight>
                       <bold>true</bold>
                      </font>
@@ -1001,6 +1086,12 @@ QGroupBox::title {
                  <layout class="QGridLayout" name="gridLayout_25">
                   <item row="0" column="4">
                    <widget class="Line" name="line_27">
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>11</pointsize>
+                     </font>
+                    </property>
                     <property name="orientation">
                      <enum>Qt::Vertical</enum>
                     </property>
@@ -1017,7 +1108,7 @@ QGroupBox::title {
                     <property name="font">
                      <font>
                       <family>Segoe UI</family>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                      </font>
                     </property>
                     <property name="styleSheet">
@@ -1039,7 +1130,7 @@ QGroupBox::title {
                     <property name="font">
                      <font>
                       <family>Segoe UI</family>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                       <weight>75</weight>
                       <bold>true</bold>
                      </font>
@@ -1060,6 +1151,12 @@ QGroupBox::title {
                       <height>16777215</height>
                      </size>
                     </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>11</pointsize>
+                     </font>
+                    </property>
                     <property name="text">
                      <string/>
                     </property>
@@ -1070,7 +1167,7 @@ QGroupBox::title {
                     <property name="font">
                      <font>
                       <family>Segoe UI</family>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                       <weight>75</weight>
                       <bold>true</bold>
                      </font>
@@ -1091,7 +1188,7 @@ QGroupBox::title {
                     <property name="font">
                      <font>
                       <family>Segoe UI</family>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                       <weight>75</weight>
                       <bold>true</bold>
                      </font>
@@ -1106,7 +1203,7 @@ QGroupBox::title {
                     <property name="font">
                      <font>
                       <family>Segoe UI</family>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                       <weight>75</weight>
                       <bold>true</bold>
                      </font>
@@ -1167,7 +1264,7 @@ QGroupBox::title {
               <property name="styleSheet">
                <string notr="true">/* Khung chính của GroupBox */
 QGroupBox {
-    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
+    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */
     border: 1px solid #000000; /* Viền xám mảnh để định hình khối */
     border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
     margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
@@ -1191,6 +1288,12 @@ QGroupBox::title {
               <layout class="QGridLayout" name="gridLayout_4">
                <item row="1" column="0">
                 <spacer name="horizontalSpacer">
+                 <property name="font">
+                  <font>
+                   <family>Segoe UI</family>
+                   <pointsize>11</pointsize>
+                  </font>
+                 </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -1243,7 +1346,7 @@ QGroupBox::title {
               <property name="styleSheet">
                <string notr="true">/* Khung chính của GroupBox */
 QGroupBox {
-    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
+    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */
     border: 1px solid #000000; /* Viền xám mảnh để định hình khối */
     border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
     margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
@@ -1287,7 +1390,7 @@ QGroupBox::title {
                    <property name="font">
                     <font>
                      <family>Segoe UI</family>
-                     <pointsize>10</pointsize>
+                     <pointsize>11</pointsize>
                      <weight>75</weight>
                      <bold>true</bold>
                     </font>
@@ -1331,6 +1434,12 @@ QPushButton:pressed {
                      <height>0</height>
                     </size>
                    </property>
+                   <property name="font">
+                    <font>
+                     <family>Segoe UI</family>
+                     <pointsize>11</pointsize>
+                    </font>
+                   </property>
                    <property name="text">
                     <string/>
                    </property>
@@ -1338,6 +1447,12 @@ QPushButton:pressed {
                  </item>
                  <item row="0" column="0">
                   <spacer name="horizontalSpacer_8">
+                   <property name="font">
+                    <font>
+                     <family>Segoe UI</family>
+                     <pointsize>11</pointsize>
+                    </font>
+                   </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
                    </property>
@@ -1366,7 +1481,7 @@ QPushButton:pressed {
                    <property name="font">
                     <font>
                      <family>Segoe UI</family>
-                     <pointsize>10</pointsize>
+                     <pointsize>11</pointsize>
                      <weight>75</weight>
                      <bold>true</bold>
                     </font>
@@ -1409,6 +1524,12 @@ QPushButton:pressed {
                      <width>20</width>
                      <height>0</height>
                     </size>
+                   </property>
+                   <property name="font">
+                    <font>
+                     <family>Segoe UI</family>
+                     <pointsize>11</pointsize>
+                    </font>
                    </property>
                    <property name="text">
                     <string/>
@@ -1486,7 +1607,7 @@ QGroupBox::title {
                       <property name="font">
                        <font>
                         <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
+                        <pointsize>11</pointsize>
                        </font>
                       </property>
                       <property name="styleSheet">
@@ -1520,7 +1641,7 @@ QGroupBox::title {
                       <property name="font">
                        <font>
                         <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
+                        <pointsize>11</pointsize>
                        </font>
                       </property>
                       <property name="styleSheet">
@@ -1554,7 +1675,7 @@ QGroupBox::title {
                       <property name="font">
                        <font>
                         <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
+                        <pointsize>11</pointsize>
                         <weight>75</weight>
                         <bold>true</bold>
                        </font>
@@ -1569,6 +1690,12 @@ QGroupBox::title {
                     </item>
                     <item row="2" column="3" rowspan="3">
                      <widget class="Line" name="line_18">
+                      <property name="font">
+                       <font>
+                        <family>Segoe UI</family>
+                        <pointsize>11</pointsize>
+                       </font>
+                      </property>
                       <property name="orientation">
                        <enum>Qt::Vertical</enum>
                       </property>
@@ -1591,7 +1718,7 @@ QGroupBox::title {
                       <property name="font">
                        <font>
                         <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
+                        <pointsize>11</pointsize>
                        </font>
                       </property>
                       <property name="styleSheet">
@@ -1625,7 +1752,7 @@ QGroupBox::title {
                       <property name="font">
                        <font>
                         <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
+                        <pointsize>11</pointsize>
                        </font>
                       </property>
                       <property name="styleSheet">
@@ -1647,7 +1774,7 @@ QGroupBox::title {
                       <property name="font">
                        <font>
                         <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
+                        <pointsize>11</pointsize>
                         <weight>75</weight>
                         <bold>true</bold>
                        </font>
@@ -1677,7 +1804,7 @@ QGroupBox::title {
                       <property name="font">
                        <font>
                         <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
+                        <pointsize>11</pointsize>
                         <weight>75</weight>
                         <bold>true</bold>
                        </font>
@@ -1707,7 +1834,7 @@ QGroupBox::title {
                       <property name="font">
                        <font>
                         <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
+                        <pointsize>11</pointsize>
                        </font>
                       </property>
                       <property name="styleSheet">
@@ -1741,7 +1868,7 @@ QGroupBox::title {
                       <property name="font">
                        <font>
                         <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
+                        <pointsize>11</pointsize>
                        </font>
                       </property>
                       <property name="styleSheet">
@@ -1775,7 +1902,7 @@ QGroupBox::title {
                       <property name="font">
                        <font>
                         <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
+                        <pointsize>11</pointsize>
                        </font>
                       </property>
                       <property name="styleSheet">
@@ -1797,7 +1924,7 @@ QGroupBox::title {
                       <property name="font">
                        <font>
                         <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
+                        <pointsize>11</pointsize>
                        </font>
                       </property>
                       <property name="text">
@@ -1822,7 +1949,7 @@ QGroupBox::title {
                       <property name="font">
                        <font>
                         <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
+                        <pointsize>11</pointsize>
                        </font>
                       </property>
                       <property name="styleSheet">
@@ -1854,7 +1981,7 @@ QGroupBox::title {
                       <property name="font">
                        <font>
                         <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
+                        <pointsize>11</pointsize>
                        </font>
                       </property>
                       <property name="text">
@@ -1864,6 +1991,12 @@ QGroupBox::title {
                     </item>
                     <item row="2" column="5" rowspan="3">
                      <widget class="Line" name="line_19">
+                      <property name="font">
+                       <font>
+                        <family>Segoe UI</family>
+                        <pointsize>11</pointsize>
+                       </font>
+                      </property>
                       <property name="orientation">
                        <enum>Qt::Vertical</enum>
                       </property>
@@ -1871,6 +2004,12 @@ QGroupBox::title {
                     </item>
                     <item row="2" column="1" rowspan="3">
                      <widget class="Line" name="line_17">
+                      <property name="font">
+                       <font>
+                        <family>Segoe UI</family>
+                        <pointsize>11</pointsize>
+                       </font>
+                      </property>
                       <property name="orientation">
                        <enum>Qt::Vertical</enum>
                       </property>
@@ -1881,7 +2020,7 @@ QGroupBox::title {
                       <property name="font">
                        <font>
                         <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
+                        <pointsize>11</pointsize>
                        </font>
                       </property>
                       <property name="text">
@@ -1906,7 +2045,7 @@ QGroupBox::title {
                       <property name="font">
                        <font>
                         <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
+                        <pointsize>11</pointsize>
                        </font>
                       </property>
                       <property name="styleSheet">
@@ -1940,7 +2079,7 @@ QGroupBox::title {
                       <property name="font">
                        <font>
                         <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
+                        <pointsize>11</pointsize>
                         <weight>75</weight>
                         <bold>true</bold>
                        </font>
@@ -1970,7 +2109,7 @@ QGroupBox::title {
                       <property name="font">
                        <font>
                         <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
+                        <pointsize>11</pointsize>
                        </font>
                       </property>
                       <property name="styleSheet">
@@ -2004,7 +2143,7 @@ QGroupBox::title {
                       <property name="font">
                        <font>
                         <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
+                        <pointsize>11</pointsize>
                        </font>
                       </property>
                       <property name="styleSheet">
@@ -2039,6 +2178,12 @@ QGroupBox::title {
                     </item>
                     <item row="1" column="0" colspan="9">
                      <widget class="Line" name="line_16">
+                      <property name="font">
+                       <font>
+                        <family>Segoe UI</family>
+                        <pointsize>11</pointsize>
+                       </font>
+                      </property>
                       <property name="orientation">
                        <enum>Qt::Horizontal</enum>
                       </property>
@@ -2061,7 +2206,7 @@ QGroupBox::title {
                       <property name="font">
                        <font>
                         <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
+                        <pointsize>11</pointsize>
                        </font>
                       </property>
                       <property name="styleSheet">
@@ -2111,7 +2256,7 @@ QGroupBox::title {
                       <property name="font">
                        <font>
                         <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
+                        <pointsize>11</pointsize>
                         <weight>75</weight>
                         <bold>true</bold>
                        </font>
@@ -2123,6 +2268,12 @@ QGroupBox::title {
                     </item>
                     <item row="2" column="7" rowspan="3">
                      <widget class="Line" name="line_20">
+                      <property name="font">
+                       <font>
+                        <family>Segoe UI</family>
+                        <pointsize>11</pointsize>
+                       </font>
+                      </property>
                       <property name="orientation">
                        <enum>Qt::Vertical</enum>
                       </property>
@@ -2130,6 +2281,12 @@ QGroupBox::title {
                     </item>
                     <item row="0" column="1">
                      <widget class="Line" name="line_21">
+                      <property name="font">
+                       <font>
+                        <family>Segoe UI</family>
+                        <pointsize>11</pointsize>
+                       </font>
+                      </property>
                       <property name="orientation">
                        <enum>Qt::Vertical</enum>
                       </property>
@@ -2137,6 +2294,12 @@ QGroupBox::title {
                     </item>
                     <item row="0" column="3">
                      <widget class="Line" name="line_22">
+                      <property name="font">
+                       <font>
+                        <family>Segoe UI</family>
+                        <pointsize>11</pointsize>
+                       </font>
+                      </property>
                       <property name="orientation">
                        <enum>Qt::Vertical</enum>
                       </property>
@@ -2144,6 +2307,12 @@ QGroupBox::title {
                     </item>
                     <item row="0" column="5">
                      <widget class="Line" name="line_23">
+                      <property name="font">
+                       <font>
+                        <family>Segoe UI</family>
+                        <pointsize>11</pointsize>
+                       </font>
+                      </property>
                       <property name="orientation">
                        <enum>Qt::Vertical</enum>
                       </property>
@@ -2151,6 +2320,12 @@ QGroupBox::title {
                     </item>
                     <item row="0" column="7">
                      <widget class="Line" name="line_24">
+                      <property name="font">
+                       <font>
+                        <family>Segoe UI</family>
+                        <pointsize>11</pointsize>
+                       </font>
+                      </property>
                       <property name="orientation">
                        <enum>Qt::Vertical</enum>
                       </property>
@@ -2163,6 +2338,12 @@ QGroupBox::title {
                </item>
                <item row="2" column="0">
                 <widget class="Line" name="line_15">
+                 <property name="font">
+                  <font>
+                   <family>Segoe UI</family>
+                   <pointsize>11</pointsize>
+                  </font>
+                 </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -2253,7 +2434,7 @@ QGroupBox::title {
               <property name="styleSheet">
                <string notr="true">/* Khung chính của GroupBox */
 QGroupBox {
-    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
+    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */
     border: 1px solid #000000; /* Viền xám mảnh để định hình khối */
     border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
     margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
@@ -2291,7 +2472,7 @@ QGroupBox::title {
                    <property name="font">
                     <font>
                      <family>Segoe UI</family>
-                     <pointsize>9</pointsize>
+                     <pointsize>11</pointsize>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -2358,7 +2539,7 @@ QTableView::item:selected {
                     <property name="font">
                      <font>
                       <family>Segoe UI</family>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                      </font>
                     </property>
                    </row>
@@ -2368,7 +2549,7 @@ QTableView::item:selected {
                     </property>
                     <property name="font">
                      <font>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                      </font>
                     </property>
                    </row>
@@ -2378,7 +2559,7 @@ QTableView::item:selected {
                     </property>
                     <property name="font">
                      <font>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                      </font>
                     </property>
                    </row>
@@ -2388,7 +2569,7 @@ QTableView::item:selected {
                     </property>
                     <property name="font">
                      <font>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                      </font>
                     </property>
                    </row>
@@ -2398,7 +2579,7 @@ QTableView::item:selected {
                     </property>
                     <property name="font">
                      <font>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                      </font>
                     </property>
                    </row>
@@ -2408,7 +2589,7 @@ QTableView::item:selected {
                     </property>
                     <property name="font">
                      <font>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                      </font>
                     </property>
                    </row>
@@ -2418,7 +2599,7 @@ QTableView::item:selected {
                     </property>
                     <property name="font">
                      <font>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                      </font>
                     </property>
                    </row>
@@ -2426,10 +2607,20 @@ QTableView::item:selected {
                     <property name="text">
                      <string>reset_counter</string>
                     </property>
+                    <property name="font">
+                     <font>
+                      <pointsize>11</pointsize>
+                     </font>
+                    </property>
                    </row>
                    <row>
                     <property name="text">
                      <string>counter_plc</string>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <pointsize>11</pointsize>
+                     </font>
                     </property>
                    </row>
                    <column>
@@ -2439,7 +2630,7 @@ QTableView::item:selected {
                     <property name="font">
                      <font>
                       <family>Segoe UI</family>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                      </font>
                     </property>
                     <property name="textAlignment">
@@ -2453,7 +2644,7 @@ QTableView::item:selected {
                     <property name="font">
                      <font>
                       <family>Segoe UI</family>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                      </font>
                     </property>
                     <property name="textAlignment">
@@ -2467,7 +2658,7 @@ QTableView::item:selected {
                     <property name="font">
                      <font>
                       <family>Segoe UI</family>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                      </font>
                     </property>
                     <property name="textAlignment">
@@ -2481,7 +2672,7 @@ QTableView::item:selected {
                     <property name="font">
                      <font>
                       <family>Segoe UI</family>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                      </font>
                     </property>
                     <property name="textAlignment">
@@ -2495,7 +2686,7 @@ QTableView::item:selected {
                     <property name="font">
                      <font>
                       <family>Segoe UI</family>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                      </font>
                     </property>
                     <property name="textAlignment">
@@ -2509,7 +2700,7 @@ QTableView::item:selected {
                     <property name="font">
                      <font>
                       <family>Segoe UI</family>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                      </font>
                     </property>
                     <property name="textAlignment">
@@ -2523,7 +2714,7 @@ QTableView::item:selected {
                     <property name="font">
                      <font>
                       <family>Segoe UI</family>
-                      <pointsize>10</pointsize>
+                      <pointsize>11</pointsize>
                      </font>
                     </property>
                     <property name="textAlignment">
@@ -2926,6 +3117,12 @@ QTableView::item:selected {
                  </item>
                  <item>
                   <widget class="Line" name="line_11">
+                   <property name="font">
+                    <font>
+                     <family>Segoe UI</family>
+                     <pointsize>11</pointsize>
+                    </font>
+                   </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
                    </property>
@@ -2955,7 +3152,7 @@ QTableView::item:selected {
                    <property name="font">
                     <font>
                      <family>Segoe UI</family>
-                     <pointsize>10</pointsize>
+                     <pointsize>11</pointsize>
                      <weight>75</weight>
                      <bold>true</bold>
                     </font>
@@ -2996,6 +3193,12 @@ QPushButton:pressed {
                  </item>
                  <item row="0" column="0">
                   <spacer name="horizontalSpacer_5">
+                   <property name="font">
+                    <font>
+                     <family>Segoe UI</family>
+                     <pointsize>11</pointsize>
+                    </font>
+                   </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
                    </property>
@@ -3014,6 +3217,12 @@ QPushButton:pressed {
                      <width>20</width>
                      <height>0</height>
                     </size>
+                   </property>
+                   <property name="font">
+                    <font>
+                     <family>Segoe UI</family>
+                     <pointsize>11</pointsize>
+                    </font>
                    </property>
                    <property name="text">
                     <string/>
@@ -3037,7 +3246,7 @@ QPushButton:pressed {
                    <property name="font">
                     <font>
                      <family>Segoe UI</family>
-                     <pointsize>10</pointsize>
+                     <pointsize>11</pointsize>
                      <weight>75</weight>
                      <bold>true</bold>
                     </font>
@@ -3090,7 +3299,7 @@ QPushButton:pressed {
                    <property name="font">
                     <font>
                      <family>Segoe UI</family>
-                     <pointsize>10</pointsize>
+                     <pointsize>11</pointsize>
                      <weight>75</weight>
                      <bold>true</bold>
                     </font>
@@ -3134,6 +3343,12 @@ QPushButton:pressed {
                      <height>0</height>
                     </size>
                    </property>
+                   <property name="font">
+                    <font>
+                     <family>Segoe UI</family>
+                     <pointsize>11</pointsize>
+                    </font>
+                   </property>
                    <property name="text">
                     <string/>
                    </property>
@@ -3163,7 +3378,7 @@ QPushButton:pressed {
               <property name="styleSheet">
                <string notr="true">/* Khung chính của GroupBox */
 QGroupBox {
-    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
+    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */
     border: 1px solid #000000; /* Viền xám mảnh để định hình khối */
     border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
     margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
@@ -3269,7 +3484,7 @@ QGroupBox::title {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                               <weight>75</weight>
                               <bold>true</bold>
                              </font>
@@ -3296,7 +3511,7 @@ QGroupBox::title {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                               <weight>75</weight>
                               <bold>true</bold>
                              </font>
@@ -3323,7 +3538,7 @@ QGroupBox::title {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                               <weight>75</weight>
                               <bold>true</bold>
                              </font>
@@ -3350,7 +3565,7 @@ QGroupBox::title {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                               <weight>75</weight>
                               <bold>true</bold>
                              </font>
@@ -3377,7 +3592,7 @@ QGroupBox::title {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -3393,7 +3608,7 @@ QGroupBox::title {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -3424,7 +3639,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="alignment">
@@ -3452,7 +3667,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -3485,7 +3700,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -3501,7 +3716,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -3532,7 +3747,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="alignment">
@@ -3560,7 +3775,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -3593,7 +3808,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -3609,7 +3824,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -3640,7 +3855,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="alignment">
@@ -3668,7 +3883,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -3703,7 +3918,7 @@ QCheckBox::indicator {
                           <property name="font">
                            <font>
                             <family>Segoe UI</family>
-                            <pointsize>10</pointsize>
+                            <pointsize>11</pointsize>
                            </font>
                           </property>
                           <property name="styleSheet">
@@ -3730,7 +3945,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                               <weight>75</weight>
                               <bold>true</bold>
                              </font>
@@ -3757,7 +3972,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                               <weight>75</weight>
                               <bold>true</bold>
                              </font>
@@ -3784,7 +3999,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                               <weight>75</weight>
                               <bold>true</bold>
                              </font>
@@ -3811,7 +4026,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                               <weight>75</weight>
                               <bold>true</bold>
                              </font>
@@ -3838,7 +4053,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -3854,7 +4069,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -3885,7 +4100,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="alignment">
@@ -3913,7 +4128,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -3946,7 +4161,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -3962,7 +4177,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -3993,7 +4208,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="alignment">
@@ -4021,7 +4236,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -4054,7 +4269,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -4070,7 +4285,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -4101,7 +4316,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="alignment">
@@ -4129,7 +4344,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -4232,7 +4447,7 @@ QGroupBox::title {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                               <weight>75</weight>
                               <bold>true</bold>
                              </font>
@@ -4259,7 +4474,7 @@ QGroupBox::title {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                               <weight>75</weight>
                               <bold>true</bold>
                              </font>
@@ -4286,7 +4501,7 @@ QGroupBox::title {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                               <weight>75</weight>
                               <bold>true</bold>
                              </font>
@@ -4313,7 +4528,7 @@ QGroupBox::title {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                               <weight>75</weight>
                               <bold>true</bold>
                              </font>
@@ -4340,7 +4555,7 @@ QGroupBox::title {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -4356,7 +4571,7 @@ QGroupBox::title {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -4381,7 +4596,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -4418,7 +4633,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="text">
@@ -4440,7 +4655,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -4456,7 +4671,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -4481,7 +4696,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -4518,7 +4733,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="text">
@@ -4540,7 +4755,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -4556,7 +4771,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -4581,7 +4796,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -4618,7 +4833,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="text">
@@ -4642,7 +4857,7 @@ QCheckBox::indicator {
                           <property name="font">
                            <font>
                             <family>Segoe UI</family>
-                            <pointsize>10</pointsize>
+                            <pointsize>11</pointsize>
                            </font>
                           </property>
                           <property name="styleSheet">
@@ -4669,7 +4884,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                               <weight>75</weight>
                               <bold>true</bold>
                              </font>
@@ -4696,7 +4911,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                               <weight>75</weight>
                               <bold>true</bold>
                              </font>
@@ -4723,7 +4938,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                               <weight>75</weight>
                               <bold>true</bold>
                              </font>
@@ -4750,7 +4965,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                               <weight>75</weight>
                               <bold>true</bold>
                              </font>
@@ -4777,7 +4992,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -4793,7 +5008,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -4818,7 +5033,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -4855,7 +5070,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="text">
@@ -4877,7 +5092,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -4893,7 +5108,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -4918,7 +5133,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -4955,7 +5170,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="text">
@@ -4977,7 +5192,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -4993,7 +5208,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -5018,7 +5233,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="styleSheet">
@@ -5055,7 +5270,7 @@ QCheckBox::indicator {
                             <property name="font">
                              <font>
                               <family>Segoe UI</family>
-                              <pointsize>10</pointsize>
+                              <pointsize>11</pointsize>
                              </font>
                             </property>
                             <property name="text">
@@ -5077,6 +5292,12 @@ QCheckBox::indicator {
                  </item>
                  <item>
                   <widget class="Line" name="line_13">
+                   <property name="font">
+                    <font>
+                     <family>Segoe UI</family>
+                     <pointsize>11</pointsize>
+                    </font>
+                   </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
                    </property>
@@ -5097,6 +5318,12 @@ QCheckBox::indicator {
                      <height>0</height>
                     </size>
                    </property>
+                   <property name="font">
+                    <font>
+                     <family>Segoe UI</family>
+                     <pointsize>11</pointsize>
+                    </font>
+                   </property>
                    <property name="text">
                     <string/>
                    </property>
@@ -5104,6 +5331,12 @@ QCheckBox::indicator {
                  </item>
                  <item row="0" column="0">
                   <spacer name="horizontalSpacer_6">
+                   <property name="font">
+                    <font>
+                     <family>Segoe UI</family>
+                     <pointsize>11</pointsize>
+                    </font>
+                   </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
                    </property>
@@ -5132,7 +5365,7 @@ QCheckBox::indicator {
                    <property name="font">
                     <font>
                      <family>Segoe UI</family>
-                     <pointsize>10</pointsize>
+                     <pointsize>11</pointsize>
                      <weight>75</weight>
                      <bold>true</bold>
                     </font>
@@ -5176,6 +5409,12 @@ QPushButton:pressed {
                      <height>0</height>
                     </size>
                    </property>
+                   <property name="font">
+                    <font>
+                     <family>Segoe UI</family>
+                     <pointsize>11</pointsize>
+                    </font>
+                   </property>
                    <property name="text">
                     <string/>
                    </property>
@@ -5198,7 +5437,7 @@ QPushButton:pressed {
                    <property name="font">
                     <font>
                      <family>Segoe UI</family>
-                     <pointsize>10</pointsize>
+                     <pointsize>11</pointsize>
                      <weight>75</weight>
                      <bold>true</bold>
                     </font>
@@ -5267,7 +5506,7 @@ QPushButton:pressed {
             <property name="styleSheet">
              <string notr="true">/* Khung chính của GroupBox */
 QGroupBox {
-    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
+    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */
     border: 1px solid #5B5B5B; /* Viền xám mảnh để định hình khối */
     border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
     margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
@@ -5311,7 +5550,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                 </widget>
@@ -5321,7 +5560,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="text">
@@ -5334,7 +5573,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="text">
@@ -5347,7 +5586,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="text">
@@ -5357,6 +5596,12 @@ QGroupBox::title {
                </item>
                <item row="5" column="0" colspan="4">
                 <widget class="Line" name="line_2">
+                 <property name="font">
+                  <font>
+                   <family>Segoe UI</family>
+                   <pointsize>11</pointsize>
+                  </font>
+                 </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -5367,7 +5612,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="text">
@@ -5386,7 +5631,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="styleSheet">
@@ -5424,7 +5669,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="styleSheet">
@@ -5453,6 +5698,12 @@ QGroupBox::title {
                </item>
                <item row="8" column="0" colspan="4">
                 <widget class="Line" name="line_10">
+                 <property name="font">
+                  <font>
+                   <family>Segoe UI</family>
+                   <pointsize>11</pointsize>
+                  </font>
+                 </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -5465,6 +5716,12 @@ QGroupBox::title {
                    <width>100</width>
                    <height>28</height>
                   </size>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <family>Segoe UI</family>
+                   <pointsize>11</pointsize>
+                  </font>
                  </property>
                  <property name="styleSheet">
                   <string notr="true">QComboBox {
@@ -5530,7 +5787,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="text">
@@ -5540,6 +5797,12 @@ QGroupBox::title {
                </item>
                <item row="2" column="0" colspan="4">
                 <widget class="Line" name="line">
+                 <property name="font">
+                  <font>
+                   <family>Segoe UI</family>
+                   <pointsize>11</pointsize>
+                  </font>
+                 </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -5552,6 +5815,12 @@ QGroupBox::title {
                    <width>0</width>
                    <height>28</height>
                   </size>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <family>Segoe UI</family>
+                   <pointsize>11</pointsize>
+                  </font>
                  </property>
                  <property name="styleSheet">
                   <string notr="true">QComboBox {
@@ -5641,7 +5910,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                    <weight>75</weight>
                    <bold>true</bold>
                   </font>
@@ -5682,6 +5951,12 @@ QPushButton:pressed {
                </item>
                <item row="0" column="0">
                 <spacer name="horizontalSpacer_3">
+                 <property name="font">
+                  <font>
+                   <family>Segoe UI</family>
+                   <pointsize>11</pointsize>
+                  </font>
+                 </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -5700,6 +5975,12 @@ QPushButton:pressed {
                    <width>20</width>
                    <height>0</height>
                   </size>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <family>Segoe UI</family>
+                   <pointsize>11</pointsize>
+                  </font>
                  </property>
                  <property name="text">
                   <string/>
@@ -5723,7 +6004,7 @@ QPushButton:pressed {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                    <weight>75</weight>
                    <bold>true</bold>
                   </font>
@@ -5776,7 +6057,7 @@ QPushButton:pressed {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                    <weight>75</weight>
                    <bold>true</bold>
                   </font>
@@ -5820,6 +6101,12 @@ QPushButton:pressed {
                    <height>0</height>
                   </size>
                  </property>
+                 <property name="font">
+                  <font>
+                   <family>Segoe UI</family>
+                   <pointsize>11</pointsize>
+                  </font>
+                 </property>
                  <property name="text">
                   <string/>
                  </property>
@@ -5849,7 +6136,7 @@ QPushButton:pressed {
             <property name="styleSheet">
              <string notr="true">/* Khung chính của GroupBox */
 QGroupBox {
-    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
+    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */
     border: 1px solid #000000; /* Viền xám mảnh để định hình khối */
     border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
     margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
@@ -5878,6 +6165,12 @@ QGroupBox::title {
                </property>
                <item row="3" column="0" colspan="3">
                 <widget class="Line" name="line_3">
+                 <property name="font">
+                  <font>
+                   <family>Segoe UI</family>
+                   <pointsize>11</pointsize>
+                  </font>
+                 </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -5885,6 +6178,12 @@ QGroupBox::title {
                </item>
                <item row="5" column="1">
                 <widget class="QLabel" name="label_12">
+                 <property name="font">
+                  <font>
+                   <family>Segoe UI</family>
+                   <pointsize>11</pointsize>
+                  </font>
+                 </property>
                  <property name="text">
                   <string>🔴 Bit OFF:</string>
                  </property>
@@ -5895,7 +6194,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="text">
@@ -5905,6 +6204,12 @@ QGroupBox::title {
                </item>
                <item row="1" column="0" colspan="3">
                 <widget class="Line" name="line_5">
+                 <property name="font">
+                  <font>
+                   <family>Segoe UI</family>
+                   <pointsize>11</pointsize>
+                  </font>
+                 </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -5917,6 +6222,12 @@ QGroupBox::title {
                    <width>0</width>
                    <height>28</height>
                   </size>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <family>Segoe UI</family>
+                   <pointsize>11</pointsize>
+                  </font>
                  </property>
                  <property name="styleSheet">
                   <string notr="true">QComboBox {
@@ -5988,7 +6299,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="styleSheet">
@@ -6052,6 +6363,12 @@ QGroupBox::title {
                </item>
                <item row="4" column="1">
                 <widget class="QLabel" name="label_11">
+                 <property name="font">
+                  <font>
+                   <family>Segoe UI</family>
+                   <pointsize>11</pointsize>
+                  </font>
+                 </property>
                  <property name="text">
                   <string>🟢 Bit ON:</string>
                  </property>
@@ -6062,7 +6379,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="text">
@@ -6081,7 +6398,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="styleSheet">
@@ -6100,6 +6417,12 @@ QGroupBox::title {
                </item>
                <item row="6" column="0" colspan="3">
                 <widget class="Line" name="line_4">
+                 <property name="font">
+                  <font>
+                   <family>Segoe UI</family>
+                   <pointsize>11</pointsize>
+                  </font>
+                 </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -6122,7 +6445,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="alignment">
@@ -6135,7 +6458,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="text">
@@ -6167,7 +6490,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                    <weight>75</weight>
                    <bold>true</bold>
                   </font>
@@ -6211,6 +6534,12 @@ QPushButton:pressed {
                    <height>0</height>
                   </size>
                  </property>
+                 <property name="font">
+                  <font>
+                   <family>Segoe UI</family>
+                   <pointsize>11</pointsize>
+                  </font>
+                 </property>
                  <property name="text">
                   <string/>
                  </property>
@@ -6218,6 +6547,12 @@ QPushButton:pressed {
                </item>
                <item row="0" column="0">
                 <spacer name="horizontalSpacer_4">
+                 <property name="font">
+                  <font>
+                   <family>Segoe UI</family>
+                   <pointsize>11</pointsize>
+                  </font>
+                 </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -6246,7 +6581,7 @@ QPushButton:pressed {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                    <weight>75</weight>
                    <bold>true</bold>
                   </font>
@@ -6290,6 +6625,12 @@ QPushButton:pressed {
                    <height>0</height>
                   </size>
                  </property>
+                 <property name="font">
+                  <font>
+                   <family>Segoe UI</family>
+                   <pointsize>11</pointsize>
+                  </font>
+                 </property>
                  <property name="text">
                   <string/>
                  </property>
@@ -6319,7 +6660,7 @@ QPushButton:pressed {
             <property name="styleSheet">
              <string notr="true">/* Khung chính của GroupBox */
 QGroupBox {
-    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
+    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */
     border: 1px solid #000000; /* Viền xám mảnh để định hình khối */
     border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
     margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
@@ -6375,7 +6716,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="styleSheet">
@@ -6492,7 +6833,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="text">
@@ -6505,7 +6846,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="text">
@@ -6515,6 +6856,12 @@ QGroupBox::title {
                </item>
                <item row="1" column="0" colspan="2">
                 <widget class="Line" name="line_6">
+                 <property name="font">
+                  <font>
+                   <family>Segoe UI</family>
+                   <pointsize>11</pointsize>
+                  </font>
+                 </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -6537,7 +6884,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="styleSheet">
@@ -6594,7 +6941,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="text">
@@ -6604,6 +6951,12 @@ QGroupBox::title {
                </item>
                <item row="3" column="0" colspan="2">
                 <widget class="Line" name="line_7">
+                 <property name="font">
+                  <font>
+                   <family>Segoe UI</family>
+                   <pointsize>11</pointsize>
+                  </font>
+                 </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -6626,7 +6979,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="alignment">
@@ -6647,6 +7000,12 @@ QGroupBox::title {
              </item>
              <item>
               <spacer name="verticalSpacer">
+               <property name="font">
+                <font>
+                 <family>Segoe UI</family>
+                 <pointsize>11</pointsize>
+                </font>
+               </property>
                <property name="orientation">
                 <enum>Qt::Vertical</enum>
                </property>
@@ -6686,7 +7045,7 @@ QGroupBox::title {
             <property name="styleSheet">
              <string notr="true">/* Khung chính của GroupBox */
 QGroupBox {
-    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
+    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */
     border: 1px solid #000000; /* Viền xám mảnh để định hình khối */
     border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
     margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
@@ -6736,7 +7095,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="styleSheet">
@@ -6775,7 +7134,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="styleSheet">
@@ -6798,7 +7157,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="text">
@@ -6811,6 +7170,12 @@ QGroupBox::title {
                </item>
                <item row="1" column="0" colspan="2">
                 <widget class="Line" name="line_8">
+                 <property name="font">
+                  <font>
+                   <family>Segoe UI</family>
+                   <pointsize>11</pointsize>
+                  </font>
+                 </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -6821,7 +7186,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="text">
@@ -6837,7 +7202,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="text">
@@ -6859,7 +7224,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="styleSheet">
@@ -6884,6 +7249,12 @@ QGroupBox::title {
                </item>
                <item row="3" column="0" colspan="2">
                 <widget class="Line" name="line_9">
+                 <property name="font">
+                  <font>
+                   <family>Segoe UI</family>
+                   <pointsize>11</pointsize>
+                  </font>
+                 </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -6893,6 +7264,12 @@ QGroupBox::title {
              </item>
              <item>
               <spacer name="verticalSpacer_2">
+               <property name="font">
+                <font>
+                 <family>Segoe UI</family>
+                 <pointsize>11</pointsize>
+                </font>
+               </property>
                <property name="orientation">
                 <enum>Qt::Vertical</enum>
                </property>
@@ -6938,7 +7315,7 @@ QGroupBox::title {
             <property name="styleSheet">
              <string notr="true">/* Khung chính của GroupBox */
 QGroupBox {
-    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */
+    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */
     border: 1px solid #000000; /* Viền xám mảnh để định hình khối */
     border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */
     margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */
@@ -6967,7 +7344,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                    <weight>62</weight>
                    <bold>true</bold>
                   </font>
@@ -6997,7 +7374,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="text">
@@ -7016,7 +7393,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="text">
@@ -7035,7 +7412,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="text">
@@ -7048,7 +7425,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                    <weight>62</weight>
                    <bold>true</bold>
                   </font>
@@ -7072,7 +7449,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="text">
@@ -7085,7 +7462,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                    <weight>62</weight>
                    <bold>true</bold>
                   </font>
@@ -7103,7 +7480,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                    <weight>62</weight>
                    <bold>true</bold>
                   </font>
@@ -7124,7 +7501,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                    <weight>62</weight>
                    <bold>true</bold>
                   </font>
@@ -7148,7 +7525,7 @@ QGroupBox::title {
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>10</pointsize>
+                   <pointsize>11</pointsize>
                   </font>
                  </property>
                  <property name="text">
@@ -7177,6 +7554,12 @@ QGroupBox::title {
                    <height>70</height>
                   </size>
                  </property>
+                 <property name="font">
+                  <font>
+                   <family>Segoe UI</family>
+                   <pointsize>11</pointsize>
+                  </font>
+                 </property>
                  <property name="frameShape">
                   <enum>QFrame::StyledPanel</enum>
                  </property>
@@ -7203,7 +7586,7 @@ QGroupBox::title {
                       <property name="font">
                        <font>
                         <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
+                        <pointsize>11</pointsize>
                        </font>
                       </property>
                       <property name="text">
@@ -7216,7 +7599,7 @@ QGroupBox::title {
                       <property name="font">
                        <font>
                         <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
+                        <pointsize>11</pointsize>
                         <weight>75</weight>
                         <bold>true</bold>
                        </font>
@@ -7231,7 +7614,7 @@ QGroupBox::title {
                       <property name="font">
                        <font>
                         <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
+                        <pointsize>11</pointsize>
                        </font>
                       </property>
                       <property name="layoutDirection">
@@ -7247,7 +7630,7 @@ QGroupBox::title {
                       <property name="font">
                        <font>
                         <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
+                        <pointsize>11</pointsize>
                         <weight>75</weight>
                         <bold>true</bold>
                        </font>
@@ -7268,7 +7651,7 @@ QGroupBox::title {
                       <property name="font">
                        <font>
                         <family>Segoe UI</family>
-                        <pointsize>10</pointsize>
+                        <pointsize>11</pointsize>
                         <weight>75</weight>
                         <bold>true</bold>
                        </font>
@@ -7301,6 +7684,12 @@ QGroupBox::title {
             <height>1</height>
            </size>
           </property>
+          <property name="font">
+           <font>
+            <family>Segoe UI</family>
+            <pointsize>11</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string/>
           </property>
@@ -7330,9 +7719,9 @@ QGroupBox::title {
           </property>
           <property name="styleSheet">
            <string notr="true">QLabel {
-    color: #000000; /* Chữ màu đen xám hiện đại, tương phản cao trên nền trắng */
+    color: #ffffff; /* Chữ màu đen xám hiện đại, tương phản cao trên nền trắng */
     
-    background-color: #DFDFDF; /* Nền màu trắng */
+    background-color:  qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #0B1E36, stop:1 #0F3B63); /* Nền màu trắng */
     border: 2px solid #7A7A7A; /* Viền xám rất nhạt để định hình khối */
     border-radius: 15px; /* Bo tròn góc mạnh hơn, tạo cảm giác mềm mại */
     
@@ -7342,7 +7731,7 @@ QGroupBox::title {
 </string>
           </property>
           <property name="text">
-           <string>SINALS  TRANMISSION  LAYOUT</string>
+           <string>SINALS  TRANMISSION SECTION</string>
           </property>
          </widget>
         </item>
@@ -7353,6 +7742,12 @@ QGroupBox::title {
             <width>16777215</width>
             <height>1</height>
            </size>
+          </property>
+          <property name="font">
+           <font>
+            <family>Segoe UI</family>
+            <pointsize>11</pointsize>
+           </font>
           </property>
           <property name="text">
            <string/>
