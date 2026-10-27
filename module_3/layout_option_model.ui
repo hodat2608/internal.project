@@ -49,7 +49,7 @@
       <property name="styleSheet">
        <string notr="true">/* Khung ngoài của ScrollArea */
 QScrollArea {
-    background-color: #FFFFF5; /* Màu vàng nhạt (Soft Yellow) */
+    background-color: #F1F5F9; /* Màu vàng nhạt (Soft Yellow) */
     border: 1px solid #c6c6c6;  /* Viền xám mảnh đồng bộ */
     border-radius: 4px;         /* Bo tròn góc 4px */
 }
@@ -94,8 +94,8 @@ QScrollBar::handle:vertical:hover {
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>-302</y>
-         <width>1661</width>
+         <y>-15</y>
+         <width>1668</width>
          <height>1280</height>
         </rect>
        </property>
@@ -141,9 +141,9 @@ QScrollBar::handle:vertical:hover {
             </property>
             <property name="styleSheet">
              <string notr="true">QLabel {
-    color: #000000; /* Chữ màu đen xám hiện đại, tương phản cao trên nền trắng */
+    color: #ffffff; /* Chữ màu đen xám hiện đại, tương phản cao trên nền trắng */
     
-    background-color: #DFDFDF; /* Nền màu trắng */
+    background-color:  qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #0B1E36, stop:1 #0F3B63); /* Nền màu trắng */
     border: 2px solid #7A7A7A; /* Viền xám rất nhạt để định hình khối */
     border-radius: 15px; /* Bo tròn góc mạnh hơn, tạo cảm giác mềm mại */
     
@@ -340,7 +340,10 @@ QGroupBox::title {
                          </property>
                          <property name="font">
                           <font>
+                           <family>Segoe UI</family>
                            <pointsize>10</pointsize>
+                           <weight>75</weight>
+                           <bold>true</bold>
                           </font>
                          </property>
                          <property name="styleSheet">
@@ -408,7 +411,10 @@ QComboBox::drop-down { border: none; }
                          </property>
                          <property name="font">
                           <font>
+                           <family>Segoe UI</family>
                            <pointsize>10</pointsize>
+                           <weight>75</weight>
+                           <bold>true</bold>
                           </font>
                          </property>
                          <property name="styleSheet">
@@ -476,7 +482,10 @@ QComboBox::drop-down { border: none; }
                          </property>
                          <property name="font">
                           <font>
+                           <family>Segoe UI</family>
                            <pointsize>10</pointsize>
+                           <weight>75</weight>
+                           <bold>true</bold>
                           </font>
                          </property>
                          <property name="styleSheet">
@@ -539,7 +548,10 @@ QComboBox::drop-down { border: none; }
                          </property>
                          <property name="font">
                           <font>
+                           <family>Segoe UI</family>
                            <pointsize>10</pointsize>
+                           <weight>75</weight>
+                           <bold>true</bold>
                           </font>
                          </property>
                          <property name="styleSheet">
@@ -686,7 +698,10 @@ QGroupBox::title {
                      </property>
                      <property name="font">
                       <font>
+                       <family>Segoe UI</family>
                        <pointsize>10</pointsize>
+                       <weight>75</weight>
+                       <bold>true</bold>
                       </font>
                      </property>
                      <property name="styleSheet">
@@ -713,17 +728,42 @@ QLineEdit:focus {
                    </item>
                    <item>
                     <widget class="QPushButton" name="pushButton_weight_pytorch">
+                     <property name="minimumSize">
+                      <size>
+                       <width>35</width>
+                       <height>28</height>
+                      </size>
+                     </property>
                      <property name="font">
                       <font>
                        <pointsize>10</pointsize>
                       </font>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true">QPushButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+}
+QPushButton:hover {
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
+}
+QPushButton:pressed {
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
+}</string>
                      </property>
                      <property name="text">
                       <string/>
                      </property>
                      <property name="icon">
                       <iconset>
-                       <normaloff>assert/icon/folder.png</normaloff>assert/icon/folder.png</iconset>
+                       <normaloff>assert/icon/folder1.png</normaloff>assert/icon/folder1.png</iconset>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
                      </property>
                     </widget>
                    </item>
@@ -731,7 +771,7 @@ QLineEdit:focus {
                     <widget class="QPushButton" name="pushButton_weight_pytorch_2">
                      <property name="minimumSize">
                       <size>
-                       <width>50</width>
+                       <width>35</width>
                        <height>28</height>
                       </size>
                      </property>
@@ -742,28 +782,34 @@ QLineEdit:focus {
                        <bold>true</bold>
                       </font>
                      </property>
+                     <property name="toolTip">
+                      <string>Load model from weight .pt file</string>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true">QPushButton {
-    border-radius: 10px; /* Độ bo tròn góc */
-    background-color: #2ecc71; /* Màu nền xanh lá dịu mắt */
-    color: white; /* Màu chữ */
-    border: 1px solid #27ae60; /* Đường viền xanh lá đậm hơn một chút */
-    padding: 5px;
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
 }
-
-/* Hiệu ứng khi di chuột qua nút (Đổi sang xanh lá đậm hơn) */
 QPushButton:hover {
-    background-color: #27ae60;
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
 }
-
-/* Hiệu ứng khi ấn giữ nút (Tùy chọn thêm để tăng trải nghiệm) */
 QPushButton:pressed {
-    background-color: #1e8449;
-}
-</string>
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
+}</string>
                      </property>
                      <property name="text">
-                      <string>LOAD</string>
+                      <string/>
+                     </property>
+                     <property name="icon">
+                      <iconset>
+                       <normaloff>assert/icon/upload.png</normaloff>assert/icon/upload.png</iconset>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
                      </property>
                     </widget>
                    </item>
@@ -802,7 +848,10 @@ QPushButton:pressed {
                      </property>
                      <property name="font">
                       <font>
+                       <family>Segoe UI</family>
                        <pointsize>10</pointsize>
+                       <weight>75</weight>
+                       <bold>true</bold>
                       </font>
                      </property>
                      <property name="styleSheet">
@@ -829,17 +878,42 @@ QLineEdit:focus {
                    </item>
                    <item>
                     <widget class="QPushButton" name="pushButton_broswer_tensort">
+                     <property name="minimumSize">
+                      <size>
+                       <width>35</width>
+                       <height>28</height>
+                      </size>
+                     </property>
                      <property name="font">
                       <font>
                        <pointsize>10</pointsize>
                       </font>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true">QPushButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+}
+QPushButton:hover {
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
+}
+QPushButton:pressed {
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
+}</string>
                      </property>
                      <property name="text">
                       <string/>
                      </property>
                      <property name="icon">
                       <iconset>
-                       <normaloff>assert/icon/folder.png</normaloff>assert/icon/folder.png</iconset>
+                       <normaloff>assert/icon/folder1.png</normaloff>assert/icon/folder1.png</iconset>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
                      </property>
                     </widget>
                    </item>
@@ -847,7 +921,7 @@ QLineEdit:focus {
                     <widget class="QPushButton" name="pushButton_model_tensorrt">
                      <property name="minimumSize">
                       <size>
-                       <width>50</width>
+                       <width>35</width>
                        <height>28</height>
                       </size>
                      </property>
@@ -858,28 +932,34 @@ QLineEdit:focus {
                        <bold>true</bold>
                       </font>
                      </property>
+                     <property name="toolTip">
+                      <string>Load model from weight .engine file</string>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true">QPushButton {
-    border-radius: 10px; /* Độ bo tròn góc */
-    background-color: #2ecc71; /* Màu nền xanh lá dịu mắt */
-    color: white; /* Màu chữ */
-    border: 1px solid #27ae60; /* Đường viền xanh lá đậm hơn một chút */
-    padding: 5px;
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
 }
-
-/* Hiệu ứng khi di chuột qua nút (Đổi sang xanh lá đậm hơn) */
 QPushButton:hover {
-    background-color: #27ae60;
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
 }
-
-/* Hiệu ứng khi ấn giữ nút (Tùy chọn thêm để tăng trải nghiệm) */
 QPushButton:pressed {
-    background-color: #1e8449;
-}
-</string>
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
+}</string>
                      </property>
                      <property name="text">
-                      <string>LOAD</string>
+                      <string/>
+                     </property>
+                     <property name="icon">
+                      <iconset>
+                       <normaloff>assert/icon/upload.png</normaloff>assert/icon/upload.png</iconset>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
                      </property>
                     </widget>
                    </item>
@@ -918,7 +998,10 @@ QPushButton:pressed {
                      </property>
                      <property name="font">
                       <font>
+                       <family>Segoe UI</family>
                        <pointsize>10</pointsize>
+                       <weight>75</weight>
+                       <bold>true</bold>
                       </font>
                      </property>
                      <property name="styleSheet">
@@ -945,17 +1028,42 @@ QLineEdit:focus {
                    </item>
                    <item>
                     <widget class="QPushButton" name="pushButton_classes_txt">
+                     <property name="minimumSize">
+                      <size>
+                       <width>35</width>
+                       <height>28</height>
+                      </size>
+                     </property>
                      <property name="font">
                       <font>
                        <pointsize>10</pointsize>
                       </font>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true">QPushButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+}
+QPushButton:hover {
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
+}
+QPushButton:pressed {
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
+}</string>
                      </property>
                      <property name="text">
                       <string/>
                      </property>
                      <property name="icon">
                       <iconset>
-                       <normaloff>assert/icon/folder.png</normaloff>assert/icon/folder.png</iconset>
+                       <normaloff>assert/icon/folder1.png</normaloff>assert/icon/folder1.png</iconset>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
                      </property>
                     </widget>
                    </item>
@@ -963,7 +1071,7 @@ QLineEdit:focus {
                     <widget class="QPushButton" name="pushButton_class_file">
                      <property name="minimumSize">
                       <size>
-                       <width>50</width>
+                       <width>35</width>
                        <height>28</height>
                       </size>
                      </property>
@@ -976,26 +1084,29 @@ QLineEdit:focus {
                      </property>
                      <property name="styleSheet">
                       <string notr="true">QPushButton {
-    border-radius: 10px; /* Độ bo tròn góc */
-    background-color: #2ecc71; /* Màu nền xanh lá dịu mắt */
-    color: white; /* Màu chữ */
-    border: 1px solid #27ae60; /* Đường viền xanh lá đậm hơn một chút */
-    padding: 5px;
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
 }
-
-/* Hiệu ứng khi di chuột qua nút (Đổi sang xanh lá đậm hơn) */
 QPushButton:hover {
-    background-color: #27ae60;
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
 }
-
-/* Hiệu ứng khi ấn giữ nút (Tùy chọn thêm để tăng trải nghiệm) */
 QPushButton:pressed {
-    background-color: #1e8449;
-}
-</string>
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
+}</string>
                      </property>
                      <property name="text">
-                      <string>LOAD</string>
+                      <string/>
+                     </property>
+                     <property name="icon">
+                      <iconset>
+                       <normaloff>assert/icon/upload.png</normaloff>assert/icon/upload.png</iconset>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
                      </property>
                     </widget>
                    </item>
@@ -1034,7 +1145,10 @@ QPushButton:pressed {
                      </property>
                      <property name="font">
                       <font>
+                       <family>Segoe UI</family>
                        <pointsize>10</pointsize>
+                       <weight>75</weight>
+                       <bold>true</bold>
                       </font>
                      </property>
                      <property name="styleSheet">
@@ -1058,17 +1172,42 @@ QLineEdit:focus {
                    </item>
                    <item>
                     <widget class="QPushButton" name="pushButton_data_change">
+                     <property name="minimumSize">
+                      <size>
+                       <width>35</width>
+                       <height>28</height>
+                      </size>
+                     </property>
                      <property name="font">
                       <font>
                        <pointsize>10</pointsize>
                       </font>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true">QPushButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+}
+QPushButton:hover {
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
+}
+QPushButton:pressed {
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
+}</string>
                      </property>
                      <property name="text">
                       <string/>
                      </property>
                      <property name="icon">
                       <iconset>
-                       <normaloff>assert/icon/folder.png</normaloff>assert/icon/folder.png</iconset>
+                       <normaloff>assert/icon/folder1.png</normaloff>assert/icon/folder1.png</iconset>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
                      </property>
                     </widget>
                    </item>
@@ -1076,7 +1215,7 @@ QLineEdit:focus {
                     <widget class="QPushButton" name="pushButton_data_change_2">
                      <property name="minimumSize">
                       <size>
-                       <width>50</width>
+                       <width>35</width>
                        <height>28</height>
                       </size>
                      </property>
@@ -1089,26 +1228,29 @@ QLineEdit:focus {
                      </property>
                      <property name="styleSheet">
                       <string notr="true">QPushButton {
-    border-radius: 10px; /* Độ bo tròn góc */
-    background-color: #2ecc71; /* Màu nền xanh lá dịu mắt */
-    color: white; /* Màu chữ */
-    border: 1px solid #27ae60; /* Đường viền xanh lá đậm hơn một chút */
-    padding: 5px;
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
 }
-
-/* Hiệu ứng khi di chuột qua nút (Đổi sang xanh lá đậm hơn) */
 QPushButton:hover {
-    background-color: #27ae60;
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
 }
-
-/* Hiệu ứng khi ấn giữ nút (Tùy chọn thêm để tăng trải nghiệm) */
 QPushButton:pressed {
-    background-color: #1e8449;
-}
-</string>
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
+}</string>
                      </property>
                      <property name="text">
-                      <string>LOAD</string>
+                      <string/>
+                     </property>
+                     <property name="icon">
+                      <iconset>
+                       <normaloff>assert/icon/upload.png</normaloff>assert/icon/upload.png</iconset>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
                      </property>
                     </widget>
                    </item>
@@ -1209,13 +1351,19 @@ QGroupBox::title {
                      </property>
                      <property name="font">
                       <font>
+                       <family>Segoe UI</family>
                        <pointsize>10</pointsize>
+                       <weight>75</weight>
+                       <bold>true</bold>
                       </font>
                      </property>
                      <property name="styleSheet">
                       <string notr="true">QSpinBox { border: 1px solid #ababab; border-radius: 6px; }
 QSpinBox::up-button, QSpinBox::down-button { border: none; }
 </string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
                      </property>
                      <property name="minimum">
                       <number>1</number>
@@ -1281,13 +1429,19 @@ QSpinBox::up-button, QSpinBox::down-button { border: none; }
                      </property>
                      <property name="font">
                       <font>
+                       <family>Segoe UI</family>
                        <pointsize>10</pointsize>
+                       <weight>75</weight>
+                       <bold>true</bold>
                       </font>
                      </property>
                      <property name="styleSheet">
                       <string notr="true">QSpinBox { border: 1px solid #ababab; border-radius: 6px; }
 QSpinBox::up-button, QSpinBox::down-button { border: none; }
 </string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
                      </property>
                      <property name="minimum">
                       <number>1</number>
@@ -1353,7 +1507,10 @@ QSpinBox::up-button, QSpinBox::down-button { border: none; }
                      </property>
                      <property name="font">
                       <font>
+                       <family>Segoe UI</family>
                        <pointsize>10</pointsize>
+                       <weight>75</weight>
+                       <bold>true</bold>
                       </font>
                      </property>
                      <property name="styleSheet">
@@ -1446,13 +1603,19 @@ QComboBox::drop-down { border: none; }
                      </property>
                      <property name="font">
                       <font>
+                       <family>Segoe UI</family>
                        <pointsize>10</pointsize>
+                       <weight>75</weight>
+                       <bold>true</bold>
                       </font>
                      </property>
                      <property name="styleSheet">
                       <string notr="true">QSpinBox { border: 1px solid #ababab; border-radius: 6px; }
 QSpinBox::up-button, QSpinBox::down-button { border: none; }
 </string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
                      </property>
                      <property name="minimum">
                       <number>1</number>
@@ -1574,7 +1737,10 @@ QGroupBox::title {
                      </property>
                      <property name="font">
                       <font>
+                       <family>Segoe UI</family>
                        <pointsize>10</pointsize>
+                       <weight>75</weight>
+                       <bold>true</bold>
                       </font>
                      </property>
                      <property name="styleSheet">
@@ -1642,7 +1808,10 @@ QComboBox::drop-down { border: none; }
                      </property>
                      <property name="font">
                       <font>
+                       <family>Segoe UI</family>
                        <pointsize>10</pointsize>
+                       <weight>75</weight>
+                       <bold>true</bold>
                       </font>
                      </property>
                      <property name="styleSheet">
@@ -1710,7 +1879,10 @@ QComboBox::drop-down { border: none; }
                      </property>
                      <property name="font">
                       <font>
+                       <family>Segoe UI</family>
                        <pointsize>10</pointsize>
+                       <weight>75</weight>
+                       <bold>true</bold>
                       </font>
                      </property>
                      <property name="styleSheet">
@@ -1816,6 +1988,8 @@ QGroupBox::title {
                       <font>
                        <family>Segoe UI</family>
                        <pointsize>10</pointsize>
+                       <weight>75</weight>
+                       <bold>true</bold>
                       </font>
                      </property>
                      <property name="styleSheet">
@@ -1892,7 +2066,10 @@ QComboBox::drop-down { border: none; }
                      </property>
                      <property name="font">
                       <font>
+                       <family>Segoe UI</family>
                        <pointsize>10</pointsize>
+                       <weight>75</weight>
+                       <bold>true</bold>
                       </font>
                      </property>
                      <property name="styleSheet">
@@ -1924,12 +2101,31 @@ QLineEdit:focus {
                        <pointsize>10</pointsize>
                       </font>
                      </property>
+                     <property name="styleSheet">
+                      <string notr="true">QPushButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+}
+QPushButton:hover {
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
+}
+QPushButton:pressed {
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
+}</string>
+                     </property>
                      <property name="text">
                       <string/>
                      </property>
                      <property name="icon">
                       <iconset>
-                       <normaloff>assert/icon/folder.png</normaloff>assert/icon/folder.png</iconset>
+                       <normaloff>assert/icon/folder1.png</normaloff>assert/icon/folder1.png</iconset>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
                      </property>
                     </widget>
                    </item>
@@ -1942,6 +2138,12 @@ QLineEdit:focus {
                      </property>
                      <property name="text">
                       <string/>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
                      </property>
                     </widget>
                    </item>
@@ -1980,7 +2182,10 @@ QLineEdit:focus {
                      </property>
                      <property name="font">
                       <font>
+                       <family>Segoe UI</family>
                        <pointsize>10</pointsize>
+                       <weight>75</weight>
+                       <bold>true</bold>
                       </font>
                      </property>
                      <property name="styleSheet">
@@ -2012,12 +2217,31 @@ QLineEdit:focus {
                        <pointsize>10</pointsize>
                       </font>
                      </property>
+                     <property name="styleSheet">
+                      <string notr="true">QPushButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+}
+QPushButton:hover {
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
+}
+QPushButton:pressed {
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
+}</string>
+                     </property>
                      <property name="text">
                       <string/>
                      </property>
                      <property name="icon">
                       <iconset>
-                       <normaloff>assert/icon/folder.png</normaloff>assert/icon/folder.png</iconset>
+                       <normaloff>assert/icon/folder1.png</normaloff>assert/icon/folder1.png</iconset>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
                      </property>
                     </widget>
                    </item>
@@ -2030,6 +2254,12 @@ QLineEdit:focus {
                      </property>
                      <property name="text">
                       <string/>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
                      </property>
                     </widget>
                    </item>
@@ -2068,7 +2298,10 @@ QLineEdit:focus {
                      </property>
                      <property name="font">
                       <font>
+                       <family>Segoe UI</family>
                        <pointsize>10</pointsize>
+                       <weight>75</weight>
+                       <bold>true</bold>
                       </font>
                      </property>
                      <property name="styleSheet">
@@ -2100,12 +2333,31 @@ QLineEdit:focus {
                        <pointsize>10</pointsize>
                       </font>
                      </property>
+                     <property name="styleSheet">
+                      <string notr="true">QPushButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+}
+QPushButton:hover {
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
+}
+QPushButton:pressed {
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
+}</string>
+                     </property>
                      <property name="text">
                       <string/>
                      </property>
                      <property name="icon">
                       <iconset>
-                       <normaloff>assert/icon/folder.png</normaloff>assert/icon/folder.png</iconset>
+                       <normaloff>assert/icon/folder1.png</normaloff>assert/icon/folder1.png</iconset>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
                      </property>
                     </widget>
                    </item>
@@ -2118,6 +2370,12 @@ QLineEdit:focus {
                      </property>
                      <property name="text">
                       <string/>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
                      </property>
                     </widget>
                    </item>
@@ -2156,7 +2414,10 @@ QLineEdit:focus {
                      </property>
                      <property name="font">
                       <font>
+                       <family>Segoe UI</family>
                        <pointsize>10</pointsize>
+                       <weight>75</weight>
+                       <bold>true</bold>
                       </font>
                      </property>
                      <property name="styleSheet">
@@ -2188,12 +2449,31 @@ QLineEdit:focus {
                        <pointsize>10</pointsize>
                       </font>
                      </property>
+                     <property name="styleSheet">
+                      <string notr="true">QPushButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+}
+QPushButton:hover {
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
+}
+QPushButton:pressed {
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
+}</string>
+                     </property>
                      <property name="text">
                       <string/>
                      </property>
                      <property name="icon">
                       <iconset>
-                       <normaloff>assert/icon/folder.png</normaloff>assert/icon/folder.png</iconset>
+                       <normaloff>assert/icon/folder1.png</normaloff>assert/icon/folder1.png</iconset>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
                      </property>
                     </widget>
                    </item>
@@ -2206,6 +2486,12 @@ QLineEdit:focus {
                      </property>
                      <property name="text">
                       <string/>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
                      </property>
                     </widget>
                    </item>
@@ -2244,7 +2530,10 @@ QLineEdit:focus {
                      </property>
                      <property name="font">
                       <font>
+                       <family>Segoe UI</family>
                        <pointsize>10</pointsize>
+                       <weight>75</weight>
+                       <bold>true</bold>
                       </font>
                      </property>
                      <property name="styleSheet">
@@ -2276,12 +2565,31 @@ QLineEdit:focus {
                        <pointsize>10</pointsize>
                       </font>
                      </property>
+                     <property name="styleSheet">
+                      <string notr="true">QPushButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+}
+QPushButton:hover {
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
+}
+QPushButton:pressed {
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
+}</string>
+                     </property>
                      <property name="text">
                       <string/>
                      </property>
                      <property name="icon">
                       <iconset>
-                       <normaloff>assert/icon/folder.png</normaloff>assert/icon/folder.png</iconset>
+                       <normaloff>assert/icon/folder1.png</normaloff>assert/icon/folder1.png</iconset>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
                      </property>
                     </widget>
                    </item>
@@ -2294,6 +2602,12 @@ QLineEdit:focus {
                      </property>
                      <property name="text">
                       <string/>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
                      </property>
                     </widget>
                    </item>
@@ -2452,8 +2766,8 @@ QPushButton:pressed {
                    </property>
                    <property name="iconSize">
                     <size>
-                     <width>30</width>
-                     <height>30</height>
+                     <width>25</width>
+                     <height>25</height>
                     </size>
                    </property>
                   </widget>
@@ -2558,8 +2872,8 @@ QPushButton:pressed {
                    </property>
                    <property name="iconSize">
                     <size>
-                     <width>30</width>
-                     <height>30</height>
+                     <width>25</width>
+                     <height>25</height>
                     </size>
                    </property>
                   </widget>

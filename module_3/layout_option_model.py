@@ -32,7 +32,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setFont(font)
         self.scrollArea.setStyleSheet("/* Khung ngoài của ScrollArea */\n"
 "QScrollArea {\n"
-"    background-color: #FFFFF5; /* Màu vàng nhạt (Soft Yellow) */\n"
+"    background-color: #F1F5F9; /* Màu vàng nhạt (Soft Yellow) */\n"
 "    border: 1px solid #c6c6c6;  /* Viền xám mảnh đồng bộ */\n"
 "    border-radius: 4px;         /* Bo tròn góc 4px */\n"
 "}\n"
@@ -66,7 +66,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, -302, 1661, 1280))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, -15, 1668, 1280))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.verticalLayout_scrollContents = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout_scrollContents.setContentsMargins(16, 16, 16, 16)
@@ -85,9 +85,9 @@ class Ui_MainWindow(object):
         self.label_28.setFont(font)
         self.label_28.setAutoFillBackground(False)
         self.label_28.setStyleSheet("QLabel {\n"
-"    color: #000000; /* Chữ màu đen xám hiện đại, tương phản cao trên nền trắng */\n"
+"    color: #ffffff; /* Chữ màu đen xám hiện đại, tương phản cao trên nền trắng */\n"
 "    \n"
-"    background-color: #DFDFDF; /* Nền màu trắng */\n"
+"    background-color:  qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #0B1E36, stop:1 #0F3B63); /* Nền màu trắng */\n"
 "    border: 2px solid #7A7A7A; /* Viền xám rất nhạt để định hình khối */\n"
 "    border-radius: 15px; /* Bo tròn góc mạnh hơn, tạo cảm giác mềm mại */\n"
 "    \n"
@@ -185,7 +185,10 @@ class Ui_MainWindow(object):
         self.comboBox_source = QtWidgets.QComboBox(self.groupBox_model_source)
         self.comboBox_source.setMinimumSize(QtCore.QSize(120, 30))
         font = QtGui.QFont()
+        font.setFamily("Segoe UI")
         font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
         self.comboBox_source.setFont(font)
         self.comboBox_source.setStyleSheet("QComboBox { border: 1px solid #ababab; border-radius: 6px; }\n"
 "QComboBox::drop-down { border: none; }\n"
@@ -210,7 +213,10 @@ class Ui_MainWindow(object):
         self.comboBox_source_task = QtWidgets.QComboBox(self.groupBox_model_source)
         self.comboBox_source_task.setMinimumSize(QtCore.QSize(120, 28))
         font = QtGui.QFont()
+        font.setFamily("Segoe UI")
         font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
         self.comboBox_source_task.setFont(font)
         self.comboBox_source_task.setStyleSheet("QComboBox { border: 1px solid #ababab; border-radius: 6px; }\n"
 "QComboBox::drop-down { border: none; }\n"
@@ -235,7 +241,10 @@ class Ui_MainWindow(object):
         self.comboBox_model_runtime = QtWidgets.QComboBox(self.groupBox_model_source)
         self.comboBox_model_runtime.setMinimumSize(QtCore.QSize(120, 28))
         font = QtGui.QFont()
+        font.setFamily("Segoe UI")
         font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
         self.comboBox_model_runtime.setFont(font)
         self.comboBox_model_runtime.setStyleSheet("QComboBox { border: 1px solid #ababab; border-radius: 6px; }\n"
 "QComboBox::drop-down { border: none; }\n"
@@ -259,7 +268,10 @@ class Ui_MainWindow(object):
         self.comboBox_device_gpu = QtWidgets.QComboBox(self.groupBox_model_source)
         self.comboBox_device_gpu.setMinimumSize(QtCore.QSize(120, 28))
         font = QtGui.QFont()
+        font.setFamily("Segoe UI")
         font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
         self.comboBox_device_gpu.setFont(font)
         self.comboBox_device_gpu.setStyleSheet("QComboBox { border: 1px solid #ababab; border-radius: 6px; }\n"
 "QComboBox::drop-down { border: none; }\n"
@@ -326,7 +338,10 @@ class Ui_MainWindow(object):
         self.lineEdit_weight_pytorch = QtWidgets.QLineEdit(self.groupBox_weights)
         self.lineEdit_weight_pytorch.setMinimumSize(QtCore.QSize(0, 28))
         font = QtGui.QFont()
+        font.setFamily("Segoe UI")
         font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
         self.lineEdit_weight_pytorch.setFont(font)
         self.lineEdit_weight_pytorch.setStyleSheet("QLineEdit {\n"
 "    border-radius: 8px;\n"
@@ -344,40 +359,51 @@ class Ui_MainWindow(object):
         self.lineEdit_weight_pytorch.setObjectName("lineEdit_weight_pytorch")
         self.hlayout_pt.addWidget(self.lineEdit_weight_pytorch)
         self.pushButton_weight_pytorch = QtWidgets.QPushButton(self.groupBox_weights)
+        self.pushButton_weight_pytorch.setMinimumSize(QtCore.QSize(35, 28))
         font = QtGui.QFont()
         font.setPointSize(10)
         self.pushButton_weight_pytorch.setFont(font)
+        self.pushButton_weight_pytorch.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
         self.pushButton_weight_pytorch.setText("")
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/folder.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/folder1.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.pushButton_weight_pytorch.setIcon(icon1)
+        self.pushButton_weight_pytorch.setIconSize(QtCore.QSize(20, 20))
         self.pushButton_weight_pytorch.setObjectName("pushButton_weight_pytorch")
         self.hlayout_pt.addWidget(self.pushButton_weight_pytorch)
         self.pushButton_weight_pytorch_2 = QtWidgets.QPushButton(self.groupBox_weights)
-        self.pushButton_weight_pytorch_2.setMinimumSize(QtCore.QSize(50, 28))
+        self.pushButton_weight_pytorch_2.setMinimumSize(QtCore.QSize(35, 28))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.pushButton_weight_pytorch_2.setFont(font)
         self.pushButton_weight_pytorch_2.setStyleSheet("QPushButton {\n"
-"    border-radius: 10px; /* Độ bo tròn góc */\n"
-"    background-color: #2ecc71; /* Màu nền xanh lá dịu mắt */\n"
-"    color: white; /* Màu chữ */\n"
-"    border: 1px solid #27ae60; /* Đường viền xanh lá đậm hơn một chút */\n"
-"    padding: 5px;\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
 "}\n"
-"\n"
-"/* Hiệu ứng khi di chuột qua nút (Đổi sang xanh lá đậm hơn) */\n"
 "QPushButton:hover {\n"
-"    background-color: #27ae60;\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
 "}\n"
-"\n"
-"/* Hiệu ứng khi ấn giữ nút (Tùy chọn thêm để tăng trải nghiệm) */\n"
 "QPushButton:pressed {\n"
-"    background-color: #1e8449;\n"
-"}\n"
-"")
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
+        self.pushButton_weight_pytorch_2.setText("")
+        icon2 = QtGui.QIcon()
+        icon2.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/upload.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_weight_pytorch_2.setIcon(icon2)
+        self.pushButton_weight_pytorch_2.setIconSize(QtCore.QSize(20, 20))
         self.pushButton_weight_pytorch_2.setObjectName("pushButton_weight_pytorch_2")
         self.hlayout_pt.addWidget(self.pushButton_weight_pytorch_2)
         self.vlayout_group_weights.addLayout(self.hlayout_pt)
@@ -394,7 +420,10 @@ class Ui_MainWindow(object):
         self.lineEdit_weight_tensorrt = QtWidgets.QLineEdit(self.groupBox_weights)
         self.lineEdit_weight_tensorrt.setMinimumSize(QtCore.QSize(0, 28))
         font = QtGui.QFont()
+        font.setFamily("Segoe UI")
         font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
         self.lineEdit_weight_tensorrt.setFont(font)
         self.lineEdit_weight_tensorrt.setStyleSheet("QLineEdit {\n"
 "    border-radius: 8px;\n"
@@ -412,38 +441,47 @@ class Ui_MainWindow(object):
         self.lineEdit_weight_tensorrt.setObjectName("lineEdit_weight_tensorrt")
         self.hlayout_trt.addWidget(self.lineEdit_weight_tensorrt)
         self.pushButton_broswer_tensort = QtWidgets.QPushButton(self.groupBox_weights)
+        self.pushButton_broswer_tensort.setMinimumSize(QtCore.QSize(35, 28))
         font = QtGui.QFont()
         font.setPointSize(10)
         self.pushButton_broswer_tensort.setFont(font)
+        self.pushButton_broswer_tensort.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
         self.pushButton_broswer_tensort.setText("")
         self.pushButton_broswer_tensort.setIcon(icon1)
+        self.pushButton_broswer_tensort.setIconSize(QtCore.QSize(20, 20))
         self.pushButton_broswer_tensort.setObjectName("pushButton_broswer_tensort")
         self.hlayout_trt.addWidget(self.pushButton_broswer_tensort)
         self.pushButton_model_tensorrt = QtWidgets.QPushButton(self.groupBox_weights)
-        self.pushButton_model_tensorrt.setMinimumSize(QtCore.QSize(50, 28))
+        self.pushButton_model_tensorrt.setMinimumSize(QtCore.QSize(35, 28))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.pushButton_model_tensorrt.setFont(font)
         self.pushButton_model_tensorrt.setStyleSheet("QPushButton {\n"
-"    border-radius: 10px; /* Độ bo tròn góc */\n"
-"    background-color: #2ecc71; /* Màu nền xanh lá dịu mắt */\n"
-"    color: white; /* Màu chữ */\n"
-"    border: 1px solid #27ae60; /* Đường viền xanh lá đậm hơn một chút */\n"
-"    padding: 5px;\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
 "}\n"
-"\n"
-"/* Hiệu ứng khi di chuột qua nút (Đổi sang xanh lá đậm hơn) */\n"
 "QPushButton:hover {\n"
-"    background-color: #27ae60;\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
 "}\n"
-"\n"
-"/* Hiệu ứng khi ấn giữ nút (Tùy chọn thêm để tăng trải nghiệm) */\n"
 "QPushButton:pressed {\n"
-"    background-color: #1e8449;\n"
-"}\n"
-"")
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
+        self.pushButton_model_tensorrt.setText("")
+        self.pushButton_model_tensorrt.setIcon(icon2)
+        self.pushButton_model_tensorrt.setIconSize(QtCore.QSize(20, 20))
         self.pushButton_model_tensorrt.setObjectName("pushButton_model_tensorrt")
         self.hlayout_trt.addWidget(self.pushButton_model_tensorrt)
         self.vlayout_group_weights.addLayout(self.hlayout_trt)
@@ -460,7 +498,10 @@ class Ui_MainWindow(object):
         self.lineEdit_classes_txt = QtWidgets.QLineEdit(self.groupBox_weights)
         self.lineEdit_classes_txt.setMinimumSize(QtCore.QSize(0, 28))
         font = QtGui.QFont()
+        font.setFamily("Segoe UI")
         font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
         self.lineEdit_classes_txt.setFont(font)
         self.lineEdit_classes_txt.setStyleSheet("QLineEdit {\n"
 "    border-radius: 8px;\n"
@@ -478,38 +519,47 @@ class Ui_MainWindow(object):
         self.lineEdit_classes_txt.setObjectName("lineEdit_classes_txt")
         self.hlayout_cls.addWidget(self.lineEdit_classes_txt)
         self.pushButton_classes_txt = QtWidgets.QPushButton(self.groupBox_weights)
+        self.pushButton_classes_txt.setMinimumSize(QtCore.QSize(35, 28))
         font = QtGui.QFont()
         font.setPointSize(10)
         self.pushButton_classes_txt.setFont(font)
+        self.pushButton_classes_txt.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
         self.pushButton_classes_txt.setText("")
         self.pushButton_classes_txt.setIcon(icon1)
+        self.pushButton_classes_txt.setIconSize(QtCore.QSize(20, 20))
         self.pushButton_classes_txt.setObjectName("pushButton_classes_txt")
         self.hlayout_cls.addWidget(self.pushButton_classes_txt)
         self.pushButton_class_file = QtWidgets.QPushButton(self.groupBox_weights)
-        self.pushButton_class_file.setMinimumSize(QtCore.QSize(50, 28))
+        self.pushButton_class_file.setMinimumSize(QtCore.QSize(35, 28))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.pushButton_class_file.setFont(font)
         self.pushButton_class_file.setStyleSheet("QPushButton {\n"
-"    border-radius: 10px; /* Độ bo tròn góc */\n"
-"    background-color: #2ecc71; /* Màu nền xanh lá dịu mắt */\n"
-"    color: white; /* Màu chữ */\n"
-"    border: 1px solid #27ae60; /* Đường viền xanh lá đậm hơn một chút */\n"
-"    padding: 5px;\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
 "}\n"
-"\n"
-"/* Hiệu ứng khi di chuột qua nút (Đổi sang xanh lá đậm hơn) */\n"
 "QPushButton:hover {\n"
-"    background-color: #27ae60;\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
 "}\n"
-"\n"
-"/* Hiệu ứng khi ấn giữ nút (Tùy chọn thêm để tăng trải nghiệm) */\n"
 "QPushButton:pressed {\n"
-"    background-color: #1e8449;\n"
-"}\n"
-"")
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
+        self.pushButton_class_file.setText("")
+        self.pushButton_class_file.setIcon(icon2)
+        self.pushButton_class_file.setIconSize(QtCore.QSize(20, 20))
         self.pushButton_class_file.setObjectName("pushButton_class_file")
         self.hlayout_cls.addWidget(self.pushButton_class_file)
         self.vlayout_group_weights.addLayout(self.hlayout_cls)
@@ -526,7 +576,10 @@ class Ui_MainWindow(object):
         self.lineEdit_data_change = QtWidgets.QLineEdit(self.groupBox_weights)
         self.lineEdit_data_change.setMinimumSize(QtCore.QSize(0, 28))
         font = QtGui.QFont()
+        font.setFamily("Segoe UI")
         font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
         self.lineEdit_data_change.setFont(font)
         self.lineEdit_data_change.setStyleSheet("QLineEdit {\n"
 "    border-radius: 8px;\n"
@@ -543,38 +596,47 @@ class Ui_MainWindow(object):
         self.lineEdit_data_change.setObjectName("lineEdit_data_change")
         self.hlayout_datalog.addWidget(self.lineEdit_data_change)
         self.pushButton_data_change = QtWidgets.QPushButton(self.groupBox_weights)
+        self.pushButton_data_change.setMinimumSize(QtCore.QSize(35, 28))
         font = QtGui.QFont()
         font.setPointSize(10)
         self.pushButton_data_change.setFont(font)
+        self.pushButton_data_change.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
         self.pushButton_data_change.setText("")
         self.pushButton_data_change.setIcon(icon1)
+        self.pushButton_data_change.setIconSize(QtCore.QSize(20, 20))
         self.pushButton_data_change.setObjectName("pushButton_data_change")
         self.hlayout_datalog.addWidget(self.pushButton_data_change)
         self.pushButton_data_change_2 = QtWidgets.QPushButton(self.groupBox_weights)
-        self.pushButton_data_change_2.setMinimumSize(QtCore.QSize(50, 28))
+        self.pushButton_data_change_2.setMinimumSize(QtCore.QSize(35, 28))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.pushButton_data_change_2.setFont(font)
         self.pushButton_data_change_2.setStyleSheet("QPushButton {\n"
-"    border-radius: 10px; /* Độ bo tròn góc */\n"
-"    background-color: #2ecc71; /* Màu nền xanh lá dịu mắt */\n"
-"    color: white; /* Màu chữ */\n"
-"    border: 1px solid #27ae60; /* Đường viền xanh lá đậm hơn một chút */\n"
-"    padding: 5px;\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
 "}\n"
-"\n"
-"/* Hiệu ứng khi di chuột qua nút (Đổi sang xanh lá đậm hơn) */\n"
 "QPushButton:hover {\n"
-"    background-color: #27ae60;\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
 "}\n"
-"\n"
-"/* Hiệu ứng khi ấn giữ nút (Tùy chọn thêm để tăng trải nghiệm) */\n"
 "QPushButton:pressed {\n"
-"    background-color: #1e8449;\n"
-"}\n"
-"")
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
+        self.pushButton_data_change_2.setText("")
+        self.pushButton_data_change_2.setIcon(icon2)
+        self.pushButton_data_change_2.setIconSize(QtCore.QSize(20, 20))
         self.pushButton_data_change_2.setObjectName("pushButton_data_change_2")
         self.hlayout_datalog.addWidget(self.pushButton_data_change_2)
         self.vlayout_group_weights.addLayout(self.hlayout_datalog)
@@ -628,11 +690,15 @@ class Ui_MainWindow(object):
         self.spinBox_confidenc_score = QtWidgets.QSpinBox(self.groupBox_detection)
         self.spinBox_confidenc_score.setMinimumSize(QtCore.QSize(80, 28))
         font = QtGui.QFont()
+        font.setFamily("Segoe UI")
         font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
         self.spinBox_confidenc_score.setFont(font)
         self.spinBox_confidenc_score.setStyleSheet("QSpinBox { border: 1px solid #ababab; border-radius: 6px; }\n"
 "QSpinBox::up-button, QSpinBox::down-button { border: none; }\n"
 "")
+        self.spinBox_confidenc_score.setAlignment(QtCore.Qt.AlignCenter)
         self.spinBox_confidenc_score.setMinimum(1)
         self.spinBox_confidenc_score.setMaximum(100)
         self.spinBox_confidenc_score.setProperty("value", 50)
@@ -660,11 +726,15 @@ class Ui_MainWindow(object):
         self.spinBox_iou = QtWidgets.QSpinBox(self.groupBox_detection)
         self.spinBox_iou.setMinimumSize(QtCore.QSize(80, 28))
         font = QtGui.QFont()
+        font.setFamily("Segoe UI")
         font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
         self.spinBox_iou.setFont(font)
         self.spinBox_iou.setStyleSheet("QSpinBox { border: 1px solid #ababab; border-radius: 6px; }\n"
 "QSpinBox::up-button, QSpinBox::down-button { border: none; }\n"
 "")
+        self.spinBox_iou.setAlignment(QtCore.Qt.AlignCenter)
         self.spinBox_iou.setMinimum(1)
         self.spinBox_iou.setMaximum(100)
         self.spinBox_iou.setProperty("value", 45)
@@ -692,7 +762,10 @@ class Ui_MainWindow(object):
         self.comboBox_imgsz = QtWidgets.QComboBox(self.groupBox_detection)
         self.comboBox_imgsz.setMinimumSize(QtCore.QSize(0, 28))
         font = QtGui.QFont()
+        font.setFamily("Segoe UI")
         font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
         self.comboBox_imgsz.setFont(font)
         self.comboBox_imgsz.setStyleSheet("QComboBox { border: 1px solid #ababab; border-radius: 6px; }\n"
 "QComboBox::drop-down { border: none; }\n"
@@ -727,11 +800,15 @@ class Ui_MainWindow(object):
         self.spinBox_max_detection = QtWidgets.QSpinBox(self.groupBox_detection)
         self.spinBox_max_detection.setMinimumSize(QtCore.QSize(80, 28))
         font = QtGui.QFont()
+        font.setFamily("Segoe UI")
         font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
         self.spinBox_max_detection.setFont(font)
         self.spinBox_max_detection.setStyleSheet("QSpinBox { border: 1px solid #ababab; border-radius: 6px; }\n"
 "QSpinBox::up-button, QSpinBox::down-button { border: none; }\n"
 "")
+        self.spinBox_max_detection.setAlignment(QtCore.Qt.AlignCenter)
         self.spinBox_max_detection.setMinimum(1)
         self.spinBox_max_detection.setMaximum(1000)
         self.spinBox_max_detection.setProperty("value", 300)
@@ -795,7 +872,10 @@ class Ui_MainWindow(object):
         self.comboBox_model_id = QtWidgets.QComboBox(self.groupBox_identity)
         self.comboBox_model_id.setMinimumSize(QtCore.QSize(80, 30))
         font = QtGui.QFont()
+        font.setFamily("Segoe UI")
         font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
         self.comboBox_model_id.setFont(font)
         self.comboBox_model_id.setStyleSheet("QComboBox { border: 1px solid #ababab; border-radius: 6px; }\n"
 "QComboBox::drop-down { border: none; }\n"
@@ -825,7 +905,10 @@ class Ui_MainWindow(object):
         self.comboBox_camera_id = QtWidgets.QComboBox(self.groupBox_identity)
         self.comboBox_camera_id.setMinimumSize(QtCore.QSize(80, 28))
         font = QtGui.QFont()
+        font.setFamily("Segoe UI")
         font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
         self.comboBox_camera_id.setFont(font)
         self.comboBox_camera_id.setStyleSheet("QComboBox { border: 1px solid #ababab; border-radius: 6px; }\n"
 "QComboBox::drop-down { border: none; }\n"
@@ -855,7 +938,10 @@ class Ui_MainWindow(object):
         self.comboBox_line_code_id = QtWidgets.QComboBox(self.groupBox_identity)
         self.comboBox_line_code_id.setMinimumSize(QtCore.QSize(120, 28))
         font = QtGui.QFont()
+        font.setFamily("Segoe UI")
         font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
         self.comboBox_line_code_id.setFont(font)
         self.comboBox_line_code_id.setStyleSheet("QComboBox { border: 1px solid #ababab; border-radius: 6px; }\n"
 "QComboBox::drop-down { border: none; }\n"
@@ -917,6 +1003,8 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
         self.Image_format.setFont(font)
         self.Image_format.setStyleSheet("QComboBox { border: 1px solid #ababab; border-radius: 6px; }\n"
 "QComboBox::drop-down { border: none; }\n"
@@ -946,7 +1034,10 @@ class Ui_MainWindow(object):
         self.lineEdit_NG_image_original = QtWidgets.QLineEdit(self.groupBox_10)
         self.lineEdit_NG_image_original.setMinimumSize(QtCore.QSize(0, 30))
         font = QtGui.QFont()
+        font.setFamily("Segoe UI")
         font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
         self.lineEdit_NG_image_original.setFont(font)
         self.lineEdit_NG_image_original.setStyleSheet("QLineEdit {\n"
 "    border-radius: 8px;\n"
@@ -967,8 +1058,20 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(10)
         self.pushButton_NG_image_original.setFont(font)
+        self.pushButton_NG_image_original.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
         self.pushButton_NG_image_original.setText("")
         self.pushButton_NG_image_original.setIcon(icon1)
+        self.pushButton_NG_image_original.setIconSize(QtCore.QSize(20, 20))
         self.pushButton_NG_image_original.setObjectName("pushButton_NG_image_original")
         self.hlayout_ng_orig.addWidget(self.pushButton_NG_image_original)
         self.checkBox_NG_image_original = QtWidgets.QCheckBox(self.groupBox_10)
@@ -976,6 +1079,7 @@ class Ui_MainWindow(object):
         font.setPointSize(10)
         self.checkBox_NG_image_original.setFont(font)
         self.checkBox_NG_image_original.setText("")
+        self.checkBox_NG_image_original.setIconSize(QtCore.QSize(20, 20))
         self.checkBox_NG_image_original.setObjectName("checkBox_NG_image_original")
         self.hlayout_ng_orig.addWidget(self.checkBox_NG_image_original)
         self.gridLayout.addLayout(self.hlayout_ng_orig, 1, 0, 1, 1)
@@ -992,7 +1096,10 @@ class Ui_MainWindow(object):
         self.lineEdit_NG_image_detected = QtWidgets.QLineEdit(self.groupBox_10)
         self.lineEdit_NG_image_detected.setMinimumSize(QtCore.QSize(0, 30))
         font = QtGui.QFont()
+        font.setFamily("Segoe UI")
         font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
         self.lineEdit_NG_image_detected.setFont(font)
         self.lineEdit_NG_image_detected.setStyleSheet("QLineEdit {\n"
 "    border-radius: 8px;\n"
@@ -1013,8 +1120,20 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(10)
         self.pushButton_NG_image_detected.setFont(font)
+        self.pushButton_NG_image_detected.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
         self.pushButton_NG_image_detected.setText("")
         self.pushButton_NG_image_detected.setIcon(icon1)
+        self.pushButton_NG_image_detected.setIconSize(QtCore.QSize(20, 20))
         self.pushButton_NG_image_detected.setObjectName("pushButton_NG_image_detected")
         self.hlayout_ng_det.addWidget(self.pushButton_NG_image_detected)
         self.checkBox_NG_image_detected = QtWidgets.QCheckBox(self.groupBox_10)
@@ -1022,6 +1141,7 @@ class Ui_MainWindow(object):
         font.setPointSize(10)
         self.checkBox_NG_image_detected.setFont(font)
         self.checkBox_NG_image_detected.setText("")
+        self.checkBox_NG_image_detected.setIconSize(QtCore.QSize(20, 20))
         self.checkBox_NG_image_detected.setObjectName("checkBox_NG_image_detected")
         self.hlayout_ng_det.addWidget(self.checkBox_NG_image_detected)
         self.gridLayout.addLayout(self.hlayout_ng_det, 3, 0, 1, 1)
@@ -1038,7 +1158,10 @@ class Ui_MainWindow(object):
         self.lineEdit_OK_image_original = QtWidgets.QLineEdit(self.groupBox_10)
         self.lineEdit_OK_image_original.setMinimumSize(QtCore.QSize(0, 30))
         font = QtGui.QFont()
+        font.setFamily("Segoe UI")
         font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
         self.lineEdit_OK_image_original.setFont(font)
         self.lineEdit_OK_image_original.setStyleSheet("QLineEdit {\n"
 "    border-radius: 8px;\n"
@@ -1059,8 +1182,20 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(10)
         self.pushButton_OK_image_original.setFont(font)
+        self.pushButton_OK_image_original.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
         self.pushButton_OK_image_original.setText("")
         self.pushButton_OK_image_original.setIcon(icon1)
+        self.pushButton_OK_image_original.setIconSize(QtCore.QSize(20, 20))
         self.pushButton_OK_image_original.setObjectName("pushButton_OK_image_original")
         self.hlayout_ok_orig.addWidget(self.pushButton_OK_image_original)
         self.checkBox_OK_image_original = QtWidgets.QCheckBox(self.groupBox_10)
@@ -1068,6 +1203,7 @@ class Ui_MainWindow(object):
         font.setPointSize(10)
         self.checkBox_OK_image_original.setFont(font)
         self.checkBox_OK_image_original.setText("")
+        self.checkBox_OK_image_original.setIconSize(QtCore.QSize(20, 20))
         self.checkBox_OK_image_original.setObjectName("checkBox_OK_image_original")
         self.hlayout_ok_orig.addWidget(self.checkBox_OK_image_original)
         self.gridLayout.addLayout(self.hlayout_ok_orig, 5, 0, 1, 1)
@@ -1084,7 +1220,10 @@ class Ui_MainWindow(object):
         self.lineEdit_OK_image_detected = QtWidgets.QLineEdit(self.groupBox_10)
         self.lineEdit_OK_image_detected.setMinimumSize(QtCore.QSize(0, 30))
         font = QtGui.QFont()
+        font.setFamily("Segoe UI")
         font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
         self.lineEdit_OK_image_detected.setFont(font)
         self.lineEdit_OK_image_detected.setStyleSheet("QLineEdit {\n"
 "    border-radius: 8px;\n"
@@ -1105,8 +1244,20 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(10)
         self.pushButton_OK_image_detected.setFont(font)
+        self.pushButton_OK_image_detected.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
         self.pushButton_OK_image_detected.setText("")
         self.pushButton_OK_image_detected.setIcon(icon1)
+        self.pushButton_OK_image_detected.setIconSize(QtCore.QSize(20, 20))
         self.pushButton_OK_image_detected.setObjectName("pushButton_OK_image_detected")
         self.hlayout_ok_det.addWidget(self.pushButton_OK_image_detected)
         self.checkBox_OK_image_detected = QtWidgets.QCheckBox(self.groupBox_10)
@@ -1114,6 +1265,7 @@ class Ui_MainWindow(object):
         font.setPointSize(10)
         self.checkBox_OK_image_detected.setFont(font)
         self.checkBox_OK_image_detected.setText("")
+        self.checkBox_OK_image_detected.setIconSize(QtCore.QSize(20, 20))
         self.checkBox_OK_image_detected.setObjectName("checkBox_OK_image_detected")
         self.hlayout_ok_det.addWidget(self.checkBox_OK_image_detected)
         self.gridLayout.addLayout(self.hlayout_ok_det, 6, 0, 1, 1)
@@ -1130,7 +1282,10 @@ class Ui_MainWindow(object):
         self.lineEdit_logging_image = QtWidgets.QLineEdit(self.groupBox_10)
         self.lineEdit_logging_image.setMinimumSize(QtCore.QSize(0, 30))
         font = QtGui.QFont()
+        font.setFamily("Segoe UI")
         font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
         self.lineEdit_logging_image.setFont(font)
         self.lineEdit_logging_image.setStyleSheet("QLineEdit {\n"
 "    border-radius: 8px;\n"
@@ -1151,8 +1306,20 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(10)
         self.pushButton_logging_image.setFont(font)
+        self.pushButton_logging_image.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
         self.pushButton_logging_image.setText("")
         self.pushButton_logging_image.setIcon(icon1)
+        self.pushButton_logging_image.setIconSize(QtCore.QSize(20, 20))
         self.pushButton_logging_image.setObjectName("pushButton_logging_image")
         self.hlayout_log.addWidget(self.pushButton_logging_image)
         self.checkBox_logging_image = QtWidgets.QCheckBox(self.groupBox_10)
@@ -1160,6 +1327,7 @@ class Ui_MainWindow(object):
         font.setPointSize(10)
         self.checkBox_logging_image.setFont(font)
         self.checkBox_logging_image.setText("")
+        self.checkBox_logging_image.setIconSize(QtCore.QSize(20, 20))
         self.checkBox_logging_image.setObjectName("checkBox_logging_image")
         self.hlayout_log.addWidget(self.checkBox_logging_image)
         self.gridLayout.addLayout(self.hlayout_log, 7, 0, 1, 1)
@@ -1216,9 +1384,9 @@ class Ui_MainWindow(object):
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
         self.pushButton_load_parameters.setText("")
-        icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/apply-now.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_load_parameters.setIcon(icon2)
+        icon3 = QtGui.QIcon()
+        icon3.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/apply-now.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_load_parameters.setIcon(icon3)
         self.pushButton_load_parameters.setIconSize(QtCore.QSize(30, 30))
         self.pushButton_load_parameters.setObjectName("pushButton_load_parameters")
         self.horizontalLayout.addWidget(self.pushButton_load_parameters)
@@ -1243,10 +1411,10 @@ class Ui_MainWindow(object):
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
         self.pushButton_save_data.setText("")
-        icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/floppy-disk.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_save_data.setIcon(icon3)
-        self.pushButton_save_data.setIconSize(QtCore.QSize(30, 30))
+        icon4 = QtGui.QIcon()
+        icon4.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/floppy-disk.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_save_data.setIcon(icon4)
+        self.pushButton_save_data.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_save_data.setObjectName("pushButton_save_data")
         self.horizontalLayout.addWidget(self.pushButton_save_data)
         self.pushButton_add_tasks = QtWidgets.QPushButton(self.groupBox_4)
@@ -1270,9 +1438,9 @@ class Ui_MainWindow(object):
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
         self.pushButton_add_tasks.setText("")
-        icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/automation.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_add_tasks.setIcon(icon4)
+        icon5 = QtGui.QIcon()
+        icon5.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/automation.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_add_tasks.setIcon(icon5)
         self.pushButton_add_tasks.setIconSize(QtCore.QSize(30, 30))
         self.pushButton_add_tasks.setObjectName("pushButton_add_tasks")
         self.horizontalLayout.addWidget(self.pushButton_add_tasks)
@@ -1297,10 +1465,10 @@ class Ui_MainWindow(object):
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
         self.pushButton_data_calculator.setText("")
-        icon5 = QtGui.QIcon()
-        icon5.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/calculator (2).png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_data_calculator.setIcon(icon5)
-        self.pushButton_data_calculator.setIconSize(QtCore.QSize(30, 30))
+        icon6 = QtGui.QIcon()
+        icon6.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/calculator (2).png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_data_calculator.setIcon(icon6)
+        self.pushButton_data_calculator.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_data_calculator.setObjectName("pushButton_data_calculator")
         self.horizontalLayout.addWidget(self.pushButton_data_calculator)
         self.vlayout_left_middle.addWidget(self.groupBox_4)
@@ -1414,16 +1582,14 @@ class Ui_MainWindow(object):
         self.groupBox_weights.setTitle(_translate("MainWindow", "Weights & Classes"))
         self.label_8.setText(_translate("MainWindow", "├── Weights PyTorch:"))
         self.lineEdit_weight_pytorch.setPlaceholderText(_translate("MainWindow", ".../*.pt"))
-        self.pushButton_weight_pytorch_2.setText(_translate("MainWindow", "LOAD"))
+        self.pushButton_weight_pytorch_2.setToolTip(_translate("MainWindow", "Load model from weight .pt file"))
         self.label_10.setText(_translate("MainWindow", "├── Weights TensorRT:"))
         self.lineEdit_weight_tensorrt.setPlaceholderText(_translate("MainWindow", ".../*.engine"))
-        self.pushButton_model_tensorrt.setText(_translate("MainWindow", "LOAD"))
+        self.pushButton_model_tensorrt.setToolTip(_translate("MainWindow", "Load model from weight .engine file"))
         self.label_17.setText(_translate("MainWindow", "├── Classes File:"))
         self.lineEdit_classes_txt.setPlaceholderText(_translate("MainWindow", ".../*.txt"))
-        self.pushButton_class_file.setText(_translate("MainWindow", "LOAD"))
         self.label_9.setText(_translate("MainWindow", "├── Data Change Log:"))
         self.lineEdit_data_change.setText(_translate("MainWindow", "..."))
-        self.pushButton_data_change_2.setText(_translate("MainWindow", "LOAD"))
         self.groupBox_detection.setTitle(_translate("MainWindow", "Detection Parameters"))
         self.label_6.setText(_translate("MainWindow", "├── Confidence (%):"))
         self.label_20.setText(_translate("MainWindow", "├── IoU / NMS (%):"))

@@ -16,9 +16,9 @@ from pathlib import Path
 from typing import Final, Any, Optional, Dict
 COLUMN_MAPPING: Final[dict[str, str]] = {
     "Label Name":     "`Label_Name`",
-    "Enabled [✓]":        "`Join`",
-    "OK [🟢]":             "`OK`",
-    "NG [🔴]":             "`NG`",
+    "Enable":        "`Join`",
+    "OK 🟢":             "`OK`",
+    "NG 🔴":             "`NG`",
     "Qty":       "`Quantity`",
     "Min Width":      "`Width_Min`",
     "Max Width":      "`Width_Max`",
@@ -31,9 +31,9 @@ COLUMN_MAPPING: Final[dict[str, str]] = {
 
 # CẤU HÌNH GIÁ TRỊ MẶC ĐỊNH CHO BẢNG THÔNG SỐ MODEL
 DEFAULT_ROW_VALUES: Final[dict[str, Any]] = {
-    "Enabled [✓]": True,       # Mặc định có tích vào ô
-    "OK [🟢]": False,          # Mặc định bỏ tích
-    "NG [🔴]": False,          # Mặc định bỏ tích
+    "Enable": True,       # Mặc định có tích vào ô
+    "OK 🟢": False,          # Mặc định bỏ tích
+    "NG 🔴": False,          # Mặc định bỏ tích
     "Qty": "1",               # Mặc định là 1
     "Min Width": "1",         # Mặc định là 1
     "Max Width": "10000",     # Mặc định là 10000
@@ -66,43 +66,95 @@ WEIGHTS_DIR = os.path.join(BASE_DIR, 'workspace_weights')
 os.makedirs(WEIGHTS_DIR, exist_ok=True)
 
 class CheckboxDelegate(QStyledItemDelegate):
+    """
+    Delegate tùy chỉnh vẽ duy nhất 1 ô checkbox căn giữa tuyệt đối cho các cột Enabled, OK, NG:
+    - Loại bỏ hoàn toàn cờ HasCheckIndicator khi vẽ nền để tránh bị trùng lặp (double) 2 ô checkbox.
+    - Vẽ 1 ô checkbox căn giữa với đầy đủ trạng thái hover, selected và tương tác nhấp chuột mượt mà.
+    """
     def paint(self, painter, option, index):
         value = index.data(Qt.CheckStateRole)
-        if value is not None:
-            checkbox_style_option = QStyleOptionButton()
-            checkbox_style_option.state |= QStyle.State_Enabled
-            if int(value) == Qt.Checked:
-                checkbox_style_option.state |= QStyle.State_On
-            else:
-                checkbox_style_option.state |= QStyle.State_Off
-
-            checkbox_rect = self.parent().style().subElementRect(QStyle.SE_CheckBoxIndicator, checkbox_style_option, None)
-            checkbox_style_option.rect = QRect(
-                option.rect.x() + option.rect.width() // 2 - checkbox_rect.width() // 2,
-                option.rect.y() + option.rect.height() // 2 - checkbox_rect.height() // 2,
-                checkbox_rect.width(),
-                checkbox_rect.height()
-            )
-            self.parent().style().drawControl(QStyle.CE_CheckBox, checkbox_style_option, painter)
-        else:
+        if value is None:
             super().paint(painter, option, index)
+            return
+
+        # 1. Vẽ nền (hover, selected, alternating colors) mà KHÔNG vẽ indicator mặc định ở lề trái
+        opt = QtWidgets.QStyleOptionViewItem(option)
+        self.initStyleOption(opt, index)
+        opt.features &= ~QtWidgets.QStyleOptionViewItem.HasCheckIndicator
+        opt.checkState = Qt.Unchecked
+        opt.text = ""
+
+        style = self.parent().style() if (self.parent() and self.parent().style()) else QtWidgets.QApplication.style()
+        style.drawControl(QStyle.CE_ItemViewItem, opt, painter)
+
+        # 2. Vẽ duy nhất 1 ô checkbox căn giữa tuyệt đối
+        checkbox_style_option = QStyleOptionButton()
+        if option.state & QStyle.State_Enabled:
+            checkbox_style_option.state |= QStyle.State_Enabled
+        if option.state & QStyle.State_MouseOver:
+            checkbox_style_option.state |= QStyle.State_MouseOver
+        if int(value) == Qt.Checked:
+            checkbox_style_option.state |= QStyle.State_On
+        else:
+            checkbox_style_option.state |= QStyle.State_Off
+
+        checkbox_rect = style.subElementRect(QStyle.SE_CheckBoxIndicator, checkbox_style_option, None)
+        checkbox_style_option.rect = QRect(
+            option.rect.x() + (option.rect.width() - checkbox_rect.width()) // 2,
+            option.rect.y() + (option.rect.height() - checkbox_rect.height()) // 2,
+            checkbox_rect.width(),
+            checkbox_rect.height()
+        )
+        style.drawControl(QStyle.CE_CheckBox, checkbox_style_option, painter)
 
     def editorEvent(self, event, model, option, index):
-        if event.type() == event.MouseButtonRelease:
+        flags = index.flags()
+        if not (flags & Qt.ItemIsEnabled) or not (flags & Qt.ItemIsUserCheckable):
+            return False
+
+        # Nhấp chuột trái để đổi trạng thái checkbox
+        if event.type() == QtCore.QEvent.MouseButtonRelease and event.button() == Qt.LeftButton:
             current_value = index.data(Qt.CheckStateRole)
             new_value = Qt.Unchecked if current_value == Qt.Checked else Qt.Checked
             model.setData(index, new_value, Qt.CheckStateRole)
-        return True
+            return True
+
+        # Nhấn phím Space khi đang focus vào ô để đổi trạng thái
+        if event.type() == QtCore.QEvent.KeyPress and event.key() == Qt.Key_Space:
+            current_value = index.data(Qt.CheckStateRole)
+            new_value = Qt.Unchecked if current_value == Qt.Checked else Qt.Checked
+            model.setData(index, new_value, Qt.CheckStateRole)
+            return True
+
+        return False
+
+
+class CenteredItemDelegate(QStyledItemDelegate):
+    """Delegate tùy chỉnh cho các ô dữ liệu trong tableView:
+    - Khi sửa trực tiếp (createEditor): ô nhập tự động cỡ 11, Segoe UI, in đậm, căn giữa.
+    """
+    def createEditor(self, parent, option, index):
+        editor = super().createEditor(parent, option, index)
+        if isinstance(editor, QtWidgets.QLineEdit):
+            editor.setAlignment(Qt.AlignCenter)
+            font = QtGui.QFont("Segoe UI", 11)
+            font.setBold(True)
+            editor.setFont(font)
+        return editor
 
 
 class RegisterDelegate(QStyledItemDelegate):
     """
     Delegate cho cột Register (thanh ghi PLC).
-    Tự động chuẩn hóa tiền tố 'DM' để người dùng chỉ cần nhập tên/số thanh ghi (VD: nhập 1009 -> DM1009).
+    Tự động chuẩn hóa tiền tố 'DM', cỡ chữ 11, font Segoe UI in đậm và căn giữa.
     """
     def createEditor(self, parent, option, index):
         editor = QtWidgets.QLineEdit(parent)
         editor.setPlaceholderText("VD: 1009 hoặc DM1009")
+        editor.setAlignment(Qt.AlignCenter)
+        font = QtGui.QFont("Segoe UI", 11)
+        font.setBold(True)
+        editor.setFont(font)
         return editor
 
     def setEditorData(self, editor, index):
@@ -123,8 +175,482 @@ class RegisterDelegate(QStyledItemDelegate):
             else:
                 formatted = upper
         model.setData(index, formatted, Qt.EditRole)
-    
-    
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# CẤU HÌNH BỘ ĐIỀU KHIỂN SLIDER CHO CÁC CỘT THÔNG SỐ (TỪ QTY ĐẾN CONFIDENCE)
+# ─────────────────────────────────────────────────────────────────────────────
+SLIDER_COLUMN_CONFIGS: Final[dict[str, dict[str, Any]]] = {
+    "Qty": {
+        "min": 1,
+        "max": 100,
+        "step": 1,
+        "unit": "",
+        "prefix": "",
+        "presets": [1, 2, 5, 10, 20],
+        "title": "🔢 Số lượng (Qty)",
+    },
+    "Min Width": {
+        "min": 1,
+        "max": 10000,
+        "step": 1,
+        "unit": " px",
+        "prefix": "",
+        "presets": [1, 50, 100, 500, 2000, 10000],
+        "title": "📏 Chiều rộng tối thiểu (Min Width)",
+    },
+    "Max Width": {
+        "min": 1,
+        "max": 10000,
+        "step": 1,
+        "unit": " px",
+        "prefix": "",
+        "presets": [1, 50, 100, 500, 2000, 10000],
+        "title": "📏 Chiều rộng tối đa (Max Width)",
+    },
+    "Min Height": {
+        "min": 1,
+        "max": 10000,
+        "step": 1,
+        "unit": " px",
+        "prefix": "",
+        "presets": [1, 50, 100, 500, 2000, 10000],
+        "title": "📐 Chiều cao tối thiểu (Min Height)",
+    },
+    "Max Height": {
+        "min": 1,
+        "max": 10000,
+        "step": 1,
+        "unit": " px",
+        "prefix": "",
+        "presets": [1, 50, 100, 500, 2000, 10000],
+        "title": "📐 Chiều cao tối đa (Max Height)",
+    },
+    "Register": {
+        "min": 0,
+        "max": 9999,
+        "step": 1,
+        "unit": "",
+        "prefix": "DM",
+        "presets": [1000, 1010, 2000, 2001, 3000],
+        "title": "🔌 Thanh ghi PLC (Register)",
+    },
+    "Value": {
+        "min": 0,
+        "max": 1000,
+        "step": 1,
+        "unit": "",
+        "prefix": "",
+        "presets": [0, 1, 2, 5, 10, 100],
+        "title": "🎯 Giá trị ghi (Value)",
+    },
+    "Confidence": {
+        "min": 1,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "prefix": "",
+        "presets": [15, 30, 50, 70, 90],
+        "title": "⚡ Độ tin cậy (Confidence)",
+    },
+}
+
+
+class CellSliderPopup(QtWidgets.QWidget):
+    """
+    Popup thanh trượt (Slider) nổi chuyên nghiệp xuất hiện khi người dùng
+    trỏ chuột hoặc chọn ô của các cột thông số (Qty -> Confidence):
+    - Tự động định vị ngay dưới (hoặc trên) ô được trỏ.
+    - Cho phép kéo thanh slider để cập nhật thông số ô trong thời gian thực.
+    - Cung cấp nút tăng giảm tinh chỉnh (-) / (+) và các phím chọn nhanh (presets).
+    - Không cản trở việc click đúp vào ô để nhập số trực tiếp bằng bàn phím.
+    """
+    def __init__(self, table):
+        super().__init__(table.window(), Qt.ToolTip | Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground, True)
+        self.setAttribute(Qt.WA_ShowWithoutActivating, True)
+        self.table = table
+        self.current_index = None
+        self.current_col_name = None
+        self.is_pinned = False
+        self._is_updating = False
+
+        self._init_ui()
+
+    def _init_ui(self):
+        outer_layout = QtWidgets.QVBoxLayout(self)
+        outer_layout.setContentsMargins(8, 8, 8, 8)
+
+        self.container = QtWidgets.QFrame(self)
+        self.container.setObjectName("sliderPopupContainer")
+        self.container.setStyleSheet("""
+            QFrame#sliderPopupContainer {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #1E293B, stop:1 #0F172A);
+                border: 1px solid #38BDF8;
+                border-radius: 8px;
+            }
+            QLabel {
+                border: none;
+                background: transparent;
+                font-family: 'Segoe UI', Arial, sans-serif;
+            }
+            QSlider::groove:horizontal {
+                height: 6px;
+                background: #334155;
+                border-radius: 3px;
+            }
+            QSlider::sub-page:horizontal {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #06B6D4, stop:1 #3B82F6);
+                border-radius: 3px;
+            }
+            QSlider::handle:horizontal {
+                background: #FFFFFF;
+                border: 2px solid #0EA5E9;
+                width: 16px;
+                margin-top: -5px;
+                margin-bottom: -5px;
+                border-radius: 8px;
+            }
+            QSlider::handle:horizontal:hover {
+                background: #38BDF8;
+                border: 2px solid #FFFFFF;
+            }
+            QPushButton {
+                background: #1E293B;
+                border: 1px solid #475569;
+                border-radius: 4px;
+                color: #E2E8F0;
+                font-family: 'Segoe UI', Arial, sans-serif;
+                font-weight: bold;
+                padding: 2px 6px;
+            }
+            QPushButton:hover {
+                background: #0EA5E9;
+                border-color: #38BDF8;
+                color: #FFFFFF;
+            }
+            QPushButton#closeBtn {
+                background: transparent;
+                border: none;
+                color: #94A3B8;
+                font-size: 11pt;
+                font-weight: bold;
+                padding: 0;
+            }
+            QPushButton#closeBtn:hover {
+                color: #EF4444;
+            }
+            QPushButton.chipBtn {
+                background: #1E293B;
+                border: 1px solid #475569;
+                border-radius: 9px;
+                color: #94A3B8;
+                font-size: 8pt;
+                font-weight: bold;
+                padding: 1px 7px;
+            }
+            QPushButton.chipBtn:hover {
+                background: #0284C7;
+                border-color: #38BDF8;
+                color: #FFFFFF;
+            }
+        """)
+
+        # Đổ bóng Drop Shadow cao cấp
+        shadow = QtWidgets.QGraphicsDropShadowEffect(self.container)
+        shadow.setBlurRadius(16)
+        shadow.setColor(QtGui.QColor(0, 0, 0, 160))
+        shadow.setOffset(0, 4)
+        self.container.setGraphicsEffect(shadow)
+
+        inner_layout = QtWidgets.QVBoxLayout(self.container)
+        inner_layout.setContentsMargins(10, 8, 10, 8)
+        inner_layout.setSpacing(6)
+
+        # 1. Tiêu đề + Giá trị + Nút đóng
+        top_row = QtWidgets.QHBoxLayout()
+        self.lbl_title = QtWidgets.QLabel("Thông số")
+        self.lbl_title.setStyleSheet("font-weight: bold; color: #38BDF8; font-size: 10pt;")
+
+        self.lbl_value = QtWidgets.QLabel("0")
+        self.lbl_value.setStyleSheet("""
+            background-color: #334155;
+            color: #38BDF8;
+            border-radius: 4px;
+            padding: 1px 8px;
+            font-weight: bold;
+            font-size: 10pt;
+        """)
+
+        self.btn_close = QtWidgets.QPushButton("✕")
+        self.btn_close.setObjectName("closeBtn")
+        self.btn_close.setFixedSize(18, 18)
+        self.btn_close.setToolTip("Đóng thanh trượt (Esc)")
+        self.btn_close.clicked.connect(self.hide)
+
+        top_row.addWidget(self.lbl_title)
+        top_row.addStretch()
+        top_row.addWidget(self.lbl_value)
+        top_row.addSpacing(6)
+        top_row.addWidget(self.btn_close)
+        inner_layout.addLayout(top_row)
+
+        # 2. Thanh trượt Slider và nút [-] / [+]
+        mid_row = QtWidgets.QHBoxLayout()
+        self.btn_minus = QtWidgets.QPushButton("-")
+        self.btn_minus.setFixedSize(22, 22)
+        self.btn_minus.setToolTip("Giảm giá trị")
+        self.btn_minus.clicked.connect(self._step_down)
+
+        self.slider = QtWidgets.QSlider(Qt.Horizontal)
+        self.slider.setFixedWidth(175)
+        self.slider.valueChanged.connect(self._on_slider_value_changed)
+
+        self.btn_plus = QtWidgets.QPushButton("+")
+        self.btn_plus.setFixedSize(22, 22)
+        self.btn_plus.setToolTip("Tăng giá trị")
+        self.btn_plus.clicked.connect(self._step_up)
+
+        mid_row.addWidget(self.btn_minus)
+        mid_row.addWidget(self.slider)
+        mid_row.addWidget(self.btn_plus)
+        inner_layout.addLayout(mid_row)
+
+        # 3. Phím bấm chọn nhanh (presets)
+        self.preset_widget = QtWidgets.QWidget()
+        self.preset_layout = QtWidgets.QHBoxLayout(self.preset_widget)
+        self.preset_layout.setContentsMargins(0, 0, 0, 0)
+        self.preset_layout.setSpacing(4)
+        inner_layout.addWidget(self.preset_widget)
+
+        outer_layout.addWidget(self.container)
+
+    def attach_to_cell(self, index, col_name, pinned=False):
+        if not index.isValid() or col_name not in SLIDER_COLUMN_CONFIGS:
+            self.hide()
+            return
+        if not self.table.isEnabled():
+            self.hide()
+            return
+
+        cfg = SLIDER_COLUMN_CONFIGS[col_name]
+        self.current_index = QtCore.QPersistentModelIndex(index)
+        self.current_col_name = col_name
+        self.is_pinned = pinned
+        self.lbl_title.setText(cfg.get("title", col_name))
+
+        # Đọc và phân tích giá trị hiện tại từ ô
+        raw_val = str(index.data() or "").strip()
+        num_val = cfg["min"]
+        if col_name == "Register":
+            clean_str = raw_val.upper().replace("DM", "").strip()
+            if clean_str.isdigit():
+                num_val = int(clean_str)
+        else:
+            digits = "".join([c for c in raw_val if c.isdigit()])
+            if digits:
+                num_val = int(digits)
+
+        slider_max = max(cfg["max"], num_val)
+        slider_min = min(cfg["min"], num_val)
+        self.slider.setRange(slider_min, slider_max)
+        self.slider.setSingleStep(cfg.get("step", 1))
+
+        self._is_updating = True
+        self.slider.setValue(num_val)
+        self._update_display(num_val, cfg)
+        self._is_updating = False
+
+        # Cập nhật các nút chọn nhanh (presets)
+        while self.preset_layout.count():
+            child = self.preset_layout.takeAt(0)
+            if child.widget():
+                child.widget().deleteLater()
+
+        presets = cfg.get("presets", [])
+        pfx = cfg.get("prefix", "")
+        unit = cfg.get("unit", "")
+        for p in presets:
+            btn = QtWidgets.QPushButton(f"{pfx}{p}{unit}")
+            btn.setProperty("class", "chipBtn")
+            btn.setFixedHeight(18)
+            btn.clicked.connect(lambda checked=False, val=p: self.slider.setValue(val))
+            self.preset_layout.addWidget(btn)
+
+        self.adjustSize()
+        self._reposition()
+        self.show()
+
+    def _update_display(self, val, cfg):
+        prefix = cfg.get("prefix", "")
+        unit = cfg.get("unit", "")
+        self.lbl_value.setText(f"{prefix}{val}{unit}")
+
+    def _step_down(self):
+        cfg = SLIDER_COLUMN_CONFIGS.get(self.current_col_name, {})
+        step = cfg.get("step", 1)
+        self.slider.setValue(self.slider.value() - step)
+
+    def _step_up(self):
+        cfg = SLIDER_COLUMN_CONFIGS.get(self.current_col_name, {})
+        step = cfg.get("step", 1)
+        self.slider.setValue(self.slider.value() + step)
+
+    def _on_slider_value_changed(self, val):
+        if self._is_updating or not self.current_index or not self.current_index.isValid():
+            return
+        cfg = SLIDER_COLUMN_CONFIGS.get(self.current_col_name, {})
+        self._update_display(val, cfg)
+
+        prefix = cfg.get("prefix", "")
+        formatted = f"{prefix}{val}"
+        model = self.table.model()
+        if model:
+            idx = QtCore.QModelIndex(self.current_index)
+            model.setData(idx, formatted, Qt.EditRole)
+
+    def _reposition(self):
+        if not self.current_index or not self.current_index.isValid():
+            return
+        rect = self.table.visualRect(QtCore.QModelIndex(self.current_index))
+        if not rect.isValid():
+            return
+
+        global_bottom_left = self.table.viewport().mapToGlobal(rect.bottomLeft())
+        pop_w = self.width() if self.width() > 10 else 240
+        pop_h = self.height() if self.height() > 10 else 85
+
+        x = global_bottom_left.x() + (rect.width() - pop_w) // 2
+        y = global_bottom_left.y() + 2
+
+        desktop = QtWidgets.QApplication.desktop()
+        screen_geo = desktop.availableGeometry(global_bottom_left)
+        if y + pop_h > screen_geo.bottom():
+            global_top_left = self.table.viewport().mapToGlobal(rect.topLeft())
+            y = global_top_left.y() - pop_h - 2
+
+        if x < screen_geo.left():
+            x = screen_geo.left() + 10
+        elif x + pop_w > screen_geo.right():
+            x = screen_geo.right() - pop_w - 10
+
+        self.move(x, y)
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            self.hide()
+            return
+        super().keyPressEvent(event)
+
+    def leaveEvent(self, event):
+        if not self.is_pinned:
+            cursor_pos = QtGui.QCursor.pos()
+            if not self.geometry().contains(cursor_pos):
+                self.hide()
+        super().leaveEvent(event)
+
+
+class TableSliderController(QtCore.QObject):
+    """
+    Bộ điều khiển kết nối giữa tableView và CellSliderPopup:
+    - Lắng nghe sự kiện click hoặc trỏ chuột (hover) trên ô để hiển thị thanh trượt.
+    - Ẩn thanh trượt khi cuộn trang, đổi tab, click ra ngoài hoặc click đúp vào ô để gõ phím.
+    """
+    def __init__(self, table, model_column):
+        super().__init__(table)
+        self.table = table
+        self.model_column = model_column
+        self.popup = CellSliderPopup(table)
+
+        self.hover_timer = QtCore.QTimer(self)
+        self.hover_timer.setSingleShot(True)
+        self.hover_timer.setInterval(280)
+        self.hover_timer.timeout.connect(self._on_hover_timeout)
+        self.pending_hover_index = None
+
+        self.table.setMouseTracking(True)
+        self.table.viewport().setMouseTracking(True)
+
+        self.table.clicked.connect(self._on_cell_clicked)
+        self.table.doubleClicked.connect(self._on_cell_double_clicked)
+        if self.table.selectionModel():
+            self.table.selectionModel().currentChanged.connect(self._on_current_changed)
+
+        self.table.viewport().installEventFilter(self)
+
+        self.table.verticalScrollBar().valueChanged.connect(self.popup.hide)
+        self.table.horizontalScrollBar().valueChanged.connect(self.popup.hide)
+
+    def _get_col_name(self, col):
+        if 0 <= col < len(self.model_column):
+            return self.model_column[col]
+        return None
+
+    def _on_cell_clicked(self, index):
+        if not self.table.isEnabled():
+            self.popup.hide()
+            return
+        col_name = self._get_col_name(index.column())
+        if col_name in SLIDER_COLUMN_CONFIGS:
+            self.popup.attach_to_cell(index, col_name, pinned=True)
+        else:
+            self.popup.hide()
+
+    def _on_cell_double_clicked(self, index):
+        self.popup.hide()
+
+    def _on_current_changed(self, current, previous):
+        if not self.table.isEnabled() or not current.isValid():
+            self.popup.hide()
+            return
+        col_name = self._get_col_name(current.column())
+        if col_name in SLIDER_COLUMN_CONFIGS:
+            self.popup.attach_to_cell(current, col_name, pinned=True)
+        else:
+            self.popup.hide()
+
+    def _on_hover_timeout(self):
+        if not self.table.isEnabled():
+            return
+        if self.pending_hover_index and self.pending_hover_index.isValid():
+            col_name = self._get_col_name(self.pending_hover_index.column())
+            if col_name in SLIDER_COLUMN_CONFIGS:
+                self.popup.attach_to_cell(QtCore.QModelIndex(self.pending_hover_index), col_name, pinned=False)
+
+    def eventFilter(self, obj, event):
+        if obj == self.table.viewport():
+            if event.type() == QtCore.QEvent.MouseMove:
+                if not self.table.isEnabled():
+                    return super().eventFilter(obj, event)
+                pos = event.pos()
+                index = self.table.indexAt(pos)
+                if index.isValid():
+                    col_name = self._get_col_name(index.column())
+                    if col_name in SLIDER_COLUMN_CONFIGS:
+                        if self.popup.isVisible() and self.popup.current_index == index:
+                            pass
+                        elif self.popup.isVisible() and self.popup.is_pinned:
+                            pass
+                        else:
+                            self.pending_hover_index = QtCore.QPersistentModelIndex(index)
+                            self.hover_timer.start()
+                    else:
+                        self.hover_timer.stop()
+                        if self.popup.isVisible() and not self.popup.is_pinned:
+                            cursor_pos = QtGui.QCursor.pos()
+                            if not self.popup.geometry().contains(cursor_pos):
+                                self.popup.hide()
+                else:
+                    self.hover_timer.stop()
+            elif event.type() in (QtCore.QEvent.Leave, QtCore.QEvent.Wheel):
+                self.hover_timer.stop()
+                if self.popup.isVisible() and not self.popup.is_pinned:
+                    cursor_pos = QtGui.QCursor.pos()
+                    if not self.popup.geometry().contains(cursor_pos):
+                        self.popup.hide()
+        return super().eventFilter(obj, event)
+
+
 class Process_Model:
     dict_active_tasks = {}
 
@@ -166,32 +692,179 @@ class Process_Model:
             self.uic.tableView.setModel(self.uic.model)
             self.uic.tableView.setContextMenuPolicy(Qt.CustomContextMenu)
             self.uic.tableView.customContextMenuRequested.connect(self.show_table_context_menu)
-            header = self.uic.tableView.horizontalHeader()
-            for i in range(len(self.uic.model_column)):
-                if i == 0:
-                    header.setSectionResizeMode(i, QtWidgets.QHeaderView.ResizeToContents)
-                else:
-                    header.setSectionResizeMode(i, QtWidgets.QHeaderView.Stretch)
             
-            # Cài đặt Delegates mặc định cho Checkbox và Register
-            checkbox_delegate = CheckboxDelegate(self.uic.tableView)
-            for chk_col in [self.keys_mapping[1], self.keys_mapping[2], self.keys_mapping[3]]:
-                if chk_col in self.uic.model_column:
-                    self.uic.tableView.setItemDelegateForColumn(self.uic.model_column.index(chk_col), checkbox_delegate)
-            if "Register" in self.uic.model_column:
-                self.uic.tableView.setItemDelegateForColumn(
-                    self.uic.model_column.index("Register"),
-                    RegisterDelegate(self.uic.tableView)
-                )
+            # Cài đặt phong cách thiết kế đồng bộ đẹp mắt cho tableView
+            self._setup_table_view_style()
+
+            # Cài đặt Delegates mặc định
+            self._setup_table_delegates()
+
+            # Định dạng toàn bộ ô và header
+            self.format_all_table_items()
+
+            # Kích hoạt bộ điều khiển Slider thông minh cho các cột từ Qty đến Confidence
+            self.slider_controller = TableSliderController(self.uic.tableView, self.uic.model_column)
 
         self.uic.model.itemChanged.connect(self._on_table_item_changed)
         self.uic.is_unlocked = False
 
         self.set_ui_enabled(False)
 
+    def _setup_table_view_style(self):
+        """Thiết lập phong cách đồ hoạ sang trọng, font chữ 11pt in đậm và căn giữa cho tableView."""
+        if not hasattr(self.uic, 'tableView') or self.uic.tableView is None:
+            return
+        table = self.uic.tableView
+
+        table.setStyleSheet("""
+            /* Khung chính của bảng TableView */
+            QTableView {
+                background-color: #F7FFFA;
+                border: 1px solid #325C62;
+                border-radius: 4px;
+                gridline-color: #d0ebd5;
+                font-family: 'Segoe UI';
+                font-size: 11pt;
+            }
+            /* Header tiêu đề cột và hàng */
+            QHeaderView::section {
+                background-color: #EAF7EF;
+                color: #1F4E78;
+                font-family: 'Segoe UI';
+                font-size: 11pt;
+                font-weight: bold;
+                border: 1px solid #d0ebd5;
+                padding: 4px;
+            }
+            /* Ô dữ liệu bên trong bảng */
+            QTableView::item {
+                background-color: #F7FFFA;
+                color: #2c3e50;
+                font-family: 'Segoe UI';
+                font-size: 11pt;
+                font-weight: bold;
+            }
+            /* Hiệu ứng khi di chuột qua */
+            QTableView::item:hover {
+                background-color: #F5FFE1;
+            }
+            /* Hiệu ứng khi chọn dòng */
+            QTableView::item:selected {
+                background-color: #E9F8FF;
+                color: black;
+            }
+        """)
+
+        table.verticalHeader().setDefaultSectionSize(36)
+        table.setAlternatingRowColors(True)
+        table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        table.horizontalHeader().setHighlightSections(False)
+        table.horizontalHeader().setStretchLastSection(True)
+
+        self._format_table_headers()
+        self._setup_column_widths()
+
+    def _setup_column_widths(self):
+        """Cấu hình độ rộng chuyên nghiệp, cân đối cho từng cột trong tableView."""
+        if not hasattr(self.uic, 'tableView') or self.uic.tableView is None:
+            return
+        table = self.uic.tableView
+        header = table.horizontalHeader()
+
+        col_widths = {
+            "Label Name": 140,
+            "Enabled [✓]": 90,
+            "OK [🟢]": 85,
+            "NG [🔴]": 85,
+            "Qty": 75,
+            "Min Width": 90,
+            "Max Width": 90,
+            "Min Height": 90,
+            "Max Height": 90,
+            "Register": 105,
+            "Value": 75,
+            "Confidence": 95,
+        }
+
+        for i, col_name in enumerate(self.uic.model_column):
+            header.setSectionResizeMode(i, QtWidgets.QHeaderView.Interactive)
+            w = col_widths.get(col_name, 90)
+            table.setColumnWidth(i, w)
+
+    def _setup_table_delegates(self):
+        """Cài đặt các delegates: Delegate mặc định font 11 Bold căn giữa, 
+        CheckboxDelegate cho cột tích chọn và RegisterDelegate cho cột Register."""
+        if not hasattr(self.uic, 'tableView') or self.uic.tableView is None:
+            return
+        
+        # 1. Delegate mặc định cho toàn bộ các ô text: font 11 Bold, căn giữa
+        centered_delegate = CenteredItemDelegate(self.uic.tableView)
+        self.uic.tableView.setItemDelegate(centered_delegate)
+
+        # 2. Checkbox Delegate cho các cột Enabled, OK, NG
+        checkbox_delegate = CheckboxDelegate(self.uic.tableView)
+        for chk_col in [self.keys_mapping[1], self.keys_mapping[2], self.keys_mapping[3]]:
+            if chk_col in self.uic.model_column:
+                self.uic.tableView.setItemDelegateForColumn(self.uic.model_column.index(chk_col), checkbox_delegate)
+
+        # 3. Register Delegate cho cột Register
+        if "Register" in self.uic.model_column:
+            self.uic.tableView.setItemDelegateForColumn(
+                self.uic.model_column.index("Register"),
+                RegisterDelegate(self.uic.tableView)
+            )
+
+    def _format_table_headers(self):
+        """Định dạng font 11, in đậm và căn giữa cho tiêu đề cột (Horizontal Header)."""
+        if not hasattr(self.uic, 'model') or self.uic.model is None:
+            return
+        font_header = QtGui.QFont("Segoe UI", 11)
+        font_header.setBold(True)
+        for col in range(self.uic.model.columnCount()):
+            h_item = self.uic.model.horizontalHeaderItem(col)
+            if h_item:
+                h_item.setFont(font_header)
+                h_item.setTextAlignment(Qt.AlignCenter)
+                h_item.setForeground(QtGui.QBrush(QtGui.QColor("#1F4E78")))
+
+    def format_all_table_items(self):
+        """Đảm bảo tất cả các ô trong bảng và tiêu đề cột/hàng đều có font 11, in đậm và căn giữa."""
+        if not hasattr(self.uic, 'model') or self.uic.model is None:
+            return
+        model = self.uic.model
+        font_cell = QtGui.QFont("Segoe UI", 11)
+        font_cell.setBold(True)
+
+        model.blockSignals(True)
+        try:
+            # 1. Định dạng Horizontal Header
+            for col in range(model.columnCount()):
+                h_item = model.horizontalHeaderItem(col)
+                if h_item:
+                    h_item.setFont(font_cell)
+                    h_item.setTextAlignment(Qt.AlignCenter)
+                    h_item.setForeground(QtGui.QBrush(QtGui.QColor("#1F4E78")))
+
+            # 2. Định dạng các ô dữ liệu và Vertical Header
+            for row in range(model.rowCount()):
+                v_item = model.verticalHeaderItem(row)
+                if v_item:
+                    v_item.setFont(font_cell)
+                    v_item.setTextAlignment(Qt.AlignCenter)
+                    v_item.setForeground(QtGui.QBrush(QtGui.QColor("#1F4E78")))
+
+                for col in range(model.columnCount()):
+                    item = model.item(row, col)
+                    if item:
+                        item.setFont(font_cell)
+                        item.setTextAlignment(Qt.AlignCenter)
+        finally:
+            model.blockSignals(False)
+
     def create_table_row_items(self, label_name: str, custom_values: Optional[dict] = None) -> list:
         """
         Tạo danh sách QStandardItem cho 1 hàng với các giá trị mặc định chuẩn xác:
+        - Font chữ 11, in đậm (Bold), căn giữa toàn bộ ô
         - Max Width, Max Height: 10000
         - Enabled [✓]: Có tích vào ô (Qt.Checked)
         - Register: Bắt đầu bằng 'DM'
@@ -202,11 +875,16 @@ class Process_Model:
         """
         values_dict = custom_values or {}
         row_items = []
+        font_cell = QtGui.QFont("Segoe UI", 11)
+        font_cell.setBold(True)
+
         for col_name in self.uic.model_column:
             item = QStandardItem()
+            item.setFont(font_cell)
+            item.setTextAlignment(Qt.AlignCenter)
+
             if col_name == self.keys_mapping[0]:  # "Label Name"
                 item.setText(str(label_name))
-                item.setTextAlignment(Qt.AlignCenter)
             elif col_name in [self.keys_mapping[1], self.keys_mapping[2], self.keys_mapping[3]]:
                 item.setCheckable(True)
                 if col_name in values_dict and values_dict[col_name] is not None:
@@ -233,30 +911,33 @@ class Process_Model:
                         val_str = val_str.upper()
 
                 item.setText(val_str)
-                item.setTextAlignment(Qt.AlignCenter)
             row_items.append(item)
         return row_items
 
     def _on_table_item_changed(self, item):
-        """Đảm bảo cột Register luôn có tiền tố 'DM' kể cả khi nhập trực tiếp hoặc paste."""
-        if not hasattr(self.uic, 'model_column'):
+        """Đảm bảo cột Register luôn có tiền tố 'DM', và toàn bộ ô nhập vào đều có font 11 Bold và căn giữa."""
+        if not hasattr(self.uic, 'model_column') or item is None:
             return
-        if "Register" in self.uic.model_column:
-            reg_idx = self.uic.model_column.index("Register")
-            if item.column() == reg_idx:
-                txt = item.text().strip()
-                if not txt:
-                    self.uic.model.blockSignals(True)
-                    item.setText("DM")
-                    self.uic.model.blockSignals(False)
-                elif not txt.upper().startswith("DM"):
-                    self.uic.model.blockSignals(True)
-                    item.setText(f"DM{txt.upper()}")
-                    self.uic.model.blockSignals(False)
-                elif txt != txt.upper():
-                    self.uic.model.blockSignals(True)
-                    item.setText(txt.upper())
-                    self.uic.model.blockSignals(False)
+        
+        self.uic.model.blockSignals(True)
+        try:
+            font = QtGui.QFont("Segoe UI", 11)
+            font.setBold(True)
+            item.setFont(font)
+            item.setTextAlignment(Qt.AlignCenter)
+
+            if "Register" in self.uic.model_column:
+                reg_idx = self.uic.model_column.index("Register")
+                if item.column() == reg_idx:
+                    txt = item.text().strip()
+                    if not txt:
+                        item.setText("DM")
+                    elif not txt.upper().startswith("DM"):
+                        item.setText(f"DM{txt.upper()}")
+                    elif txt != txt.upper():
+                        item.setText(txt.upper())
+        finally:
+            self.uic.model.blockSignals(False)
 
     def get_current_camera_id(self):
         """Lấy camera_id từ thuộc tính hoặc từ comboBox_camera_id."""
@@ -299,6 +980,8 @@ class Process_Model:
 
     def show_table_context_menu(self, pos):
         """Hiển thị menu ngữ cảnh chuột phải khi chọn các dòng trên tableView."""
+        if hasattr(self, 'slider_controller') and self.slider_controller:
+            self.slider_controller.popup.hide()
         selected_indexes = self.uic.tableView.selectionModel().selectedRows()
         if not selected_indexes:
             return
@@ -460,6 +1143,8 @@ class Process_Model:
                     if widget != self.uic.pushButton_edit_params:
                         widget.setEnabled(False)
             self.uic.pushButton_edit_params.setEnabled(True)
+            if hasattr(self, 'slider_controller') and self.slider_controller:
+                self.slider_controller.popup.hide()
             return
 
         # 2. Nếu quyền modify: Chỉ thao tác điều chỉnh các thông số trong tableView và lưu dữ liệu
@@ -772,22 +1457,16 @@ class Process_Model:
             return
         
     def populateTable(self):
+        if hasattr(self, 'slider_controller') and self.slider_controller:
+            self.slider_controller.popup.hide()
         self.uic.model.removeRows(0, self.uic.model.rowCount())
         if isinstance(self.model.names, list) or isinstance(self.model.names, dict):
-            # Cài đặt delegates cho cột Checkbox và Register
-            checkbox_delegate = CheckboxDelegate(self.uic.tableView)
-            for col_name in [self.keys_mapping[1], self.keys_mapping[2], self.keys_mapping[3]]:
-                col_index = self.uic.model_column.index(col_name)
-                self.uic.tableView.setItemDelegateForColumn(col_index, checkbox_delegate)
-            if "Register" in self.uic.model_column:
-                self.uic.tableView.setItemDelegateForColumn(
-                    self.uic.model_column.index("Register"),
-                    RegisterDelegate(self.uic.tableView)
-                )
-
+            self._setup_table_delegates()
             for label in (self.model.names if isinstance(self.model.names, list) else self.model.names.values()):
                 row_items = self.create_table_row_items(str(label))
                 self.uic.model.appendRow(row_items)
+            self._setup_column_widths()
+            self.format_all_table_items()
         _log.info("Populate table successfully")
         
         
@@ -971,6 +1650,7 @@ class Process_Model:
                     for col, item in enumerate(row_items):
                         model.setItem(row, col, item)
 
+        self.format_all_table_items()
         _log.info("Load parameter successfully")
             
     def assign_values(self,model,camera,code):  
@@ -1104,6 +1784,9 @@ class Process_Model:
                                     custom_vals[ui_col] = db_value
                                 row_items = self.create_table_row_items(str(label_name), custom_vals)
                                 self.uic.model.appendRow(row_items)   
+                    self._setup_table_delegates()
+                    self._setup_column_widths()
+                    self.format_all_table_items()
                 else:
                     _log.warning("Not found label model data in database")  
             self.parametes_model = self.save_parameter_before_load_weight()
