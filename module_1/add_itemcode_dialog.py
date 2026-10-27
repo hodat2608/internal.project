@@ -51,9 +51,13 @@ class _DeepCopier:
     (dst_name) trong cùng database, với id hoàn toàn mới.
     """
 
-    def __init__(self, cursor, connection):
+    def __init__(self, cursor, connection, db_name: str = ""):
         self._cur  = cursor
         self._conn = connection
+        self._db   = db_name
+
+    def _t(self, table: str) -> str:
+        return f"`{self._db}`.{table}" if self._db else table
 
     # ── public entry ────────────────────────────────────────────────────────
 
@@ -66,8 +70,8 @@ class _DeepCopier:
 
         # cameras
         self._cur.execute(
-            "SELECT id, nums_camera, device_type, device_serial, connection_type, ip_address "
-            "FROM NUMS_CAMERA WHERE item_code_id = %s ORDER BY nums_camera",
+            f"SELECT id, nums_camera, device_type, device_serial, connection_type, ip_address "
+            f"FROM {self._t('NUMS_CAMERA')} WHERE item_code_id = %s ORDER BY nums_camera",
             (src_item_id,)
         )
         cameras = self._cur.fetchall()
@@ -87,7 +91,7 @@ class _DeepCopier:
 
     def _copy_item_code(self, name: str, register: str | None) -> int:
         self._cur.execute(
-            "INSERT INTO ITEMS_CODE (name_line_code, assign_register) VALUES (%s, %s)",
+            f"INSERT INTO {self._t('ITEMS_CODE')} (name_line_code, assign_register) VALUES (%s, %s)",
             (name, register)
         )
         return self._cur.lastrowid
@@ -95,7 +99,7 @@ class _DeepCopier:
     def _copy_camera(self, cam_row: tuple, new_item_id: int) -> int:
         _, nums_camera, device_type, device_serial, connection_type, ip_address = cam_row
         self._cur.execute(
-            """INSERT INTO NUMS_CAMERA
+            f"""INSERT INTO {self._t('NUMS_CAMERA')}
                (nums_camera, device_type, device_serial, connection_type, ip_address, item_code_id)
                VALUES (%s, %s, %s, %s, %s, %s)""",
             (nums_camera, device_type, device_serial, connection_type, ip_address, new_item_id)
@@ -104,13 +108,13 @@ class _DeepCopier:
 
     def _copy_models(self, old_cam_id: int, new_cam_id: int):
         self._cur.execute(
-            "SELECT id, nums_model FROM NUMS_MODEL WHERE camera_id = %s ORDER BY nums_model",
+            f"SELECT id, nums_model FROM {self._t('NUMS_MODEL')} WHERE camera_id = %s ORDER BY nums_model",
             (old_cam_id,)
         )
         models = self._cur.fetchall()
         for old_model_id, nums_model in models:
             self._cur.execute(
-                "INSERT INTO NUMS_MODEL (nums_model, camera_id) VALUES (%s, %s)",
+                f"INSERT INTO {self._t('NUMS_MODEL')} (nums_model, camera_id) VALUES (%s, %s)",
                 (nums_model, new_cam_id)
             )
             new_model_id = self._cur.lastrowid
@@ -119,24 +123,24 @@ class _DeepCopier:
 
     def _copy_weights(self, old_model_id: int, new_model_id: int):
         try:
-            self._cur.execute("SHOW COLUMNS FROM WEIGHTS LIKE 'Image_format'")
+            self._cur.execute(f"SHOW COLUMNS FROM {self._t('WEIGHTS')} LIKE 'Image_format'")
             if not self._cur.fetchone():
-                self._cur.execute("ALTER TABLE WEIGHTS ADD COLUMN Image_format VARCHAR(255) DEFAULT 'PNG' AFTER Max_Detections")
+                self._cur.execute(f"ALTER TABLE {self._t('WEIGHTS')} ADD COLUMN Image_format VARCHAR(255) DEFAULT 'PNG' AFTER Max_Detections")
         except Exception:
             pass
 
         self._cur.execute(
-            """SELECT Weight_Path, Activity_History_Path, Conf_Value, Size_Value, Device, Source, Task,
+            f"""SELECT Weight_Path, Activity_History_Path, Conf_Value, Size_Value, Device, Source, Task,
                       Model_Runtime, Weight_TensorRT_Path, Classes_File_Path, IOU_Value, Max_Detections,
                       Image_format, Folder_NG_Original_Path, Save_NG_Original, Folder_NG_Detected_Path,
                       Save_NG_Detected, Folder_OK_Original_Path, Save_OK_Original, Folder_OK_Detected_Path,
                       Save_OK_Detected, Folder_Image_Logging
-               FROM WEIGHTS WHERE model_id = %s""",
+               FROM {self._t('WEIGHTS')} WHERE model_id = %s""",
             (old_model_id,)
         )
         for row in self._cur.fetchall():
             self._cur.execute(
-                """INSERT INTO WEIGHTS
+                f"""INSERT INTO {self._t('WEIGHTS')}
                    (Weight_Path, Activity_History_Path, Conf_Value, Size_Value, Device, Source, Task,
                     Model_Runtime, Weight_TensorRT_Path, Classes_File_Path, IOU_Value, Max_Detections,
                     Image_format, Folder_NG_Original_Path, Save_NG_Original, Folder_NG_Detected_Path,
@@ -148,14 +152,14 @@ class _DeepCopier:
 
     def _copy_parameterset(self, old_model_id: int, new_model_id: int):
         self._cur.execute(
-            "SELECT Label_Name, `Join`, OK, NG, Quantity, "
-            "Width_Min, Width_Max, Height_Min, Height_Max, Assign_Value, Confidence "
-            "FROM PARAMETERSET WHERE model_id = %s",
+            f"SELECT Label_Name, `Join`, OK, NG, Quantity, "
+            f"Width_Min, Width_Max, Height_Min, Height_Max, Assign_Value, Confidence "
+            f"FROM {self._t('PARAMETERSET')} WHERE model_id = %s",
             (old_model_id,)
         )
         for row in self._cur.fetchall():
             self._cur.execute(
-                """INSERT INTO PARAMETERSET
+                f"""INSERT INTO {self._t('PARAMETERSET')}
                    (Label_Name, `Join`, OK, NG, Quantity,
                     Width_Min, Width_Max, Height_Min, Height_Max, Assign_Value, Confidence, model_id)
                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
@@ -164,13 +168,13 @@ class _DeepCopier:
 
     def _copy_modes(self, old_cam_id: int, new_cam_id: int):
         self._cur.execute(
-            "SELECT id, mode_name, assign_register FROM MODE_AUTO WHERE camera_id = %s",
+            f"SELECT id, mode_name, assign_register FROM {self._t('MODE_AUTO')} WHERE camera_id = %s",
             (old_cam_id,)
         )
         modes = self._cur.fetchall()
         for old_mode_id, mode_name, assign_register in modes:
             self._cur.execute(
-                "INSERT INTO MODE_AUTO (mode_name, assign_register, camera_id) VALUES (%s, %s, %s)",
+                f"INSERT INTO {self._t('MODE_AUTO')} (mode_name, assign_register, camera_id) VALUES (%s, %s, %s)",
                 (mode_name, assign_register, new_cam_id)
             )
             new_mode_id = self._cur.lastrowid
@@ -180,14 +184,14 @@ class _DeepCopier:
 
     def _copy_mode_signals(self, old_mode_id: int, new_mode_id: int):
         self._cur.execute(
-            "SELECT signal_name, address, read_register, read_value_on, read_value_off, "
-            "write_register, write_value_on, write_value_off "
-            "FROM MODE_AUTO_SIGNAL WHERE mode_id = %s",
+            f"SELECT signal_name, address, read_register, read_value_on, read_value_off, "
+            f"write_register, write_value_on, write_value_off "
+            f"FROM {self._t('MODE_AUTO_SIGNAL')} WHERE mode_id = %s",
             (old_mode_id,)
         )
         for row in self._cur.fetchall():
             self._cur.execute(
-                """INSERT INTO MODE_AUTO_SIGNAL
+                f"""INSERT INTO {self._t('MODE_AUTO_SIGNAL')}
                    (signal_name, address, read_register, read_value_on, read_value_off,
                     write_register, write_value_on, write_value_off, mode_id)
                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
@@ -196,34 +200,34 @@ class _DeepCopier:
 
     def _copy_shotxmodel(self, old_mode_id: int, new_mode_id: int):
         self._cur.execute(
-            "SELECT shot, no_of_model FROM SHOTXMODEL WHERE mode_id = %s",
+            f"SELECT shot, no_of_model FROM {self._t('SHOTXMODEL')} WHERE mode_id = %s",
             (old_mode_id,)
         )
         for row in self._cur.fetchall():
             self._cur.execute(
-                "INSERT INTO SHOTXMODEL (shot, no_of_model, mode_id) VALUES (%s, %s, %s)",
+                f"INSERT INTO {self._t('SHOTXMODEL')} (shot, no_of_model, mode_id) VALUES (%s, %s, %s)",
                 (*row, new_mode_id)
             )
 
     def _copy_user_set_camera(self, old_mode_id: int, new_mode_id: int):
         self._cur.execute(
-            "SELECT index_user_selector, user_set_selector FROM USER_SET_CAMERA WHERE mode_id = %s",
+            f"SELECT index_user_selector, user_set_selector FROM {self._t('USER_SET_CAMERA')} WHERE mode_id = %s",
             (old_mode_id,)
         )
         for row in self._cur.fetchall():
             self._cur.execute(
-                "INSERT INTO USER_SET_CAMERA (index_user_selector, user_set_selector, mode_id) VALUES (%s, %s, %s)",
+                f"INSERT INTO {self._t('USER_SET_CAMERA')} (index_user_selector, user_set_selector, mode_id) VALUES (%s, %s, %s)",
                 (*row, new_mode_id)
             )
 
     def _copy_default_mode(self, old_cam_id: int, new_cam_id: int):
         self._cur.execute(
-            "SELECT mode_name FROM DEFAULT_MODE_AUTO WHERE camera_id = %s",
+            f"SELECT mode_name FROM {self._t('DEFAULT_MODE_AUTO')} WHERE camera_id = %s",
             (old_cam_id,)
         )
         for (mode_name,) in self._cur.fetchall():
             self._cur.execute(
-                "INSERT IGNORE INTO DEFAULT_MODE_AUTO (mode_name, camera_id) VALUES (%s, %s)",
+                f"INSERT IGNORE INTO {self._t('DEFAULT_MODE_AUTO')} (mode_name, camera_id) VALUES (%s, %s)",
                 (mode_name, new_cam_id)
             )
 
@@ -368,8 +372,7 @@ class AddItemCodeDialog(QDialog):
     def _load_existing_items(self):
         try:
             cur = self._conn.cursor()
-            cur.execute(f"USE {self._db}")
-            cur.execute("SELECT id, name_line_code FROM ITEMS_CODE ORDER BY name_line_code")
+            cur.execute(f"SELECT id, name_line_code FROM `{self._db}`.ITEMS_CODE ORDER BY name_line_code")
             rows = cur.fetchall()
             cur.close()
             self._source_combo.clear()
@@ -396,10 +399,9 @@ class AddItemCodeDialog(QDialog):
 
         try:
             cur = self._conn.cursor()
-            cur.execute(f"USE {self._db}")
 
             # Kiểm tra trùng tên
-            cur.execute("SELECT id FROM ITEMS_CODE WHERE name_line_code = %s", (new_name,))
+            cur.execute(f"SELECT id FROM `{self._db}`.ITEMS_CODE WHERE name_line_code = %s", (new_name,))
             if cur.fetchone():
                 QMessageBox.warning(self, "Tên đã tồn tại",
                                     f"Mã hàng '{new_name}' đã tồn tại trong database '{self._db}'.")
@@ -409,7 +411,7 @@ class AddItemCodeDialog(QDialog):
             if mode == 'custom':
                 # ── Custom: chỉ insert tên ──────────────────────────────────
                 cur.execute(
-                    "INSERT INTO ITEMS_CODE (name_line_code, assign_register) VALUES (%s, %s)",
+                    f"INSERT INTO `{self._db}`.ITEMS_CODE (name_line_code, assign_register) VALUES (%s, %s)",
                     (new_name, register)
                 )
                 new_id = cur.lastrowid
@@ -433,7 +435,7 @@ class AddItemCodeDialog(QDialog):
                     cur.close()
                     return
 
-                copier = _DeepCopier(cur, self._conn)
+                copier = _DeepCopier(cur, self._conn, self._db)
                 new_id = copier.run(src_id, new_name, register)
                 _log.info("Copy: '%s' (id=%s) → '%s' (id=%s)", src_name, src_id, new_name, new_id)
 

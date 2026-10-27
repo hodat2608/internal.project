@@ -277,11 +277,11 @@ class ItemCodeConfigEditor(QMainWindow):
     def _load_data(self):
         try:
             cur = self._conn.cursor()
-            cur.execute(f"USE {self._db_name}")
+            db = self._db_name
 
             # ITEMS_CODE
             cur.execute(
-                "SELECT id, name_line_code, assign_register, value_bit_on, value_bit_off FROM ITEMS_CODE WHERE name_line_code = %s",
+                f"SELECT id, name_line_code, assign_register, value_bit_on, value_bit_off FROM `{db}`.ITEMS_CODE WHERE name_line_code = %s",
                 (self._item_code,)
             )
             row = cur.fetchone()
@@ -298,9 +298,9 @@ class ItemCodeConfigEditor(QMainWindow):
 
             # NUMS_CAMERA
             cur.execute(
-                """SELECT id, nums_camera, device_type, device_serial,
+                f"""SELECT id, nums_camera, device_type, device_serial,
                           connection_type, ip_address
-                   FROM NUMS_CAMERA
+                   FROM `{db}`.NUMS_CAMERA
                    WHERE item_code_id = %s
                    ORDER BY nums_camera""",
                 (self._item_db_id,)
@@ -311,7 +311,7 @@ class ItemCodeConfigEditor(QMainWindow):
                 cam_id = cam_row[0]
                 # NUMS_MODEL for this camera
                 cur.execute(
-                    "SELECT id, nums_model FROM NUMS_MODEL WHERE camera_id = %s ORDER BY nums_model",
+                    f"SELECT id, nums_model FROM `{db}`.NUMS_MODEL WHERE camera_id = %s ORDER BY nums_model",
                     (cam_id,)
                 )
                 models = [{'id': m[0], 'nums_model': m[1]} for m in cur.fetchall()]
@@ -369,11 +369,11 @@ class ItemCodeConfigEditor(QMainWindow):
 
         try:
             cur = self._conn.cursor()
-            cur.execute(f"USE {self._db_name}")
+            db = self._db_name
 
             # ── 1. Update ITEMS_CODE ─────────────────────────────────────────
             cur.execute(
-                """UPDATE ITEMS_CODE 
+                f"""UPDATE `{db}`.ITEMS_CODE 
                    SET name_line_code = %s, assign_register = %s, value_bit_on = %s, value_bit_off = %s 
                    WHERE id = %s""",
                 (
@@ -387,7 +387,7 @@ class ItemCodeConfigEditor(QMainWindow):
 
             # ── 2. Collect current camera db-ids (to detect removed ones) ───
             cur.execute(
-                "SELECT id FROM NUMS_CAMERA WHERE item_code_id = %s", (self._item_db_id,)
+                f"SELECT id FROM `{db}`.NUMS_CAMERA WHERE item_code_id = %s", (self._item_db_id,)
             )
             existing_cam_ids = {row[0] for row in cur.fetchall()}
             kept_cam_ids     = set()
@@ -399,8 +399,8 @@ class ItemCodeConfigEditor(QMainWindow):
 
                 if cam_db_id:
                     # UPDATE existing
-                    cur.execute("""
-                        UPDATE NUMS_CAMERA
+                    cur.execute(f"""
+                        UPDATE `{db}`.NUMS_CAMERA
                            SET nums_camera     = %s,
                                device_type     = %s,
                                device_serial   = %s,
@@ -418,8 +418,8 @@ class ItemCodeConfigEditor(QMainWindow):
                     kept_cam_ids.add(cam_db_id)
                 else:
                     # INSERT new
-                    cur.execute("""
-                        INSERT INTO NUMS_CAMERA
+                    cur.execute(f"""
+                        INSERT INTO `{db}`.NUMS_CAMERA
                             (nums_camera, device_type, device_serial,
                              connection_type, ip_address, item_code_id)
                         VALUES (%s, %s, %s, %s, %s, %s)
@@ -437,7 +437,7 @@ class ItemCodeConfigEditor(QMainWindow):
                 # ── 4. Sync NUMS_MODEL for this camera ───────────────────────
                 num_models_wanted = data['num_models']
                 cur.execute(
-                    "SELECT id FROM NUMS_MODEL WHERE camera_id = %s ORDER BY nums_model",
+                    f"SELECT id FROM `{db}`.NUMS_MODEL WHERE camera_id = %s ORDER BY nums_model",
                     (cam_db_id,)
                 )
                 existing_models = [row[0] for row in cur.fetchall()]
@@ -445,19 +445,19 @@ class ItemCodeConfigEditor(QMainWindow):
                 # Remove excess models (from end)
                 while len(existing_models) > num_models_wanted:
                     mid = existing_models.pop()
-                    cur.execute("DELETE FROM NUMS_MODEL WHERE id = %s", (mid,))
+                    cur.execute(f"DELETE FROM `{db}`.NUMS_MODEL WHERE id = %s", (mid,))
 
                 # Add missing models
                 for m_idx in range(len(existing_models) + 1, num_models_wanted + 1):
                     cur.execute(
-                        "INSERT INTO NUMS_MODEL (nums_model, camera_id) VALUES (%s, %s)",
+                        f"INSERT INTO `{db}`.NUMS_MODEL (nums_model, camera_id) VALUES (%s, %s)",
                         (m_idx, cam_db_id)
                     )
 
             # ── 5. Delete cameras removed by user ────────────────────────────
             removed_cam_ids = existing_cam_ids - kept_cam_ids
             for cid in removed_cam_ids:
-                cur.execute("DELETE FROM NUMS_CAMERA WHERE id = %s", (cid,))
+                cur.execute(f"DELETE FROM `{db}`.NUMS_CAMERA WHERE id = %s", (cid,))
 
             self._conn.commit()
             cur.close()

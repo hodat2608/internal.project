@@ -23,7 +23,6 @@ import mysql.connector
 from mysql.connector import Error
 from module_1.database import Connect2Mysql
 from module_1.confirm_dataset import Ui_MainWindow as FormConfirmTable
-from module_3.main_thread import intermediate_layer
 from PyQt5 import QtCore, QtGui, QtWidgets
 from module_2.StyleSheet import *
 from PyQt5 import QtCore, QtGui, QtWidgets

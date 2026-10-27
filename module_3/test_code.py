@@ -99,5 +99,5 @@
 
 # print(ping_ip('192.168.42.37'))
 
-from PIL import Image
-Image.open(r"C:\Users\VDM\Pictures\New folder (2)\NG\2026-10-24\2026-10-24_13-45-24-529563.jpg").save(r"C:\Users\VDM\Pictures\New folder (2)\NG\2026-10-24\2026-10-24_13-45-24-529563.png")
+# from PIL import Image
+# Image.open(r"C:\Users\VDM\Pictures\New folder (2)\NG\2026-10-24\2026-10-24_13-45-24-529563.jpg").save(r"C:\Users\VDM\Pictures\New folder (2)\NG\2026-10-24\2026-10-24_13-45-24-529563.png")

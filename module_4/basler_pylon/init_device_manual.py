@@ -138,7 +138,6 @@ class Initial_Device_Manual:
             grabResult = self.camera.RetrieveResult(100, pylon.TimeoutHandling_ThrowException)
             if grabResult.GrabSucceeded(): 
                 img = grabResult.GetArray()
-                cv2.imwrite('swap.jpg',img)
                 if self.ui.checkBox_display_img.isChecked():
                     h, w = img.shape[:2]
                     qimg = QImage(img.data, w, h, img.strides[0], QImage.Format_RGB888)

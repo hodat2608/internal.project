@@ -209,7 +209,7 @@ class DeveloperAuthDialog(QDialog):
         layout.addLayout(btn_layout)
 
     def _verify(self):
-        EXPECTED_HASH = "2c6a4ee56bfec670aab2f13d0489f462bba435e9abe30a90125008f94cbdf079"
+        EXPECTED_HASH = "1424ec7b330114f392bdbe04bdb05d534253a66f6a5b4c5b3edfe5d50b2ccf4d" #beyourself
         user_input_hash = hashlib.sha256(self.key_input.text().encode("utf-8")).hexdigest()
         if user_input_hash == EXPECTED_HASH:
             self.authenticated = True

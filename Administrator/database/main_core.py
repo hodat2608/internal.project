@@ -5,6 +5,13 @@ class DataExport:
     def __init__(self,main_core_from_log, ui_data_export):
         self.connection = main_core_from_log
         self.ui_data_export = ui_data_export
+        import os, datetime
+        user_dumps = os.path.join(os.path.expanduser("~"), "Documents", "dumps")
+        try: os.makedirs(user_dumps, exist_ok=True)
+        except Exception: pass
+        date_str = datetime.datetime.now().strftime("%Y%m%d")
+        self.ui_data_export.editDumpProjectFolder.setText(os.path.join(user_dumps, f"Dump_{date_str}"))
+        self.ui_data_export.editSelfContainedFile.setText(os.path.join(user_dumps, f"Dump_{date_str}.sql"))
         
         
 
@@ -18,8 +25,7 @@ class DataExport:
             
         try:
             self.cursor = self.connection.cursor()
-            self.cursor.execute(f"USE {db_name_str}")
-            self.cursor.execute(f"SELECT name_line_code FROM ITEMS_CODE")
+            self.cursor.execute(f"SELECT name_line_code FROM `{db_name_str}`.ITEMS_CODE")
             item_codes = self.cursor.fetchall()
             for code in item_codes:
                 item_obj_table = QtWidgets.QTreeWidgetItem(self.treeSchemaObjects)
@@ -45,13 +51,12 @@ class DataExport:
             if db_name_str in ['information_schema', 'mysql', 'performance_schema', 'sys']:
                 continue
                 
-            self.cursor.execute(f"USE {db_name_str}")
-            self.cursor.execute(f"SHOW TABLES")
+            self.cursor.execute(f"SHOW TABLES IN `{db_name_str}`")
             tables = self.cursor.fetchall()
             
             has_items_code = False
             for table in tables:
-                if 'items_code' == table[0]:
+                if 'items_code' == table[0].lower():
                     has_items_code = True
                     break
                     
@@ -159,8 +164,7 @@ class DataExport:
         
         for db_name in selected_dbs:
             try:
-                cursor.execute(f"USE `{db_name}`")
-                cursor.execute("SHOW TABLES")
+                cursor.execute(f"SHOW TABLES IN `{db_name}`")
                 tables = [t[0] for t in cursor.fetchall()]
                 all_export_tasks.append((db_name, tables, False))
             except Exception as e:
@@ -218,12 +222,6 @@ class DataExport:
                     single_f.write(headers + "\n")
                     
                 log_msg(f"--- Đang xử lý Database: {db_name} ---")
-                try:
-                    cursor.execute(f"USE `{db_name}`")
-                except Exception as e:
-                    log_msg(f"Bỏ qua Database {db_name}")
-                    current_progress += len(tables)
-                    continue
                     
                 for tbl in tables:
                     log_msg(f" -> Đang export table: {tbl}")
@@ -242,7 +240,7 @@ class DataExport:
                             tbl_buffer.append(f"DROP TABLE IF EXISTS `{tbl}`;")
                             tbl_buffer.append("/*!40101 SET @saved_cs_client     = @@character_set_client */;")
                             tbl_buffer.append("/*!50503 SET character_set_client = utf8mb4 */;")
-                            cursor.execute(f"SHOW CREATE TABLE `{tbl}`")
+                            cursor.execute(f"SHOW CREATE TABLE `{db_name}`.`{tbl}`")
                             create_stmt = cursor.fetchone()[1]
                             tbl_buffer.append(f"{create_stmt};")
                             tbl_buffer.append("/*!40101 SET character_set_client = @saved_cs_client */;\n")
@@ -255,12 +253,12 @@ class DataExport:
                             if tbl.lower() == 'items_code' and not is_default:
                                 if selected_item_codes:
                                     placeholders = ','.join(['%s'] * len(selected_item_codes))
-                                    query = f"SELECT * FROM `{tbl}` WHERE name_line_code IN ({placeholders})"
+                                    query = f"SELECT * FROM `{db_name}`.`{tbl}` WHERE name_line_code IN ({placeholders})"
                                     cursor.execute(query, tuple(selected_item_codes))
                                 else:
-                                    cursor.execute(f"SELECT * FROM `{tbl}` WHERE 1=0")
+                                    cursor.execute(f"SELECT * FROM `{db_name}`.`{tbl}` WHERE 1=0")
                             else:
-                                cursor.execute(f"SELECT * FROM `{tbl}`")
+                                cursor.execute(f"SELECT * FROM `{db_name}`.`{tbl}`")
                                 
                             rows = cursor.fetchall()
                             if rows:
@@ -404,6 +402,12 @@ class DataImport():
         self.connection = main_core_from_log
         self.ui_data_import = ui_data_import
         self.import_db_map = {}
+        import os
+        user_dumps = os.path.join(os.path.expanduser("~"), "Documents", "dumps")
+        try: os.makedirs(user_dumps, exist_ok=True)
+        except Exception: pass
+        self.ui_data_import.editDumpProjectFolder.setText(user_dumps)
+        self.ui_data_import.editSelfContainedFile.setText(os.path.join(user_dumps, "export.sql"))
        
     def query_all_table(self):
         self.ui_data_import.treeSchemas.clear()

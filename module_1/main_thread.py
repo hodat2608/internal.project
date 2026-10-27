@@ -14,7 +14,6 @@ import mysql.connector
 from mysql.connector import Error
 from module_1.database import Connect2Mysql
 from module_1.confirm_dataset import Ui_MainWindow as FormConfirmTable
-from module_3.main_thread import intermediate_layer
 import sys
 from module_1.dashboard_ver1 import Ui_MainWindow as Database_Management
 from module_1.main_core import *

@@ -16,7 +16,7 @@ from module_6.omron.initial import OmronClient as Omron_Socket_Client
 from datetime import datetime
 from app_logger.app_logger import get_logger as _get_logger, open_log_window
 import subprocess,re
-from module_1.root_path import resource_path
+from module_1.root_path import resource_path, get_mysql_config_path
 from module_1.table_db import _ADMIN_TABLES_SQL,TABLES_SQL_ITEM_CODE_SAVE,TABLES_SQL_DATA_IP_ADDRESS,TABLES_SQL_DATA_AUTO_LOGIN
 _log = _get_logger('module_2.main_core')
 
@@ -112,7 +112,9 @@ class core:
             _log.info("No instance of pyuic6_instance found to close")
         _log.info('Success to stop monitoring')
 
-    def read_mysql_config(self, filepath=resource_path("module_2/mysql_config.log")):
+    def read_mysql_config(self, filepath=None):
+        if filepath is None:
+            filepath = get_mysql_config_path()
         config = {}
         try:
             with open(filepath, 'r') as f:
@@ -128,44 +130,67 @@ class core:
             return None
         return config
 
-    def connect_mysql_from_log(self, filepath=resource_path("module_2/mysql_config.log")):
+    def connect_mysql_from_log(self, filepath=None, retries=15, delay=1.5):
+        """
+        Kết nối MySQL từ file cấu hình với cơ chế Retry thông minh.
+        Khi khởi động cùng Windows (Startup), dịch vụ MySQL Server cần 3-10s để khởi tạo
+        và nạp bảng phân quyền (grant tables). Cơ chế này tự động chờ và thử lại,
+        tránh lỗi 1045 Access denied hoặc lỗi 2003 Can't connect.
+        """
+        if filepath is None:
+            filepath = get_mysql_config_path()
         _log.info("[connect_mysql_from_log] Reading config from %s", filepath)
         config = self.read_mysql_config(filepath)
         if not config:
-            _log.info("[connect_mysql_from_log] No config found")
-            return None
-        try:
-            _log.info("[connect_mysql_from_log] Attempting mysql.connector.connect with host=%s, user=%s, port=%s...", config.get('host'), config.get('user'), config.get('port'))
-            connection = mysql.connector.connect(
-                host     = config.get('host', 'localhost'),
-                user     = config.get('user', 'root'),
-                password = config.get('password', ''),
-                port     = int(config.get('port', 3306)),
-                use_pure = True,
-                ssl_disabled=True
-            )
-            _log.info('[connect_mysql_from_log] Success to connect mysql')
-            return connection
-        except Exception as err:
-            _log.warning('[connect_mysql_from_log] Failed to connect mysql: %s', err)
-            return None
+            fallback_path = resource_path("module_2/mysql_config.log")
+            if fallback_path != filepath:
+                _log.info("[connect_mysql_from_log] Trying fallback config from %s", fallback_path)
+                config = self.read_mysql_config(fallback_path)
+            if not config:
+                _log.info("[connect_mysql_from_log] No config found")
+                return None
 
-    def write_mysql_config(self, host, user, password, port, database,filepath=resource_path("module_2/mysql_config.log")):
+        host     = config.get('host', '127.0.0.1')
+        user     = config.get('user', 'root')
+        password = config.get('password', '')
+        port     = int(config.get('port', 3306))
+
+        for attempt in range(1, retries + 1):
+            try:
+                _log.info("[connect_mysql_from_log] Attempt %d/%d: Connecting to MySQL (%s:%s, user=%s)...",
+                          attempt, retries, host, port, user)
+                connection = mysql.connector.connect(
+                    host     = host,
+                    user     = user,
+                    password = password,
+                    port     = port,
+                    use_pure = True
+                )
+                if connection and connection.is_connected():
+                    _log.info('[connect_mysql_from_log] Success to connect mysql on attempt %d', attempt)
+                    return connection
+            except Exception as err:
+                _log.warning('[connect_mysql_from_log] Attempt %d/%d failed: %s', attempt, retries, err)
+                if attempt < retries:
+                    _log.info("[connect_mysql_from_log] Waiting %.1fs for MySQL service to become ready...", delay)
+                    time.sleep(delay)
+                else:
+                    _log.error('[connect_mysql_from_log] All %d attempts failed to connect to MySQL. Last error: %s', retries, err)
+                    return None
+        return None
+
+    def write_mysql_config(self, host, user, password, port, database, filepath=None):
+        if filepath is None:
+            filepath = get_mysql_config_path(for_writing=True)
         try:
-            if password == "":
-                with open(filepath, 'w') as f:
-                    f.write(f"host={host}\n")
-                    f.write(f"user={user}\n")
-                    f.write(f"port={port}\n")
-                    f.write(f"database={database}\n")
-            else:
-                with open(filepath, 'w') as f:
-                    f.write(f"host={host}\n")
-                    f.write(f"user={user}\n")
+            with open(filepath, 'w') as f:
+                f.write(f"host={host}\n")
+                f.write(f"user={user}\n")
+                if password != "":
                     f.write(f"password={password}\n")
-                    f.write(f"port={port}\n")
-                    f.write(f"database={database}\n")
-            _log.info('Success to write mysql config')
+                f.write(f"port={port}\n")
+                f.write(f"database={database}\n")
+            _log.info('Success to write mysql config to %s', filepath)
             return True
         except Exception as e:
             _log.warning('Failed to write mysql config: %s', e)
@@ -173,10 +198,9 @@ class core:
 
     def create_table_data_save_default(self, connection):
         cursor = connection.cursor()
-        cursor.execute("CREATE DATABASE IF NOT EXISTS ITEM_CODE_SAVE")
-        cursor.execute("USE ITEM_CODE_SAVE")
+        cursor.execute("CREATE DATABASE IF NOT EXISTS `ITEM_CODE_SAVE`")
         cursor.execute("""
-            CREATE TABLE IF NOT EXISTS DATA_SAVE_DEFAULT (
+            CREATE TABLE IF NOT EXISTS `ITEM_CODE_SAVE`.`DATA_SAVE_DEFAULT` (
                 id               INT AUTO_INCREMENT PRIMARY KEY,
                 name_item_code   VARCHAR(255),
                 name_line        VARCHAR(255),
@@ -215,8 +239,7 @@ class core:
 
         try:
             cursor = connection.cursor()
-            cursor.execute("USE DATA_AUTO_LOGIN")
-            cursor.execute("SELECT * FROM INFOR")
+            cursor.execute("SELECT * FROM `DATA_AUTO_LOGIN`.`INFOR`")
             result = cursor.fetchall()
             cursor.close()
 
@@ -245,7 +268,6 @@ class core:
             return
         try:
             cursor = self.connection.cursor()
-            cursor.execute("USE DATA_IP_ADDRESS")
 
             # Đảm bảo các cột mới tồn tại trong CSDL MySQL
             columns_to_check = [
@@ -258,9 +280,9 @@ class core:
             ]
             for col_name, col_def in columns_to_check:
                 try:
-                    cursor.execute(f"SHOW COLUMNS FROM INFOR_ADDRESS LIKE '{col_name}'")
+                    cursor.execute(f"SHOW COLUMNS FROM `DATA_IP_ADDRESS`.`INFOR_ADDRESS` LIKE '{col_name}'")
                     if not cursor.fetchone():
-                        cursor.execute(f"ALTER TABLE INFOR_ADDRESS ADD COLUMN {col_name} {col_def}")
+                        cursor.execute(f"ALTER TABLE `DATA_IP_ADDRESS`.`INFOR_ADDRESS` ADD COLUMN {col_name} {col_def}")
                 except Exception as col_err:
                     _log.debug("Column check error for %s: %s", col_name, col_err)
             self.connection.commit()
@@ -269,7 +291,7 @@ class core:
                 SELECT plc_module, connection_port, ip_address_plc, port_plc,
                        manual, automatic, local_ip, retry_attempts,
                        auto_reconnect_on_disconnect, direct_to_plc, indirect_from_log
-                FROM INFOR_ADDRESS
+                FROM `DATA_IP_ADDRESS`.`INFOR_ADDRESS`
             """)
             result = cursor.fetchall()
             cursor.close()
@@ -415,11 +437,10 @@ class core:
             return
         try:
             cursor = self.connection.cursor()
-            cursor.execute("USE ITEM_CODE_SAVE")
-            cursor.execute("DELETE FROM DATA_SAVE_DEFAULT")
+            cursor.execute("DELETE FROM `ITEM_CODE_SAVE`.`DATA_SAVE_DEFAULT`")
             self.connection.commit()
             cursor.execute(
-                "INSERT INTO DATA_SAVE_DEFAULT (date_time, name_item_code, name_line) VALUES (%s, %s, %s)",
+                "INSERT INTO `ITEM_CODE_SAVE`.`DATA_SAVE_DEFAULT` (date_time, name_item_code, name_line) VALUES (%s, %s, %s)",
                 (date_time, item_code, name_line)
             )
             self.connection.commit()
@@ -434,8 +455,7 @@ class core:
             return None
         try:
             cursor = self.connection.cursor()
-            cursor.execute("USE ITEM_CODE_SAVE")
-            cursor.execute("SELECT name_item_code, name_line, date_time FROM DATA_SAVE_DEFAULT")
+            cursor.execute("SELECT name_item_code, name_line, date_time FROM `ITEM_CODE_SAVE`.`DATA_SAVE_DEFAULT`")
             result = cursor.fetchall()
             cursor.close()
             return result

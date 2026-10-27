@@ -17,16 +17,43 @@ from PyQt5.QtGui import (
 # ─────────────────────────────────────────────
 #  THEME FILE
 # ─────────────────────────────────────────────
-THEME_FILE = os.path.join(os.path.dirname(__file__), "theme.txt")
+def get_theme_file_path() -> str:
+    try:
+        from module_1.root_path import get_app_data_dir, resource_path
+        app_data_file = os.path.join(get_app_data_dir(), "theme.txt")
+        if os.path.exists(app_data_file):
+            return app_data_file
+        bundled = resource_path("module_2/theme.txt")
+        if os.path.exists(bundled):
+            try:
+                import shutil
+                shutil.copy2(bundled, app_data_file)
+                return app_data_file
+            except Exception:
+                pass
+        return app_data_file
+    except Exception:
+        app_data = os.environ.get('LOCALAPPDATA') or os.environ.get('APPDATA') or os.path.expanduser('~')
+        base_dir = os.path.join(app_data, 'MBC_Vision_Inspector')
+        os.makedirs(base_dir, exist_ok=True)
+        return os.path.join(base_dir, "theme.txt")
+
+THEME_FILE = get_theme_file_path()
 
 def save_theme_color(hex_color: str):
-    with open(THEME_FILE, 'w') as f:
-        json.dump({"bg_color": hex_color}, f)
+    try:
+        theme_path = get_theme_file_path()
+        os.makedirs(os.path.dirname(theme_path), exist_ok=True)
+        with open(theme_path, 'w', encoding='utf-8') as f:
+            json.dump({"bg_color": hex_color}, f)
+    except Exception:
+        pass
 
 def load_theme_color() -> str:
-    if os.path.exists(THEME_FILE):
+    theme_path = get_theme_file_path()
+    if os.path.exists(theme_path):
         try:
-            with open(THEME_FILE, 'r') as f:
+            with open(theme_path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
                 return data.get("bg_color", "#aedecc")
         except Exception:

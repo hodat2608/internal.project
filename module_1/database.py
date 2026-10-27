@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from module_1.table_db import *
 import subprocess
 import platform
-from module_1.root_path import resource_path
+from module_1.root_path import resource_path, get_mysql_config_path
 from app_logger.app_logger import get_logger as _get_logger, open_log_window
 _log = _get_logger('module_1.database')
 
@@ -50,21 +50,18 @@ class Connect2Mysql:
         try:
             self.cursor = self.connection.cursor()
             name_database = 'DATA_AUTO_LOGIN'
-            self.cursor.execute(f"CREATE DATABASE IF NOT EXISTS {name_database}")
-            self.cursor.execute(f"USE {name_database}")
-            tables = [
-                """CREATE TABLE IF NOT EXISTS INFOR (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    hostname VARCHAR(255),
-                    username VARCHAR(255),
-                    password VARCHAR(255),
-                    port VARCHAR(255),
-                    manual BOOLEAN DEFAULT FALSE,
-                    automatic BOOLEAN DEFAULT FALSE,
-                    credential BOOLEAN DEFAULT FALSE,
-                    retry_attemps INT NOT NULL
-                )"""]
-            self.cursor.execute(tables[0])
+            self.cursor.execute(f"CREATE DATABASE IF NOT EXISTS `{name_database}`")
+            self.cursor.execute(f"""CREATE TABLE IF NOT EXISTS `{name_database}`.INFOR (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                hostname VARCHAR(255),
+                username VARCHAR(255),
+                password VARCHAR(255),
+                port VARCHAR(255),
+                manual BOOLEAN DEFAULT FALSE,
+                automatic BOOLEAN DEFAULT FALSE,
+                credential BOOLEAN DEFAULT FALSE,
+                retry_attemps INT NOT NULL
+            )""")
         except mysql.connector.Error as error:
             self.connection.rollback()
             QMessageBox.critical(None, "Error", f"Lỗi query: {str(error)}")
@@ -76,17 +73,18 @@ class Connect2Mysql:
         if self.ui_connection_sql.checkBox_save_infor_login.isChecked():
             if self.flag:
                 self.cursor.execute("""
-                    SELECT * FROM INFOR 
+                    SELECT * FROM `DATA_AUTO_LOGIN`.`INFOR` 
                     WHERE hostname = %s
                 """, (self.hostname,))
                 
-                if results := self.cursor.fetchall():
+                results = self.cursor.fetchall()
+                if results:
                     self.cursor.execute("""
-                        DELETE FROM INFOR WHERE hostname = %s
+                        DELETE FROM `DATA_AUTO_LOGIN`.`INFOR` WHERE hostname = %s
                     """, (self.hostname,))
 
                     self.cursor.execute("""
-                            INSERT IGNORE INTO INFOR (
+                            INSERT IGNORE INTO `DATA_AUTO_LOGIN`.`INFOR` (
                                 hostname, username, password, port
                             ) VALUES (%s, %s, %s, %s)
                         """, (
@@ -98,7 +96,7 @@ class Connect2Mysql:
                     self.connection.commit()
                 else:
                     self.cursor.execute("""
-                            INSERT IGNORE INTO INFOR (
+                            INSERT IGNORE INTO `DATA_AUTO_LOGIN`.`INFOR` (
                                 hostname, username, password, port
                             ) VALUES (%s, %s, %s, %s)
                         """, (
@@ -154,8 +152,9 @@ class Connect2Mysql:
         except Error as e:
             QMessageBox.critical(None, "Lỗi kết nối", f"Lỗi: {str(e)}")
 
-    def write_mysql_config(self, host, user, password, port, database,
-                           filepath=resource_path("module_2/mysql_config.log")):
+    def write_mysql_config(self, host, user, password, port, database, filepath=None):
+        if filepath is None:
+            filepath = get_mysql_config_path(for_writing=True)
         try:
             with open(filepath, 'w') as f:
                 f.write(f"host={host}\n")
@@ -163,7 +162,7 @@ class Connect2Mysql:
                 f.write(f"password={password}\n")
                 f.write(f"port={port}\n")
                 f.write(f"database={database}\n")
-            _log.info('Success to write mysql config')
+            _log.info('Success to write mysql config to %s', filepath)
             return True
         except Exception as e:
             _log.warning('Failed to write mysql config: %s', e)
@@ -183,11 +182,12 @@ class Connect2Mysql:
                 return
                 
             try:
+                db_name = self.uicmin.lineEdit_name_devic.text().strip()
                 self.cursor = self.connection.cursor()
-                self.cursor.execute(f"CREATE DATABASE IF NOT EXISTS {self.uicmin.lineEdit_name_devic.text()}")
-                self.cursor.execute(f"USE {self.uicmin.lineEdit_name_devic.text()}")
+                self.cursor.execute(f"CREATE DATABASE IF NOT EXISTS `{db_name}`")
                 for table in TABLES:
-                    self.cursor.execute(table)
+                    table_sql = table.replace("CREATE TABLE IF NOT EXISTS ", f"CREATE TABLE IF NOT EXISTS `{db_name}`.")
+                    self.cursor.execute(table_sql)
                 QMessageBox.information(None, "Thành công", "Thiết lập cơ sở dữ liệu thành công")
                 self.uicmin.pushButton_2.setEnabled(True)
             except Exception as error:
@@ -196,16 +196,17 @@ class Connect2Mysql:
                 QMessageBox.critical(None, "Error", f"Lỗi khởi tạo DB: {str(error)}, Login vào MySQL Workbench, sau đó kết nối lại.")
                 logging.error(f"Lỗi: {error}")
 
-    def insert_item_code(self,item_code):
+    def insert_item_code(self, item_code):
         try:
-            self.cursor.execute("""
-                INSERT IGNORE INTO ITEMS_CODE (name_line_code)
+            db_name = self.uicmin.lineEdit_name_devic.text().strip()
+            self.cursor.execute(f"""
+                INSERT IGNORE INTO `{db_name}`.ITEMS_CODE (name_line_code)
                 VALUES (%s)
             """, (item_code,))
             self.connection.commit()
             
-            self.cursor.execute("""
-                SELECT id FROM ITEMS_CODE 
+            self.cursor.execute(f"""
+                SELECT id FROM `{db_name}`.ITEMS_CODE 
                 WHERE name_line_code = %s
             """, (item_code,))
             
@@ -215,11 +216,12 @@ class Connect2Mysql:
             self.connection.rollback()
             return None
 
-    def insert_camera_data(self,camera_data,item_code_id):
+    def insert_camera_data(self, camera_data, item_code_id):
         try:
+            db_name = self.uicmin.lineEdit_name_devic.text().strip()
             for index, camera in enumerate(camera_data.get("camera_tabs", []), 1):
-                self.cursor.execute("""
-                    INSERT IGNORE INTO NUMS_CAMERA (
+                self.cursor.execute(f"""
+                    INSERT IGNORE INTO `{db_name}`.NUMS_CAMERA (
                         nums_camera, device_type, device_serial, 
                         connection_type, ip_address, item_code_id
                     ) VALUES (%s, %s, %s, %s, %s, %s)
@@ -232,8 +234,8 @@ class Connect2Mysql:
                     item_code_id
                 ))
 
-                self.cursor.execute("""
-                    SELECT id FROM NUMS_CAMERA 
+                self.cursor.execute(f"""
+                    SELECT id FROM `{db_name}`.NUMS_CAMERA 
                     WHERE nums_camera = %s AND item_code_id = %s
                 """, (index, item_code_id))
                 
@@ -241,8 +243,8 @@ class Connect2Mysql:
                 if camera_result:
                     camera_id = camera_result[0]
                     for model_index in range(1, int(camera.get("model_count", "0")) + 1):
-                        self.cursor.execute("""
-                            INSERT IGNORE INTO NUMS_MODEL (nums_model, camera_id)
+                        self.cursor.execute(f"""
+                            INSERT IGNORE INTO `{db_name}`.NUMS_MODEL (nums_model, camera_id)
                             VALUES (%s, %s)
                         """, (model_index, camera_id))
             

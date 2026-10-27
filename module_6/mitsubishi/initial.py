@@ -5,14 +5,14 @@ from module_6.mitsubishi.pymcprotocol.type3e import Type3E
 from app_logger.app_logger import get_logger as _get_logger
 _log = _get_logger('module_6.mitsubishi.initial')
 import threading
-from module_1.root_path import resource_path
+from module_1.root_path import resource_path, get_trigger_file_path
 
 class SocketClient:
     def __init__(self, ip_address, port):
         self.ipv4 = ip_address
         self.port = int(port)
         self.client = None 
-        self.trigger_file_path = resource_path("module_3\\trigger.txt")
+        self.trigger_file_path = get_trigger_file_path("trigger")
         self.locked = threading.Lock()
 
     def test_connection(self, ip: str, port: int, timeout: float = 3.0) -> bool:
@@ -40,19 +40,18 @@ class SocketClient:
         import time
         import os
         
-        dir_name = os.path.dirname(self.trigger_file_path)
-        file_path = os.path.join(dir_name, f"trigger_{register_trigger}.txt")
+        file_path = get_trigger_file_path(register_trigger, for_writing=False)
         
         for _ in range(10):
             try:
-                with open(file_path, 'r') as file:
+                with open(file_path, 'r', encoding='utf-8') as file:
                     line = file.readline().strip()
                     if '=' not in line:
                         return 0
                     register, value = line.split('=')
                     register = register.strip()
                     value = int(value.strip())
-                    return value if register == register_trigger else 0
+                    return value if register.upper() == str(register_trigger).strip().upper() else 0
             except FileNotFoundError:
                 # File chưa tồn tại, mặc định là 0
                 return 0
@@ -64,13 +63,14 @@ class SocketClient:
     def write_plc_log(self, register, value):
         import time
         import os
-        
-        dir_name = os.path.dirname(self.trigger_file_path)
-        file_path = os.path.join(dir_name, f"trigger_{register}.txt")
-        
+        file_path = get_trigger_file_path(register, for_writing=True)
+        try:
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        except Exception:
+            pass
         for _ in range(10):
             try:
-                with open(file_path, 'w') as file:
+                with open(file_path, 'w', encoding='utf-8') as file:
                     file.write(f"{register} = {value}\n")
                 return True
             except (IOError, PermissionError) as e:

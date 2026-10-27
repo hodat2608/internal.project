@@ -47,7 +47,7 @@ class KiemGuong:
 
         # Apply the translation using warpAffine function
         shifted_image = cv2.warpAffine(img, translation_matrix, (width, height))
-        cv2.imwrite(f"D:\\AI\\LOC\\KIEMGUONG\\images\\train\\{shift_x}_{shift_y}.jpg",shifted_image,[cv2.IMWRITE_JPEG_QUALITY, 100])
+        # cv2.imwrite(f"D:\\AI\\LOC\\KIEMGUONG\\images\\train\\{shift_x}_{shift_y}.jpg",shifted_image,[cv2.IMWRITE_JPEG_QUALITY, 100])
         return shifted_image
 
     def location(self,img):

@@ -326,5 +326,13 @@ _ADMIN_TABLES_SQL = [
         is_enabled      TINYINT(1) NOT NULL DEFAULT 1,
         registered_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS ADMINISTRATOR.SYSTEM_CONFIG (
+        config_key      VARCHAR(100) PRIMARY KEY,
+        config_value    TEXT,
+        description     VARCHAR(255) DEFAULT '',
+        updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     """
 ]

@@ -47,18 +47,17 @@ class MySQL_Core:
         self.automatic   = layer.radioButton_automatic_login.isChecked()
         if self.flag:
             self.cursor = self.connection.cursor()
-            self.cursor.execute(f"USE DATA_AUTO_LOGIN")
             self.cursor.execute("""
-                SELECT * FROM INFOR 
+                SELECT * FROM `DATA_AUTO_LOGIN`.`INFOR` 
                 WHERE hostname = %s
             """, (self.hostname,))
             results = self.cursor.fetchall()
             if results:
                 self.cursor.execute("""
-                    DELETE FROM INFOR """)
+                    DELETE FROM `DATA_AUTO_LOGIN`.`INFOR` """)
                 
             self.cursor.execute("""
-                    INSERT IGNORE INTO INFOR (
+                    INSERT IGNORE INTO `DATA_AUTO_LOGIN`.`INFOR` (
                         hostname, username, password, port, manual, automatic
                     ) VALUES (%s, %s, %s, %s, %s, %s)
                 """, (

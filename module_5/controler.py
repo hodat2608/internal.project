@@ -14,6 +14,7 @@ from module_1.table_db import *
 import subprocess
 import platform
 import os
+from module_1.root_path import get_trigger_file_path
 
 from module_6.mitsubishi.initial import SocketClient as Mitsubishi_Socket_Client
 from module_6.keyence.initial import KeyenceClient as Keyence_Socket_Client
@@ -37,10 +38,9 @@ class PLC_Controler:
         try:
             self.cursor = self.main_core.connection.cursor()
             name_database = 'DATA_IP_ADDRESS'
-            self.cursor.execute(f"CREATE DATABASE IF NOT EXISTS {name_database}")
-            self.cursor.execute(f"USE {name_database}")
+            self.cursor.execute(f"CREATE DATABASE IF NOT EXISTS `{name_database}`")
             tables = [
-                """CREATE TABLE IF NOT EXISTS INFOR_ADDRESS (
+                f"""CREATE TABLE IF NOT EXISTS `{name_database}`.INFOR_ADDRESS (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     plc_module VARCHAR(255),
                     connection_port VARCHAR(255),
@@ -67,9 +67,9 @@ class PLC_Controler:
             ]
             for col_name, col_def in columns_to_add:
                 try:
-                    self.cursor.execute(f"SHOW COLUMNS FROM INFOR_ADDRESS LIKE '{col_name}'")
+                    self.cursor.execute(f"SHOW COLUMNS FROM `{name_database}`.INFOR_ADDRESS LIKE '{col_name}'")
                     if not self.cursor.fetchone():
-                        self.cursor.execute(f"ALTER TABLE INFOR_ADDRESS ADD COLUMN {col_name} {col_def}")
+                        self.cursor.execute(f"ALTER TABLE `{name_database}`.INFOR_ADDRESS ADD COLUMN {col_name} {col_def}")
                 except Exception as col_err:
                     logging.warning(f"Could not add column {col_name} to INFOR_ADDRESS: {col_err}")
             self.main_core.connection.commit()
@@ -394,17 +394,9 @@ class PLC_Controler:
 
         return False
 
-    def _get_trigger_file_path(self, register: str) -> str:
-        """Lấy đường dẫn file trigger_{register}.txt trong module_3"""
-        reg_clean = register.strip().replace(" ", "")
-        if reg_clean.lower().startswith("trigger_"):
-            reg_clean = reg_clean[8:]
-        if reg_clean.lower().endswith(".txt"):
-            reg_clean = reg_clean[:-4]
-        
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        module_3_dir = os.path.abspath(os.path.join(current_dir, "..", "module_3"))
-        return os.path.join(module_3_dir, f"trigger_{reg_clean}.txt")
+    def _get_trigger_file_path(self, register: str, for_writing: bool = False) -> str:
+        """Lấy đường dẫn file trigger_{register}.txt trong AppData bền vững (không bị Access Denied)"""
+        return get_trigger_file_path(register, for_writing=for_writing)
 
     def _read_plc_log(self, register: str):
         """Đọc giá trị PLC từ file log mô phỏng (trigger_{register}.txt)"""
@@ -414,8 +406,8 @@ class PLC_Controler:
         if reg_clean.lower().endswith(".txt"):
             reg_clean = reg_clean[:-4]
 
-        # 1. Ưu tiên đọc trực tiếp từ file trigger_{register}.txt chuẩn trong module_3
-        file_path = self._get_trigger_file_path(reg_clean)
+        # 1. Ưu tiên đọc trực tiếp từ file trigger_{register}.txt chuẩn trong AppData / bundle
+        file_path = self._get_trigger_file_path(reg_clean, for_writing=False)
         try:
             if os.path.exists(file_path):
                 with open(file_path, 'r', encoding='utf-8') as f:
@@ -458,17 +450,17 @@ class PLC_Controler:
         return 0
 
     def _write_plc_log(self, register: str, value) -> bool:
-        """Ghi giá trị PLC vào file log mô phỏng (trigger_{register}.txt)"""
+        """Ghi giá trị PLC vào file log mô phỏng (trigger_{register}.txt) trong AppData"""
         reg_clean = register.strip().replace(" ", "")
         if reg_clean.lower().startswith("trigger_"):
             reg_clean = reg_clean[8:]
         if reg_clean.lower().endswith(".txt"):
             reg_clean = reg_clean[:-4]
 
-        file_path = self._get_trigger_file_path(reg_clean)
+        file_path = self._get_trigger_file_path(reg_clean, for_writing=True)
         success = False
 
-        # 1. Ghi trực tiếp vào file trong module_3
+        # 1. Ghi trực tiếp vào file trong AppData
         try:
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
             with open(file_path, 'w', encoding='utf-8') as f:

@@ -21,62 +21,84 @@ import re
 from module_3.config_status_logger import PLCConfigStatusLogger
 
 
-def _create_number_cell_item(value=""):
-    item = QtWidgets.QTableWidgetItem(str(value) if value is not None else "")
-    f = QtGui.QFont("Segoe UI", 11)
-    f.setBold(True)
-    item.setFont(f)
+def create_table_item(text=""):
+    """Tạo QTableWidgetItem với cỡ chữ 11, font Segoe UI, in đậm và căn giữa."""
+    item = QtWidgets.QTableWidgetItem(str(text) if text is not None else "")
+    font = QtGui.QFont("Segoe UI", 11)
+    font.setBold(True)
+    item.setFont(font)
     item.setTextAlignment(QtCore.Qt.AlignCenter)
     return item
 
 
-class SignalNumberDelegate(QtWidgets.QStyledItemDelegate):
+class SignalTableDelegate(QtWidgets.QStyledItemDelegate):
+    """Delegate tùy chỉnh cho bảng tableWidget tín hiệu PLC:
+    - Khi sửa trực tiếp (createEditor): ô nhập tự động cỡ 11, Segoe UI, in đậm, căn giữa.
+    - Khi vẽ (paint): vẽ thêm nét viền/đường kẻ phân cách giữa cột 3 (Read) và cột 4 (Write).
+    """
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.number_font = QtGui.QFont("Segoe UI", 11)
-        self.number_font.setBold(True)
 
     def createEditor(self, parent, option, index):
         editor = super().createEditor(parent, option, index)
-        if index.column() >= 1 and isinstance(editor, QtWidgets.QLineEdit):
-            editor.setFont(self.number_font)
+        if isinstance(editor, QtWidgets.QLineEdit):
             editor.setAlignment(QtCore.Qt.AlignCenter)
-            editor.setStyleSheet("""
-                QLineEdit {
-                    font-family: 'Segoe UI';
-                    font-size: 11pt;
-                    font-weight: bold;
-                    color: #000000;
-                    background-color: #FFFFFF;
-                    border: 1px solid #325C62;
-                }
-            """)
+            font = QtGui.QFont("Segoe UI", 11)
+            font.setBold(True)
+            editor.setFont(font)
         return editor
 
-    def setEditorData(self, editor, index):
-        super().setEditorData(editor, index)
-        if index.column() >= 1 and isinstance(editor, QtWidgets.QLineEdit):
-            editor.setFont(self.number_font)
-            editor.setAlignment(QtCore.Qt.AlignCenter)
+    def paint(self, painter, option, index):
+        super().paint(painter, option, index)
+        # Nếu là cột 3 (read_value_off), vẽ thêm đường viền dọc dày 3px ở cạnh phải của ô
+        if index.column() == 3:
+            painter.save()
+            pen = QtGui.QPen(QtGui.QColor("#1A5276"), 3, QtCore.Qt.SolidLine)
+            pen.setCapStyle(QtCore.Qt.SquareCap)
+            painter.setPen(pen)
+            x = option.rect.right()
+            painter.drawLine(x, option.rect.top(), x, option.rect.bottom())
+            painter.restore()
 
-    def setModelData(self, editor, model, index):
-        super().setModelData(editor, model, index)
-        if index.column() >= 1:
-            model.setData(index, self.number_font, QtCore.Qt.FontRole)
-            model.setData(index, QtCore.Qt.AlignCenter, QtCore.Qt.TextAlignmentRole)
 
-    def initStyleOption(self, option, index):
-        super().initStyleOption(option, index)
-        if index.column() >= 1:
-            option.font = self.number_font
-            option.displayAlignment = QtCore.Qt.AlignCenter
+class SignalTableSeparatorFilter(QtCore.QObject):
+    """Event filter vẽ đường phân cách rõ rệt (separator line) giữa khối READ (cột 1, 2, 3)
+    và khối WRITE (cột 4, 5, 6) trên cả TableView viewport lẫn HorizontalHeader viewport.
+    Đường vẽ này xuyên suốt từ trên đỉnh Header xuống tận đáy bảng."""
+    def __init__(self, table_widget):
+        super().__init__(table_widget)
+        self.table = table_widget
+
+    def eventFilter(self, obj, event):
+        res = super().eventFilter(obj, event)
+        if event.type() == QtCore.QEvent.Paint:
+            # Cột 3 là cột cuối cùng của nhóm READ ('read_value_off')
+            col = 3
+            if col < self.table.columnCount():
+                if obj == self.table.viewport():
+                    x = self.table.columnViewportPosition(col) + self.table.columnWidth(col) - 1
+                    if 0 <= x <= self.table.viewport().width():
+                        painter = QtGui.QPainter(self.table.viewport())
+                        pen = QtGui.QPen(QtGui.QColor("#1A5276"), 3, QtCore.Qt.SolidLine)
+                        painter.setPen(pen)
+                        painter.drawLine(x, 0, x, self.table.viewport().height())
+                        painter.end()
+                elif obj == self.table.horizontalHeader().viewport():
+                    header = self.table.horizontalHeader()
+                    x = header.sectionViewportPosition(col) + header.sectionSize(col) - 1
+                    if 0 <= x <= header.viewport().width():
+                        painter = QtGui.QPainter(header.viewport())
+                        pen = QtGui.QPen(QtGui.QColor("#1A5276"), 3, QtCore.Qt.SolidLine)
+                        painter.setPen(pen)
+                        painter.drawLine(x, 0, x, header.viewport().height())
+                        painter.end()
+        return res
 
 
 class SignalTableHelper:
     def __init__(self, table_widget):
         self.table = table_widget
         self.rows = {}
-        self.update_rows_mapping()
         self.columns = {
             'address': 0,
             'read_register': 1,
@@ -86,7 +108,80 @@ class SignalTableHelper:
             'write_value_on': 5,
             'write_value_off': 6
         }
-        
+        self.update_rows_mapping()
+        self._init_table_style_and_formatting()
+
+    def _init_table_style_and_formatting(self):
+        """Khởi tạo delegate, event filter đường phân cách Read/Write, 
+        và định dạng toàn bộ số/chữ trong bảng cỡ 11, căn giữa."""
+        # 1. Cài đặt Delegate cho bảng
+        self.delegate = SignalTableDelegate(self.table)
+        self.table.setItemDelegate(self.delegate)
+
+        # 2. Cài đặt EventFilter vẽ đường phân cách giữa cột 3 và cột 4
+        self.separator_filter = SignalTableSeparatorFilter(self.table)
+        self.table.viewport().installEventFilter(self.separator_filter)
+        self.table.horizontalHeader().viewport().installEventFilter(self.separator_filter)
+
+        # 3. Lắng nghe sự kiện itemChanged để tự động áp dụng cỡ 11 + căn giữa khi người dùng gõ
+        self.table.itemChanged.connect(self._on_table_item_changed)
+
+        # 4. Định dạng toàn bộ các item hiện hữu và Header
+        self.format_all_table_items()
+
+    def format_all_table_items(self):
+        """Định dạng tất cả ô dữ liệu và header thành cỡ 11, in đậm, căn giữa."""
+        self.table.blockSignals(True)
+        try:
+            # Định dạng Horizontal Header
+            font_header = QtGui.QFont("Segoe UI", 11)
+            font_header.setBold(True)
+            for col in range(self.table.columnCount()):
+                h_item = self.table.horizontalHeaderItem(col)
+                if h_item:
+                    h_item.setFont(font_header)
+                    h_item.setTextAlignment(QtCore.Qt.AlignCenter)
+                    # Gợi ý phân biệt nhóm trực quan bằng ToolTip và màu chữ
+                    if col in [1, 2, 3]:
+                        h_item.setToolTip("Khối ĐỌC tín hiệu từ PLC (READ)")
+                        h_item.setForeground(QtGui.QBrush(QtGui.QColor("#0C4A6E"))) # Xanh dương đậm
+                    elif col in [4, 5, 6]:
+                        h_item.setToolTip("Khối GHI tín hiệu xuống PLC (WRITE)")
+                        h_item.setForeground(QtGui.QBrush(QtGui.QColor("#7C2D12"))) # Cam đất/Đỏ gạch đậm
+
+            # Định dạng Vertical Header (Tên tín hiệu)
+            for row in range(self.table.rowCount()):
+                v_item = self.table.verticalHeaderItem(row)
+                if v_item:
+                    v_item.setFont(font_header)
+
+            # Định dạng tất cả các ô trong bảng
+            font_cell = QtGui.QFont("Segoe UI", 11)
+            font_cell.setBold(True)
+            for row in range(self.table.rowCount()):
+                for col in range(1, self.table.columnCount()):
+                    item = self.table.item(row, col)
+                    if not item:
+                        item = QtWidgets.QTableWidgetItem("")
+                        self.table.setItem(row, col, item)
+                    item.setFont(font_cell)
+                    item.setTextAlignment(QtCore.Qt.AlignCenter)
+        finally:
+            self.table.blockSignals(False)
+
+    def _on_table_item_changed(self, item):
+        """Tự động định dạng font 11 và căn giữa ngay khi có dữ liệu được nhập/thay đổi."""
+        if item is None or item.column() == 0:
+            return
+        self.table.blockSignals(True)
+        try:
+            font = QtGui.QFont("Segoe UI", 11)
+            font.setBold(True)
+            item.setFont(font)
+            item.setTextAlignment(QtCore.Qt.AlignCenter)
+        finally:
+            self.table.blockSignals(False)
+
     def update_rows_mapping(self):
         self.rows = {}
         for row in range(self.table.rowCount()):
@@ -114,8 +209,15 @@ class SignalTableHelper:
                 if widget:
                     widget.setCurrentText(str(value) if value is not None else "")
             else:
-                item = _create_number_cell_item(value)
-                self.table.setItem(row, col, item)
+                item = self.table.item(row, col)
+                if not item:
+                    item = QtWidgets.QTableWidgetItem()
+                    self.table.setItem(row, col, item)
+                item.setText(str(value) if value is not None else "")
+                font = QtGui.QFont("Segoe UI", 11)
+                font.setBold(True)
+                item.setFont(font)
+                item.setTextAlignment(QtCore.Qt.AlignCenter)
 
 
 class DataProcessSignal:
@@ -128,12 +230,12 @@ class DataProcessSignal:
         self.check_connect_plc = False
         self.is_connected_plc = None
         
+        # Thiết lập style cho bảng tableWidget_shotxmodel
+        self._setup_shotxmodel_table_style()
+
         # Thiết lập Context Menu cho bảng
         self.uic.tableWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.uic.tableWidget.customContextMenuRequested.connect(self.setup_context_menu)
-
-        # Cấu hình font Segoe UI 11pt in đậm và delegate cho các ô nhập số
-        self._setup_table_style_and_delegate()
 
         # Thêm ComboBox DMA cho các hàng có sẵn
         for row in range(self.uic.tableWidget.rowCount()):
@@ -145,63 +247,136 @@ class DataProcessSignal:
         self.set_ui_enabled(False)
         self._setup_config_status_log_ui()
 
-    def _setup_table_style_and_delegate(self):
-        # 1. Delegate cho các ô nhập số (cột >= 1)
-        self.number_delegate = SignalNumberDelegate(self.uic.tableWidget)
-        self.uic.tableWidget.setItemDelegate(self.number_delegate)
+    def _setup_shotxmodel_table_style(self):
+        """Thiết lập phong cách đồ hoạ sang trọng, font chữ 11pt in đậm và căn giữa cho tableWidget_shotxmodel."""
+        if not hasattr(self.uic, 'tableWidget_shotxmodel') or self.uic.tableWidget_shotxmodel is None:
+            return
+        table = self.uic.tableWidget_shotxmodel
 
-        # 2. Font mặc định cho tableWidget
-        table_font = QtGui.QFont("Segoe UI", 11)
-        table_font.setBold(True)
-        self.uic.tableWidget.setFont(table_font)
-
-        # 3. StyleSheet cho QTableWidget và QLineEdit khi nhập/sửa ô
-        existing_ss = self.uic.tableWidget.styleSheet() or ""
-        self.uic.tableWidget.setStyleSheet(existing_ss + """
-            QTableWidget, QTableView {
-                font-family: 'Segoe UI';
-                font-size: 11pt;
-                font-weight: bold;
-            }
-            QTableWidget::item, QTableView::item {
-                font-family: 'Segoe UI';
-                font-size: 11pt;
-                font-weight: bold;
-            }
-            QTableWidget QLineEdit, QTableView QLineEdit {
-                font-family: 'Segoe UI';
-                font-size: 11pt;
-                font-weight: bold;
-                color: #000000;
-                background-color: #FFFFFF;
+        # 1. Cập nhật StyleSheet đồng bộ viền xanh #325C62, nền Mint dịu mắt và Header nổi bật
+        table.setStyleSheet("""
+            /* Khung chính của bảng TableView */
+            QTableView {
+                background-color: #F7FFFA;
                 border: 1px solid #325C62;
+                border-radius: 4px;
+                gridline-color: #d0ebd5;
+            }
+            /* Header tiêu đề bảng */
+            QHeaderView::section {
+                background-color: #EAF7EF;
+                color: #1F4E78;
+                font-family: 'Segoe UI';
+                font-size: 11pt;
+                font-weight: bold;
+                border: 1px solid #d0ebd5;
+                padding: 4px;
+            }
+            /* Ô dữ liệu bên trong bảng */
+            QTableView::item {
+                background-color: #F7FFFA;
+                color: #2c3e50;
+                font-family: 'Segoe UI';
+                font-size: 11pt;
+                font-weight: bold;
+            }
+            /* Hiệu ứng di chuột */
+            QTableView::item:hover {
+                background-color: #F5FFE1;
+            }
+            /* Hiệu ứng khi chọn dòng */
+            QTableView::item:selected {
+                background-color: #E9F8FF;
+                color: black;
             }
         """)
 
-        # 4. Định dạng toàn bộ các ô hiện có
-        for row in range(self.uic.tableWidget.rowCount()):
-            for col in range(1, self.uic.tableWidget.columnCount()):
-                item = self.uic.tableWidget.item(row, col)
-                if not item:
-                    item = _create_number_cell_item("")
-                    self.uic.tableWidget.setItem(row, col, item)
-                else:
-                    item.setFont(table_font)
-                    item.setTextAlignment(QtCore.Qt.AlignCenter)
+        # 2. Định dạng Font và Căn giữa cho Horizontal Header
+        font_header = QtGui.QFont("Segoe UI", 11)
+        font_header.setBold(True)
+        for col in range(table.columnCount()):
+            h_item = table.horizontalHeaderItem(col)
+            if h_item:
+                h_item.setFont(font_header)
+                h_item.setTextAlignment(QtCore.Qt.AlignCenter)
+                h_item.setForeground(QtGui.QBrush(QtGui.QColor("#1F4E78")))
 
-        # 5. Bắt sự kiện itemChanged để tự động chuẩn hóa font khi người dùng nhập hoặc sửa
-        self.uic.tableWidget.itemChanged.connect(self._on_table_item_changed)
+        table.horizontalHeader().setDefaultSectionSize(140)
+        table.horizontalHeader().setStretchLastSection(True)
+        table.verticalHeader().setDefaultSectionSize(38)
 
-    def _on_table_item_changed(self, item):
-        if item and item.column() >= 1:
-            font = item.font()
-            if font.family() != "Segoe UI" or font.pointSize() != 11 or not font.bold():
-                self.uic.tableWidget.blockSignals(True)
-                f = QtGui.QFont("Segoe UI", 11)
-                f.setBold(True)
-                item.setFont(f)
-                item.setTextAlignment(QtCore.Qt.AlignCenter)
-                self.uic.tableWidget.blockSignals(False)
+    def _create_model_combobox(self, current_val=None, num_models=None):
+        """Tạo ComboBox Model chọn cho shotxmodel với font 11pt, căn giữa và style đẹp mắt."""
+        combo = QtWidgets.QComboBox()
+        if num_models is None:
+            try:
+                num_models = int(self.uic.comboBox_n_model.currentText())
+            except Exception:
+                num_models = 1
+        combo.addItems([str(i + 1) for i in range(int(num_models))])
+        if current_val is not None:
+            combo.setCurrentText(str(current_val))
+            
+        combo.setStyleSheet("""
+            QComboBox { 
+                background-color: #F7FFFA; 
+                color: black; 
+                font-family: 'Segoe UI'; 
+                font-size: 11pt; 
+                font-weight: bold;
+                border: 1px solid #d0ebd5;
+                border-radius: 3px;
+                padding: 2px;
+            }
+            QComboBox QAbstractItemView {
+                text-align: center;
+                font-family: 'Segoe UI';
+                font-size: 11pt;
+                font-weight: bold;
+                selection-background-color: #E9F8FF;
+                selection-color: black;
+            }
+        """)
+        combo.setEditable(True)
+        combo.lineEdit().setAlignment(QtCore.Qt.AlignCenter)
+        combo.lineEdit().setReadOnly(True)
+        font = QtGui.QFont("Segoe UI", 11)
+        font.setBold(True)
+        combo.lineEdit().setFont(font)
+        return combo
+
+    def _format_shotxmodel_table_items(self):
+        """Định dạng toàn bộ item trong tableWidget_shotxmodel thành cỡ 11, in đậm, căn giữa."""
+        if not hasattr(self.uic, 'tableWidget_shotxmodel') or self.uic.tableWidget_shotxmodel is None:
+            return
+        table = self.uic.tableWidget_shotxmodel
+        font_header = QtGui.QFont("Segoe UI", 11)
+        font_header.setBold(True)
+        for col in range(table.columnCount()):
+            h_item = table.horizontalHeaderItem(col)
+            if h_item:
+                h_item.setFont(font_header)
+                h_item.setTextAlignment(QtCore.Qt.AlignCenter)
+                h_item.setForeground(QtGui.QBrush(QtGui.QColor("#1F4E78")))
+
+        font_cell = QtGui.QFont("Segoe UI", 11)
+        font_cell.setBold(True)
+        for row in range(table.rowCount()):
+            v_item = table.verticalHeaderItem(row)
+            if v_item:
+                v_item.setFont(font_header)
+
+            shot_item = table.item(row, 0)
+            if shot_item:
+                shot_item.setFont(font_cell)
+                shot_item.setTextAlignment(QtCore.Qt.AlignCenter)
+
+            widget = table.cellWidget(row, 1)
+            if isinstance(widget, QtWidgets.QComboBox):
+                widget.setFont(font_cell)
+                if widget.lineEdit():
+                    widget.lineEdit().setFont(font_cell)
+                    widget.lineEdit().setAlignment(QtCore.Qt.AlignCenter)
 
     def _setup_config_status_log_ui(self):
         """Khởi tạo textBrowser_status_log động bên trong self.uic.groupBox_5
@@ -242,16 +417,20 @@ class DataProcessSignal:
         combo = QtWidgets.QComboBox()
         combo.addItems(["DM", "MR", "R", "T", "C"])
         
-        # 1. Thiết lập StyleSheet gộp toàn bộ cấu hình (Font Segoe UI, Size 10pt, Nền trắng, Chữ đen)
+        # 1. Thiết lập StyleSheet gộp toàn bộ cấu hình (Font Segoe UI, Size 11pt, in đậm, Nền xanh nhẹ, Chữ đen)
         combo.setStyleSheet("""
             QComboBox { 
                 background-color: #F7FFFA; 
                 color: black; 
                 font-family: 'Segoe UI'; 
-                font-size: 10pt; 
+                font-size: 11pt; 
+                font-weight: bold;
             }
             QComboBox QAbstractItemView {
                 text-align: center;
+                font-family: 'Segoe UI';
+                font-size: 11pt;
+                font-weight: bold;
             }
         """)
         
@@ -259,6 +438,9 @@ class DataProcessSignal:
         combo.setEditable(True)
         combo.lineEdit().setAlignment(QtCore.Qt.AlignCenter)
         combo.lineEdit().setReadOnly(True)
+        font = QtGui.QFont("Segoe UI", 11)
+        font.setBold(True)
+        combo.lineEdit().setFont(font)
         
         self.uic.tableWidget.setCellWidget(row_index, 0, combo)
 
@@ -302,14 +484,18 @@ class DataProcessSignal:
             row_count = self.uic.tableWidget.rowCount()
             self.uic.tableWidget.insertRow(row_count)
             item = QtWidgets.QTableWidgetItem(signal_name)
+            font = QtGui.QFont("Segoe UI", 11)
+            font.setBold(True)
+            item.setFont(font)
             self.uic.tableWidget.setVerticalHeaderItem(row_count, item)
             
             self._add_dma_combobox_to_row(row_count)
             for col in range(1, self.uic.tableWidget.columnCount()):
-                empty_item = _create_number_cell_item("")
+                empty_item = create_table_item("")
                 self.uic.tableWidget.setItem(row_count, col, empty_item)
                 
             self.signal_table.update_rows_mapping()
+            self.signal_table.format_all_table_items()
             self.table_signal_up_to_selected_trigger_signals()
 
     def delete_row(self):
@@ -569,11 +755,14 @@ class DataProcessSignal:
                         row_count = self.uic.tableWidget.rowCount()
                         self.uic.tableWidget.insertRow(row_count)
                         item = QtWidgets.QTableWidgetItem(signal_name)
+                        font = QtGui.QFont("Segoe UI", 11)
+                        font.setBold(True)
+                        item.setFont(font)
                         self.uic.tableWidget.setVerticalHeaderItem(row_count, item)
                         
                         self._add_dma_combobox_to_row(row_count)
                         for col in range(1, self.uic.tableWidget.columnCount()):
-                            empty_item = _create_number_cell_item("")
+                            empty_item = create_table_item("")
                             self.uic.tableWidget.setItem(row_count, col, empty_item)
                         self.signal_table.update_rows_mapping()
                         self.table_signal_up_to_selected_trigger_signals()
@@ -585,6 +774,7 @@ class DataProcessSignal:
                         if value is not None:
                             self.signal_table.set_value(signal_name, column_name, value)
                 
+                self.signal_table.format_all_table_items()
                 return mode_auto_id
             
     def load_params_signals_from_gui_mapping_db(self, cursor, camera_id, mode_name=None, show_message=True):
@@ -623,7 +813,7 @@ class DataProcessSignal:
                 else:
                     self._add_dma_combobox_to_row(row)
                 for col in range(1, self.uic.tableWidget.columnCount()):
-                    self.uic.tableWidget.setItem(row, col, _create_number_cell_item(""))
+                    self.uic.tableWidget.setItem(row, col, create_table_item(""))
                     
             for row in rows:
                 signal_name = row[0].lower()
@@ -631,11 +821,14 @@ class DataProcessSignal:
                     row_count = self.uic.tableWidget.rowCount()
                     self.uic.tableWidget.insertRow(row_count)
                     item = QtWidgets.QTableWidgetItem(signal_name)
+                    font = QtGui.QFont("Segoe UI", 11)
+                    font.setBold(True)
+                    item.setFont(font)
                     self.uic.tableWidget.setVerticalHeaderItem(row_count, item)
                     
                     self._add_dma_combobox_to_row(row_count)
                     for col in range(1, self.uic.tableWidget.columnCount()):
-                        empty_item = _create_number_cell_item("")
+                        empty_item = create_table_item("")
                         self.uic.tableWidget.setItem(row_count, col, empty_item)
                     self.signal_table.update_rows_mapping()
                     self.table_signal_up_to_selected_trigger_signals()
@@ -647,6 +840,7 @@ class DataProcessSignal:
                     if value is not None:
                         self.signal_table.set_value(signal_name, column_name, value)
 
+            self.signal_table.format_all_table_items()
             return mode_auto_id if result else None
         else: 
             if show_message:
@@ -689,7 +883,7 @@ class DataProcessSignal:
                         else:
                             self._add_dma_combobox_to_row(row)
                         for col in range(1, self.uic.tableWidget.columnCount()):
-                            self.uic.tableWidget.setItem(row, col, _create_number_cell_item(""))
+                            self.uic.tableWidget.setItem(row, col, create_table_item(""))
                             
                     for row in rows:
                         signal_name = row[0].lower()
@@ -697,11 +891,14 @@ class DataProcessSignal:
                             row_count = self.uic.tableWidget.rowCount()
                             self.uic.tableWidget.insertRow(row_count)
                             item = QtWidgets.QTableWidgetItem(signal_name)
+                            font = QtGui.QFont("Segoe UI", 11)
+                            font.setBold(True)
+                            item.setFont(font)
                             self.uic.tableWidget.setVerticalHeaderItem(row_count, item)
                             
                             self._add_dma_combobox_to_row(row_count)
                             for col in range(1, self.uic.tableWidget.columnCount()):
-                                empty_item = _create_number_cell_item("")
+                                empty_item = create_table_item("")
                                 self.uic.tableWidget.setItem(row_count, col, empty_item)
                             self.signal_table.update_rows_mapping()
                             self.table_signal_up_to_selected_trigger_signals()
@@ -716,6 +913,7 @@ class DataProcessSignal:
                 self.dict_mode_params[mode_name] = {}
                 self.dict_mode_params[mode_name]['values_signals'] = dict_params
                 self.dict_mode_params[mode_name]['register_on'] = result[1]
+            self.signal_table.format_all_table_items()
             return self.dict_mode_params
         else: 
             # QMessageBox.warning(None, "Warning", f"No mode found for camera {camera_id}\n Please setup mode in camera setting!")
@@ -812,16 +1010,11 @@ class DataProcessSignal:
                 self.uic.tableWidget_shotxmodel.setRowCount(len(results))
                 self.uic.spinBox_num_shot.setValue(len(results))
                 for row_index, (shot, no_of_model) in enumerate(results):
-                    shot_item = QTableWidgetItem(f'{str(shot)}')
-                    shot_item.setTextAlignment(QtCore.Qt.AlignCenter)
-                    self.uic.tableWidget_shotxmodel.setItem(row_index,0,shot_item)
-                    combo = QComboBox()
-                    combo.addItems([str(i+1) for i in range(int(num_models))])
-                    combo.setCurrentText(str(no_of_model))
-                    combo.setEditable(True)
-                    combo.lineEdit().setReadOnly(True)
-                    combo.lineEdit().setAlignment(QtCore.Qt.AlignCenter)
+                    shot_item = create_table_item(str(shot))
+                    self.uic.tableWidget_shotxmodel.setItem(row_index, 0, shot_item)
+                    combo = self._create_model_combobox(current_val=no_of_model, num_models=num_models)
                     self.uic.tableWidget_shotxmodel.setCellWidget(row_index, 1, combo)
+                self._format_shotxmodel_table_items()
         except Error as e:
             connect_db.connection.rollback()
             QMessageBox.critical(None, "Lỗi", f"MySQL Error: {e}")
@@ -1217,15 +1410,11 @@ class DataProcessSignal:
         num_shots = self.uic.spinBox_num_shot.value()
         self.uic.tableWidget_shotxmodel.setRowCount(num_shots)
         for row in range(num_shots):
-            shot_item = QTableWidgetItem(f'{str(row+1)}')
-            shot_item.setTextAlignment(QtCore.Qt.AlignCenter)
-            self.uic.tableWidget_shotxmodel.setItem(row,0,shot_item)
-            list_model = QComboBox()
-            list_model.addItems([str(i+1) for i in range(int(self.uic.comboBox_n_model.currentText()))])
-            list_model.setEditable(True)
-            list_model.lineEdit().setReadOnly(True)
-            list_model.lineEdit().setAlignment(QtCore.Qt.AlignCenter)
-            self.uic.tableWidget_shotxmodel.setCellWidget(row,1,list_model)
+            shot_item = create_table_item(str(row + 1))
+            self.uic.tableWidget_shotxmodel.setItem(row, 0, shot_item)
+            list_model = self._create_model_combobox()
+            self.uic.tableWidget_shotxmodel.setCellWidget(row, 1, list_model)
+        self._format_shotxmodel_table_items()
 
 
 

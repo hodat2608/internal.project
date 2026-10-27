@@ -33,6 +33,14 @@ _ADMIN_TABLES_SQL = [
         is_enabled      TINYINT(1) NOT NULL DEFAULT 1,
         registered_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS ADMINISTRATOR.SYSTEM_CONFIG (
+        config_key      VARCHAR(100) PRIMARY KEY,
+        config_value    TEXT,
+        description     VARCHAR(255) DEFAULT '',
+        updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     """
 ]
 
@@ -255,3 +263,58 @@ def is_usb_serial_authorized(cursor, hash_code: str) -> bool:
         return cursor.fetchone()[0] > 0
     except Exception:
         return False
+
+
+# ─────────────────────────────────────────────
+#  SYSTEM CONFIG CRUD (Auto-start & System Settings)
+# ─────────────────────────────────────────────
+def get_system_config(cursor, config_key: str, default: str = None) -> str:
+    """Lấy giá trị cấu hình từ bảng ADMINISTRATOR.SYSTEM_CONFIG"""
+    try:
+        cursor.execute(
+            "SELECT config_value FROM ADMINISTRATOR.SYSTEM_CONFIG WHERE config_key = %s",
+            (config_key,)
+        )
+        row = cursor.fetchone()
+        if row is not None:
+            return row[0]
+        return default
+    except Exception as e:
+        print(f"[get_system_config] Lỗi: {e}")
+        return default
+
+
+def set_system_config(cursor, connect_db, config_key: str, config_value: str, description: str = "") -> bool:
+    """Lưu giá trị cấu hình vào bảng ADMINISTRATOR.SYSTEM_CONFIG (Upsert)"""
+    try:
+        cursor.execute(
+            """
+            INSERT INTO ADMINISTRATOR.SYSTEM_CONFIG (config_key, config_value, description)
+            VALUES (%s, %s, %s)
+            ON DUPLICATE KEY UPDATE 
+                config_value = VALUES(config_value),
+                description = VALUES(description),
+                updated_at = CURRENT_TIMESTAMP
+            """,
+            (config_key, config_value, description)
+        )
+        connect_db.commit()
+        return True
+    except Exception as e:
+        connect_db.rollback()
+        print(f"[set_system_config] Lỗi: {e}")
+        return False
+
+
+def get_auto_start_setting(cursor) -> bool:
+    """Đọc cấu hình tự khởi động từ database (True nếu bật, False nếu tắt)"""
+    val = get_system_config(cursor, 'auto_start_on_boot', default='0')
+    return str(val).strip() in ('1', 'true', 'True')
+
+
+def set_auto_start_setting(cursor, connect_db, enabled: bool) -> bool:
+    """Lưu trạng thái tự khởi động vào database"""
+    val = '1' if enabled else '0'
+    desc = 'Automatic application launch on Windows system startup'
+    return set_system_config(cursor, connect_db, 'auto_start_on_boot', val, desc)
+
