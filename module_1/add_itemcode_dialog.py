@@ -66,7 +66,7 @@ class _DeepCopier:
         Trả về id của ITEMS_CODE mới vừa tạo.
         Raise Exception nếu lỗi (caller phải rollback).
         """
-        new_item_id = self._copy_item_code(dst_name, dst_register)
+        new_item_id = self._copy_item_code(src_item_id, dst_name, dst_register)
 
         # cameras
         self._cur.execute(
@@ -89,10 +89,22 @@ class _DeepCopier:
 
     # ── private steps ────────────────────────────────────────────────────────
 
-    def _copy_item_code(self, name: str, register: str | None) -> int:
+    def _copy_item_code(self, src_item_id: int, name: str, register: str | None) -> int:
+        v_on = 1
+        v_off = '0'
+        try:
+            self._cur.execute(
+                f"SELECT value_bit_on, value_bit_off FROM {self._t('ITEMS_CODE')} WHERE id = %s",
+                (src_item_id,)
+            )
+            if row := self._cur.fetchone():
+                v_on = row[0] if row[0] is not None else 1
+                v_off = str(row[1]) if row[1] is not None else '0'
+        except Exception:
+            pass
         self._cur.execute(
-            f"INSERT INTO {self._t('ITEMS_CODE')} (name_line_code, assign_register) VALUES (%s, %s)",
-            (name, register)
+            f"INSERT INTO {self._t('ITEMS_CODE')} (name_line_code, assign_register, value_bit_on, value_bit_off) VALUES (%s, %s, %s, %s)",
+            (name, register, v_on, v_off)
         )
         return self._cur.lastrowid
 
@@ -167,20 +179,36 @@ class _DeepCopier:
             )
 
     def _copy_modes(self, old_cam_id: int, new_cam_id: int):
-        self._cur.execute(
-            f"SELECT id, mode_name, assign_register FROM {self._t('MODE_AUTO')} WHERE camera_id = %s",
-            (old_cam_id,)
-        )
-        modes = self._cur.fetchall()
-        for old_mode_id, mode_name, assign_register in modes:
+        try:
             self._cur.execute(
-                f"INSERT INTO {self._t('MODE_AUTO')} (mode_name, assign_register, camera_id) VALUES (%s, %s, %s)",
-                (mode_name, assign_register, new_cam_id)
+                f"SELECT id, mode_name, assign_register, value_bit_on, value_bit_off FROM {self._t('MODE_AUTO')} WHERE camera_id = %s",
+                (old_cam_id,)
             )
-            new_mode_id = self._cur.lastrowid
-            self._copy_mode_signals(old_mode_id, new_mode_id)
-            self._copy_shotxmodel(old_mode_id, new_mode_id)
-            self._copy_user_set_camera(old_mode_id, new_mode_id)
+            modes = self._cur.fetchall()
+            for old_mode_id, mode_name, assign_register, v_on, v_off in modes:
+                self._cur.execute(
+                    f"INSERT INTO {self._t('MODE_AUTO')} (mode_name, assign_register, value_bit_on, value_bit_off, camera_id) VALUES (%s, %s, %s, %s, %s)",
+                    (mode_name, assign_register, v_on, v_off, new_cam_id)
+                )
+                new_mode_id = self._cur.lastrowid
+                self._copy_mode_signals(old_mode_id, new_mode_id)
+                self._copy_shotxmodel(old_mode_id, new_mode_id)
+                self._copy_user_set_camera(old_mode_id, new_mode_id)
+        except Exception:
+            self._cur.execute(
+                f"SELECT id, mode_name, assign_register FROM {self._t('MODE_AUTO')} WHERE camera_id = %s",
+                (old_cam_id,)
+            )
+            modes = self._cur.fetchall()
+            for old_mode_id, mode_name, assign_register in modes:
+                self._cur.execute(
+                    f"INSERT INTO {self._t('MODE_AUTO')} (mode_name, assign_register, camera_id) VALUES (%s, %s, %s)",
+                    (mode_name, assign_register, new_cam_id)
+                )
+                new_mode_id = self._cur.lastrowid
+                self._copy_mode_signals(old_mode_id, new_mode_id)
+                self._copy_shotxmodel(old_mode_id, new_mode_id)
+                self._copy_user_set_camera(old_mode_id, new_mode_id)
 
     def _copy_mode_signals(self, old_mode_id: int, new_mode_id: int):
         self._cur.execute(
@@ -199,15 +227,26 @@ class _DeepCopier:
             )
 
     def _copy_shotxmodel(self, old_mode_id: int, new_mode_id: int):
-        self._cur.execute(
-            f"SELECT shot, no_of_model FROM {self._t('SHOTXMODEL')} WHERE mode_id = %s",
-            (old_mode_id,)
-        )
-        for row in self._cur.fetchall():
+        try:
             self._cur.execute(
-                f"INSERT INTO {self._t('SHOTXMODEL')} (shot, no_of_model, mode_id) VALUES (%s, %s, %s)",
-                (*row, new_mode_id)
+                f"SELECT shot, no_of_model, Discription FROM {self._t('SHOTXMODEL')} WHERE mode_id = %s",
+                (old_mode_id,)
             )
+            for row in self._cur.fetchall():
+                self._cur.execute(
+                    f"INSERT INTO {self._t('SHOTXMODEL')} (shot, no_of_model, Discription, mode_id) VALUES (%s, %s, %s, %s)",
+                    (row[0], row[1], row[2] or "", new_mode_id)
+                )
+        except Exception:
+            self._cur.execute(
+                f"SELECT shot, no_of_model FROM {self._t('SHOTXMODEL')} WHERE mode_id = %s",
+                (old_mode_id,)
+            )
+            for row in self._cur.fetchall():
+                self._cur.execute(
+                    f"INSERT INTO {self._t('SHOTXMODEL')} (shot, no_of_model, mode_id) VALUES (%s, %s, %s)",
+                    (*row, new_mode_id)
+                )
 
     def _copy_user_set_camera(self, old_mode_id: int, new_mode_id: int):
         self._cur.execute(

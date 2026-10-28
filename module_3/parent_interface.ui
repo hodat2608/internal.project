@@ -17,10 +17,14 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Display Image</string>
+   <string>Standard Display</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>assert/icon/technology.png</normaloff>assert/icon/technology.png</iconset>
   </property>
   <property name="styleSheet">
-   <string notr="true">QMainWindow { background-color: #f0f0f0; }</string>
+   <string notr="true">QMainWindow { background-color: #F1F5F9; }</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_centralwidget">
@@ -59,7 +63,12 @@
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">QFrame { background-color:#6C6C6C; border:1px solid #d0d0d0; border-radius:6px; }</string>
+         <string notr="true">QFrame { 
+    background-color: #F0F9FF; 
+    border: none; 
+    border-radius: 6px; 
+}
+</string>
         </property>
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
@@ -92,9 +101,9 @@
            </property>
            <property name="styleSheet">
             <string notr="true">QLabel {
-    color: #000000; /* Chữ màu đen xám hiện đại, tương phản cao trên nền trắng */
+    color: #ffffff; /* Chữ màu đen xám hiện đại, tương phản cao trên nền trắng */
     
-    background-color: #C1C1C0; /* Nền màu trắng */
+    background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #0B1E36, stop:1 #0F3B63); /* Nền màu trắng */
     border: 1px solid #e0e0e0; /* Viền xám rất nhạt để định hình khối */
     border-radius: 15px; /* Bo tròn góc mạnh hơn, tạo cảm giác mềm mại */
     
@@ -129,7 +138,12 @@
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">QFrame { background-color:#6C6C6C; border:1px solid #d0d0d0; border-radius:6px; }</string>
+         <string notr="true">QFrame { 
+    background-color: #F0F9FF; 
+    border: none; 
+    border-radius: 6px; 
+}
+</string>
         </property>
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
@@ -162,9 +176,9 @@
            </property>
            <property name="styleSheet">
             <string notr="true">QLabel {
-    color: #000000; /* Chữ màu đen xám hiện đại, tương phản cao trên nền trắng */
+    color: #ffffff; /* Chữ màu đen xám hiện đại, tương phản cao trên nền trắng */
     
-    background-color: #C1C1C0; /* Nền màu trắng */
+    background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #0B1E36, stop:1 #0F3B63); /* Nền màu trắng */
     border: 1px solid #e0e0e0; /* Viền xám rất nhạt để định hình khối */
     border-radius: 15px; /* Bo tròn góc mạnh hơn, tạo cảm giác mềm mại */
     

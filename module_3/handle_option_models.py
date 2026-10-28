@@ -746,11 +746,11 @@ class Process_Model:
             }
             /* Hiệu ứng khi di chuột qua */
             QTableView::item:hover {
-                background-color: #F5FFE1;
+                background-color: #88FF7A;
             }
             /* Hiệu ứng khi chọn dòng */
             QTableView::item:selected {
-                background-color: #E9F8FF;
+                background-color: #1DB20D;
                 color: black;
             }
         """)

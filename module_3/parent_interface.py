@@ -9,7 +9,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+from module_1.root_path import resource_path
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -19,7 +19,10 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(9)
         MainWindow.setFont(font)
-        MainWindow.setStyleSheet("QMainWindow { background-color: #f0f0f0; }")
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/technology.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        MainWindow.setWindowIcon(icon)
+        MainWindow.setStyleSheet("QMainWindow { background-color: #F1F5F9; }")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout_centralwidget = QtWidgets.QVBoxLayout(self.centralwidget)
@@ -32,7 +35,12 @@ class Ui_MainWindow(object):
         self.frame = QtWidgets.QFrame(self.centralwidget)
         self.frame.setMinimumSize(QtCore.QSize(0, 0))
         self.frame.setMaximumSize(QtCore.QSize(16777215, 80))
-        self.frame.setStyleSheet("QFrame { background-color:#6C6C6C; border:1px solid #d0d0d0; border-radius:6px; }")
+        self.frame.setStyleSheet("QFrame { \n"
+"    background-color: #F0F9FF; \n"
+"    border: none; \n"
+"    border-radius: 6px; \n"
+"}\n"
+"")
         self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame.setObjectName("frame")
@@ -47,9 +55,9 @@ class Ui_MainWindow(object):
         font.setWeight(75)
         self.label.setFont(font)
         self.label.setStyleSheet("QLabel {\n"
-"    color: #000000; /* Chữ màu đen xám hiện đại, tương phản cao trên nền trắng */\n"
+"    color: #ffffff; /* Chữ màu đen xám hiện đại, tương phản cao trên nền trắng */\n"
 "    \n"
-"    background-color: #C1C1C0; /* Nền màu trắng */\n"
+"    background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #0B1E36, stop:1 #0F3B63); /* Nền màu trắng */\n"
 "    border: 1px solid #e0e0e0; /* Viền xám rất nhạt để định hình khối */\n"
 "    border-radius: 15px; /* Bo tròn góc mạnh hơn, tạo cảm giác mềm mại */\n"
 "    \n"
@@ -64,7 +72,12 @@ class Ui_MainWindow(object):
         self.frame_3 = QtWidgets.QFrame(self.centralwidget)
         self.frame_3.setMinimumSize(QtCore.QSize(0, 0))
         self.frame_3.setMaximumSize(QtCore.QSize(16777215, 80))
-        self.frame_3.setStyleSheet("QFrame { background-color:#6C6C6C; border:1px solid #d0d0d0; border-radius:6px; }")
+        self.frame_3.setStyleSheet("QFrame { \n"
+"    background-color: #F0F9FF; \n"
+"    border: none; \n"
+"    border-radius: 6px; \n"
+"}\n"
+"")
         self.frame_3.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_3.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_3.setObjectName("frame_3")
@@ -79,9 +92,9 @@ class Ui_MainWindow(object):
         font.setWeight(75)
         self.label_3.setFont(font)
         self.label_3.setStyleSheet("QLabel {\n"
-"    color: #000000; /* Chữ màu đen xám hiện đại, tương phản cao trên nền trắng */\n"
+"    color: #ffffff; /* Chữ màu đen xám hiện đại, tương phản cao trên nền trắng */\n"
 "    \n"
-"    background-color: #C1C1C0; /* Nền màu trắng */\n"
+"    background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #0B1E36, stop:1 #0F3B63); /* Nền màu trắng */\n"
 "    border: 1px solid #e0e0e0; /* Viền xám rất nhạt để định hình khối */\n"
 "    border-radius: 15px; /* Bo tròn góc mạnh hơn, tạo cảm giác mềm mại */\n"
 "    \n"
@@ -186,7 +199,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Display Image"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Standard Display"))
         self.label.setText(_translate("MainWindow", "#N/A"))
         self.label_3.setText(_translate("MainWindow", "#N/A"))
         self.comboBox_display_mode.setItemText(0, _translate("MainWindow", "Show Bounding Boxes"))

@@ -31,6 +31,34 @@ def create_table_item(text=""):
     return item
 
 
+def _ensure_value_bit_off_columns(cursor, connect_db=None):
+    """Đảm bảo cột value_bit_off trong ITEMS_CODE và MODE_AUTO là VARCHAR(255) để lưu 'No Value'."""
+    try:
+        cursor.execute("ALTER TABLE ITEMS_CODE MODIFY COLUMN value_bit_off VARCHAR(255) NOT NULL DEFAULT '0'")
+        if connect_db and hasattr(connect_db, 'connection') and connect_db.connection:
+            connect_db.connection.commit()
+    except Exception:
+        pass
+    try:
+        cursor.execute("ALTER TABLE MODE_AUTO MODIFY COLUMN value_bit_off VARCHAR(255) NOT NULL DEFAULT '0'")
+        if connect_db and hasattr(connect_db, 'connection') and connect_db.connection:
+            connect_db.connection.commit()
+    except Exception:
+        pass
+
+
+def _ensure_shotxmodel_column(cursor, connect_db=None):
+    """Đảm bảo bảng SHOTXMODEL có cột Discription VARCHAR(255)."""
+    try:
+        cursor.execute("SHOW COLUMNS FROM SHOTXMODEL LIKE 'Discription'")
+        if not cursor.fetchone():
+            cursor.execute("ALTER TABLE SHOTXMODEL ADD COLUMN Discription VARCHAR(255) DEFAULT '' AFTER no_of_model")
+            if connect_db and hasattr(connect_db, 'connection') and connect_db.connection:
+                connect_db.connection.commit()
+    except Exception:
+        pass
+
+
 class SignalTableDelegate(QtWidgets.QStyledItemDelegate):
     """Delegate tùy chỉnh cho bảng tableWidget tín hiệu PLC:
     - Khi sửa trực tiếp (createEditor): ô nhập tự động cỡ 11, Segoe UI, in đậm, căn giữa.
@@ -302,6 +330,9 @@ class DataProcessSignal:
                 h_item.setForeground(QtGui.QBrush(QtGui.QColor("#1F4E78")))
 
         table.horizontalHeader().setDefaultSectionSize(140)
+        if table.columnCount() >= 2:
+            table.setColumnWidth(0, 130)
+            table.setColumnWidth(1, 160)
         table.horizontalHeader().setStretchLastSection(True)
         table.verticalHeader().setDefaultSectionSize(38)
 
@@ -377,6 +408,11 @@ class DataProcessSignal:
                 if widget.lineEdit():
                     widget.lineEdit().setFont(font_cell)
                     widget.lineEdit().setAlignment(QtCore.Qt.AlignCenter)
+
+            desc_item = table.item(row, 2)
+            if desc_item:
+                desc_item.setFont(font_cell)
+                desc_item.setTextAlignment(QtCore.Qt.AlignCenter)
 
     def _setup_config_status_log_ui(self):
         """Khởi tạo textBrowser_status_log động bên trong self.uic.groupBox_5
@@ -539,6 +575,7 @@ class DataProcessSignal:
         if not assign_register or assign_register == '':
             QMessageBox.warning(None, "Cảnh báo", f"Vui lòng nhập thanh ghi cho Mã hàng {Itemcode}")
             return
+        _ensure_value_bit_off_columns(cursor, connect_db)
         try:
             cursor.execute("""
                     SELECT id FROM ITEMS_CODE 
@@ -601,6 +638,7 @@ class DataProcessSignal:
                 QMessageBox.warning(None, "Cảnh báo", f"Vui lòng nhập thanh ghi cho chế độ {mode_name}")
                 return
 
+            _ensure_value_bit_off_columns(cursor, connect_db)
             cursor.execute("""
                         SELECT id FROM NUMS_CAMERA 
                         WHERE item_code_id = %s AND nums_camera = %s
@@ -945,6 +983,7 @@ class DataProcessSignal:
         mode_auto_id = self.produce_mode_auto_id(cursor,connect_db,item_code_id)
         if mode_auto_id:
             try: 
+                _ensure_shotxmodel_column(cursor, connect_db)
                 cursor.execute("""
                     DELETE FROM SHOTXMODEL WHERE mode_id = %s
                 """, (mode_auto_id,))
@@ -968,13 +1007,14 @@ class DataProcessSignal:
                 _log.debug('list_insert: %s', list_insert)
                 if list_insert:
                     insert_query = """
-                        INSERT INTO SHOTXMODEL (shot, no_of_model, mode_id)
-                        VALUES (%s, %s, %s)
+                        INSERT INTO SHOTXMODEL (shot, no_of_model, Discription, mode_id)
+                        VALUES (%s, %s, %s, %s)
                     """
                     for row in list_insert:
                         shot = int(row.get(0, 0)) 
                         no_of_model = int(row.get(1, 0))  
-                        cursor.execute(insert_query, (shot, no_of_model,mode_auto_id))
+                        discription = str(row.get(2, "") or "")
+                        cursor.execute(insert_query, (shot, no_of_model, discription, mode_auto_id))
                     connect_db.connection.commit()
                     if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
                         self.uic.config_logger.set_status('shot_model', 'success', f"Đã lưu thành công bảng Shot x Model ({len(list_insert)} dòng)")
@@ -999,8 +1039,9 @@ class DataProcessSignal:
 
     def load_shotxmodel_from_db(self,cursor,connect_db,mode_auto_id,num_models):
         try: 
+            _ensure_shotxmodel_column(cursor, connect_db)
             query = """
-                SELECT shot,no_of_model
+                SELECT shot, no_of_model, Discription
                 FROM SHOTXMODEL
                 WHERE mode_id = %s
                 ORDER BY shot ASC
@@ -1009,11 +1050,16 @@ class DataProcessSignal:
             if results:=cursor.fetchall():
                 self.uic.tableWidget_shotxmodel.setRowCount(len(results))
                 self.uic.spinBox_num_shot.setValue(len(results))
-                for row_index, (shot, no_of_model) in enumerate(results):
+                for row_index, row_vals in enumerate(results):
+                    shot = row_vals[0]
+                    no_of_model = row_vals[1]
+                    discription = row_vals[2] if len(row_vals) > 2 and row_vals[2] is not None else ""
                     shot_item = create_table_item(str(shot))
                     self.uic.tableWidget_shotxmodel.setItem(row_index, 0, shot_item)
                     combo = self._create_model_combobox(current_val=no_of_model, num_models=num_models)
                     self.uic.tableWidget_shotxmodel.setCellWidget(row_index, 1, combo)
+                    desc_item = create_table_item(str(discription))
+                    self.uic.tableWidget_shotxmodel.setItem(row_index, 2, desc_item)
                 self._format_shotxmodel_table_items()
         except Error as e:
             connect_db.connection.rollback()
@@ -1414,6 +1460,8 @@ class DataProcessSignal:
             self.uic.tableWidget_shotxmodel.setItem(row, 0, shot_item)
             list_model = self._create_model_combobox()
             self.uic.tableWidget_shotxmodel.setCellWidget(row, 1, list_model)
+            desc_item = create_table_item("")
+            self.uic.tableWidget_shotxmodel.setItem(row, 2, desc_item)
         self._format_shotxmodel_table_items()
 
 

@@ -217,13 +217,13 @@ QTableView::item:selected {
                     <number>0</number>
                    </property>
                    <property name="columnCount">
-                    <number>2</number>
+                    <number>3</number>
                    </property>
                    <attribute name="horizontalHeaderCascadingSectionResizes">
                     <bool>true</bool>
                    </attribute>
                    <attribute name="horizontalHeaderDefaultSectionSize">
-                    <number>400</number>
+                    <number>280</number>
                    </attribute>
                    <attribute name="horizontalHeaderHighlightSections">
                     <bool>true</bool>
@@ -263,6 +263,17 @@ QTableView::item:selected {
                    <column>
                     <property name="text">
                      <string>Model Link to Shot</string>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Segoe UI</family>
+                      <pointsize>11</pointsize>
+                     </font>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Discription</string>
                     </property>
                     <property name="font">
                      <font>
@@ -431,8 +442,8 @@ QPushButton:pressed {
                    </property>
                    <property name="iconSize">
                     <size>
-                     <width>25</width>
-                     <height>25</height>
+                     <width>22</width>
+                     <height>22</height>
                     </size>
                    </property>
                   </widget>
@@ -832,8 +843,8 @@ QPushButton:pressed {
                    </property>
                    <property name="iconSize">
                     <size>
-                     <width>25</width>
-                     <height>25</height>
+                     <width>22</width>
+                     <height>22</height>
                     </size>
                    </property>
                   </widget>
@@ -1517,8 +1528,8 @@ QPushButton:pressed {
                    </property>
                    <property name="iconSize">
                     <size>
-                     <width>25</width>
-                     <height>25</height>
+                     <width>22</width>
+                     <height>22</height>
                     </size>
                    </property>
                   </widget>
@@ -3306,8 +3317,8 @@ QPushButton:pressed {
                    </property>
                    <property name="iconSize">
                     <size>
-                     <width>25</width>
-                     <height>25</height>
+                     <width>22</width>
+                     <height>22</height>
                     </size>
                    </property>
                   </widget>
@@ -5465,8 +5476,8 @@ QPushButton:pressed {
                    </property>
                    <property name="iconSize">
                     <size>
-                     <width>25</width>
-                     <height>25</height>
+                     <width>22</width>
+                     <height>22</height>
                     </size>
                    </property>
                   </widget>
@@ -5959,7 +5970,7 @@ QGroupBox::title {
                  </item>
                  <item>
                   <property name="text">
-                   <string/>
+                   <string>No Value</string>
                   </property>
                  </item>
                 </widget>
@@ -6112,8 +6123,8 @@ QPushButton:pressed {
                  </property>
                  <property name="iconSize">
                   <size>
-                   <width>25</width>
-                   <height>25</height>
+                   <width>22</width>
+                   <height>22</height>
                   </size>
                  </property>
                 </widget>
@@ -6366,6 +6377,11 @@ QGroupBox::title {
                    <string>9</string>
                   </property>
                  </item>
+                 <item>
+                  <property name="text">
+                   <string>No Value</string>
+                  </property>
+                 </item>
                 </widget>
                </item>
                <item row="4" column="2">
@@ -6494,7 +6510,7 @@ QGroupBox::title {
                  </property>
                  <item>
                   <property name="text">
-                   <string>N/A</string>
+                   <string>#N/A</string>
                   </property>
                  </item>
                 </widget>
@@ -6697,8 +6713,8 @@ QPushButton:pressed {
                  </property>
                  <property name="iconSize">
                   <size>
-                   <width>25</width>
-                   <height>25</height>
+                   <width>22</width>
+                   <height>22</height>
                   </size>
                  </property>
                 </widget>

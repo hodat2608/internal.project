@@ -406,7 +406,11 @@ class core:
                     current_value = self.driver_loader.read_plc(register)
                     if current_value is not None and int(current_value) == value_bit_on:
                         _log.info("PLC Trigger detected: %s = %d (Item: %s)", register, value_bit_on, item_code)
-                        self.driver_loader.write_plc(register, value_bit_off)
+                        if value_bit_off is not None and str(value_bit_off).strip() != "" and str(value_bit_off).strip().lower() not in ('none', 'no value'):
+                            try:
+                                self.driver_loader.write_plc(register, int(value_bit_off))
+                            except (ValueError, TypeError):
+                                pass
 
                         date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                         self.item_code = item_code

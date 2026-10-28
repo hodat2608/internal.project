@@ -43,7 +43,7 @@ from PyQt5.QtWidgets import (
     QTableWidgetItem, QComboBox
 )
 from PyQt5.QtWidgets import QMessageBox
-import glob
+import glob, random
 from PyQt5 import QtCore, QtGui, QtWidgets, QtMultimedia
 from PyQt5.QtCore import QTimer
 from module_3.layout_option_model import Ui_MainWindow  as uicmain
@@ -376,7 +376,7 @@ class PLCHandler:
         if value is None:
             return None
         val_str = str(value).strip()
-        if val_str == "" or val_str.lower() == "none":
+        if val_str == "" or val_str.lower() in ("none", "no value"):
             return None
 
         if self.is_indirect_log_mode():
@@ -420,7 +420,7 @@ class PLCHandler:
         if value is None:
             return False
         val_str = str(value).strip()
-        if val_str == "" or val_str.lower() == "none":
+        if val_str == "" or val_str.lower() in ("none", "no value"):
             return False
 
         # 1. Nếu driver_loader có hàm write_plc_log thì ưu tiên gọi
@@ -599,8 +599,11 @@ class PLCHandler:
                         self._reset_counter(key)
                         # _log.info("[PLCHandler] Reset counter %s", key)
                         off_val = signals.get(signals_selected, {}).get('off')
-                        if off_val is not None and str(off_val).strip() != "" and str(off_val).strip().lower() != 'none':
-                            self._safe_write_plc(reg, int(off_val))
+                        if off_val is not None and str(off_val).strip() != "" and str(off_val).strip().lower() not in ('none', 'no value'):
+                            try:
+                                self._safe_write_plc(reg, int(off_val))
+                            except (ValueError, TypeError):
+                                pass
 
     # -----------------------------------------------------------------------
     # Load mã hàng
@@ -796,8 +799,11 @@ class PLCHandler:
                         self._set_mode_reg_process()
                         self.load_user_set_selector_from_mode()
                         self.load_params_from_activated_mode(mode_key)
-                        if value_bit_off is not None and str(value_bit_off).strip() != "" and str(value_bit_off).strip().lower() != 'none':
-                            self._safe_write_plc(str(register), int(value_bit_off))
+                        if value_bit_off is not None and str(value_bit_off).strip() != "" and str(value_bit_off).strip().lower() not in ('none', 'no value'):
+                            try:
+                                self._safe_write_plc(str(register), int(value_bit_off))
+                            except (TypeError, ValueError):
+                                pass
                     except (TypeError, ValueError) as e:
                         _log.debug("[PLCHandler] _activate_mode value error for register %s: %s", register, e)
                         continue
@@ -964,8 +970,11 @@ class PLCHandler:
 
                 if int(current_value) == item['on']:
                     off_val = item.get('off')
-                    if off_val is not None and str(off_val).strip() != "" and str(off_val).strip().lower() != 'none':
-                        self._safe_write_plc(str(item['reg']), int(off_val))
+                    if off_val is not None and str(off_val).strip() != "" and str(off_val).strip().lower() not in ('none', 'no value'):
+                        try:
+                            self._safe_write_plc(str(item['reg']), int(off_val))
+                        except (ValueError, TypeError):
+                            pass
                     
                     mapping = self.built_in_mapping_mode.get(key, {}).get('mapping', {})
                     automatic_mode = mapping.get('automatic', {}).get('mapping_mode')
@@ -1871,9 +1880,14 @@ class PLCHandler:
                     try:
                         addr, _, _, _, write_reg, val_on, val_off = self.processor.return_reg(camera_name, name_signal=sig, mode_name=current_mode)
                         if addr is not None and write_reg is not None and val_off is not None:
-                            reg_addr = f"{addr}{write_reg}"
-                            _log.info("Cleanup PLC: writing OFF to %s signal %s on reg %s value %s", camera_name, sig, reg_addr, val_off)
-                            self._safe_write_plc(reg_addr, int(val_off))
+                            val_off_str = str(val_off).strip()
+                            if val_off_str != "" and val_off_str.lower() not in ('none', 'no value'):
+                                reg_addr = f"{addr}{write_reg}"
+                                _log.info("Cleanup PLC: writing OFF to %s signal %s on reg %s value %s", camera_name, sig, reg_addr, val_off)
+                                try:
+                                    self._safe_write_plc(reg_addr, int(val_off))
+                                except (ValueError, TypeError):
+                                    pass
                     except Exception:
                         _log.exception("Cleanup PLC: Error resetting signal %s for camera %s", sig, camera_name)
 
@@ -1943,11 +1957,43 @@ class DatabaseManager:
         self.connect_db = connect_db
         self.cursor = self.connect_db.connection.cursor()
 
+    def ensure_schema_compatibility(self):
+        """Tự động nâng cấp cấu trúc bảng nếu database cũ chưa có:
+        - ITEMS_CODE.value_bit_off -> VARCHAR(255)
+        - MODE_AUTO.value_bit_off -> VARCHAR(255)
+        - SHOTXMODEL.Discription -> VARCHAR(255)
+        """
+        try:
+            self.cursor.execute(f"ALTER TABLE `{self.db}`.ITEMS_CODE MODIFY COLUMN value_bit_off VARCHAR(255) NOT NULL DEFAULT '0'")
+            self.connect_db.connection.commit()
+        except Exception as e:
+            _log.debug("ITEMS_CODE modify value_bit_off check: %s", e)
+
+        try:
+            self.cursor.execute(f"ALTER TABLE `{self.db}`.MODE_AUTO MODIFY COLUMN value_bit_off VARCHAR(255) NOT NULL DEFAULT '0'")
+            self.connect_db.connection.commit()
+        except Exception as e:
+            _log.debug("MODE_AUTO modify value_bit_off check: %s", e)
+
+        try:
+            self.cursor.execute(f"""
+                SELECT COUNT(*) FROM information_schema.COLUMNS 
+                WHERE TABLE_SCHEMA = %s AND TABLE_NAME = 'SHOTXMODEL' AND COLUMN_NAME = 'Discription'
+            """, (self.db,))
+            row = self.cursor.fetchone()
+            if not row or row[0] == 0:
+                self.cursor.execute(f"ALTER TABLE `{self.db}`.SHOTXMODEL ADD COLUMN Discription VARCHAR(255) DEFAULT '' AFTER no_of_model")
+                self.connect_db.connection.commit()
+                _log.info("Added column Discription to `%s`.SHOTXMODEL", self.db)
+        except Exception as e:
+            _log.debug("SHOTXMODEL add Discription check: %s", e)
+
     def select_database(self):
         """Chọn database làm việc cho phiên kiểm tra"""
         try:
             self.cursor.execute(f"USE `{self.db}`")
             _log.info(f'Select database: {self.db}')
+            self.ensure_schema_compatibility()
         except Exception as e:
             _log.error(f'Failed to select database {self.db}: {e}')
         
@@ -1997,6 +2043,55 @@ class CameraTabManager:
         self.set_list_model = []
         self.total_key = []
         self.device = None
+        self.camera_colors = {}
+
+    def get_camera_frame_style(self, camera_id):
+        """Trả về stylesheet màu nền sáng, nhạt, dịu mắt đồng bộ cho các frame cùng camera."""
+        if not hasattr(self, 'camera_colors'):
+            self.camera_colors = {}
+
+        cam_key = str(camera_id).strip()
+        if cam_key not in self.camera_colors:
+            # Danh sách các tone màu sáng rõ nét, viền nổi bật tương phản cao cho từng camera
+            palette = [
+                {"bg": "#D9EDF7", "border": "#1976D2"},  # Xanh dương (Ocean Blue)
+                {"bg": "#D4EFDF", "border": "#27AE60"},  # Xanh lục (Emerald Green)
+                {"bg": "#E8DAEF", "border": "#8E44AD"},  # Tím đậm nét (Royal Violet)
+                {"bg": "#FCF3CF", "border": "#E67E22"},  # Cam vàng (Vibrant Amber)
+                {"bg": "#FADBD8", "border": "#E91E63"},  # Hồng sen nổi bật (Rose Pink)
+                {"bg": "#D1F2EB", "border": "#0097A7"},  # Xanh mòng két (Bright Teal)
+                {"bg": "#D5D8DC", "border": "#3F51B5"},  # Xanh chàm (Indigo Blue)
+                {"bg": "#E8F8F5", "border": "#689F38"},  # Xanh lá mạ (Fresh Lime)
+                {"bg": "#FBEEE6", "border": "#D35400"},  # Cam san hô (Warm Coral)
+                {"bg": "#F9EBEA", "border": "#C0392B"},  # Đỏ ruby dịu (Crimson Red)
+                {"bg": "#A2D9CE", "border": "#16A085"},  # Xanh ngọc biển (Deep Sea Teal)
+                {"bg": "#E5E7E9", "border": "#455A64"},  # Xám thép (Steel Slate)
+            ]
+            used_bgs = {v.get("bg") for v in self.camera_colors.values() if isinstance(v, dict)}
+            available = [c for c in palette if c["bg"] not in used_bgs]
+            if not available:
+                available = palette
+
+            chosen = random.choice(available)
+            self.camera_colors[cam_key] = chosen
+
+        entry = self.camera_colors[cam_key]
+        bg = entry["bg"]
+        border = entry["border"]
+        return f"QFrame#frame {{ background-color: {bg}; border: 2px solid {border}; border-radius: 6px; }}"
+
+    def get_camera_label_style(self, camera_id):
+        """Trả về stylesheet cho label_4 nổi bật đồng bộ với màu của camera."""
+        if not hasattr(self, 'camera_colors'):
+            self.camera_colors = {}
+
+        cam_key = str(camera_id).strip()
+        if cam_key not in self.camera_colors:
+            self.get_camera_frame_style(camera_id)
+
+        entry = self.camera_colors.get(cam_key, {})
+        border = entry.get("border", "#1976D2")
+        return f"QLabel {{ background-color: {border}; color: #ffffff; border: 1px solid {border}; border-radius: 4px; padding: 4px; font-weight: bold; }}"
 
     def create_camera_tab(self):
 
@@ -2022,8 +2117,10 @@ class CameraTabManager:
             ui_child = Ui_MainWindow_child()
             ui_child.setupUi(child_window)
             ui_child.label_4.setText(f"CAMERA [{camera_id}]")
+            ui_child.label_4.setStyleSheet(self.get_camera_label_style(camera_id))
         
             child_frame = ui_child.frame
+            child_frame.setStyleSheet(self.get_camera_frame_style(camera_id))
             child_frame.setParent(ui_mother.scrollAreaWidgetContents_display)
             
             child_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
@@ -2122,6 +2219,7 @@ class CameraTabManager:
         self.ui_child.setupUi(child_window)
 
         self.ui_child.label_4.setText(f"CAMERA [{camera_id}] 🔗 MODEL [{model_id}]")
+        self.ui_child.label_4.setStyleSheet(self.get_camera_label_style(camera_id))
         self.dict_child[(f'camera-{camera_id}', f'model-{model_id}')] = {
             'ldi': self.ui_child.label_display_image,
             'ldr': self.ui_child.label_display_okng,
@@ -2129,6 +2227,7 @@ class CameraTabManager:
         }
     
         self.child_frame = self.ui_child.frame
+        self.child_frame.setStyleSheet(self.get_camera_frame_style(camera_id))
         self.child_frame.setParent(ui_mother.scrollAreaWidgetContents_display)
         
         # Thiết lập policy thành Expanding ở cả hai chiều để layout tự quản lý độ co giãn
@@ -2326,10 +2425,10 @@ class CameraTabManager:
         self.automation_ui.pushButton_applyshotxmodel.clicked.connect(lambda _: _signals_processor.save_shotxmodel_to_db(self.db_manager.cursor, self.db_manager.connect_db, item_code_id))
         self.automation_ui.pushButton_applysignalplc.clicked.connect(lambda _: _signals_processor.save_values_signal_to_db_from_gui(self.db_manager.cursor, self.db_manager.connect_db, item_code_id))
         self.automation_ui.pushButton_set_save_mode.clicked.connect(lambda _: _signals_processor.save_mode_auto(self.db_manager.cursor, self.db_manager.connect_db, item_code_id))
-        def _on_load_mode(_):
+        def _on_load_mode(_=None, show_message=False):
             mode_name = _automation_ui.comboBox_mode_auto.currentText()
             mode_auto_id = _signals_processor.load_params_signals_from_gui_mapping_db(
-                self.db_manager.cursor, camera_id, mode_name=mode_name, show_message=True
+                self.db_manager.cursor, camera_id, mode_name=mode_name, show_message=show_message
             )
             if mode_auto_id:
                 _signals_processor.load_shotxmodel_from_db(
@@ -2348,7 +2447,8 @@ class CameraTabManager:
                     _automation_ui.comboBox_mode_auto.currentText(),
                     _automation_ui.comboBox_Itemcode.currentText()
                 )
-        self.automation_ui.pushButton_load_params_from_mode.clicked.connect(_on_load_mode)
+        _on_load_mode(show_message=False)
+        self.automation_ui.pushButton_load_params_from_mode.clicked.connect(lambda _: _on_load_mode(show_message=True))
         self.automation_ui.pushButton_apply_itemcode_assign.clicked.connect(lambda _: _signals_processor.save_register_name_line_code(self.db_manager.cursor, self.db_manager.connect_db))
         mode_dict = self.get_mode(_signals_processor,camera_id)
 

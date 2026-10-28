@@ -3,8 +3,8 @@ TABLES = [
         id INT AUTO_INCREMENT PRIMARY KEY,
         name_line_code VARCHAR(255) NOT NULL UNIQUE,
         assign_register VARCHAR(255),
-        value_bit_on INT NOT NULL,
-        value_bit_off INT NOT NULL
+        value_bit_on INT NOT NULL DEFAULT 1,
+        value_bit_off VARCHAR(255) NOT NULL DEFAULT '0'
     )""",
     """CREATE TABLE IF NOT EXISTS NUMS_CAMERA (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -70,8 +70,8 @@ TABLES = [
         id INT AUTO_INCREMENT PRIMARY KEY,
         mode_name VARCHAR(255) NOT NULL,
         assign_register VARCHAR(255),
-        value_bit_on INT NOT NULL,
-        value_bit_off INT NOT NULL,
+        value_bit_on INT NOT NULL DEFAULT 1,
+        value_bit_off VARCHAR(255) NOT NULL DEFAULT '0',
         camera_id INT NOT NULL,
         UNIQUE (mode_name, camera_id),
         FOREIGN KEY (camera_id) REFERENCES NUMS_CAMERA(id) ON DELETE CASCADE
@@ -100,6 +100,7 @@ TABLES = [
         id INT AUTO_INCREMENT PRIMARY KEY,
         shot INT NOT NULL,
         no_of_model INT NOT NULL,
+        Discription VARCHAR(255) DEFAULT '',
         mode_id INT NOT NULL,
         FOREIGN KEY (mode_id) REFERENCES MODE_AUTO(id) ON DELETE CASCADE
     )""",

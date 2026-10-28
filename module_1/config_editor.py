@@ -294,7 +294,10 @@ class ItemCodeConfigEditor(QMainWindow):
             self._name_edit.setText(row[1] or '')
             self._register_edit.setText(row[2] or '')
             self._value_bit_on_spin.setValue(int(row[3]) if row[3] is not None else 1)
-            self._value_bit_off_spin.setValue(int(row[4]) if row[4] is not None else 0)
+            try:
+                self._value_bit_off_spin.setValue(int(row[4]) if row[4] is not None else 0)
+            except (ValueError, TypeError):
+                self._value_bit_off_spin.setValue(0)
 
             # NUMS_CAMERA
             cur.execute(
