@@ -126,8 +126,14 @@ class ImageConsumerWorker:
             try:
                 with h._signal_rwlock.read():
                     comp_sig = dict(h.dict_signal_complete[task.key]['complete'])
-                for reg in all_registers:
-                    h.layer_core.driver_loader.write_plc(str(reg), 1)
+                if isinstance(all_registers, dict):
+                    for reg, val in all_registers.items():
+                        if reg and str(reg).strip():
+                            h.layer_core.driver_loader.write_plc(str(reg).strip(), val)
+                else:
+                    for reg in all_registers:
+                        if reg and str(reg).strip():
+                            h.layer_core.driver_loader.write_plc(str(reg).strip(), 1)
                 h.layer_core.driver_loader.write_plc(
                     str(comp_sig['reg']), int(comp_sig['on'])
                 )

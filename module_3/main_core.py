@@ -183,7 +183,6 @@ class PLCWorkerModeAuto1(QThread):
             try:
                 triggered = self.plc_handler._run_trigger_from_activated_mode()
                 self.plc_handler._activate_mode()
-                self.plc_handler.load_item_code()
                 self.plc_handler.reset_counter_from_plc()
             except Exception:
                 # Worker loop KHÔNG được chết — log rồi tiếp tục
@@ -271,7 +270,7 @@ class PLCHandler:
         self.font.setPointSize(12)
         self.font.setBold(True)
 
-        self._register_store: defaultdict[str, list]                = defaultdict(list)
+        self._register_store: defaultdict[str, dict]                 = defaultdict(dict)
         self._register_store_locks: defaultdict[str, threading.Lock] = defaultdict(threading.Lock)
         self._register_store_meta_lock = threading.Lock()
 
@@ -530,18 +529,22 @@ class PLCHandler:
         with self._register_store_meta_lock:
             return self._register_store_locks[key]
 
-    def _accumulate_registers(self, key: str, registers: list):
+    def _accumulate_registers(self, key: str, registers: dict | list):
         if not registers:
-            _log.error("[PLCHandler] _accumulate_registers failed for key: %s", key)
             return
         with self._get_register_lock(key):
-            self._register_store[key].extend(registers)
+            if isinstance(registers, dict):
+                self._register_store[key].update(registers)
+            elif isinstance(registers, (list, tuple, set)):
+                for r in registers:
+                    if r and str(r).strip():
+                        self._register_store[key][str(r).strip()] = 1
         _log.debug('[%s] Accumulated %s registers (total: %s)',
                    key, len(registers), len(self._register_store[key]))
 
-    def _pop_registers(self, key: str) -> list:
+    def _pop_registers(self, key: str) -> dict:
         with self._get_register_lock(key):
-            registers = list(self._register_store[key])
+            registers = dict(self._register_store[key])
             self._register_store[key].clear()
         return registers
 
@@ -597,46 +600,13 @@ class PLCHandler:
                     
                     if self._safe_read_plc(reg) != 0 :
                         self._reset_counter(key)
-                        # _log.info("[PLCHandler] Reset counter %s", key)
+                        _log.info("[PLCHandler] Reset counter %s", key)
                         off_val = signals.get(signals_selected, {}).get('off')
                         if off_val is not None and str(off_val).strip() != "" and str(off_val).strip().lower() not in ('none', 'no value'):
                             try:
                                 self._safe_write_plc(reg, int(off_val))
                             except (ValueError, TypeError):
                                 pass
-
-    # -----------------------------------------------------------------------
-    # Load mã hàng
-    # -----------------------------------------------------------------------
-
-    def load_item_code(self):
-        self._item_code_tick += 1
-        if self._item_code_tick % self.ITEM_CODE_POLL_EVERY != 0:
-            # _log.error("[PLCHandler] load_item_code failed for tick: %s", self._item_code_tick)
-            return
-
-        try:
-            v1 = self._safe_read_plc('DM1530')
-            v2 = self._safe_read_plc('DM1630')
-            v3 = self._safe_read_plc('DM1960')
-
-            if v1 == 1 and v2 == 1 and v3 == 1:
-                new_code, jumper = 'MÃ HÀNG : CÓ DÂY JUMPER', False
-            elif v1 == 2 and v2 == 2 and v3 == 2:
-                new_code, jumper = 'MÃ HÀNG : KHÔNG DÂY JUMPER', True
-            else:
-                return
-
-            if new_code == self._last_item_code:
-                return
-
-            self._last_item_code  = new_code
-            self.mode_load_jumper = jumper
-            _log.info("KHỞI ĐỘNG %s", new_code)
-            self.ui_itemcode.label_3.setText(new_code)
-
-        except Exception:
-            _log.exception("[PLCHandler] load_item_code failed")
 
     # -----------------------------------------------------------------------
     # Mode reg / trigger cache
@@ -1340,8 +1310,14 @@ class PLCHandler:
 
                 if all_registers:
                     _log.info('[%s] NG registers: %s', key, all_registers)
-                    for reg in all_registers:
-                        self._safe_write_plc(str(reg), 1)
+                    if isinstance(all_registers, dict):
+                        for reg, val in all_registers.items():
+                            if reg and str(reg).strip():
+                                self._safe_write_plc(str(reg).strip(), val)
+                    else:
+                        for reg in all_registers:
+                            if reg and str(reg).strip():
+                                self._safe_write_plc(str(reg).strip(), 1)
                 else:
                     if reset_sig:
                         _log.info(f'Send Reset Signal OK {reset_sig}')
@@ -1365,8 +1341,14 @@ class PLCHandler:
 
             if list_register:
                 _log.info('[%s] NG registers: %s', key, list_register)
-                for reg in list_register:
-                    self._safe_write_plc(str(reg), 1)
+                if isinstance(list_register, dict):
+                    for reg, val in list_register.items():
+                        if reg and str(reg).strip():
+                            self._safe_write_plc(str(reg).strip(), val)
+                else:
+                    for reg in list_register:
+                        if reg and str(reg).strip():
+                            self._safe_write_plc(str(reg).strip(), 1)
             else:
                 if reset_sig:
                     _log.info(f'Send Reset Signal OK {reset_sig}')
@@ -1481,8 +1463,10 @@ class PLCHandler:
 
             if all_registers:
                 _log.info('[%s] NG registers: %s', key, all_registers)
-                for reg in all_registers:
-                    self._safe_write_plc(str(reg), 1)
+                if isinstance(all_registers, dict):
+                    for reg, val in all_registers.items():
+                        if reg and str(reg).strip():
+                            self._safe_write_plc(str(reg).strip(), val)
             else:
                 self._safe_write_plc(str(reset_sig['reg']), int(reset_sig['on']))
 
@@ -1711,8 +1695,14 @@ class PLCHandler:
 
                         if all_registers:
                             _log.info('[%s] NG registers: %s', key, all_registers)
-                            for reg in all_registers:
-                                self._safe_write_plc(str(reg), 1)
+                            if isinstance(all_registers, dict):
+                                for reg, val in all_registers.items():
+                                    if reg and str(reg).strip():
+                                        self._safe_write_plc(str(reg).strip(), val)
+                            else:
+                                for reg in all_registers:
+                                    if reg and str(reg).strip():
+                                        self._safe_write_plc(str(reg).strip(), 1)
 
                         self._safe_write_plc(register, value_off)
 
@@ -2052,20 +2042,16 @@ class CameraTabManager:
 
         cam_key = str(camera_id).strip()
         if cam_key not in self.camera_colors:
-            # Danh sách các tone màu sáng rõ nét, viền nổi bật tương phản cao cho từng camera
+            # Bảng màu tối giản, gần trung tính, chỉ ngả sắc rất nhẹ
             palette = [
-                {"bg": "#D9EDF7", "border": "#1976D2"},  # Xanh dương (Ocean Blue)
-                {"bg": "#D4EFDF", "border": "#27AE60"},  # Xanh lục (Emerald Green)
-                {"bg": "#E8DAEF", "border": "#8E44AD"},  # Tím đậm nét (Royal Violet)
-                {"bg": "#FCF3CF", "border": "#E67E22"},  # Cam vàng (Vibrant Amber)
-                {"bg": "#FADBD8", "border": "#E91E63"},  # Hồng sen nổi bật (Rose Pink)
-                {"bg": "#D1F2EB", "border": "#0097A7"},  # Xanh mòng két (Bright Teal)
-                {"bg": "#D5D8DC", "border": "#3F51B5"},  # Xanh chàm (Indigo Blue)
-                {"bg": "#E8F8F5", "border": "#689F38"},  # Xanh lá mạ (Fresh Lime)
-                {"bg": "#FBEEE6", "border": "#D35400"},  # Cam san hô (Warm Coral)
-                {"bg": "#F9EBEA", "border": "#C0392B"},  # Đỏ ruby dịu (Crimson Red)
-                {"bg": "#A2D9CE", "border": "#16A085"},  # Xanh ngọc biển (Deep Sea Teal)
-                {"bg": "#E5E7E9", "border": "#455A64"},  # Xám thép (Steel Slate)
+                {"bg": "#E7ECF0", "border": "#6B829A"},  # Xám xanh dương
+                {"bg": "#E7EDE8", "border": "#6F8C75"},  # Xám xanh lá
+                {"bg": "#EDE9EF", "border": "#8A7B95"},  # Xám tím
+                {"bg": "#F0ECE4", "border": "#9A8A68"},  # Xám kaki
+                {"bg": "#EFE8E7", "border": "#9A7A76"},  # Xám hồng nâu
+                {"bg": "#E5ECEB", "border": "#6A8F8C"},  # Xám teal
+                {"bg": "#EAEAEA", "border": "#7A7A7A"},  # Xám trung tính
+                {"bg": "#EBE7E1", "border": "#86786A"},  # Xám ấm
             ]
             used_bgs = {v.get("bg") for v in self.camera_colors.values() if isinstance(v, dict)}
             available = [c for c in palette if c["bg"] not in used_bgs]
@@ -2620,7 +2606,7 @@ class CameraTabManager:
                     if plc_signals['run']['reg'] and plc_signals['run']['off']:
                         plc.write_plc(str(plc_signals['run']['reg']),   int(plc_signals['run']['off']))
                     if plc_signals['busy']['reg'] and plc_signals['busy']['off']:
-                        plc.write_plc(str(plc_signals['busy']['reg']),   int(plc_signals['busy']['off']))
+                        plc.write_plc(str(plc_signals['busy']['reg']),   int(plc_signals['busy']['on']))
                     _log.info("[Camera %s] Thử lại sau %s giây...", camera_name, retry_interval)
                     time.sleep(retry_interval)
                     if attempt == 3:

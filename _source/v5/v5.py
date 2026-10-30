@@ -207,6 +207,7 @@ def _read_model_config(model, model_column: list, keys_mapping: list) -> list:
             'hmax'     : to_int(i,  keys_mapping[8]),
             'conf_thr' : to_int(i,  keys_mapping[-1]) / 100,
             'register' : text(i,    keys_mapping[9]),
+            'value'    : to_int(i,  keys_mapping[10], default=1),
         })
     return rows
  
@@ -295,7 +296,7 @@ class v5s:
             })
 
         flag          = True
-        list_register = []
+        list_register = {}
         fail_labels   = set()
 
         # ── Per-label OK / NG quantity check (from UI config table) ──────────
@@ -309,12 +310,16 @@ class v5s:
             if cfg['ok'] and ok_count != cfg['quantity']:
                 flag = False
                 fail_labels.add(f'* {label}')
-                list_register.append(cfg['register'])
+                reg = str(cfg.get('register') or '').strip()
+                if reg:
+                    list_register[reg] = cfg.get('value', 1)
 
             if cfg['ng'] and label in valid_names:
                 flag = False
                 fail_labels.add(f'* {label}')
-                list_register.append(cfg['register'])
+                reg = str(cfg.get('register') or '').strip()
+                if reg:
+                    list_register[reg] = cfg.get('value', 1)
 
         # ── Colour failing boxes red ──────────────────────────────────────────
         for d in draw_candidates:
@@ -422,8 +427,9 @@ class v5s:
             if not task_all_pass:
                 flag = False
                 for reg, val in plc_to_send:
-                    if reg and reg not in list_register:
-                        list_register.append(reg)
+                    reg_str = str(reg or '').strip()
+                    if reg_str and reg_str not in list_register:
+                        list_register[reg_str] = val
         except Exception as e:
             print("Error in evaluate_task_calculator (v5):", e)
 
