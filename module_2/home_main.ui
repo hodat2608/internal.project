@@ -10,6 +10,14 @@
     <height>1080</height>
    </rect>
   </property>
+  <property name="font">
+   <font>
+    <family>Segoe UI</family>
+    <pointsize>10</pointsize>
+    <weight>50</weight>
+    <bold>false</bold>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>AI Vision Pro</string>
   </property>
@@ -19,6 +27,12 @@
   </property>
   <property name="windowOpacity">
    <double>10.000000000000000</double>
+  </property>
+  <property name="documentMode">
+   <bool>true</bool>
+  </property>
+  <property name="tabShape">
+   <enum>QTabWidget::Rounded</enum>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
@@ -33,12 +47,12 @@
      <x>0</x>
      <y>0</y>
      <width>1920</width>
-     <height>21</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuOpen">
     <property name="title">
-     <string>Dashborad</string>
+     <string>Create Device</string>
     </property>
     <addaction name="actiondevice_configuration_settings"/>
    </widget>
@@ -52,14 +66,50 @@
     <property name="title">
      <string>Systems</string>
     </property>
+    <widget class="QMenu" name="menuReset_Application">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="title">
+      <string>Reset Application</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>../module_3/assert/icon/circular-arrows.png</normaloff>../module_3/assert/icon/circular-arrows.png</iconset>
+     </property>
+     <addaction name="actionRestart"/>
+     <addaction name="actionManageReset"/>
+    </widget>
+    <widget class="QMenu" name="menuClose_Application">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="title">
+      <string>Close Application</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>../module_3/assert/icon/close-window.png</normaloff>../module_3/assert/icon/close-window.png</iconset>
+     </property>
+     <addaction name="actionManage_2"/>
+     <addaction name="actionManage_Close"/>
+    </widget>
     <addaction name="separator"/>
     <addaction name="actionAuto_Configuration"/>
-    <addaction name="action_Reset_Application"/>
-    <addaction name="actionClose_Application"/>
+    <addaction name="menuReset_Application"/>
+    <addaction name="menuClose_Application"/>
    </widget>
    <widget class="QMenu" name="menuAdministrator">
     <property name="title">
-     <string>Administrator</string>
+     <string>Users and Group</string>
     </property>
     <addaction name="actionConfigure_settings"/>
     <addaction name="actionCreate_User"/>
@@ -82,12 +132,20 @@
     <addaction name="actionUser_Manual"/>
     <addaction name="actionAbout"/>
    </widget>
+   <widget class="QMenu" name="menuPerformance">
+    <property name="title">
+     <string>Performance</string>
+    </property>
+    <addaction name="actionOverView_of_Monitor"/>
+    <addaction name="actionSystem_Sumary"/>
+   </widget>
    <addaction name="menuOpen"/>
    <addaction name="menuAdministrator"/>
    <addaction name="menuOperator"/>
    <addaction name="menuSetting"/>
    <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
+   <addaction name="menuPerformance"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actiondevice_configuration_settings">
@@ -100,7 +158,10 @@
    </property>
    <property name="font">
     <font>
-     <family>Microsoft Tai Le</family>
+     <family>Segoe UI</family>
+     <pointsize>10</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
     </font>
    </property>
   </action>
@@ -110,7 +171,15 @@
      <normaloff>../module_3/assert/icon/responsive.png</normaloff>../module_3/assert/icon/responsive.png</iconset>
    </property>
    <property name="text">
-    <string>Device Launching</string>
+    <string>Device Manager</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI</family>
+     <pointsize>10</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
    </property>
   </action>
   <action name="actionAuto_Configuration">
@@ -119,25 +188,15 @@
      <normaloff>../module_3/assert/icon/settings.png</normaloff>../module_3/assert/icon/settings.png</iconset>
    </property>
    <property name="text">
-    <string>Auto Configuration</string>
+    <string>Startup Management</string>
    </property>
-  </action>
-  <action name="action_Reset_Application">
-   <property name="icon">
-    <iconset>
-     <normaloff>../module_3/assert/icon/circular-arrows.png</normaloff>../module_3/assert/icon/circular-arrows.png</iconset>
-   </property>
-   <property name="text">
-    <string>Reset Application</string>
-   </property>
-  </action>
-  <action name="actionClose_Application">
-   <property name="icon">
-    <iconset>
-     <normaloff>../module_3/assert/icon/close-window.png</normaloff>../module_3/assert/icon/close-window.png</iconset>
-   </property>
-   <property name="text">
-    <string>Close Application</string>
+   <property name="font">
+    <font>
+     <family>Segoe UI</family>
+     <pointsize>10</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
    </property>
   </action>
   <action name="actionConfigure_settings">
@@ -146,11 +205,14 @@
      <normaloff>../module_3/assert/icon/gear.png</normaloff>../module_3/assert/icon/gear.png</iconset>
    </property>
    <property name="text">
-    <string>Configure settings</string>
+    <string>Administrator</string>
    </property>
    <property name="font">
     <font>
-     <family>Microsoft Tai Le</family>
+     <family>Segoe UI</family>
+     <pointsize>10</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
     </font>
    </property>
   </action>
@@ -162,6 +224,14 @@
    <property name="text">
     <string>Create User</string>
    </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI</family>
+     <pointsize>10</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
   </action>
   <action name="actionRemove_User">
    <property name="icon">
@@ -171,6 +241,14 @@
    <property name="text">
     <string>Remove User</string>
    </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI</family>
+     <pointsize>10</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
   </action>
   <action name="actionHardware_Key">
    <property name="icon">
@@ -178,7 +256,15 @@
      <normaloff>../module_3/assert/icon/flash-drive.png</normaloff>../module_3/assert/icon/flash-drive.png</iconset>
    </property>
    <property name="text">
-    <string>Hardware Key USB</string>
+    <string>USB License key</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI</family>
+     <pointsize>10</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
    </property>
   </action>
   <action name="actionScripts">
@@ -187,7 +273,15 @@
      <normaloff>../module_3/assert/icon/source-code (1).png</normaloff>../module_3/assert/icon/source-code (1).png</iconset>
    </property>
    <property name="text">
-    <string>Scripts</string>
+    <string>Editor Scripts</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI</family>
+     <pointsize>10</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
    </property>
   </action>
   <action name="actionDocumentation">
@@ -198,6 +292,14 @@
    <property name="text">
     <string>Documentation</string>
    </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI</family>
+     <pointsize>10</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
   </action>
   <action name="actionUser_Manual">
    <property name="icon">
@@ -206,6 +308,14 @@
    </property>
    <property name="text">
     <string>User Manual</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI</family>
+     <pointsize>10</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
    </property>
   </action>
   <action name="actionAbout">
@@ -216,6 +326,14 @@
    <property name="text">
     <string>About</string>
    </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI</family>
+     <pointsize>10</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
   </action>
   <action name="actionData_Export">
    <property name="icon">
@@ -225,6 +343,14 @@
    <property name="text">
     <string>Data Export</string>
    </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI</family>
+     <pointsize>10</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
   </action>
   <action name="actionData_Import">
    <property name="icon">
@@ -233,6 +359,86 @@
    </property>
    <property name="text">
     <string>Data Import</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI</family>
+     <pointsize>10</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+  </action>
+  <action name="actionRestart">
+   <property name="icon">
+    <iconset>
+     <normaloff>../module_3/assert/icon/rotating.png</normaloff>../module_3/assert/icon/rotating.png</iconset>
+   </property>
+   <property name="text">
+    <string>Restart</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="actionManage_2">
+   <property name="icon">
+    <iconset>
+     <normaloff>../module_3/assert/icon/vote-no.png</normaloff>../module_3/assert/icon/vote-no.png</iconset>
+   </property>
+   <property name="text">
+    <string>Close</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
+  </action>
+  <action name="actionManageReset">
+   <property name="icon">
+    <iconset>
+     <normaloff>../module_3/assert/icon/exchange.png</normaloff>../module_3/assert/icon/exchange.png</iconset>
+   </property>
+   <property name="text">
+    <string>Manage...</string>
+   </property>
+  </action>
+  <action name="actionManage_Close">
+   <property name="icon">
+    <iconset>
+     <normaloff>../module_3/assert/icon/exchange.png</normaloff>../module_3/assert/icon/exchange.png</iconset>
+   </property>
+   <property name="text">
+    <string>Manage...</string>
+   </property>
+  </action>
+  <action name="actionOverView_of_Monitor">
+   <property name="icon">
+    <iconset>
+     <normaloff>../module_3/assert/icon/statistics.png</normaloff>../module_3/assert/icon/statistics.png</iconset>
+   </property>
+   <property name="text">
+    <string>OverView of Performance</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+  </action>
+  <action name="actionSystem_Sumary">
+   <property name="icon">
+    <iconset>
+     <normaloff>../module_3/assert/icon/windows.png</normaloff>../module_3/assert/icon/windows.png</iconset>
+   </property>
+   <property name="text">
+    <string>System Sumary</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI</family>
+     <pointsize>10</pointsize>
+    </font>
    </property>
   </action>
  </widget>

@@ -303,10 +303,11 @@ class intermediate_layer:
                 if hasattr(self.ui, 'camera_manager') and hasattr(self.ui.camera_manager, 'MainWindoww'):
                     display_win = self.ui.camera_manager.MainWindoww
                     if display_win:
-                        display_win.setWindowState(
-                            (display_win.windowState() & ~QtCore.Qt.WindowMinimized) | QtCore.Qt.WindowActive
-                        )
-                        display_win.showMaximized()
+                        if not display_win.isFullScreen() and not display_win.isMinimized():
+                            display_win.setWindowState(
+                                (display_win.windowState() & ~QtCore.Qt.WindowMinimized) | QtCore.Qt.WindowActive
+                            )
+                            display_win.showMaximized()
                         display_win.raise_()
                         display_win.activateWindow()
             except Exception as e:

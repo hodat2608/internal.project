@@ -29,6 +29,7 @@ PLC_COLLECT = {
 
 class CoreWorker(QThread):
     trigger_detected = pyqtSignal(str, str)
+    system_action_triggered = pyqtSignal(str, dict)
 
     def __init__(self, core_instance):
         super().__init__()
@@ -58,7 +59,6 @@ class core:
         self.connection    = None
         self.driver_loader = None
 
-        # Mặc định thông số PLC (phòng ngừa máy mới tinh chưa có cấu hình trong CSDL)
         self.plc_module                  = "KEYENCE"
         self.connection_port             = "Enthernet"
         self.ip_address_plc              = "192.168.0.10"
@@ -94,6 +94,10 @@ class core:
         self.count = 0
         _log.info("[core.__init__] collect_dict_item...")
         self.collect_dict_item()
+        _log.info("[core.__init__] reload_system_action_configs...")
+        self.system_action_configs = {}
+        self._action_cooldowns = {}
+        self.reload_system_action_configs()
         _log.info("[core.__init__] DONE")
 
     def start_monitoring(self):
@@ -389,7 +393,63 @@ class core:
             
             progress.close()
 
+    def reload_system_action_configs(self):
+        try:
+            from module_2.manage_system_actions import get_system_action_config
+            self.system_action_configs = {
+                "RESTART": get_system_action_config("RESTART", self.connection),
+                "CLOSE": get_system_action_config("CLOSE", self.connection)
+            }
+            _log.info("System action configs reloaded successfully: %s", list(self.system_action_configs.keys()))
+        except Exception as e:
+            _log.warning("Could not reload system action configs: %s", e)
+
+    def check_system_action_triggers(self):
+        if not hasattr(self, 'driver_loader') or self.driver_loader is None:
+            return
+        if not hasattr(self, 'system_action_configs') or not self.system_action_configs:
+            return
+
+        now = time.time()
+        if not hasattr(self, '_action_cooldowns'):
+            self._action_cooldowns = {}
+
+        for action_type, cfg in self.system_action_configs.items():
+            if not cfg.get("enabled"):
+                continue
+            register = str(cfg.get("register", "")).strip()
+            if not register:
+                continue
+
+            last_trig = self._action_cooldowns.get(action_type, 0)
+            if now - last_trig < 15:
+                continue
+
+            try:
+                current_value = self.driver_loader.read_plc(register)
+                val_on = int(cfg.get("value_bit_on", 1))
+                if current_value is not None and int(current_value) == val_on:
+                    self._action_cooldowns[action_type] = now
+                    _log.info("PLC System Action Trigger detected: %s on register %s = %s", action_type, register, current_value)
+
+                    if cfg.get("auto_write_off"):
+                        val_off_str = str(cfg.get("value_bit_off", "0")).strip()
+                        if val_off_str.lower() not in ('none', 'no value', ''):
+                            try:
+                                self.driver_loader.write_plc(register, int(val_off_str))
+                                _log.info("Handshake OFF written to %s = %s", register, val_off_str)
+                            except Exception as e_w:
+                                _log.warning("Failed to write OFF to %s: %s", register, e_w)
+
+                    if hasattr(self, 'worker_thread') and self.worker_thread:
+                        self.worker_thread.system_action_triggered.emit(action_type, cfg)
+            except Exception as e:
+                _log.debug("Error checking system action %s on %s: %s", action_type, register, e)
+
     def wait_for_signal(self):
+        # Kiểm tra lệnh Restart / Close từ PLC
+        self.check_system_action_triggers()
+
         if not self.dict_list_line or self.driver_loader is None:
             return
 

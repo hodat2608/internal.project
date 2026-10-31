@@ -2042,23 +2042,38 @@ class CameraTabManager:
 
         cam_key = str(camera_id).strip()
         if cam_key not in self.camera_colors:
-            # Bảng màu tối giản, gần trung tính, chỉ ngả sắc rất nhẹ
+            # Danh sách các tone màu hơi trầm nhã nhặn, dịu mắt, không quá nổi bật nhưng phân biệt rõ ràng giữa các camera
             palette = [
-                {"bg": "#E7ECF0", "border": "#6B829A"},  # Xám xanh dương
-                {"bg": "#E7EDE8", "border": "#6F8C75"},  # Xám xanh lá
-                {"bg": "#EDE9EF", "border": "#8A7B95"},  # Xám tím
-                {"bg": "#F0ECE4", "border": "#9A8A68"},  # Xám kaki
-                {"bg": "#EFE8E7", "border": "#9A7A76"},  # Xám hồng nâu
-                {"bg": "#E5ECEB", "border": "#6A8F8C"},  # Xám teal
-                {"bg": "#EAEAEA", "border": "#7A7A7A"},  # Xám trung tính
-                {"bg": "#EBE7E1", "border": "#86786A"},  # Xám ấm
+                {"bg": "#CAD2DA", "border": "#364554"},  # Xanh xám thép (Slate Blue)
+                {"bg": "#CAD4CB", "border": "#354A3A"},  # Xanh rêu xám (Sage Green)
+                {"bg": "#D3CCC5", "border": "#4D423B"},  # Nâu xám ấm (Warm Taupe)
+                {"bg": "#C6D2D4", "border": "#284449"},  # Xanh cổ vịt trầm (Petrol Teal)
+                {"bg": "#CBCDE0", "border": "#373C54"},  # Xanh chàm tro (Dusk Indigo)
+                {"bg": "#CCD0C2", "border": "#424A35"},  # Rêu đá trầm (Muted Olive)
+                {"bg": "#D0D4D8", "border": "#3D464F"},  # Xám than chì (Charcoal Slate)
+                {"bg": "#CFC7CF", "border": "#443743"},  # Xám tro ánh tím trầm (Dusk Plum)
+                {"bg": "#C4CDD3", "border": "#2D3E49"},  # Xanh xám bão trầm (Storm Slate)
+                {"bg": "#C8CDD0", "border": "#343E43"},  # Xám thép kim loại (Pewter Steel)
             ]
             used_bgs = {v.get("bg") for v in self.camera_colors.values() if isinstance(v, dict)}
             available = [c for c in palette if c["bg"] not in used_bgs]
             if not available:
                 available = palette
 
-            chosen = random.choice(available)
+            # Ưu tiên gán màu cố định theo camera_id để nhất quán và phân biệt tối ưu giữa các camera
+            try:
+                digits = ''.join(filter(str.isdigit, cam_key))
+                if digits:
+                    cam_idx = (int(digits) - 1) % len(palette)
+                    if palette[cam_idx]["bg"] not in used_bgs:
+                        chosen = palette[cam_idx]
+                    else:
+                        chosen = available[0]
+                else:
+                    chosen = random.choice(available)
+            except Exception:
+                chosen = random.choice(available)
+
             self.camera_colors[cam_key] = chosen
 
         entry = self.camera_colors[cam_key]
@@ -2076,7 +2091,7 @@ class CameraTabManager:
             self.get_camera_frame_style(camera_id)
 
         entry = self.camera_colors.get(cam_key, {})
-        border = entry.get("border", "#1976D2")
+        border = entry.get("border", "#364554")
         return f"QLabel {{ background-color: {border}; color: #ffffff; border: 1px solid {border}; border-radius: 4px; padding: 4px; font-weight: bold; }}"
 
     def create_camera_tab(self):
@@ -2246,7 +2261,94 @@ class CameraTabManager:
             frame_layout.setColumnStretch(c, 1)
         for r in range(num_rows):
             frame_layout.setRowStretch(r, 1)
-  
+
+    def apply_window_state(self, show_mode: str):
+        """Áp dụng trạng thái cửa sổ hiển thị: Full Screen, Maximize, Minimize."""
+        if not hasattr(self, 'MainWindoww') or self.MainWindoww is None:
+            return
+        mode_str = str(show_mode).strip()
+        if mode_str == "Full Screen":
+            self.MainWindoww.showFullScreen()
+        elif mode_str == "Minimize":
+            self.MainWindoww.showMinimized()
+        elif mode_str == "Maximize":
+            if self.MainWindoww.isFullScreen():
+                self.MainWindoww.showNormal()
+            self.MainWindoww.showMaximized()
+        self.MainWindoww.raise_()
+        self.MainWindoww.activateWindow()
+
+    def save_show_ui_mode(self, show_mode: str):
+        """Lưu trạng thái hiển thị vào database mode_display."""
+        if not hasattr(self, 'ui_mother'):
+            return
+        display_mode = self.ui_mother.comboBox_display_mode.currentText()
+        layout_mode = self.ui_mother.comboBox_layout_mode_by.currentText()
+        try:
+            if hasattr(self, 'processor') and hasattr(self.processor, 'save_display_mode'):
+                self.processor.save_display_mode(
+                    self.db_manager.cursor,
+                    self.db_manager.connect_db,
+                    self.item_code_id,
+                    display_mode,
+                    layout_mode,
+                    str(show_mode).strip()
+                )
+        except Exception as e:
+            _log.warning("Could not save show_ui_mode to database: %s", e)
+
+    def toggle_fullscreen(self):
+        """Phím tắt F11: Chuyển đổi qua lại giữa Full Screen và Maximize."""
+        if not hasattr(self, 'MainWindoww') or self.MainWindoww is None:
+            return
+        if self.MainWindoww.isFullScreen():
+            new_mode = "Maximize"
+        else:
+            new_mode = "Full Screen"
+        self.apply_window_state(new_mode)
+        if hasattr(self, 'ui_mother') and hasattr(self.ui_mother, 'comboBox_show_ui'):
+            self.ui_mother.comboBox_show_ui.setCurrentText(new_mode)
+        self.save_show_ui_mode(new_mode)
+
+    def exit_fullscreen_on_esc(self):
+        """Phím tắt Escape: Nếu đang ở Full Screen thì trở về Maximize."""
+        if not hasattr(self, 'MainWindoww') or self.MainWindoww is None:
+            return
+        if self.MainWindoww.isFullScreen():
+            new_mode = "Maximize"
+            self.apply_window_state(new_mode)
+            if hasattr(self, 'ui_mother') and hasattr(self.ui_mother, 'comboBox_show_ui'):
+                self.ui_mother.comboBox_show_ui.setCurrentText(new_mode)
+            self.save_show_ui_mode(new_mode)
+
+    def on_show_ui_activated(self):
+        """Xử lý khi người dùng tương tác chọn mục trên comboBox_show_ui."""
+        if not hasattr(self, 'ui_mother') or not hasattr(self, 'MainWindoww'):
+            return
+        selected_mode = self.ui_mother.comboBox_show_ui.currentText()
+        self.apply_window_state(selected_mode)
+        self.save_show_ui_mode(selected_mode)
+
+    def on_display_mode_activated(self):
+        """Xử lý khi người dùng chọn Show/Hide Bounding Boxes."""
+        if not hasattr(self, 'ui_mother'):
+            return
+        display_mode = self.ui_mother.comboBox_display_mode.currentText()
+        layout_mode = self.ui_mother.comboBox_layout_mode_by.currentText()
+        show_layout = self.ui_mother.comboBox_show_ui.currentText()
+        try:
+            if hasattr(self, 'processor') and hasattr(self.processor, 'save_display_mode'):
+                self.processor.save_display_mode(
+                    self.db_manager.cursor,
+                    self.db_manager.connect_db,
+                    self.item_code_id,
+                    display_mode,
+                    layout_mode,
+                    show_layout
+                )
+        except Exception as e:
+            _log.warning("Could not save display_mode to database: %s", e)
+
     def create_model_tabs(self, models, camera_name, camera_id, tab_widget_2, product_code_forms,total_models,total_cameras,item_code_id,progress_callback=None, base_progress=0, step_progress=0):
 
         ui_instances = {}
@@ -2258,10 +2360,18 @@ class CameraTabManager:
             self.MainWindoww = QtWidgets.QMainWindow()
             self.ui_mother = Ui_MainWindow_mother()
             self.ui_mother.setupUi(self.MainWindoww)
-            self.MainWindoww.showMaximized()
-            QtCore.QTimer.singleShot(0, self.MainWindoww.raise_)
-            QtCore.QTimer.singleShot(0, self.MainWindoww.activateWindow)
 
+            # Đăng ký phím tắt F11 (toggle Full Screen <-> Maximize)
+            self.shortcut_f11 = QtWidgets.QShortcut(QtGui.QKeySequence(QtCore.Qt.Key_F11), self.MainWindoww)
+            self.shortcut_f11.setContext(QtCore.Qt.ApplicationShortcut)
+            self.shortcut_f11.activated.connect(self.toggle_fullscreen)
+
+            # Đăng ký phím tắt Escape (thoát Full Screen về Maximize)
+            self.shortcut_esc = QtWidgets.QShortcut(QtGui.QKeySequence(QtCore.Qt.Key_Escape), self.MainWindoww)
+            self.shortcut_esc.setContext(QtCore.Qt.WindowShortcut)
+            self.shortcut_esc.activated.connect(self.exit_fullscreen_on_esc)
+
+            show_ui_default = "Maximize"
             try:
                 self.db_manager.cursor.execute(
                     f"SELECT display_mode, layout_mode, show_layout FROM `{self.db_manager.db}`.mode_display WHERE item_code_id = %s",
@@ -2269,17 +2379,39 @@ class CameraTabManager:
                 )
                 result_cursor = self.db_manager.cursor.fetchone()
                 if result_cursor:
-                    self.ui_mother.comboBox_display_mode.setCurrentText(result_cursor[0])
-                    self.ui_mother.comboBox_layout_mode_by.setCurrentText(result_cursor[1])
-                    self.ui_mother.comboBox_show_ui.setCurrentText(result_cursor[2])
+                    if result_cursor[0]:
+                        self.ui_mother.comboBox_display_mode.setCurrentText(str(result_cursor[0]))
+                    if result_cursor[1]:
+                        self.ui_mother.comboBox_layout_mode_by.setCurrentText(str(result_cursor[1]))
+                    if result_cursor[2]:
+                        show_ui_default = str(result_cursor[2]).strip()
+                        self.ui_mother.comboBox_show_ui.setCurrentText(show_ui_default)
+                else:
+                    self.ui_mother.comboBox_show_ui.setCurrentText(show_ui_default)
             except Exception as e:
                 _log.warning("Could not read mode_display: %s", e)
-                
+                self.ui_mother.comboBox_show_ui.setCurrentText(show_ui_default)
+
+            # Áp dụng trạng thái hiển thị ban đầu từ cấu hình đã lưu
+            self.apply_window_state(show_ui_default)
+
             try:
                 self.ui_mother.comboBox_layout_mode_by.currentIndexChanged.disconnect(self.change_layout_mode)
-            except TypeError:
+            except (TypeError, RuntimeError):
                 pass
             self.ui_mother.comboBox_layout_mode_by.currentIndexChanged.connect(self.change_layout_mode)
+
+            try:
+                self.ui_mother.comboBox_show_ui.activated.disconnect(self.on_show_ui_activated)
+            except (TypeError, RuntimeError):
+                pass
+            self.ui_mother.comboBox_show_ui.activated.connect(self.on_show_ui_activated)
+
+            try:
+                self.ui_mother.comboBox_display_mode.activated.disconnect(self.on_display_mode_activated)
+            except (TypeError, RuntimeError):
+                pass
+            self.ui_mother.comboBox_display_mode.activated.connect(self.on_display_mode_activated)
 
         self.item_code_id = item_code_id
         layout_mode = self.ui_mother.comboBox_layout_mode_by.currentText()

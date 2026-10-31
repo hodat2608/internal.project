@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>MBC Vision Inspector</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../module_3/assert/icon/product-display.png</normaloff>../module_3/assert/icon/product-display.png</iconset>
+  </property>
   <property name="styleSheet">
    <string notr="true">
 * { font-family: &quot;Segoe UI&quot;, &quot;Inter&quot;, &quot;Roboto&quot;, &quot;Helvetica Neue&quot;, Arial, sans-serif; }
@@ -27,13 +31,13 @@ QFrame#frame_app_header {
 }
 QLabel#label_app_logo {
     background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #38BDF8, stop:1 #0284C7);
-    color: #FFFFFF; border-radius: 10px; font-size: 10pt; font-weight: 800;
+    color: #FFFFFF; border-radius: 10px; font-size: 12pt; font-weight: 800;
 }
-QLabel#label_app_title { color: #FFFFFF; font-size: 14pt; font-weight: 700; background: transparent; }
-QLabel#label_app_subtitle { color: #9CC3E6; font-size: 9pt; background: transparent; }
+QLabel#label_app_title { color: #FFFFFF; font-size: 18pt; font-weight: 700; background: transparent; }
+QLabel#label_app_subtitle { color: #9CC3E6; font-size: 11pt; background: transparent; }
 QLabel#label_status_mysql, QLabel#label_status_plc {
     background-color: #1E3350; color: #94A3B8; border: 1px solid #2B4668;
-    border-radius: 11px; padding: 3px 14px; font-size: 8pt; font-weight: 700;
+    border-radius: 11px; padding: 3px 14px; font-size: 10pt; font-weight: 700;
 }
 QLabel#label_status_mysql[state=&quot;online&quot;], QLabel#label_status_plc[state=&quot;online&quot;] {
     background-color: #0B3D31; color: #6EE7B7; border: 1px solid #0F766E;
@@ -45,7 +49,7 @@ QTabWidget::tab-bar { left: 4px; }
 QTabBar { background: transparent; }
 QTabBar::tab {
     background: transparent; color: #64748B; padding: 10px 22px; margin-right: 2px;
-    border: none; border-bottom: 3px solid transparent; font-size: 9pt; font-weight: 600;
+    border: none; border-bottom: 3px solid transparent; font-size: 12pt; font-weight: 600;
 }
 QTabBar::tab:hover { color: #0F172A; }
 QTabBar::tab:selected { color: #0369A1; border-bottom: 3px solid #0284C7; }
@@ -54,20 +58,20 @@ QMenuBar { background-color: #FFFFFF; border-bottom: 1px solid #E2E8F0; }
 QStatusBar { background-color: #FFFFFF; border-top: 1px solid #E2E8F0; color: #64748B; }
 
 /* ---------- page header ---------- */
-QLabel { color: #334155; font-size: 9pt; font-weight: 400; background: transparent; }
+QLabel { color: #334155; font-size: 10pt; font-weight: 400; background: transparent; }
 QLabel:disabled { color: #94A3B8; }
 QLabel#label_page_title_mysql, QLabel#label_page_title_plc, QLabel#label_plc_test_title {
-    color: #0F172A; font-size: 15pt; font-weight: 700;
+    color: #0F172A; font-size: 16pt; font-weight: 700;
 }
 QLabel#label_page_sub_mysql, QLabel#label_page_sub_plc, QLabel#label_plc_test_subtitle {
-    color: #64748B; font-size: 9pt;
+    color: #64748B; font-size: 12pt;
 }
-QLabel#label_plc_conn_target { color: #64748B; font-size: 8pt; }
+QLabel#label_plc_conn_target { color: #64748B; font-size: 10pt; }
 QFrame#frame_plc_test_header { background: transparent; border: none; }
 
 QLabel#label_mysql_state, QLabel#label_plc_state, QLabel#label_plc_conn_status {
     background-color: #FEE2E2; color: #B91C1C; border: 1px solid #FCA5A5;
-    border-radius: 11px; padding: 3px 14px; font-size: 8pt; font-weight: 700;
+    border-radius: 11px; padding: 3px 14px; font-size: 10pt; font-weight: 700;
 }
 QLabel#label_mysql_state[state=&quot;connected&quot;], QLabel#label_plc_state[state=&quot;connected&quot;],
 QLabel#label_plc_conn_status[state=&quot;connected&quot;] {
@@ -78,27 +82,27 @@ QLabel#label_plc_conn_status[state=&quot;connected&quot;] {
 QGroupBox {
     background-color: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px;
     margin-top: 12px; padding: 22px 16px 16px 16px;
-    font-size: 9pt; font-weight: 700; color: #0F172A;
+    font-size: 11pt; font-weight: 700; color: #0F172A;
 }
 QGroupBox::title {
     subcontrol-origin: margin; subcontrol-position: top left;
     left: 14px; padding: 0px 8px; color: #0369A1; background-color: #F1F5F9;
 }
 QGroupBox:disabled { color: #94A3B8; }
-QLabel[role=&quot;section&quot;] { color: #0369A1; font-size: 8pt; font-weight: 700; padding-top: 6px; }
+QLabel[role=&quot;section&quot;] { color: #0369A1; font-size: 10pt; font-weight: 700; padding-top: 6px; }
 QLabel[role=&quot;section&quot;]:disabled { color: #94A3B8; }
 
 /* side &quot;quick guide&quot; panels */
 QFrame#frame_2, QFrame#frame {
     background-color: #F0F9FF; border: 1px solid #BAE6FD; border-radius: 10px;
 }
-QLabel#label_mysql_guide_title, QLabel#label_plc_guide_title { color: #0369A1; font-size: 8pt; font-weight: 700; }
-QLabel#label_mysql_guide_body, QLabel#label_plc_guide_body { color: #334155; font-size: 9pt; }
+QLabel#label_mysql_guide_title, QLabel#label_plc_guide_title { color: #0369A1; font-size: 10pt; font-weight: 700; }
+QLabel#label_mysql_guide_body, QLabel#label_plc_guide_body { color: #334155; font-size: 10pt; }
 
 /* ---------- inputs ---------- */
 QLineEdit, QComboBox, QSpinBox {
     background-color: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 6px;
-    padding: 5px 10px; min-height: 22px; color: #0F172A; font-size: 9pt; font-weight: 400;
+    padding: 5px 10px; min-height: 22px; color: #0F172A; font-size: 10pt; font-weight: 400;
     selection-background-color: #0284C7; selection-color: #FFFFFF;
 }
 QLineEdit:hover, QComboBox:hover, QSpinBox:hover { border: 1px solid #94A3B8; }
@@ -109,7 +113,7 @@ QComboBox QAbstractItemView {
     selection-background-color: #E0F2FE; selection-color: #0369A1; outline: none;
 }
 
-QCheckBox, QRadioButton { color: #334155; font-size: 9pt; font-weight: 400; spacing: 8px; background: transparent; }
+QCheckBox, QRadioButton { color: #334155; font-size: 10pt; font-weight: 400; spacing: 8px; background: transparent; }
 QCheckBox:disabled, QRadioButton:disabled { color: #94A3B8; }
 QCheckBox::indicator { width: 14px; height: 14px; border: 1px solid #94A3B8; border-radius: 4px; background-color: #FFFFFF; }
 QCheckBox::indicator:hover { border: 1px solid #0284C7; }
@@ -127,7 +131,7 @@ QRadioButton::indicator:disabled { background-color: #F1F5F9; border: 1px solid 
 /* ---------- buttons ---------- */
 QPushButton {
     background-color: #FFFFFF; color: #334155; border: 1px solid #CBD5E1; border-radius: 6px;
-    padding: 7px 18px; min-height: 20px; font-size: 9pt; font-weight: 600;
+    padding: 7px 18px; min-height: 20px; font-size: 10pt; font-weight: 600;
 }
 QPushButton:hover { background-color: #F1F5F9; border: 1px solid #94A3B8; }
 QPushButton:pressed { background-color: #E2E8F0; }
@@ -156,6 +160,16 @@ QPushButton#pushButton_test_connection:hover, QPushButton#pushButton_test_connec
 QPushButton#pushButton_test_connection:disabled, QPushButton#pushButton_test_connection_3:disabled {
     color: #94A3B8; border: 1px solid #E2E8F0; background-color: #F1F5F9;
 }
+
+QPushButton#network_setting_advanced, QPushButton#network_setting_advanced {
+    color: #0369A1; border: 1px solid #7DD3FC; background-color: #F0F9FF;
+}
+QPushButton#network_setting_advanced:hover, QPushButton#network_setting_advanced:hover { background-color: #E0F2FE; }
+QPushButton#network_setting_advanced:disabled, QPushButton#network_setting_advanced:disabled {
+    color: #94A3B8; border: 1px solid #E2E8F0; background-color: #F1F5F9;
+}
+
+
 QPushButton#pushButton_disconnect_mysql { color: #B91C1C; border: 1px solid #FCA5A5; background-color: #FEF2F2; }
 QPushButton#pushButton_disconnect_mysql:hover { background-color: #FEE2E2; }
 QPushButton#pushButton_disconnect_mysql:disabled { color: #94A3B8; border: 1px solid #E2E8F0; background-color: #F1F5F9; }
@@ -171,7 +185,7 @@ QLineEdit#lineEdit_read_value:disabled { background-color: #1E293B; border: 1px 
 
 QLabel#label_read_status, QLabel#label_write_result {
     background-color: #F1F5F9; color: #64748B; border: 1px solid #E2E8F0;
-    border-radius: 6px; padding: 7px 12px; font-size: 9pt; font-weight: 700;
+    border-radius: 6px; padding: 7px 12px; font-size: 10pt; font-weight: 700;
 }
 QLabel#label_read_status[state=&quot;ok&quot;], QLabel#label_write_result[state=&quot;ok&quot;] {
     background-color: #DCFCE7; color: #15803D; border: 1px solid #86EFAC;
@@ -187,7 +201,7 @@ QPushButton#pushButton_plc_clear_log, QPushButton#pushButton_plc_copy_log { padd
 QTextEdit#textEdit_plc_log {
     background-color: #0F172A; color: #CBD5E1; border: 1px solid #1E293B; border-radius: 8px;
     padding: 6px; selection-background-color: #0284C7;
-    font-family: &quot;Consolas&quot;, &quot;Cascadia Mono&quot;, &quot;Courier New&quot;, monospace; font-size: 9pt;
+    font-family: &quot;Consolas&quot;, &quot;Cascadia Mono&quot;, &quot;Courier New&quot;, monospace; font-size: 10pt;
 }
 </string>
   </property>
@@ -365,9 +379,24 @@ QTextEdit#textEdit_plc_log {
         <height>16</height>
        </size>
       </property>
+      <property name="elideMode">
+       <enum>Qt::ElideLeft</enum>
+      </property>
+      <property name="documentMode">
+       <bool>true</bool>
+      </property>
+      <property name="tabsClosable">
+       <bool>false</bool>
+      </property>
+      <property name="movable">
+       <bool>true</bool>
+      </property>
+      <property name="tabBarAutoHide">
+       <bool>false</bool>
+      </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
-        <string>   Autologon   </string>
+        <string>              Auto Connect Database            </string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3" columnstretch="1,0">
         <property name="leftMargin">
@@ -402,7 +431,7 @@ QTextEdit#textEdit_plc_log {
              <property name="font">
               <font>
                <family>Segoe UI</family>
-               <pointsize>8</pointsize>
+               <pointsize>10</pointsize>
                <weight>87</weight>
                <bold>true</bold>
               </font>
@@ -482,7 +511,7 @@ QTextEdit#textEdit_plc_log {
              <property name="font">
               <font>
                <family>Segoe UI</family>
-               <pointsize>8</pointsize>
+               <pointsize>10</pointsize>
                <weight>87</weight>
                <bold>true</bold>
               </font>
@@ -543,7 +572,7 @@ QTextEdit#textEdit_plc_log {
              <property name="font">
               <font>
                <family>Segoe UI</family>
-               <pointsize>8</pointsize>
+               <pointsize>10</pointsize>
                <weight>87</weight>
                <bold>true</bold>
               </font>
@@ -610,7 +639,7 @@ QTextEdit#textEdit_plc_log {
              <property name="font">
               <font>
                <family>Segoe UI</family>
-               <pointsize>8</pointsize>
+               <pointsize>10</pointsize>
                <weight>87</weight>
                <bold>true</bold>
               </font>
@@ -883,7 +912,7 @@ QTextEdit#textEdit_plc_log {
       </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
-        <string>   Auto Connect PLC   </string>
+        <string>        Auto Connect PLC           </string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_4" columnstretch="1,0">
         <property name="leftMargin">
@@ -978,7 +1007,7 @@ QTextEdit#textEdit_plc_log {
           <property name="font">
            <font>
             <family>Segoe UI</family>
-            <pointsize>9</pointsize>
+            <pointsize>11</pointsize>
             <weight>87</weight>
             <bold>true</bold>
            </font>
@@ -1310,7 +1339,7 @@ QTextEdit#textEdit_plc_log {
                 <property name="font">
                  <font>
                   <family>Segoe UI</family>
-                  <pointsize>9</pointsize>
+                  <pointsize>10</pointsize>
                   <weight>50</weight>
                   <bold>false</bold>
                  </font>
@@ -1325,7 +1354,7 @@ QTextEdit#textEdit_plc_log {
                 <property name="font">
                  <font>
                   <family>Segoe UI</family>
-                  <pointsize>9</pointsize>
+                  <pointsize>10</pointsize>
                   <weight>50</weight>
                   <bold>false</bold>
                  </font>
@@ -1471,7 +1500,7 @@ QTextEdit#textEdit_plc_log {
       </widget>
       <widget class="QWidget" name="tab_3">
        <attribute name="title">
-        <string>   PLC Signal Test   </string>
+        <string>           PLC Command                 </string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_plc_test">
         <property name="spacing">

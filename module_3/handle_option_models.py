@@ -1797,30 +1797,26 @@ class Process_Model:
         except Exception as e:
             connect_db.connection.rollback()
             QMessageBox.critical(None, "Lỗi không xác định", str(e))
-    # CREATE TABLE IF NOT EXISTS mode_display (
-    #     id              INT AUTO_INCREMENT PRIMARY KEY,
-    #     display_mode    VARCHAR(255) NOT NULL,
-    #     layout_mode     VARCHAR(255) NOT NULL,
-    #     FOREIGN KEY (item_code_id) REFERENCES ITEMS_CODE(id) ON DELETE CASCADE
-    # """,
+
     def save_display_mode(self,cursor,connection,item_code_id,display_mode,layout_mode,show_layout):
         cursor.execute("""
             SELECT * FROM mode_display
             WHERE item_code_id = %s
         """,(item_code_id,))
+        conn = getattr(connection, 'connection', connection)
         if result_cursor := cursor.fetchall():
             cursor.execute("""
                 UPDATE mode_display
                 SET display_mode = %s, layout_mode = %s,show_layout = %s
                 WHERE item_code_id = %s
             """,(display_mode,layout_mode,show_layout,item_code_id))
-            connection.connection.commit()
+            conn.commit()
         else:
             cursor.execute("""
                 INSERT INTO mode_display (item_code_id, display_mode, layout_mode,show_layout)
                 VALUES (%s, %s, %s,%s)
             """,(item_code_id,display_mode,layout_mode,show_layout))
-            connection.connection.commit()
+            conn.commit()
 
 
     def load_display_mode(self,cursor,connection,item_code_id,ui):

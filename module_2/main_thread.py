@@ -19,6 +19,7 @@ from PyQt5 import QtCore, QtWidgets
 import os
 from module_2.StyleSheet import *
 from app_logger.app_logger import get_logger as _get_logger, open_log_window
+_log = _get_logger('module_2.main_thread')
 from Administrator.admin_config import open_admin_config
 from Administrator.create_user import open_create_user
 from Administrator.remove_user import open_remove_user
@@ -986,6 +987,100 @@ class main_thread(HomeScreenMixin):
             QMessageBox.warning(None, "Lỗi", "Chưa kết nối đến MySQL!\nVui lòng cấu hình Auto Configuration trước.")
             return None, None
 
+    def _open_manage_restart(self):
+        from module_2.manage_system_actions import open_manage_restart_dialog
+        cursor, db = self._get_db_cursor()
+        open_manage_restart_dialog(cursor, self.main_core.connection, self.main_core)
+
+    def _open_manage_close(self):
+        from module_2.manage_system_actions import open_manage_close_dialog
+        cursor, db = self._get_db_cursor()
+        open_manage_close_dialog(cursor, self.main_core.connection, self.main_core)
+
+    def handle_system_action(self, action_type, config):
+        _log.info("[main_thread] Handling PLC system action: %s with config: %s", action_type, config)
+        delay = int(config.get("delay_seconds", 3))
+        show_countdown = bool(config.get("show_countdown", 1))
+
+        if show_countdown and delay > 0:
+            from module_2.manage_system_actions import ActionCountdownDialog
+            dialog = ActionCountdownDialog(action_type, delay, parent=None)
+            result = dialog.exec_()
+            if result != QtWidgets.QDialog.Accepted:
+                _log.info("[main_thread] Operator cancelled %s action countdown", action_type)
+                return
+
+        if action_type == "RESTART":
+            self.execute_plc_restart(config)
+        elif action_type == "CLOSE":
+            self.execute_plc_close(config)
+
+    def execute_plc_restart(self, config):
+        _log.info("[main_thread] Executing PLC RESTART...")
+        app_inst = QtWidgets.QApplication.instance()
+        if app_inst:
+            app_inst.setProperty("is_restarting", True)
+            app_inst.setProperty("is_exiting", True)
+
+        # 1. Lưu cấu hình CSDL và chốt log trước khi restart
+        if config.get("save_before_action", 1):
+            try:
+                date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                if hasattr(self.main_core, 'item_code') and self.main_core.item_code:
+                    self.main_core.write_data_save_default(date_time, self.main_core.item_code, self.main_core.line_code or "")
+                if self.main_core.connection:
+                    self.main_core.connection.commit()
+            except Exception as e:
+                _log.warning("Could not save state before restart: %s", e)
+
+        # 2. Dừng an toàn camera & worker giám sát
+        if config.get("cleanup_hardware", 1):
+            try:
+                self.main_core.stop_monitoring()
+            except Exception as e:
+                _log.warning("Could not stop monitoring before restart: %s", e)
+
+        # 3. Ẩn toàn bộ các cửa sổ ngay lập tức để không kích hoạt closeEvent
+        try:
+            for widget in QtWidgets.QApplication.topLevelWidgets():
+                widget.hide()
+        except Exception:
+            pass
+
+        # 4. Khởi chạy tiến trình mới độc lập và thoát tiến trình cũ
+        import subprocess
+        python_exe = sys.executable
+        subprocess.Popen([python_exe] + sys.argv)
+        os._exit(0)
+
+    def execute_plc_close(self, config):
+        _log.info("[main_thread] Executing PLC CLOSE...")
+        app_inst = QtWidgets.QApplication.instance()
+        if app_inst:
+            app_inst.setProperty("is_exiting", True)
+
+        if config.get("cleanup_hardware", 1):
+            try:
+                self.main_core.stop_monitoring()
+            except Exception as e:
+                _log.warning("Could not stop monitoring before close: %s", e)
+
+        try:
+            for widget in QtWidgets.QApplication.topLevelWidgets():
+                widget.hide()
+        except Exception:
+            pass
+
+        post_mode = str(config.get("post_action_mode", "App Only"))
+        if "Shutdown" in post_mode:
+            _log.info("Executing Windows PC Shutdown...")
+            os.system("shutdown /s /t 1")
+        elif "Reboot" in post_mode:
+            _log.info("Executing Windows PC Reboot...")
+            os.system("shutdown /r /t 1")
+
+        os._exit(0)
+
     def _open_admin_config(self):
         cursor, db = self._get_db_cursor()
         if cursor:
@@ -1015,7 +1110,8 @@ class main_thread(HomeScreenMixin):
 
 
     def closeEvent(self, event, main_core_ref=None):
-        if QtWidgets.QApplication.instance().property("is_exiting"):
+        app_inst = QtWidgets.QApplication.instance()
+        if app_inst and (app_inst.property("is_exiting") or app_inst.property("is_restarting")):
             event.accept()
             return
 
@@ -1044,6 +1140,16 @@ class main_thread(HomeScreenMixin):
             event.ignore()
 
     def close_application(self, event=None, main_core_ref=None):
+        app_inst = QtWidgets.QApplication.instance()
+        if app_inst and (app_inst.property("is_exiting") or app_inst.property("is_restarting")):
+            if event is not None:
+                try:
+                    event.accept()
+                except:
+                    pass
+            os._exit(0)
+            return
+
         reply = QMessageBox.question(
             None,
             "Xác nhận thoát",
@@ -1082,8 +1188,23 @@ class main_thread(HomeScreenMixin):
         if reply != QMessageBox.Yes:
             return
         try:
+            app_inst = QtWidgets.QApplication.instance()
+            if app_inst:
+                app_inst.setProperty("is_restarting", True)
+                app_inst.setProperty("is_exiting", True)
+            if hasattr(self, 'main_core') and self.main_core:
+                try:
+                    self.main_core.stop_monitoring()
+                except Exception:
+                    pass
+            try:
+                QtWidgets.QApplication.closeAllWindows()
+            except Exception:
+                pass
+            import subprocess
             python_exe = sys.executable
-            os.execv(python_exe, [python_exe] + sys.argv)
+            subprocess.Popen([python_exe] + sys.argv)
+            os._exit(0)
         except Exception as e:
             QMessageBox.critical(
                 None, "Lỗi Reset",

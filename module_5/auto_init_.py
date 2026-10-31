@@ -9,12 +9,15 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+from module_1.root_path import resource_path
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1100, 873)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/product-display.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        MainWindow.setWindowIcon(icon)
         MainWindow.setStyleSheet("\n"
 "* { font-family: \"Segoe UI\", \"Inter\", \"Roboto\", \"Helvetica Neue\", Arial, sans-serif; }\n"
 "QMainWindow, QWidget#centralwidget { background-color: #F1F5F9; }\n"
@@ -28,13 +31,13 @@ class Ui_MainWindow(object):
 "}\n"
 "QLabel#label_app_logo {\n"
 "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #38BDF8, stop:1 #0284C7);\n"
-"    color: #FFFFFF; border-radius: 10px; font-size: 10pt; font-weight: 800;\n"
+"    color: #FFFFFF; border-radius: 10px; font-size: 12pt; font-weight: 800;\n"
 "}\n"
-"QLabel#label_app_title { color: #FFFFFF; font-size: 14pt; font-weight: 700; background: transparent; }\n"
-"QLabel#label_app_subtitle { color: #9CC3E6; font-size: 9pt; background: transparent; }\n"
+"QLabel#label_app_title { color: #FFFFFF; font-size: 18pt; font-weight: 700; background: transparent; }\n"
+"QLabel#label_app_subtitle { color: #9CC3E6; font-size: 11pt; background: transparent; }\n"
 "QLabel#label_status_mysql, QLabel#label_status_plc {\n"
 "    background-color: #1E3350; color: #94A3B8; border: 1px solid #2B4668;\n"
-"    border-radius: 11px; padding: 3px 14px; font-size: 8pt; font-weight: 700;\n"
+"    border-radius: 11px; padding: 3px 14px; font-size: 10pt; font-weight: 700;\n"
 "}\n"
 "QLabel#label_status_mysql[state=\"online\"], QLabel#label_status_plc[state=\"online\"] {\n"
 "    background-color: #0B3D31; color: #6EE7B7; border: 1px solid #0F766E;\n"
@@ -46,7 +49,7 @@ class Ui_MainWindow(object):
 "QTabBar { background: transparent; }\n"
 "QTabBar::tab {\n"
 "    background: transparent; color: #64748B; padding: 10px 22px; margin-right: 2px;\n"
-"    border: none; border-bottom: 3px solid transparent; font-size: 9pt; font-weight: 600;\n"
+"    border: none; border-bottom: 3px solid transparent; font-size: 12pt; font-weight: 600;\n"
 "}\n"
 "QTabBar::tab:hover { color: #0F172A; }\n"
 "QTabBar::tab:selected { color: #0369A1; border-bottom: 3px solid #0284C7; }\n"
@@ -55,20 +58,20 @@ class Ui_MainWindow(object):
 "QStatusBar { background-color: #FFFFFF; border-top: 1px solid #E2E8F0; color: #64748B; }\n"
 "\n"
 "/* ---------- page header ---------- */\n"
-"QLabel { color: #334155; font-size: 9pt; font-weight: 400; background: transparent; }\n"
+"QLabel { color: #334155; font-size: 10pt; font-weight: 400; background: transparent; }\n"
 "QLabel:disabled { color: #94A3B8; }\n"
 "QLabel#label_page_title_mysql, QLabel#label_page_title_plc, QLabel#label_plc_test_title {\n"
-"    color: #0F172A; font-size: 15pt; font-weight: 700;\n"
+"    color: #0F172A; font-size: 16pt; font-weight: 700;\n"
 "}\n"
 "QLabel#label_page_sub_mysql, QLabel#label_page_sub_plc, QLabel#label_plc_test_subtitle {\n"
-"    color: #64748B; font-size: 9pt;\n"
+"    color: #64748B; font-size: 12pt;\n"
 "}\n"
-"QLabel#label_plc_conn_target { color: #64748B; font-size: 8pt; }\n"
+"QLabel#label_plc_conn_target { color: #64748B; font-size: 10pt; }\n"
 "QFrame#frame_plc_test_header { background: transparent; border: none; }\n"
 "\n"
 "QLabel#label_mysql_state, QLabel#label_plc_state, QLabel#label_plc_conn_status {\n"
 "    background-color: #FEE2E2; color: #B91C1C; border: 1px solid #FCA5A5;\n"
-"    border-radius: 11px; padding: 3px 14px; font-size: 8pt; font-weight: 700;\n"
+"    border-radius: 11px; padding: 3px 14px; font-size: 10pt; font-weight: 700;\n"
 "}\n"
 "QLabel#label_mysql_state[state=\"connected\"], QLabel#label_plc_state[state=\"connected\"],\n"
 "QLabel#label_plc_conn_status[state=\"connected\"] {\n"
@@ -79,27 +82,27 @@ class Ui_MainWindow(object):
 "QGroupBox {\n"
 "    background-color: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px;\n"
 "    margin-top: 12px; padding: 22px 16px 16px 16px;\n"
-"    font-size: 9pt; font-weight: 700; color: #0F172A;\n"
+"    font-size: 11pt; font-weight: 700; color: #0F172A;\n"
 "}\n"
 "QGroupBox::title {\n"
 "    subcontrol-origin: margin; subcontrol-position: top left;\n"
 "    left: 14px; padding: 0px 8px; color: #0369A1; background-color: #F1F5F9;\n"
 "}\n"
 "QGroupBox:disabled { color: #94A3B8; }\n"
-"QLabel[role=\"section\"] { color: #0369A1; font-size: 8pt; font-weight: 700; padding-top: 6px; }\n"
+"QLabel[role=\"section\"] { color: #0369A1; font-size: 10pt; font-weight: 700; padding-top: 6px; }\n"
 "QLabel[role=\"section\"]:disabled { color: #94A3B8; }\n"
 "\n"
 "/* side \"quick guide\" panels */\n"
 "QFrame#frame_2, QFrame#frame {\n"
 "    background-color: #F0F9FF; border: 1px solid #BAE6FD; border-radius: 10px;\n"
 "}\n"
-"QLabel#label_mysql_guide_title, QLabel#label_plc_guide_title { color: #0369A1; font-size: 8pt; font-weight: 700; }\n"
-"QLabel#label_mysql_guide_body, QLabel#label_plc_guide_body { color: #334155; font-size: 9pt; }\n"
+"QLabel#label_mysql_guide_title, QLabel#label_plc_guide_title { color: #0369A1; font-size: 10pt; font-weight: 700; }\n"
+"QLabel#label_mysql_guide_body, QLabel#label_plc_guide_body { color: #334155; font-size: 10pt; }\n"
 "\n"
 "/* ---------- inputs ---------- */\n"
 "QLineEdit, QComboBox, QSpinBox {\n"
 "    background-color: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 6px;\n"
-"    padding: 5px 10px; min-height: 22px; color: #0F172A; font-size: 9pt; font-weight: 400;\n"
+"    padding: 5px 10px; min-height: 22px; color: #0F172A; font-size: 10pt; font-weight: 400;\n"
 "    selection-background-color: #0284C7; selection-color: #FFFFFF;\n"
 "}\n"
 "QLineEdit:hover, QComboBox:hover, QSpinBox:hover { border: 1px solid #94A3B8; }\n"
@@ -110,7 +113,7 @@ class Ui_MainWindow(object):
 "    selection-background-color: #E0F2FE; selection-color: #0369A1; outline: none;\n"
 "}\n"
 "\n"
-"QCheckBox, QRadioButton { color: #334155; font-size: 9pt; font-weight: 400; spacing: 8px; background: transparent; }\n"
+"QCheckBox, QRadioButton { color: #334155; font-size: 10pt; font-weight: 400; spacing: 8px; background: transparent; }\n"
 "QCheckBox:disabled, QRadioButton:disabled { color: #94A3B8; }\n"
 "QCheckBox::indicator { width: 14px; height: 14px; border: 1px solid #94A3B8; border-radius: 4px; background-color: #FFFFFF; }\n"
 "QCheckBox::indicator:hover { border: 1px solid #0284C7; }\n"
@@ -128,7 +131,7 @@ class Ui_MainWindow(object):
 "/* ---------- buttons ---------- */\n"
 "QPushButton {\n"
 "    background-color: #FFFFFF; color: #334155; border: 1px solid #CBD5E1; border-radius: 6px;\n"
-"    padding: 7px 18px; min-height: 20px; font-size: 9pt; font-weight: 600;\n"
+"    padding: 7px 18px; min-height: 20px; font-size: 10pt; font-weight: 600;\n"
 "}\n"
 "QPushButton:hover { background-color: #F1F5F9; border: 1px solid #94A3B8; }\n"
 "QPushButton:pressed { background-color: #E2E8F0; }\n"
@@ -157,6 +160,16 @@ class Ui_MainWindow(object):
 "QPushButton#pushButton_test_connection:disabled, QPushButton#pushButton_test_connection_3:disabled {\n"
 "    color: #94A3B8; border: 1px solid #E2E8F0; background-color: #F1F5F9;\n"
 "}\n"
+"\n"
+"QPushButton#network_setting_advanced, QPushButton#network_setting_advanced {\n"
+"    color: #0369A1; border: 1px solid #7DD3FC; background-color: #F0F9FF;\n"
+"}\n"
+"QPushButton#network_setting_advanced:hover, QPushButton#network_setting_advanced:hover { background-color: #E0F2FE; }\n"
+"QPushButton#network_setting_advanced:disabled, QPushButton#network_setting_advanced:disabled {\n"
+"    color: #94A3B8; border: 1px solid #E2E8F0; background-color: #F1F5F9;\n"
+"}\n"
+"\n"
+"\n"
 "QPushButton#pushButton_disconnect_mysql { color: #B91C1C; border: 1px solid #FCA5A5; background-color: #FEF2F2; }\n"
 "QPushButton#pushButton_disconnect_mysql:hover { background-color: #FEE2E2; }\n"
 "QPushButton#pushButton_disconnect_mysql:disabled { color: #94A3B8; border: 1px solid #E2E8F0; background-color: #F1F5F9; }\n"
@@ -172,7 +185,7 @@ class Ui_MainWindow(object):
 "\n"
 "QLabel#label_read_status, QLabel#label_write_result {\n"
 "    background-color: #F1F5F9; color: #64748B; border: 1px solid #E2E8F0;\n"
-"    border-radius: 6px; padding: 7px 12px; font-size: 9pt; font-weight: 700;\n"
+"    border-radius: 6px; padding: 7px 12px; font-size: 10pt; font-weight: 700;\n"
 "}\n"
 "QLabel#label_read_status[state=\"ok\"], QLabel#label_write_result[state=\"ok\"] {\n"
 "    background-color: #DCFCE7; color: #15803D; border: 1px solid #86EFAC;\n"
@@ -188,7 +201,7 @@ class Ui_MainWindow(object):
 "QTextEdit#textEdit_plc_log {\n"
 "    background-color: #0F172A; color: #CBD5E1; border: 1px solid #1E293B; border-radius: 8px;\n"
 "    padding: 6px; selection-background-color: #0284C7;\n"
-"    font-family: \"Consolas\", \"Cascadia Mono\", \"Courier New\", monospace; font-size: 9pt;\n"
+"    font-family: \"Consolas\", \"Cascadia Mono\", \"Courier New\", monospace; font-size: 10pt;\n"
 "}\n"
 "")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -245,6 +258,11 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabPosition(QtWidgets.QTabWidget.North)
         self.tabWidget.setTabShape(QtWidgets.QTabWidget.Rounded)
         self.tabWidget.setIconSize(QtCore.QSize(16, 16))
+        self.tabWidget.setElideMode(QtCore.Qt.ElideLeft)
+        self.tabWidget.setDocumentMode(True)
+        self.tabWidget.setTabsClosable(False)
+        self.tabWidget.setMovable(True)
+        self.tabWidget.setTabBarAutoHide(False)
         self.tabWidget.setObjectName("tabWidget")
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")
@@ -261,7 +279,7 @@ class Ui_MainWindow(object):
         self.label_sec_mysql_mode = QtWidgets.QLabel(self.groupBox_auto_login)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(8)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(87)
         self.label_sec_mysql_mode.setFont(font)
@@ -294,7 +312,7 @@ class Ui_MainWindow(object):
         self.label_sec_mysql_server = QtWidgets.QLabel(self.groupBox_auto_login)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(8)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(87)
         self.label_sec_mysql_server.setFont(font)
@@ -319,7 +337,7 @@ class Ui_MainWindow(object):
         self.label_sec_mysql_credentials = QtWidgets.QLabel(self.groupBox_auto_login)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(8)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(87)
         self.label_sec_mysql_credentials.setFont(font)
@@ -346,7 +364,7 @@ class Ui_MainWindow(object):
         self.label_sec_mysql_behaviour = QtWidgets.QLabel(self.groupBox_auto_login)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(8)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(87)
         self.label_sec_mysql_behaviour.setFont(font)
@@ -473,7 +491,7 @@ class Ui_MainWindow(object):
         self.groupBox_plc_connection.setMinimumSize(QtCore.QSize(0, 600))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(9)
+        font.setPointSize(11)
         font.setBold(True)
         font.setWeight(87)
         self.groupBox_plc_connection.setFont(font)
@@ -597,7 +615,7 @@ class Ui_MainWindow(object):
         self.label_8 = QtWidgets.QLabel(self.frame_3)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(9)
+        font.setPointSize(10)
         font.setBold(False)
         font.setWeight(50)
         self.label_8.setFont(font)
@@ -606,7 +624,7 @@ class Ui_MainWindow(object):
         self.indirect_from_log = QtWidgets.QRadioButton(self.frame_3)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(9)
+        font.setPointSize(10)
         font.setBold(False)
         font.setWeight(50)
         self.indirect_from_log.setFont(font)
@@ -919,7 +937,7 @@ class Ui_MainWindow(object):
         self.label_page_sub_mysql.setText(_translate("MainWindow", "Credentials used to auto-select the item code from MySQL"))
         self.label_mysql_state.setText(_translate("MainWindow", "●  NOT CONNECTED"))
         self.label_mysql_state.setProperty("state", _translate("MainWindow", "disconnected"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "   Autologon   "))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "              Auto Connect Database            "))
         self.label_page_title_plc.setText(_translate("MainWindow", "PLC Connection"))
         self.label_page_sub_plc.setText(_translate("MainWindow", "Link the inspector to the PLC that controls the line"))
         self.label_plc_state.setText(_translate("MainWindow", "●  NOT CONNECTED"))
@@ -964,7 +982,7 @@ class Ui_MainWindow(object):
 "3.  Run Test Connection, then Apply.\n"
 "\n"
 "4.  Open “PLC Signal Test” to read and write registers."))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "   Auto Connect PLC   "))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "        Auto Connect PLC           "))
         self.label_plc_test_title.setText(_translate("MainWindow", "PLC Signal Test"))
         self.label_plc_test_subtitle.setText(_translate("MainWindow", "Verify the PLC link by reading and writing device registers"))
         self.label_plc_conn_status.setText(_translate("MainWindow", "●  DISCONNECTED"))
@@ -1015,7 +1033,7 @@ class Ui_MainWindow(object):
         self.textEdit_plc_log.setPlaceholderText(_translate("MainWindow", "Transmit / receive history will appear here…"))
         self.pushButton_plc_copy_log.setText(_translate("MainWindow", "Copy"))
         self.pushButton_plc_clear_log.setText(_translate("MainWindow", "Clear"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("MainWindow", "   PLC Signal Test   "))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("MainWindow", "           PLC Command                 "))
 
 
 if __name__ == "__main__":
