@@ -1081,7 +1081,6 @@ class PLCHandler:
                 ordinal = 0
             tasks.append((ordinal, sig_key, phase_cfg, sig))
 
-        # Sắp xếp theo ordinal tăng dần
         tasks.sort(key=lambda x: x[0])
 
         for ordinal, sig_key, phase_cfg, sig in tasks:
@@ -1141,56 +1140,6 @@ class PLCHandler:
 
         return raw_image_rgb
 
-    # -----------------------------------------------------------------------
-    # take_image_bk
-    # -----------------------------------------------------------------------
-    def take_image_bk(self, device, key, timer, current_count, timer1):
-        with self._signal_rwlock.read():
-            signals = dict(self.dict_signal_complete.get(key, {}))
-
-        write = self._safe_write_plc
-
-        def grab_with_retry(max_attempts=3, delay=0.03):
-            for attempt in range(max_attempts):
-                start_time = time.perf_counter()
-                img = device.Retrieve_Image_Buffer()
-                lapsed = (time.perf_counter() - start_time) * 1000
-                _log.debug('[take_image] Retrieve latency (attempt %d): %.2fms', attempt + 1, lapsed)
-                if img is not None:
-                    return img
-                time.sleep(delay)
-            return None
-
-        for sig_name, val_key in [('gate', 'on'), ('busy', 'on'), ('ready', 'off')]:
-            if sig_name in signals:
-                val = signals[sig_name].get(val_key)
-                if val is not None and str(val).strip() != '' and str(val).strip().lower() != 'none':
-                    write(str(signals[sig_name]['reg']), int(val))
-
-        time.sleep(timer)
-        raw_image_rgb = grab_with_retry()
-
-        if raw_image_rgb is None:
-            _log.warning('[%s] First grab phase failed. Attempting camera soft reset...', key)
-            try:
-                device.stop_grabbing_array_class()
-                time.sleep(0.1)
-                device.start_grabbing_array_class()
-                time.sleep(0.1)
-            except Exception as e:
-                _log.error('[%s] Camera soft reset failed: %s', key, e)
-                
-            raw_image_rgb = grab_with_retry()
-
-        for sig_name, val_key in [('gate', 'off'), ('busy', 'off'), ('ready', 'on')]:
-            if sig_name in signals:
-                val = signals[sig_name].get(val_key)
-                if val is not None and str(val).strip() != '' and str(val).strip().lower() != 'none':
-                    write(str(signals[sig_name]['reg']), int(val))
-
-        time.sleep(timer1)
-        
-        return raw_image_rgb
     # -----------------------------------------------------------------------
     # handler counter shot
     # -----------------------------------------------------------------------
@@ -1283,10 +1232,7 @@ class PLCHandler:
             return
 
         try:
-            result_img, flag, list_register, logo_text = model_processor.process_image_func(
-                raw_image, model_loader, pyuic, camera, key_model, current_count,
-                mode_load_jumper=self.mode_load_jumper,
-            )
+            result_img, flag, list_register, logo_text = model_processor.process_image_func(raw_image, model_loader, pyuic, camera, key_model)
         except Exception:
             _log.exception('[%s] process_image_func failed at shot %s', key, current_count)
             return

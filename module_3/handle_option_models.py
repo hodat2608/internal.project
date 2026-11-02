@@ -4,7 +4,7 @@ from module_2 import root
 from PyQt5.QtWidgets import (QMessageBox,QFileDialog)
 import sys
 from PyQt5.QtWidgets import (QFileDialog)
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets, sip
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QStyledItemDelegate, QStyleOptionButton, QStyle
@@ -425,11 +425,24 @@ class CellSliderPopup(QtWidgets.QWidget):
 
         outer_layout.addWidget(self.container)
 
+    def _is_table_valid(self):
+        try:
+            return self.table is not None and not sip.isdeleted(self.table)
+        except (RuntimeError, AttributeError):
+            return False
+
     def attach_to_cell(self, index, col_name, pinned=False):
+        if not self._is_table_valid():
+            self.hide()
+            return
         if not index.isValid() or col_name not in SLIDER_COLUMN_CONFIGS:
             self.hide()
             return
-        if not self.table.isEnabled():
+        try:
+            if not self.table.isEnabled():
+                self.hide()
+                return
+        except (RuntimeError, AttributeError):
             self.hide()
             return
 
@@ -499,42 +512,56 @@ class CellSliderPopup(QtWidgets.QWidget):
     def _on_slider_value_changed(self, val):
         if self._is_updating or not self.current_index or not self.current_index.isValid():
             return
-        cfg = SLIDER_COLUMN_CONFIGS.get(self.current_col_name, {})
-        self._update_display(val, cfg)
+        if not self._is_table_valid():
+            return
+        try:
+            cfg = SLIDER_COLUMN_CONFIGS.get(self.current_col_name, {})
+            self._update_display(val, cfg)
 
-        prefix = cfg.get("prefix", "")
-        formatted = f"{prefix}{val}"
-        model = self.table.model()
-        if model:
-            idx = QtCore.QModelIndex(self.current_index)
-            model.setData(idx, formatted, Qt.EditRole)
+            prefix = cfg.get("prefix", "")
+            formatted = f"{prefix}{val}"
+            model = self.table.model()
+            if model and not sip.isdeleted(model):
+                idx = QtCore.QModelIndex(self.current_index)
+                model.setData(idx, formatted, Qt.EditRole)
+        except (RuntimeError, AttributeError):
+            pass
 
     def _reposition(self):
+        if not self._is_table_valid():
+            return
         if not self.current_index or not self.current_index.isValid():
             return
-        rect = self.table.visualRect(QtCore.QModelIndex(self.current_index))
-        if not rect.isValid():
-            return
+        try:
+            rect = self.table.visualRect(QtCore.QModelIndex(self.current_index))
+            if not rect.isValid():
+                return
 
-        global_bottom_left = self.table.viewport().mapToGlobal(rect.bottomLeft())
-        pop_w = self.width() if self.width() > 10 else 240
-        pop_h = self.height() if self.height() > 10 else 85
+            viewport = self.table.viewport()
+            if not self._is_table_valid() or sip.isdeleted(viewport):
+                return
 
-        x = global_bottom_left.x() + (rect.width() - pop_w) // 2
-        y = global_bottom_left.y() + 2
+            global_bottom_left = viewport.mapToGlobal(rect.bottomLeft())
+            pop_w = self.width() if self.width() > 10 else 240
+            pop_h = self.height() if self.height() > 10 else 85
 
-        desktop = QtWidgets.QApplication.desktop()
-        screen_geo = desktop.availableGeometry(global_bottom_left)
-        if y + pop_h > screen_geo.bottom():
-            global_top_left = self.table.viewport().mapToGlobal(rect.topLeft())
-            y = global_top_left.y() - pop_h - 2
+            x = global_bottom_left.x() + (rect.width() - pop_w) // 2
+            y = global_bottom_left.y() + 2
 
-        if x < screen_geo.left():
-            x = screen_geo.left() + 10
-        elif x + pop_w > screen_geo.right():
-            x = screen_geo.right() - pop_w - 10
+            desktop = QtWidgets.QApplication.desktop()
+            screen_geo = desktop.availableGeometry(global_bottom_left)
+            if y + pop_h > screen_geo.bottom():
+                global_top_left = viewport.mapToGlobal(rect.topLeft())
+                y = global_top_left.y() - pop_h - 2
 
-        self.move(x, y)
+            if x < screen_geo.left():
+                x = screen_geo.left() + 10
+            elif x + pop_w > screen_geo.right():
+                x = screen_geo.right() - pop_w - 10
+
+            self.move(x, y)
+        except (RuntimeError, AttributeError):
+            pass
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
@@ -581,74 +608,115 @@ class TableSliderController(QtCore.QObject):
         self.table.verticalScrollBar().valueChanged.connect(self.popup.hide)
         self.table.horizontalScrollBar().valueChanged.connect(self.popup.hide)
 
+    def _is_valid(self, qobj):
+        try:
+            return qobj is not None and not sip.isdeleted(qobj)
+        except (RuntimeError, AttributeError):
+            return False
+
     def _get_col_name(self, col):
         if 0 <= col < len(self.model_column):
             return self.model_column[col]
         return None
 
     def _on_cell_clicked(self, index):
-        if not self.table.isEnabled():
-            self.popup.hide()
-            return
-        col_name = self._get_col_name(index.column())
-        if col_name in SLIDER_COLUMN_CONFIGS:
-            self.popup.attach_to_cell(index, col_name, pinned=True)
-        else:
-            self.popup.hide()
+        try:
+            if not self._is_valid(self.table) or not self._is_valid(self.popup):
+                return
+            if not self.table.isEnabled():
+                self.popup.hide()
+                return
+            col_name = self._get_col_name(index.column())
+            if col_name in SLIDER_COLUMN_CONFIGS:
+                self.popup.attach_to_cell(index, col_name, pinned=True)
+            else:
+                self.popup.hide()
+        except (RuntimeError, AttributeError):
+            pass
 
     def _on_cell_double_clicked(self, index):
-        self.popup.hide()
+        try:
+            if self._is_valid(self.popup):
+                self.popup.hide()
+        except (RuntimeError, AttributeError):
+            pass
 
     def _on_current_changed(self, current, previous):
-        if not self.table.isEnabled() or not current.isValid():
-            self.popup.hide()
-            return
-        col_name = self._get_col_name(current.column())
-        if col_name in SLIDER_COLUMN_CONFIGS:
-            self.popup.attach_to_cell(current, col_name, pinned=True)
-        else:
-            self.popup.hide()
+        try:
+            if not self._is_valid(self.table) or not self._is_valid(self.popup):
+                return
+            if not self.table.isEnabled() or not current.isValid():
+                self.popup.hide()
+                return
+            col_name = self._get_col_name(current.column())
+            if col_name in SLIDER_COLUMN_CONFIGS:
+                self.popup.attach_to_cell(current, col_name, pinned=True)
+            else:
+                self.popup.hide()
+        except (RuntimeError, AttributeError):
+            pass
 
     def _on_hover_timeout(self):
-        if not self.table.isEnabled():
-            return
-        if self.pending_hover_index and self.pending_hover_index.isValid():
-            col_name = self._get_col_name(self.pending_hover_index.column())
-            if col_name in SLIDER_COLUMN_CONFIGS:
-                self.popup.attach_to_cell(QtCore.QModelIndex(self.pending_hover_index), col_name, pinned=False)
+        try:
+            if not self._is_valid(self.table) or not self._is_valid(self.popup):
+                return
+            if not self.table.isEnabled():
+                return
+            if self.pending_hover_index and self.pending_hover_index.isValid():
+                col_name = self._get_col_name(self.pending_hover_index.column())
+                if col_name in SLIDER_COLUMN_CONFIGS:
+                    self.popup.attach_to_cell(QtCore.QModelIndex(self.pending_hover_index), col_name, pinned=False)
+        except (RuntimeError, AttributeError):
+            pass
 
     def eventFilter(self, obj, event):
-        if obj == self.table.viewport():
-            if event.type() == QtCore.QEvent.MouseMove:
-                if not self.table.isEnabled():
-                    return super().eventFilter(obj, event)
-                pos = event.pos()
-                index = self.table.indexAt(pos)
-                if index.isValid():
-                    col_name = self._get_col_name(index.column())
-                    if col_name in SLIDER_COLUMN_CONFIGS:
-                        if self.popup.isVisible() and self.popup.current_index == index:
-                            pass
-                        elif self.popup.isVisible() and self.popup.is_pinned:
-                            pass
+        try:
+            if not self._is_valid(self.table):
+                return False
+            viewport = self.table.viewport()
+            if not self._is_valid(viewport):
+                return False
+        except (RuntimeError, AttributeError):
+            return False
+
+        try:
+            if obj == viewport:
+                if event.type() == QtCore.QEvent.MouseMove:
+                    if not self.table.isEnabled():
+                        return super().eventFilter(obj, event)
+                    pos = event.pos()
+                    index = self.table.indexAt(pos)
+                    if index.isValid():
+                        col_name = self._get_col_name(index.column())
+                        if col_name in SLIDER_COLUMN_CONFIGS:
+                            if self._is_valid(self.popup) and self.popup.isVisible() and self.popup.current_index == index:
+                                pass
+                            elif self._is_valid(self.popup) and self.popup.isVisible() and self.popup.is_pinned:
+                                pass
+                            else:
+                                self.pending_hover_index = QtCore.QPersistentModelIndex(index)
+                                self.hover_timer.start()
                         else:
-                            self.pending_hover_index = QtCore.QPersistentModelIndex(index)
-                            self.hover_timer.start()
+                            self.hover_timer.stop()
+                            if self._is_valid(self.popup) and self.popup.isVisible() and not self.popup.is_pinned:
+                                cursor_pos = QtGui.QCursor.pos()
+                                if not self.popup.geometry().contains(cursor_pos):
+                                    self.popup.hide()
                     else:
                         self.hover_timer.stop()
-                        if self.popup.isVisible() and not self.popup.is_pinned:
-                            cursor_pos = QtGui.QCursor.pos()
-                            if not self.popup.geometry().contains(cursor_pos):
-                                self.popup.hide()
-                else:
+                elif event.type() in (QtCore.QEvent.Leave, QtCore.QEvent.Wheel):
                     self.hover_timer.stop()
-            elif event.type() in (QtCore.QEvent.Leave, QtCore.QEvent.Wheel):
-                self.hover_timer.stop()
-                if self.popup.isVisible() and not self.popup.is_pinned:
-                    cursor_pos = QtGui.QCursor.pos()
-                    if not self.popup.geometry().contains(cursor_pos):
-                        self.popup.hide()
-        return super().eventFilter(obj, event)
+                    if self._is_valid(self.popup) and self.popup.isVisible() and not self.popup.is_pinned:
+                        cursor_pos = QtGui.QCursor.pos()
+                        if not self.popup.geometry().contains(cursor_pos):
+                            self.popup.hide()
+        except (RuntimeError, AttributeError):
+            return False
+
+        try:
+            return super().eventFilter(obj, event)
+        except (RuntimeError, AttributeError):
+            return False
 
 
 class Process_Model:

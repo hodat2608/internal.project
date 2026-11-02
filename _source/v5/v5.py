@@ -232,7 +232,7 @@ class v5s:
 
 
 
-    def run_model(self, image: np.ndarray, model_loader, pyuic,camera,key_model,current_count,mode_load_jumper=False):
+    def run_model(self, image: np.ndarray, model_loader, pyuic,camera,key_model):
         """
         Chạy inference, lọc detection, vẽ kết quả và đánh giá pass/fail.
  

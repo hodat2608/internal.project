@@ -617,10 +617,13 @@ class ManageRestartDialog(QDialog):
         main_layout.addLayout(footer)
 
     def _get_plc_status_text(self):
-        if self.main_core and getattr(self.main_core, 'mode_init_plc', 0):
-            plc_name = getattr(self.main_core, 'plc_module', 'PLC')
-            ip = getattr(self.main_core, 'ip_address_plc', '127.0.0.1')
-            return f"🟢 Đã kết nối {plc_name} ({ip})"
+        if self.main_core:
+            if hasattr(self.main_core, 'is_indirect_log_mode') and self.main_core.is_indirect_log_mode():
+                return "📁 Mô phỏng qua LOG (Simulation Active)"
+            if getattr(self.main_core, 'mode_init_plc', 0):
+                plc_name = getattr(self.main_core, 'plc_module', 'PLC')
+                ip = getattr(self.main_core, 'ip_address_plc', '127.0.0.1')
+                return f"🟢 Đã kết nối {plc_name} ({ip})"
         return "🟡 Chưa kết nối PLC vật lý"
 
     def _insert_prefix(self, p):
@@ -697,16 +700,23 @@ class ManageRestartDialog(QDialog):
         if not reg:
             QMessageBox.warning(self, "Cảnh báo", "Vui lòng nhập địa chỉ thanh ghi cần đọc!")
             return
-        if not self.main_core or not getattr(self.main_core, 'driver_loader', None):
-            QMessageBox.warning(self, "PLC Offline", "Hiện chưa có kết nối vật lý đến PLC!")
+        if not self.main_core:
+            QMessageBox.warning(self, "Lỗi", "Không tìm thấy tham chiếu main_core!")
             return
         try:
-            val = self.main_core.driver_loader.read_plc(reg)
+            if hasattr(self.main_core, '_safe_read_plc'):
+                val = self.main_core._safe_read_plc(reg)
+            elif getattr(self.main_core, 'driver_loader', None):
+                val = self.main_core.driver_loader.read_plc(reg)
+            else:
+                val = None
+            is_log_mode = self.main_core.is_indirect_log_mode() if hasattr(self.main_core, 'is_indirect_log_mode') else False
+            mode_tag = " (Mô phỏng LOG)" if is_log_mode else " (PLC Thật)"
             if val is not None:
-                self.lbl_read_val.setText(f"Giá trị: {val}")
+                self.lbl_read_val.setText(f"Giá trị: {val}{mode_tag}")
                 self.lbl_read_val.setStyleSheet("background-color: #DCFCE7; color: #166534; font-weight: bold; padding: 4px 10px; border-radius: 4px;")
             else:
-                self.lbl_read_val.setText("Không có phản hồi")
+                self.lbl_read_val.setText(f"Không có phản hồi{mode_tag}")
                 self.lbl_read_val.setStyleSheet("background-color: #FEE2E2; color: #991B1B; padding: 4px 10px; border-radius: 4px;")
         except Exception as e:
             QMessageBox.critical(self, "Lỗi đọc PLC", f"Không thể đọc thanh ghi {reg}:\n{e}")
@@ -716,13 +726,23 @@ class ManageRestartDialog(QDialog):
         if not reg:
             QMessageBox.warning(self, "Cảnh báo", "Vui lòng nhập địa chỉ thanh ghi!")
             return
-        if not self.main_core or not getattr(self.main_core, 'driver_loader', None):
-            QMessageBox.warning(self, "PLC Offline", "Hiện chưa có kết nối vật lý đến PLC!")
+        if not self.main_core:
+            QMessageBox.warning(self, "Lỗi", "Không tìm thấy tham chiếu main_core!")
             return
         try:
             val = self.spin_val_on.value()
-            self.main_core.driver_loader.write_plc(reg, val)
-            QMessageBox.information(self, "Thành công", f"Đã ghi thành công giá trị {val} vào thanh ghi {reg}!")
+            if hasattr(self.main_core, '_safe_write_plc'):
+                res = self.main_core._safe_write_plc(reg, val)
+            elif getattr(self.main_core, 'driver_loader', None):
+                res = self.main_core.driver_loader.write_plc(reg, val)
+            else:
+                res = None
+            is_log_mode = self.main_core.is_indirect_log_mode() if hasattr(self.main_core, 'is_indirect_log_mode') else False
+            mode_tag = " [Chế độ mô phỏng qua LOG]" if is_log_mode else " [Kết nối PLC thật]"
+            if res is not None and res is not False:
+                QMessageBox.information(self, "Thành công", f"Đã ghi thành công giá trị {val} vào thanh ghi {reg}!{mode_tag}")
+            else:
+                QMessageBox.warning(self, "Cảnh báo", f"Ghi thanh ghi {reg} không trả về kết quả thành công!{mode_tag}")
         except Exception as e:
             QMessageBox.critical(self, "Lỗi ghi PLC", f"Không thể ghi vào thanh ghi {reg}:\n{e}")
 
@@ -1042,10 +1062,13 @@ class ManageCloseDialog(QDialog):
         main_layout.addLayout(footer)
 
     def _get_plc_status_text(self):
-        if self.main_core and getattr(self.main_core, 'mode_init_plc', 0):
-            plc_name = getattr(self.main_core, 'plc_module', 'PLC')
-            ip = getattr(self.main_core, 'ip_address_plc', '127.0.0.1')
-            return f"🟢 Đã kết nối {plc_name} ({ip})"
+        if self.main_core:
+            if hasattr(self.main_core, 'is_indirect_log_mode') and self.main_core.is_indirect_log_mode():
+                return "📁 Mô phỏng qua LOG (Simulation Active)"
+            if getattr(self.main_core, 'mode_init_plc', 0):
+                plc_name = getattr(self.main_core, 'plc_module', 'PLC')
+                ip = getattr(self.main_core, 'ip_address_plc', '127.0.0.1')
+                return f"🟢 Đã kết nối {plc_name} ({ip})"
         return "🟡 Chưa kết nối PLC vật lý"
 
     def _insert_prefix(self, p):
@@ -1134,16 +1157,23 @@ class ManageCloseDialog(QDialog):
         if not reg:
             QMessageBox.warning(self, "Cảnh báo", "Vui lòng nhập địa chỉ thanh ghi cần đọc!")
             return
-        if not self.main_core or not getattr(self.main_core, 'driver_loader', None):
-            QMessageBox.warning(self, "PLC Offline", "Hiện chưa có kết nối vật lý đến PLC!")
+        if not self.main_core:
+            QMessageBox.warning(self, "Lỗi", "Không tìm thấy tham chiếu main_core!")
             return
         try:
-            val = self.main_core.driver_loader.read_plc(reg)
+            if hasattr(self.main_core, '_safe_read_plc'):
+                val = self.main_core._safe_read_plc(reg)
+            elif getattr(self.main_core, 'driver_loader', None):
+                val = self.main_core.driver_loader.read_plc(reg)
+            else:
+                val = None
+            is_log_mode = self.main_core.is_indirect_log_mode() if hasattr(self.main_core, 'is_indirect_log_mode') else False
+            mode_tag = " (Mô phỏng LOG)" if is_log_mode else " (PLC Thật)"
             if val is not None:
-                self.lbl_read_val.setText(f"Giá trị: {val}")
+                self.lbl_read_val.setText(f"Giá trị: {val}{mode_tag}")
                 self.lbl_read_val.setStyleSheet("background-color: #DCFCE7; color: #166534; font-weight: bold; padding: 4px 10px; border-radius: 4px;")
             else:
-                self.lbl_read_val.setText("Không có phản hồi")
+                self.lbl_read_val.setText(f"Không có phản hồi{mode_tag}")
                 self.lbl_read_val.setStyleSheet("background-color: #FEE2E2; color: #991B1B; padding: 4px 10px; border-radius: 4px;")
         except Exception as e:
             QMessageBox.critical(self, "Lỗi đọc PLC", f"Không thể đọc thanh ghi {reg}:\n{e}")
@@ -1153,13 +1183,23 @@ class ManageCloseDialog(QDialog):
         if not reg:
             QMessageBox.warning(self, "Cảnh báo", "Vui lòng nhập địa chỉ thanh ghi!")
             return
-        if not self.main_core or not getattr(self.main_core, 'driver_loader', None):
-            QMessageBox.warning(self, "PLC Offline", "Hiện chưa có kết nối vật lý đến PLC!")
+        if not self.main_core:
+            QMessageBox.warning(self, "Lỗi", "Không tìm thấy tham chiếu main_core!")
             return
         try:
             val = self.spin_val_on.value()
-            self.main_core.driver_loader.write_plc(reg, val)
-            QMessageBox.information(self, "Thành công", f"Đã ghi thành công giá trị {val} vào thanh ghi {reg}!")
+            if hasattr(self.main_core, '_safe_write_plc'):
+                res = self.main_core._safe_write_plc(reg, val)
+            elif getattr(self.main_core, 'driver_loader', None):
+                res = self.main_core.driver_loader.write_plc(reg, val)
+            else:
+                res = None
+            is_log_mode = self.main_core.is_indirect_log_mode() if hasattr(self.main_core, 'is_indirect_log_mode') else False
+            mode_tag = " [Chế độ mô phỏng qua LOG]" if is_log_mode else " [Kết nối PLC thật]"
+            if res is not None and res is not False:
+                QMessageBox.information(self, "Thành công", f"Đã ghi thành công giá trị {val} vào thanh ghi {reg}!{mode_tag}")
+            else:
+                QMessageBox.warning(self, "Cảnh báo", f"Ghi thanh ghi {reg} không trả về kết quả thành công!{mode_tag}")
         except Exception as e:
             QMessageBox.critical(self, "Lỗi ghi PLC", f"Không thể ghi vào thanh ghi {reg}:\n{e}")
 

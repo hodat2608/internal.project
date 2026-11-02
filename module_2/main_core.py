@@ -16,7 +16,7 @@ from module_6.omron.initial import OmronClient as Omron_Socket_Client
 from datetime import datetime
 from app_logger.app_logger import get_logger as _get_logger, open_log_window
 import subprocess,re
-from module_1.root_path import resource_path, get_mysql_config_path
+from module_1.root_path import resource_path, get_mysql_config_path, get_trigger_file_path
 from module_1.table_db import _ADMIN_TABLES_SQL,TABLES_SQL_ITEM_CODE_SAVE,TABLES_SQL_DATA_IP_ADDRESS,TABLES_SQL_DATA_AUTO_LOGIN
 _log = _get_logger('module_2.main_core')
 
@@ -393,6 +393,123 @@ class core:
             
             progress.close()
 
+    def is_indirect_log_mode(self) -> bool:
+        """
+        Kiểm tra chế độ giao tiếp PLC được cấu hình:
+        - True: Chế độ mô phỏng qua LOG (indirect_from_log = True hoặc direct_to_plc = False)
+        - False: Chế độ kết nối trực tiếp thiết bị PLC (direct_to_plc = True)
+        """
+        if bool(getattr(self, 'direct_to_plc', False)) is True and not bool(getattr(self, 'indirect_from_log', False)):
+            return False
+        if bool(getattr(self, 'indirect_from_log', False)) is True:
+            return True
+        if hasattr(self, 'direct_to_plc') and bool(getattr(self, 'direct_to_plc')) is False:
+            return True
+
+        try:
+            if self.connection and hasattr(self.connection, 'cursor'):
+                cursor = self.connection.cursor()
+                cursor.execute("SELECT direct_to_plc, indirect_from_log FROM `DATA_IP_ADDRESS`.`INFOR_ADDRESS` LIMIT 1")
+                row = cursor.fetchone()
+                cursor.close()
+                if row:
+                    direct_to_plc, indirect_from_log = bool(row[0]), bool(row[1])
+                    return indirect_from_log or (not direct_to_plc)
+        except Exception:
+            pass
+
+        return False
+
+    def _safe_read_plc(self, register: str):
+        """
+        Đọc PLC an toàn:
+        - Nếu user chọn indirect_from_log: Sử dụng _safe_read_plc_log để đọc từ log mô phỏng.
+        - Nếu user chọn direct_to_plc: Sử dụng đọc trực tiếp từ thiết bị PLC.
+        """
+        if not register or str(register).strip() == "":
+            return None
+
+        if self.is_indirect_log_mode():
+            return self._safe_read_plc_log(register)
+
+        if self.driver_loader is None:
+            return None
+        try:
+            return self.driver_loader.read_plc(register)
+        except Exception as e:
+            _log.debug("_safe_read_plc exception on %s: %s", register, e)
+            return None
+
+    def _safe_write_plc(self, register: str, value):
+        """
+        Ghi PLC an toàn:
+        - Nếu value là None, rỗng ("") hoặc "No Value": bỏ qua không ghi.
+        - Nếu user chọn indirect_from_log: Sử dụng _safe_write_plc_log để ghi vào log mô phỏng.
+        - Nếu user chọn direct_to_plc: Sử dụng ghi trực tiếp xuống thiết bị PLC.
+        """
+        if value is None:
+            return None
+        val_str = str(value).strip()
+        if val_str == "" or val_str.lower() in ("none", "no value"):
+            return None
+
+        if self.is_indirect_log_mode():
+            return self._safe_write_plc_log(register, value)
+
+        if self.driver_loader is None:
+            return None
+        try:
+            val_to_write = int(val_str) if val_str.lstrip('-').isdigit() else val_str
+            return self.driver_loader.write_plc(register, val_to_write)
+        except Exception as e:
+            _log.debug("_safe_write_plc exception on %s: %s", register, e)
+            return None
+
+    def _safe_read_plc_log(self, register: str):
+        """Đọc PLC từ file log mô phỏng (trigger_{register}.txt)."""
+        if self.driver_loader is not None and hasattr(self.driver_loader, 'read_plc_log'):
+            try:
+                return self.driver_loader.read_plc_log(register)
+            except Exception:
+                pass
+
+        try:
+            file_path = get_trigger_file_path(register, for_writing=False)
+            if os.path.exists(file_path):
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    line = f.readline().strip()
+                    if '=' in line:
+                        reg, val = line.split('=')
+                        if reg.strip().upper() == register.strip().upper():
+                            return int(val.strip())
+            return 0
+        except Exception:
+            return 0
+
+    def _safe_write_plc_log(self, register: str, value):
+        """Ghi PLC vào file log mô phỏng (trigger_{register}.txt)."""
+        if value is None:
+            return False
+        val_str = str(value).strip()
+        if val_str == "" or val_str.lower() in ("none", "no value"):
+            return False
+
+        if self.driver_loader is not None and hasattr(self.driver_loader, 'write_plc_log'):
+            try:
+                return self.driver_loader.write_plc_log(register, value)
+            except Exception:
+                pass
+
+        try:
+            file_path = get_trigger_file_path(register, for_writing=True)
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(f"{register} = {value}\n")
+            return True
+        except Exception as e:
+            _log.debug("_safe_write_plc_log fallback failed on %s: %s", register, e)
+            return False
+
     def reload_system_action_configs(self):
         try:
             from module_2.manage_system_actions import get_system_action_config
@@ -405,7 +522,7 @@ class core:
             _log.warning("Could not reload system action configs: %s", e)
 
     def check_system_action_triggers(self):
-        if not hasattr(self, 'driver_loader') or self.driver_loader is None:
+        if not self.is_indirect_log_mode() and (not hasattr(self, 'driver_loader') or self.driver_loader is None):
             return
         if not hasattr(self, 'system_action_configs') or not self.system_action_configs:
             return
@@ -426,7 +543,7 @@ class core:
                 continue
 
             try:
-                current_value = self.driver_loader.read_plc(register)
+                current_value = self._safe_read_plc(register)
                 val_on = int(cfg.get("value_bit_on", 1))
                 if current_value is not None and int(current_value) == val_on:
                     self._action_cooldowns[action_type] = now
@@ -435,11 +552,8 @@ class core:
                     if cfg.get("auto_write_off"):
                         val_off_str = str(cfg.get("value_bit_off", "0")).strip()
                         if val_off_str.lower() not in ('none', 'no value', ''):
-                            try:
-                                self.driver_loader.write_plc(register, int(val_off_str))
-                                _log.info("Handshake OFF written to %s = %s", register, val_off_str)
-                            except Exception as e_w:
-                                _log.warning("Failed to write OFF to %s: %s", register, e_w)
+                            self._safe_write_plc(register, val_off_str)
+                            _log.info("Handshake OFF written to %s = %s", register, val_off_str)
 
                     if hasattr(self, 'worker_thread') and self.worker_thread:
                         self.worker_thread.system_action_triggered.emit(action_type, cfg)
@@ -450,7 +564,9 @@ class core:
         # Kiểm tra lệnh Restart / Close từ PLC
         self.check_system_action_triggers()
 
-        if not self.dict_list_line or self.driver_loader is None:
+        if not self.is_indirect_log_mode() and (not self.dict_list_line or self.driver_loader is None):
+            return
+        if self.is_indirect_log_mode() and not self.dict_list_line:
             return
 
         for name_line, values in list(self.dict_list_line.items()):
@@ -463,14 +579,11 @@ class core:
                 if not register:
                     continue
                 try:
-                    current_value = self.driver_loader.read_plc(register)
+                    current_value = self._safe_read_plc(register)
                     if current_value is not None and int(current_value) == value_bit_on:
                         _log.info("PLC Trigger detected: %s = %d (Item: %s)", register, value_bit_on, item_code)
                         if value_bit_off is not None and str(value_bit_off).strip() != "" and str(value_bit_off).strip().lower() not in ('none', 'no value'):
-                            try:
-                                self.driver_loader.write_plc(register, int(value_bit_off))
-                            except (ValueError, TypeError):
-                                pass
+                            self._safe_write_plc(register, value_bit_off)
 
                         date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                         self.item_code = item_code
@@ -528,17 +641,18 @@ class core:
             return None
 
         
-    def query_hardware_key(self):
+    def query_hardware_key(self, show_dialog=True):
         if not self.connection:
             _log.warning("No database connection. Bypassing hardware key check to allow GUI configuration.")
             return True
         serial_hardware_key = self.get_serial_hardware_key()
         if not serial_hardware_key:
-            QMessageBox.warning(
-                None,
-                "No License found!",
-                "No License found! \nPlease insert USB Hardware Key to continue!\n\n"
-            )
+            if show_dialog:
+                QMessageBox.warning(
+                    None,
+                    "No License found!",
+                    "No License found! \nPlease insert USB Hardware Key to continue!\n\n"
+                )
             return False
         else:
             usb_list = self.get_connected_usb_serials()
@@ -547,12 +661,17 @@ class core:
                     if usb['serial'] == serial_hardware_key[i][0]:
                         _log.info('Success to check hardware key')
                         return True
-            QMessageBox.warning(
-                None,
-                "No License found!",
-                "No License found! \n Please insert USB Hardware Key to continue!\n\n"
-            )
+            if show_dialog:
+                QMessageBox.warning(
+                    None,
+                    "No License found!",
+                    "No License found! \n Please insert USB Hardware Key to continue!\n\n"
+                )
             return False
+
+    def is_hardware_key_valid(self) -> bool:
+        """Kiểm tra USB Hardware Key âm thầm, không hiển thị hộp thoại cảnh báo."""
+        return self.query_hardware_key(show_dialog=False)
 
 
     def get_serial_hardware_key(self):

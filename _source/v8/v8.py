@@ -19,7 +19,7 @@ class v8s(v5s):
         self.keys_mapping = list(COLUMN_MAPPING.keys())
         self.params           = ['xmax', 'xmin', 'ymax', 'ymin']
 
-    def run_model(self, image: np.ndarray, model_loader, pyuic,camera,key_model,current_count,mode_load_jumper=False):
+    def run_model(self, image: np.ndarray, model_loader, pyuic,camera,key_model):
         if camera:
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) 
         
