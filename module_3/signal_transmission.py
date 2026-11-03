@@ -66,1210 +66,28 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 1781, 1559))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, -861, 1781, 1919))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
-        self.gridLayout_17 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents)
-        self.gridLayout_17.setObjectName("gridLayout_17")
-        self.vlayout_bottomrow_container_wrap = QtWidgets.QVBoxLayout()
-        self.vlayout_bottomrow_container_wrap.setContentsMargins(0, 0, 0, 0)
-        self.vlayout_bottomrow_container_wrap.setObjectName("vlayout_bottomrow_container_wrap")
-        self.hlayout_bottomrow = QtWidgets.QHBoxLayout()
-        self.hlayout_bottomrow.setSpacing(12)
-        self.hlayout_bottomrow.setObjectName("hlayout_bottomrow")
-        self.groupAssignShot = QtWidgets.QGroupBox(self.scrollAreaWidgetContents)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(1)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.groupAssignShot.sizePolicy().hasHeightForWidth())
-        self.groupAssignShot.setSizePolicy(sizePolicy)
-        self.groupAssignShot.setMaximumSize(QtCore.QSize(16777215, 350))
+        self.gridLayout_32 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents)
+        self.gridLayout_32.setObjectName("gridLayout_32")
+        self.label_25 = QtWidgets.QLabel(self.scrollAreaWidgetContents)
+        self.label_25.setMaximumSize(QtCore.QSize(16777215, 1))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.groupAssignShot.setFont(font)
-        self.groupAssignShot.setStyleSheet("/* Khung chính của GroupBox */\n"
-"QGroupBox {\n"
-"    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */\n"
-"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
-"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
-"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
-"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
-"    color: #333333;            /* Màu chữ tiêu đề */\n"
-"}\n"
-"\n"
-"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
-"QGroupBox::title {\n"
-"    subcontrol-origin: margin;\n"
-"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
-"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
-"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
-"}\n"
-"")
-        self.groupAssignShot.setObjectName("groupAssignShot")
-        self.gridLayout_22 = QtWidgets.QGridLayout(self.groupAssignShot)
-        self.gridLayout_22.setObjectName("gridLayout_22")
-        self.vlayout_shot_v = QtWidgets.QVBoxLayout()
-        self.vlayout_shot_v.setSpacing(8)
-        self.vlayout_shot_v.setObjectName("vlayout_shot_v")
-        self.tableWidget_shotxmodel = QtWidgets.QTableWidget(self.groupAssignShot)
-        self.tableWidget_shotxmodel.setMinimumSize(QtCore.QSize(0, 0))
+        self.label_25.setFont(font)
+        self.label_25.setText("")
+        self.label_25.setObjectName("label_25")
+        self.gridLayout_32.addWidget(self.label_25, 3, 0, 1, 2)
+        self.label_5 = QtWidgets.QLabel(self.scrollAreaWidgetContents)
+        self.label_5.setMaximumSize(QtCore.QSize(16777215, 1))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
-        self.tableWidget_shotxmodel.setFont(font)
-        self.tableWidget_shotxmodel.setStyleSheet("/* Khung chính của bảng TableView */\n"
-"QTableView {\n"
-"    background-color: #F7FFFA; /* Màu xanh lá nhạt dịu mắt (Mint Light) */\n"
-"    border: 1px solid #c6c6c6;  /* Viền xám mảnh đồng bộ */\n"
-"    border-radius: 4px;         /* Bo tròn góc 4px */\n"
-"    gridline-color: #d0ebd5;    /* Màu của các đường lưới ngăn cách ô (xanh lá rất nhạt) */\n"
-"}\n"
-"\n"
-"/* Màu nền của từng ô dữ liệu bên trong bảng */\n"
-"QTableView::item {\n"
-"    background-color: #F7FFFA; /* Đồng bộ màu xanh lá nhạt cho các ô */\n"
-"    color: #2c3e50;            /* Màu chữ tối để dễ đọc */\n"
-"}\n"
-"\n"
-"/* Hiệu ứng khi di chuột qua một dòng/ô */\n"
-"QTableView::item:hover {\n"
-"    background-color: #F5FFE1; /* Xanh lá đậm hơn một chút khi di chuột */\n"
-"}\n"
-"\n"
-"/* Hiệu ứng khi NGƯỜI DÙNG CLICK CHỌN một dòng/ô */\n"
-"QTableView::item:selected {\n"
-"    background-color: #E9F8FF; /* Đổi thành màu xanh lá đậm khi được chọn */\n"
-"    color: black;              /* Chữ chuyển sang trắng để nổi bật */\n"
-"}\n"
-"")
-        self.tableWidget_shotxmodel.setEditTriggers(QtWidgets.QAbstractItemView.DoubleClicked|QtWidgets.QAbstractItemView.EditKeyPressed)
-        self.tableWidget_shotxmodel.setAlternatingRowColors(True)
-        self.tableWidget_shotxmodel.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
-        self.tableWidget_shotxmodel.setRowCount(0)
-        self.tableWidget_shotxmodel.setColumnCount(3)
-        self.tableWidget_shotxmodel.setObjectName("tableWidget_shotxmodel")
-        item = QtWidgets.QTableWidgetItem()
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(11)
-        item.setFont(font)
-        self.tableWidget_shotxmodel.setHorizontalHeaderItem(0, item)
-        item = QtWidgets.QTableWidgetItem()
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(11)
-        item.setFont(font)
-        self.tableWidget_shotxmodel.setHorizontalHeaderItem(1, item)
-        item = QtWidgets.QTableWidgetItem()
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(11)
-        item.setFont(font)
-        self.tableWidget_shotxmodel.setHorizontalHeaderItem(2, item)
-        self.tableWidget_shotxmodel.horizontalHeader().setCascadingSectionResizes(True)
-        self.tableWidget_shotxmodel.horizontalHeader().setDefaultSectionSize(280)
-        self.tableWidget_shotxmodel.horizontalHeader().setHighlightSections(True)
-        self.tableWidget_shotxmodel.horizontalHeader().setSortIndicatorShown(True)
-        self.tableWidget_shotxmodel.horizontalHeader().setStretchLastSection(True)
-        self.tableWidget_shotxmodel.verticalHeader().setCascadingSectionResizes(True)
-        self.tableWidget_shotxmodel.verticalHeader().setDefaultSectionSize(40)
-        self.tableWidget_shotxmodel.verticalHeader().setHighlightSections(True)
-        self.tableWidget_shotxmodel.verticalHeader().setSortIndicatorShown(True)
-        self.tableWidget_shotxmodel.verticalHeader().setStretchLastSection(False)
-        self.vlayout_shot_v.addWidget(self.tableWidget_shotxmodel)
-        self.line_12 = QtWidgets.QFrame(self.groupAssignShot)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_12.setFont(font)
-        self.line_12.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_12.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_12.setObjectName("line_12")
-        self.vlayout_shot_v.addWidget(self.line_12)
-        self.gridLayout_22.addLayout(self.vlayout_shot_v, 0, 0, 1, 1)
-        self.gridLayout_21 = QtWidgets.QGridLayout()
-        self.gridLayout_21.setSpacing(0)
-        self.gridLayout_21.setObjectName("gridLayout_21")
-        self.pushButton_clear_shotx = QtWidgets.QPushButton(self.groupAssignShot)
-        self.pushButton_clear_shotx.setMinimumSize(QtCore.QSize(0, 30))
-        self.pushButton_clear_shotx.setMaximumSize(QtCore.QSize(30, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.pushButton_clear_shotx.setFont(font)
-        self.pushButton_clear_shotx.setStyleSheet("QPushButton {\n"
-"    background-color: transparent;\n"
-"    border: none;\n"
-"    border-radius: 6px;\n"
-"}\n"
-"QPushButton:hover {\n"
-"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
-"}\n"
-"QPushButton:pressed {\n"
-"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
-"}")
-        self.pushButton_clear_shotx.setText("")
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/remove.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_clear_shotx.setIcon(icon)
-        self.pushButton_clear_shotx.setIconSize(QtCore.QSize(25, 25))
-        self.pushButton_clear_shotx.setObjectName("pushButton_clear_shotx")
-        self.gridLayout_21.addWidget(self.pushButton_clear_shotx, 0, 2, 1, 1)
-        self.label_38 = QtWidgets.QLabel(self.groupAssignShot)
-        self.label_38.setMinimumSize(QtCore.QSize(20, 0))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_38.setFont(font)
-        self.label_38.setText("")
-        self.label_38.setObjectName("label_38")
-        self.gridLayout_21.addWidget(self.label_38, 0, 3, 1, 1)
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_21.addItem(spacerItem, 0, 0, 1, 1)
-        self.pushButton_applyshotxmodel = QtWidgets.QPushButton(self.groupAssignShot)
-        self.pushButton_applyshotxmodel.setMinimumSize(QtCore.QSize(0, 30))
-        self.pushButton_applyshotxmodel.setMaximumSize(QtCore.QSize(30, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.pushButton_applyshotxmodel.setFont(font)
-        self.pushButton_applyshotxmodel.setStyleSheet("QPushButton {\n"
-"    background-color: transparent;\n"
-"    border: none;\n"
-"    border-radius: 6px;\n"
-"}\n"
-"QPushButton:hover {\n"
-"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
-"}\n"
-"QPushButton:pressed {\n"
-"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
-"}")
-        self.pushButton_applyshotxmodel.setText("")
-        icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/floppy-disk.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_applyshotxmodel.setIcon(icon1)
-        self.pushButton_applyshotxmodel.setIconSize(QtCore.QSize(22, 22))
-        self.pushButton_applyshotxmodel.setObjectName("pushButton_applyshotxmodel")
-        self.gridLayout_21.addWidget(self.pushButton_applyshotxmodel, 0, 4, 1, 1)
-        self.label_39 = QtWidgets.QLabel(self.groupAssignShot)
-        self.label_39.setMinimumSize(QtCore.QSize(20, 0))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_39.setFont(font)
-        self.label_39.setText("")
-        self.label_39.setObjectName("label_39")
-        self.gridLayout_21.addWidget(self.label_39, 0, 1, 1, 1)
-        self.gridLayout_22.addLayout(self.gridLayout_21, 1, 0, 1, 1)
-        self.hlayout_bottomrow.addWidget(self.groupAssignShot)
-        self.groupAnimationEffect = QtWidgets.QGroupBox(self.scrollAreaWidgetContents)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(1)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.groupAnimationEffect.sizePolicy().hasHeightForWidth())
-        self.groupAnimationEffect.setSizePolicy(sizePolicy)
-        self.groupAnimationEffect.setMinimumSize(QtCore.QSize(0, 350))
-        self.groupAnimationEffect.setMaximumSize(QtCore.QSize(16777215, 350))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.groupAnimationEffect.setFont(font)
-        self.groupAnimationEffect.setStyleSheet("/* Khung chính của GroupBox */\n"
-"QGroupBox {\n"
-"    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */\n"
-"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
-"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
-"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
-"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
-"    color: #333333;            /* Màu chữ tiêu đề */\n"
-"}\n"
-"\n"
-"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
-"QGroupBox::title {\n"
-"    subcontrol-origin: margin;\n"
-"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
-"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
-"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
-"}\n"
-"")
-        self.groupAnimationEffect.setTitle("")
-        self.groupAnimationEffect.setObjectName("groupAnimationEffect")
-        self.gridLayout_23 = QtWidgets.QGridLayout(self.groupAnimationEffect)
-        self.gridLayout_23.setObjectName("gridLayout_23")
-        self.groupBox_3 = QtWidgets.QGroupBox(self.groupAnimationEffect)
-        self.groupBox_3.setMinimumSize(QtCore.QSize(0, 0))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.groupBox_3.setFont(font)
-        self.groupBox_3.setStyleSheet("/* Khung chính của GroupBox */\n"
-"QGroupBox {\n"
-"    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */\n"
-"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
-"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
-"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
-"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
-"    color: #333333;            /* Màu chữ tiêu đề */\n"
-"}\n"
-"\n"
-"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
-"QGroupBox::title {\n"
-"    subcontrol-origin: margin;\n"
-"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
-"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
-"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
-"}\n"
-"")
-        self.groupBox_3.setObjectName("groupBox_3")
-        self.gridLayout_5 = QtWidgets.QGridLayout(self.groupBox_3)
-        self.gridLayout_5.setObjectName("gridLayout_5")
-        self.radioButton_counter_plc = QtWidgets.QRadioButton(self.groupBox_3)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.radioButton_counter_plc.setFont(font)
-        self.radioButton_counter_plc.setObjectName("radioButton_counter_plc")
-        self.gridLayout_5.addWidget(self.radioButton_counter_plc, 1, 2, 1, 1)
-        self.comboBox_increment_counter_signal_selected = QtWidgets.QComboBox(self.groupBox_3)
-        self.comboBox_increment_counter_signal_selected.setMinimumSize(QtCore.QSize(0, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_increment_counter_signal_selected.setFont(font)
-        self.comboBox_increment_counter_signal_selected.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 60px; \n"
-"}\n"
-"")
-        self.comboBox_increment_counter_signal_selected.setObjectName("comboBox_increment_counter_signal_selected")
-        self.comboBox_increment_counter_signal_selected.addItem("")
-        self.gridLayout_5.addWidget(self.comboBox_increment_counter_signal_selected, 1, 7, 1, 1)
-        self.radioButton_condition_plc_pc = QtWidgets.QRadioButton(self.groupBox_3)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.radioButton_condition_plc_pc.setFont(font)
-        self.radioButton_condition_plc_pc.setObjectName("radioButton_condition_plc_pc")
-        self.gridLayout_5.addWidget(self.radioButton_condition_plc_pc, 1, 4, 1, 1)
-        self.label_24 = QtWidgets.QLabel(self.groupBox_3)
-        self.label_24.setMaximumSize(QtCore.QSize(100, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_24.setFont(font)
-        self.label_24.setObjectName("label_24")
-        self.gridLayout_5.addWidget(self.label_24, 1, 6, 1, 1)
-        self.radioButton_counter_pc = QtWidgets.QRadioButton(self.groupBox_3)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.radioButton_counter_pc.setFont(font)
-        self.radioButton_counter_pc.setChecked(True)
-        self.radioButton_counter_pc.setObjectName("radioButton_counter_pc")
-        self.gridLayout_5.addWidget(self.radioButton_counter_pc, 1, 1, 1, 1)
-        self.label_10 = QtWidgets.QLabel(self.groupBox_3)
-        self.label_10.setMaximumSize(QtCore.QSize(50, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_10.setFont(font)
-        self.label_10.setText("")
-        self.label_10.setObjectName("label_10")
-        self.gridLayout_5.addWidget(self.label_10, 1, 0, 1, 1)
-        self.line_25 = QtWidgets.QFrame(self.groupBox_3)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_25.setFont(font)
-        self.line_25.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line_25.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_25.setObjectName("line_25")
-        self.gridLayout_5.addWidget(self.line_25, 1, 5, 1, 1)
-        self.gridLayout_23.addWidget(self.groupBox_3, 0, 0, 1, 2)
-        self.gridLayout_20 = QtWidgets.QGridLayout()
-        self.gridLayout_20.setSpacing(0)
-        self.gridLayout_20.setObjectName("gridLayout_20")
-        self.pushButton_load_setting_for_counter = QtWidgets.QPushButton(self.groupAnimationEffect)
-        self.pushButton_load_setting_for_counter.setMinimumSize(QtCore.QSize(0, 30))
-        self.pushButton_load_setting_for_counter.setMaximumSize(QtCore.QSize(30, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.pushButton_load_setting_for_counter.setFont(font)
-        self.pushButton_load_setting_for_counter.setStyleSheet("QPushButton {\n"
-"    background-color: transparent;\n"
-"    border: none;\n"
-"    border-radius: 6px;\n"
-"}\n"
-"QPushButton:hover {\n"
-"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
-"}\n"
-"QPushButton:pressed {\n"
-"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
-"}")
-        self.pushButton_load_setting_for_counter.setText("")
-        icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/apply-now.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_load_setting_for_counter.setIcon(icon2)
-        self.pushButton_load_setting_for_counter.setIconSize(QtCore.QSize(25, 25))
-        self.pushButton_load_setting_for_counter.setObjectName("pushButton_load_setting_for_counter")
-        self.gridLayout_20.addWidget(self.pushButton_load_setting_for_counter, 0, 2, 1, 1)
-        self.label_34 = QtWidgets.QLabel(self.groupAnimationEffect)
-        self.label_34.setMinimumSize(QtCore.QSize(20, 0))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_34.setFont(font)
-        self.label_34.setText("")
-        self.label_34.setObjectName("label_34")
-        self.gridLayout_20.addWidget(self.label_34, 0, 3, 1, 1)
-        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_20.addItem(spacerItem1, 0, 0, 1, 1)
-        self.pushButton_apply_setting_for_counter = QtWidgets.QPushButton(self.groupAnimationEffect)
-        self.pushButton_apply_setting_for_counter.setMinimumSize(QtCore.QSize(0, 30))
-        self.pushButton_apply_setting_for_counter.setMaximumSize(QtCore.QSize(30, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.pushButton_apply_setting_for_counter.setFont(font)
-        self.pushButton_apply_setting_for_counter.setStyleSheet("QPushButton {\n"
-"    background-color: transparent;\n"
-"    border: none;\n"
-"    border-radius: 6px;\n"
-"}\n"
-"QPushButton:hover {\n"
-"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
-"}\n"
-"QPushButton:pressed {\n"
-"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
-"}")
-        self.pushButton_apply_setting_for_counter.setText("")
-        self.pushButton_apply_setting_for_counter.setIcon(icon1)
-        self.pushButton_apply_setting_for_counter.setIconSize(QtCore.QSize(22, 22))
-        self.pushButton_apply_setting_for_counter.setObjectName("pushButton_apply_setting_for_counter")
-        self.gridLayout_20.addWidget(self.pushButton_apply_setting_for_counter, 0, 4, 1, 1)
-        self.label_35 = QtWidgets.QLabel(self.groupAnimationEffect)
-        self.label_35.setMinimumSize(QtCore.QSize(20, 0))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_35.setFont(font)
-        self.label_35.setText("")
-        self.label_35.setObjectName("label_35")
-        self.gridLayout_20.addWidget(self.label_35, 0, 1, 1, 1)
-        self.gridLayout_23.addLayout(self.gridLayout_20, 4, 0, 1, 1)
-        self.line_14 = QtWidgets.QFrame(self.groupAnimationEffect)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_14.setFont(font)
-        self.line_14.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_14.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_14.setObjectName("line_14")
-        self.gridLayout_23.addWidget(self.line_14, 3, 0, 1, 2)
-        self.groupBox = QtWidgets.QGroupBox(self.groupAnimationEffect)
-        self.groupBox.setMinimumSize(QtCore.QSize(0, 0))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.groupBox.setFont(font)
-        self.groupBox.setStyleSheet("/* Khung chính của GroupBox */\n"
-"QGroupBox {\n"
-"    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */\n"
-"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
-"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
-"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
-"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
-"    color: #333333;            /* Màu chữ tiêu đề */\n"
-"}\n"
-"\n"
-"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
-"QGroupBox::title {\n"
-"    subcontrol-origin: margin;\n"
-"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
-"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
-"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
-"}\n"
-"")
-        self.groupBox.setObjectName("groupBox")
-        self.gridLayout_7 = QtWidgets.QGridLayout(self.groupBox)
-        self.gridLayout_7.setObjectName("gridLayout_7")
-        self.radioButton_reset = QtWidgets.QRadioButton(self.groupBox)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.radioButton_reset.setFont(font)
-        self.radioButton_reset.setChecked(True)
-        self.radioButton_reset.setObjectName("radioButton_reset")
-        self.gridLayout_7.addWidget(self.radioButton_reset, 0, 1, 1, 1)
-        self.label_13 = QtWidgets.QLabel(self.groupBox)
-        self.label_13.setMaximumSize(QtCore.QSize(50, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_13.setFont(font)
-        self.label_13.setText("")
-        self.label_13.setObjectName("label_13")
-        self.gridLayout_7.addWidget(self.label_13, 0, 0, 1, 1)
-        self.line_26 = QtWidgets.QFrame(self.groupBox)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_26.setFont(font)
-        self.line_26.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line_26.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_26.setObjectName("line_26")
-        self.gridLayout_7.addWidget(self.line_26, 0, 4, 1, 1)
-        self.comboBox_reset_counter_signal_selected = QtWidgets.QComboBox(self.groupBox)
-        self.comboBox_reset_counter_signal_selected.setMinimumSize(QtCore.QSize(0, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_reset_counter_signal_selected.setFont(font)
-        self.comboBox_reset_counter_signal_selected.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 60px; \n"
-"}\n"
-"")
-        self.comboBox_reset_counter_signal_selected.setObjectName("comboBox_reset_counter_signal_selected")
-        self.comboBox_reset_counter_signal_selected.addItem("")
-        self.gridLayout_7.addWidget(self.comboBox_reset_counter_signal_selected, 0, 6, 1, 1)
-        self.label_19 = QtWidgets.QLabel(self.groupBox)
-        self.label_19.setMaximumSize(QtCore.QSize(100, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_19.setFont(font)
-        self.label_19.setObjectName("label_19")
-        self.gridLayout_7.addWidget(self.label_19, 0, 5, 1, 1)
-        self.radioButton_none_1 = QtWidgets.QRadioButton(self.groupBox)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.radioButton_none_1.setFont(font)
-        self.radioButton_none_1.setObjectName("radioButton_none_1")
-        self.gridLayout_7.addWidget(self.radioButton_none_1, 0, 3, 1, 1)
-        self.radioButton_none_reset = QtWidgets.QRadioButton(self.groupBox)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.radioButton_none_reset.setFont(font)
-        self.radioButton_none_reset.setObjectName("radioButton_none_reset")
-        self.gridLayout_7.addWidget(self.radioButton_none_reset, 0, 2, 1, 1)
-        self.gridLayout_23.addWidget(self.groupBox, 1, 0, 1, 2)
-        self.groupBox_6 = QtWidgets.QGroupBox(self.groupAnimationEffect)
-        self.groupBox_6.setMinimumSize(QtCore.QSize(0, 0))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.groupBox_6.setFont(font)
-        self.groupBox_6.setStyleSheet("/* Khung chính của GroupBox */\n"
-"QGroupBox {\n"
-"    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */\n"
-"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
-"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
-"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
-"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
-"    color: #333333;            /* Màu chữ tiêu đề */\n"
-"}\n"
-"\n"
-"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
-"QGroupBox::title {\n"
-"    subcontrol-origin: margin;\n"
-"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
-"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
-"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
-"}\n"
-"")
-        self.groupBox_6.setObjectName("groupBox_6")
-        self.gridLayout_25 = QtWidgets.QGridLayout(self.groupBox_6)
-        self.gridLayout_25.setObjectName("gridLayout_25")
-        self.line_27 = QtWidgets.QFrame(self.groupBox_6)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_27.setFont(font)
-        self.line_27.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line_27.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_27.setObjectName("line_27")
-        self.gridLayout_25.addWidget(self.line_27, 0, 4, 1, 1)
-        self.comboBox_method_use_signal_selected = QtWidgets.QComboBox(self.groupBox_6)
-        self.comboBox_method_use_signal_selected.setMinimumSize(QtCore.QSize(0, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_method_use_signal_selected.setFont(font)
-        self.comboBox_method_use_signal_selected.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 60px; \n"
-"}\n"
-"")
-        self.comboBox_method_use_signal_selected.setObjectName("comboBox_method_use_signal_selected")
-        self.comboBox_method_use_signal_selected.addItem("")
-        self.gridLayout_25.addWidget(self.comboBox_method_use_signal_selected, 0, 6, 1, 1)
-        self.radioButton_cycle_frame = QtWidgets.QRadioButton(self.groupBox_6)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.radioButton_cycle_frame.setFont(font)
-        self.radioButton_cycle_frame.setChecked(True)
-        self.radioButton_cycle_frame.setObjectName("radioButton_cycle_frame")
-        self.gridLayout_25.addWidget(self.radioButton_cycle_frame, 0, 2, 1, 1)
-        self.label_15 = QtWidgets.QLabel(self.groupBox_6)
-        self.label_15.setMaximumSize(QtCore.QSize(50, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_15.setFont(font)
-        self.label_15.setText("")
-        self.label_15.setObjectName("label_15")
-        self.gridLayout_25.addWidget(self.label_15, 0, 0, 1, 1)
-        self.radioButton_single_frame = QtWidgets.QRadioButton(self.groupBox_6)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.radioButton_single_frame.setFont(font)
-        self.radioButton_single_frame.setObjectName("radioButton_single_frame")
-        self.gridLayout_25.addWidget(self.radioButton_single_frame, 0, 1, 1, 1)
-        self.label_41 = QtWidgets.QLabel(self.groupBox_6)
-        self.label_41.setMaximumSize(QtCore.QSize(100, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_41.setFont(font)
-        self.label_41.setObjectName("label_41")
-        self.gridLayout_25.addWidget(self.label_41, 0, 5, 1, 1)
-        self.radioButton_none_2 = QtWidgets.QRadioButton(self.groupBox_6)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.radioButton_none_2.setFont(font)
-        self.radioButton_none_2.setObjectName("radioButton_none_2")
-        self.gridLayout_25.addWidget(self.radioButton_none_2, 0, 3, 1, 1)
-        self.gridLayout_23.addWidget(self.groupBox_6, 2, 0, 1, 2)
-        self.hlayout_bottomrow.addWidget(self.groupAnimationEffect)
-        self.vlayout_bottomrow_container_wrap.addLayout(self.hlayout_bottomrow)
-        self.gridLayout_17.addLayout(self.vlayout_bottomrow_container_wrap, 6, 0, 1, 1)
-        self.horizontalLayout = QtWidgets.QHBoxLayout()
-        self.horizontalLayout.setSpacing(12)
-        self.horizontalLayout.setObjectName("horizontalLayout")
-        self.verticalLayout_2 = QtWidgets.QVBoxLayout()
-        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
-        self.verticalLayout_2.setSpacing(12)
-        self.verticalLayout_2.setObjectName("verticalLayout_2")
-        self.groupBox_5 = QtWidgets.QGroupBox(self.scrollAreaWidgetContents)
-        self.groupBox_5.setMinimumSize(QtCore.QSize(500, 0))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.groupBox_5.setFont(font)
-        self.groupBox_5.setStyleSheet("/* Khung chính của GroupBox */\n"
-"QGroupBox {\n"
-"    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */\n"
-"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
-"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
-"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
-"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
-"    color: #333333;            /* Màu chữ tiêu đề */\n"
-"}\n"
-"\n"
-"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
-"QGroupBox::title {\n"
-"    subcontrol-origin: margin;\n"
-"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
-"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
-"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
-"}\n"
-"")
-        self.groupBox_5.setObjectName("groupBox_5")
-        self.gridLayout_4 = QtWidgets.QGridLayout(self.groupBox_5)
-        self.gridLayout_4.setObjectName("gridLayout_4")
-        spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_4.addItem(spacerItem2, 1, 0, 1, 1)
-        self.verticalLayout_2.addWidget(self.groupBox_5)
-        self.horizontalLayout.addLayout(self.verticalLayout_2)
-        self.verticalLayout = QtWidgets.QVBoxLayout()
-        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
-        self.verticalLayout.setSpacing(12)
-        self.verticalLayout.setObjectName("verticalLayout")
-        self.groupBox_4 = QtWidgets.QGroupBox(self.scrollAreaWidgetContents)
-        self.groupBox_4.setMinimumSize(QtCore.QSize(0, 0))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.groupBox_4.setFont(font)
-        self.groupBox_4.setStyleSheet("/* Khung chính của GroupBox */\n"
-"QGroupBox {\n"
-"    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */\n"
-"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
-"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
-"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
-"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
-"    color: #333333;            /* Màu chữ tiêu đề */\n"
-"}\n"
-"\n"
-"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
-"QGroupBox::title {\n"
-"    subcontrol-origin: margin;\n"
-"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
-"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
-"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
-"}\n"
-"")
-        self.groupBox_4.setObjectName("groupBox_4")
-        self.gridLayout_24 = QtWidgets.QGridLayout(self.groupBox_4)
-        self.gridLayout_24.setObjectName("gridLayout_24")
-        self.gridLayout_14 = QtWidgets.QGridLayout()
-        self.gridLayout_14.setSpacing(0)
-        self.gridLayout_14.setObjectName("gridLayout_14")
-        self.pushButton_load_Set_mode = QtWidgets.QPushButton(self.groupBox_4)
-        self.pushButton_load_Set_mode.setMinimumSize(QtCore.QSize(0, 30))
-        self.pushButton_load_Set_mode.setMaximumSize(QtCore.QSize(30, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.pushButton_load_Set_mode.setFont(font)
-        self.pushButton_load_Set_mode.setStyleSheet("QPushButton {\n"
-"    background-color: transparent;\n"
-"    border: none;\n"
-"    border-radius: 6px;\n"
-"}\n"
-"QPushButton:hover {\n"
-"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
-"}\n"
-"QPushButton:pressed {\n"
-"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
-"}")
-        self.pushButton_load_Set_mode.setText("")
-        self.pushButton_load_Set_mode.setIcon(icon2)
-        self.pushButton_load_Set_mode.setIconSize(QtCore.QSize(25, 25))
-        self.pushButton_load_Set_mode.setObjectName("pushButton_load_Set_mode")
-        self.gridLayout_14.addWidget(self.pushButton_load_Set_mode, 0, 2, 1, 1)
-        self.label_36 = QtWidgets.QLabel(self.groupBox_4)
-        self.label_36.setMinimumSize(QtCore.QSize(20, 0))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_36.setFont(font)
-        self.label_36.setText("")
-        self.label_36.setObjectName("label_36")
-        self.gridLayout_14.addWidget(self.label_36, 0, 3, 1, 1)
-        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_14.addItem(spacerItem3, 0, 0, 1, 1)
-        self.pushButton_apply_Set_mode = QtWidgets.QPushButton(self.groupBox_4)
-        self.pushButton_apply_Set_mode.setMinimumSize(QtCore.QSize(0, 30))
-        self.pushButton_apply_Set_mode.setMaximumSize(QtCore.QSize(30, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.pushButton_apply_Set_mode.setFont(font)
-        self.pushButton_apply_Set_mode.setStyleSheet("QPushButton {\n"
-"    background-color: transparent;\n"
-"    border: none;\n"
-"    border-radius: 6px;\n"
-"}\n"
-"QPushButton:hover {\n"
-"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
-"}\n"
-"QPushButton:pressed {\n"
-"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
-"}")
-        self.pushButton_apply_Set_mode.setText("")
-        self.pushButton_apply_Set_mode.setIcon(icon1)
-        self.pushButton_apply_Set_mode.setIconSize(QtCore.QSize(22, 22))
-        self.pushButton_apply_Set_mode.setObjectName("pushButton_apply_Set_mode")
-        self.gridLayout_14.addWidget(self.pushButton_apply_Set_mode, 0, 4, 1, 1)
-        self.label_37 = QtWidgets.QLabel(self.groupBox_4)
-        self.label_37.setMinimumSize(QtCore.QSize(20, 0))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_37.setFont(font)
-        self.label_37.setText("")
-        self.label_37.setObjectName("label_37")
-        self.gridLayout_14.addWidget(self.label_37, 0, 1, 1, 1)
-        self.gridLayout_24.addLayout(self.gridLayout_14, 3, 0, 1, 1)
-        self.groupBox_2 = QtWidgets.QGroupBox(self.groupBox_4)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.groupBox_2.setFont(font)
-        self.groupBox_2.setStyleSheet("/* Khung chính của GroupBox */\n"
-"QGroupBox {\n"
-"    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */\n"
-"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
-"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
-"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
-"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
-"    color: #333333;            /* Màu chữ tiêu đề */\n"
-"}\n"
-"\n"
-"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
-"QGroupBox::title {\n"
-"    subcontrol-origin: margin;\n"
-"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
-"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
-"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
-"}\n"
-"")
-        self.groupBox_2.setTitle("")
-        self.groupBox_2.setObjectName("groupBox_2")
-        self.gridLayout_8 = QtWidgets.QGridLayout(self.groupBox_2)
-        self.gridLayout_8.setObjectName("gridLayout_8")
-        self.gridLayout_13 = QtWidgets.QGridLayout()
-        self.gridLayout_13.setContentsMargins(40, 10, -1, 10)
-        self.gridLayout_13.setHorizontalSpacing(10)
-        self.gridLayout_13.setVerticalSpacing(20)
-        self.gridLayout_13.setObjectName("gridLayout_13")
-        self.comboBox_set_trigger_logging = QtWidgets.QComboBox(self.groupBox_2)
-        self.comboBox_set_trigger_logging.setMinimumSize(QtCore.QSize(0, 30))
-        self.comboBox_set_trigger_logging.setMaximumSize(QtCore.QSize(16777215, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_set_trigger_logging.setFont(font)
-        self.comboBox_set_trigger_logging.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 50px; \n"
-"}\n"
-"")
-        self.comboBox_set_trigger_logging.setObjectName("comboBox_set_trigger_logging")
-        self.comboBox_set_trigger_logging.addItem("")
-        self.gridLayout_13.addWidget(self.comboBox_set_trigger_logging, 4, 4, 1, 1)
-        self.comboBox_set_completed_mirror = QtWidgets.QComboBox(self.groupBox_2)
-        self.comboBox_set_completed_mirror.setMinimumSize(QtCore.QSize(0, 30))
-        self.comboBox_set_completed_mirror.setMaximumSize(QtCore.QSize(16777215, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_set_completed_mirror.setFont(font)
-        self.comboBox_set_completed_mirror.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 50px; \n"
-"}\n"
-"")
-        self.comboBox_set_completed_mirror.setObjectName("comboBox_set_completed_mirror")
-        self.comboBox_set_completed_mirror.addItem("")
-        self.gridLayout_13.addWidget(self.comboBox_set_completed_mirror, 3, 8, 1, 1)
-        self.label_22 = QtWidgets.QLabel(self.groupBox_2)
-        self.label_22.setMinimumSize(QtCore.QSize(0, 30))
-        self.label_22.setMaximumSize(QtCore.QSize(16777215, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_22.setFont(font)
-        self.label_22.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_22.setObjectName("label_22")
-        self.gridLayout_13.addWidget(self.label_22, 0, 6, 1, 1)
-        self.line_18 = QtWidgets.QFrame(self.groupBox_2)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_18.setFont(font)
-        self.line_18.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line_18.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_18.setObjectName("line_18")
-        self.gridLayout_13.addWidget(self.line_18, 2, 3, 3, 1)
-        self.comboBox_set_component_logging = QtWidgets.QComboBox(self.groupBox_2)
-        self.comboBox_set_component_logging.setMinimumSize(QtCore.QSize(0, 30))
-        self.comboBox_set_component_logging.setMaximumSize(QtCore.QSize(16777215, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_set_component_logging.setFont(font)
-        self.comboBox_set_component_logging.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 50px; \n"
-"}\n"
-"")
-        self.comboBox_set_component_logging.setObjectName("comboBox_set_component_logging")
-        self.comboBox_set_component_logging.addItem("")
-        self.gridLayout_13.addWidget(self.comboBox_set_component_logging, 4, 6, 1, 1)
-        self.comboBox_set_trigger_automatic = QtWidgets.QComboBox(self.groupBox_2)
-        self.comboBox_set_trigger_automatic.setMinimumSize(QtCore.QSize(0, 30))
-        self.comboBox_set_trigger_automatic.setMaximumSize(QtCore.QSize(16777215, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_set_trigger_automatic.setFont(font)
-        self.comboBox_set_trigger_automatic.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 50px; \n"
-"}\n"
-"")
-        self.comboBox_set_trigger_automatic.setObjectName("comboBox_set_trigger_automatic")
-        self.comboBox_set_trigger_automatic.addItem("")
-        self.gridLayout_13.addWidget(self.comboBox_set_trigger_automatic, 2, 4, 1, 1)
-        self.label_23 = QtWidgets.QLabel(self.groupBox_2)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_23.setFont(font)
-        self.label_23.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_23.setObjectName("label_23")
-        self.gridLayout_13.addWidget(self.label_23, 0, 8, 1, 1)
-        self.label_21 = QtWidgets.QLabel(self.groupBox_2)
-        self.label_21.setMinimumSize(QtCore.QSize(0, 30))
-        self.label_21.setMaximumSize(QtCore.QSize(16777215, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_21.setFont(font)
-        self.label_21.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_21.setObjectName("label_21")
-        self.gridLayout_13.addWidget(self.label_21, 0, 4, 1, 1)
-        self.comboBox_set_trigger_mirror = QtWidgets.QComboBox(self.groupBox_2)
-        self.comboBox_set_trigger_mirror.setMinimumSize(QtCore.QSize(0, 30))
-        self.comboBox_set_trigger_mirror.setMaximumSize(QtCore.QSize(16777215, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_set_trigger_mirror.setFont(font)
-        self.comboBox_set_trigger_mirror.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 50px; \n"
-"}\n"
-"")
-        self.comboBox_set_trigger_mirror.setObjectName("comboBox_set_trigger_mirror")
-        self.comboBox_set_trigger_mirror.addItem("")
-        self.gridLayout_13.addWidget(self.comboBox_set_trigger_mirror, 3, 4, 1, 1)
-        self.comboBox_set_completed_automatic = QtWidgets.QComboBox(self.groupBox_2)
-        self.comboBox_set_completed_automatic.setMinimumSize(QtCore.QSize(0, 30))
-        self.comboBox_set_completed_automatic.setMaximumSize(QtCore.QSize(16777215, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_set_completed_automatic.setFont(font)
-        self.comboBox_set_completed_automatic.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 50px; \n"
-"}\n"
-"")
-        self.comboBox_set_completed_automatic.setObjectName("comboBox_set_completed_automatic")
-        self.comboBox_set_completed_automatic.addItem("")
-        self.gridLayout_13.addWidget(self.comboBox_set_completed_automatic, 2, 8, 1, 1)
-        self.comboBox_set_completed_logging = QtWidgets.QComboBox(self.groupBox_2)
-        self.comboBox_set_completed_logging.setMinimumSize(QtCore.QSize(0, 30))
-        self.comboBox_set_completed_logging.setMaximumSize(QtCore.QSize(16777215, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_set_completed_logging.setFont(font)
-        self.comboBox_set_completed_logging.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 50px; \n"
-"}\n"
-"")
-        self.comboBox_set_completed_logging.setObjectName("comboBox_set_completed_logging")
-        self.comboBox_set_completed_logging.addItem("")
-        self.gridLayout_13.addWidget(self.comboBox_set_completed_logging, 4, 8, 1, 1)
-        self.label_17 = QtWidgets.QLabel(self.groupBox_2)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_17.setFont(font)
-        self.label_17.setObjectName("label_17")
-        self.gridLayout_13.addWidget(self.label_17, 3, 0, 1, 1)
-        self.comboBox_automatic_mode = QtWidgets.QComboBox(self.groupBox_2)
-        self.comboBox_automatic_mode.setMinimumSize(QtCore.QSize(0, 30))
-        self.comboBox_automatic_mode.setMaximumSize(QtCore.QSize(16777215, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_automatic_mode.setFont(font)
-        self.comboBox_automatic_mode.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 50px; \n"
-"}\n"
-"")
-        self.comboBox_automatic_mode.setObjectName("comboBox_automatic_mode")
-        self.comboBox_automatic_mode.addItem("")
-        self.comboBox_automatic_mode.addItem("")
-        self.comboBox_automatic_mode.addItem("")
-        self.gridLayout_13.addWidget(self.comboBox_automatic_mode, 2, 2, 1, 1)
-        self.label_8 = QtWidgets.QLabel(self.groupBox_2)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_8.setFont(font)
-        self.label_8.setObjectName("label_8")
-        self.gridLayout_13.addWidget(self.label_8, 2, 0, 1, 1)
-        self.line_19 = QtWidgets.QFrame(self.groupBox_2)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_19.setFont(font)
-        self.line_19.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line_19.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_19.setObjectName("line_19")
-        self.gridLayout_13.addWidget(self.line_19, 2, 5, 3, 1)
-        self.line_17 = QtWidgets.QFrame(self.groupBox_2)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_17.setFont(font)
-        self.line_17.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line_17.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_17.setObjectName("line_17")
-        self.gridLayout_13.addWidget(self.line_17, 2, 1, 3, 1)
-        self.label_18 = QtWidgets.QLabel(self.groupBox_2)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_18.setFont(font)
-        self.label_18.setObjectName("label_18")
-        self.gridLayout_13.addWidget(self.label_18, 4, 0, 1, 1)
-        self.comboBox_set_component_mirror = QtWidgets.QComboBox(self.groupBox_2)
-        self.comboBox_set_component_mirror.setMinimumSize(QtCore.QSize(0, 30))
-        self.comboBox_set_component_mirror.setMaximumSize(QtCore.QSize(16777215, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_set_component_mirror.setFont(font)
-        self.comboBox_set_component_mirror.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 50px; \n"
-"}\n"
-"")
-        self.comboBox_set_component_mirror.setObjectName("comboBox_set_component_mirror")
-        self.comboBox_set_component_mirror.addItem("")
-        self.gridLayout_13.addWidget(self.comboBox_set_component_mirror, 3, 6, 1, 1)
-        self.label_40 = QtWidgets.QLabel(self.groupBox_2)
-        self.label_40.setMinimumSize(QtCore.QSize(0, 30))
-        self.label_40.setMaximumSize(QtCore.QSize(16777215, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_40.setFont(font)
-        self.label_40.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_40.setObjectName("label_40")
-        self.gridLayout_13.addWidget(self.label_40, 0, 2, 1, 1)
-        self.comboBox_set_component_automatic = QtWidgets.QComboBox(self.groupBox_2)
-        self.comboBox_set_component_automatic.setMinimumSize(QtCore.QSize(0, 30))
-        self.comboBox_set_component_automatic.setMaximumSize(QtCore.QSize(16777215, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_set_component_automatic.setFont(font)
-        self.comboBox_set_component_automatic.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 50px; \n"
-"}\n"
-"")
-        self.comboBox_set_component_automatic.setObjectName("comboBox_set_component_automatic")
-        self.comboBox_set_component_automatic.addItem("")
-        self.gridLayout_13.addWidget(self.comboBox_set_component_automatic, 2, 6, 1, 1)
-        self.comboBox_logging_mode = QtWidgets.QComboBox(self.groupBox_2)
-        self.comboBox_logging_mode.setMinimumSize(QtCore.QSize(0, 30))
-        self.comboBox_logging_mode.setMaximumSize(QtCore.QSize(16777215, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_logging_mode.setFont(font)
-        self.comboBox_logging_mode.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 50px; \n"
-"}\n"
-"")
-        self.comboBox_logging_mode.setObjectName("comboBox_logging_mode")
-        self.comboBox_logging_mode.addItem("")
-        self.comboBox_logging_mode.addItem("")
-        self.comboBox_logging_mode.addItem("")
-        self.gridLayout_13.addWidget(self.comboBox_logging_mode, 4, 2, 1, 1)
-        self.line_16 = QtWidgets.QFrame(self.groupBox_2)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_16.setFont(font)
-        self.line_16.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_16.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_16.setObjectName("line_16")
-        self.gridLayout_13.addWidget(self.line_16, 1, 0, 1, 9)
-        self.comboBox_mirror_mode = QtWidgets.QComboBox(self.groupBox_2)
-        self.comboBox_mirror_mode.setMinimumSize(QtCore.QSize(0, 30))
-        self.comboBox_mirror_mode.setMaximumSize(QtCore.QSize(16777215, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_mirror_mode.setFont(font)
-        self.comboBox_mirror_mode.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 50px; \n"
-"}\n"
-"")
-        self.comboBox_mirror_mode.setObjectName("comboBox_mirror_mode")
-        self.comboBox_mirror_mode.addItem("")
-        self.comboBox_mirror_mode.addItem("")
-        self.comboBox_mirror_mode.addItem("")
-        self.gridLayout_13.addWidget(self.comboBox_mirror_mode, 3, 2, 1, 1)
-        self.label_6 = QtWidgets.QLabel(self.groupBox_2)
-        self.label_6.setMinimumSize(QtCore.QSize(0, 30))
-        self.label_6.setMaximumSize(QtCore.QSize(16777215, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_6.setFont(font)
-        self.label_6.setObjectName("label_6")
-        self.gridLayout_13.addWidget(self.label_6, 0, 0, 1, 1)
-        self.line_20 = QtWidgets.QFrame(self.groupBox_2)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_20.setFont(font)
-        self.line_20.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line_20.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_20.setObjectName("line_20")
-        self.gridLayout_13.addWidget(self.line_20, 2, 7, 3, 1)
-        self.line_21 = QtWidgets.QFrame(self.groupBox_2)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_21.setFont(font)
-        self.line_21.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line_21.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_21.setObjectName("line_21")
-        self.gridLayout_13.addWidget(self.line_21, 0, 1, 1, 1)
-        self.line_22 = QtWidgets.QFrame(self.groupBox_2)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_22.setFont(font)
-        self.line_22.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line_22.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_22.setObjectName("line_22")
-        self.gridLayout_13.addWidget(self.line_22, 0, 3, 1, 1)
-        self.line_23 = QtWidgets.QFrame(self.groupBox_2)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_23.setFont(font)
-        self.line_23.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line_23.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_23.setObjectName("line_23")
-        self.gridLayout_13.addWidget(self.line_23, 0, 5, 1, 1)
-        self.line_24 = QtWidgets.QFrame(self.groupBox_2)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_24.setFont(font)
-        self.line_24.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line_24.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_24.setObjectName("line_24")
-        self.gridLayout_13.addWidget(self.line_24, 0, 7, 1, 1)
-        self.gridLayout_8.addLayout(self.gridLayout_13, 0, 0, 1, 1)
-        self.gridLayout_24.addWidget(self.groupBox_2, 1, 0, 1, 1)
-        self.line_15 = QtWidgets.QFrame(self.groupBox_4)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_15.setFont(font)
-        self.line_15.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_15.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_15.setObjectName("line_15")
-        self.gridLayout_24.addWidget(self.line_15, 2, 0, 1, 1)
-        self.verticalLayout.addWidget(self.groupBox_4)
-        self.horizontalLayout.addLayout(self.verticalLayout)
-        self.gridLayout_17.addLayout(self.horizontalLayout, 7, 0, 1, 1)
+        self.label_5.setFont(font)
+        self.label_5.setText("")
+        self.label_5.setObjectName("label_5")
+        self.gridLayout_32.addWidget(self.label_5, 1, 0, 1, 2)
         self.pushButton_admin = QtWidgets.QPushButton(self.scrollAreaWidgetContents)
         self.pushButton_admin.setMinimumSize(QtCore.QSize(0, 40))
         self.pushButton_admin.setMaximumSize(QtCore.QSize(150, 16777215))
@@ -1280,12 +98,12 @@ class Ui_MainWindow(object):
         font.setWeight(75)
         self.pushButton_admin.setFont(font)
         self.pushButton_admin.setStyleSheet("QPushButton { background-color:#209E3D; color:white; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#005ba1; }")
-        icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/admin-panel.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_admin.setIcon(icon3)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/admin-panel.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_admin.setIcon(icon)
         self.pushButton_admin.setIconSize(QtCore.QSize(30, 30))
         self.pushButton_admin.setObjectName("pushButton_admin")
-        self.gridLayout_17.addWidget(self.pushButton_admin, 2, 0, 1, 1)
+        self.gridLayout_32.addWidget(self.pushButton_admin, 2, 0, 1, 1)
         self.vlayout_midrow_container_wrap = QtWidgets.QVBoxLayout()
         self.vlayout_midrow_container_wrap.setContentsMargins(0, 0, 0, 0)
         self.vlayout_midrow_container_wrap.setObjectName("vlayout_midrow_container_wrap")
@@ -1300,7 +118,7 @@ class Ui_MainWindow(object):
         self.groupAssignPLC.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupAssignPLC.setFont(font)
@@ -1649,14 +467,14 @@ class Ui_MainWindow(object):
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
         self.pushButton_add_reg.setText("")
-        icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/new-file.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_add_reg.setIcon(icon4)
+        icon1 = QtGui.QIcon()
+        icon1.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/new-file.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_add_reg.setIcon(icon1)
         self.pushButton_add_reg.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_add_reg.setObjectName("pushButton_add_reg")
         self.gridLayout_11.addWidget(self.pushButton_add_reg, 0, 1, 1, 1)
-        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_11.addItem(spacerItem4, 0, 0, 1, 1)
+        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_11.addItem(spacerItem, 0, 0, 1, 1)
         self.label_30 = QtWidgets.QLabel(self.groupAssignPLC)
         self.label_30.setMinimumSize(QtCore.QSize(20, 0))
         font = QtGui.QFont()
@@ -1687,7 +505,9 @@ class Ui_MainWindow(object):
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
         self.pushButton_applysignalplc.setText("")
-        self.pushButton_applysignalplc.setIcon(icon1)
+        icon2 = QtGui.QIcon()
+        icon2.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/floppy-disk.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_applysignalplc.setIcon(icon2)
         self.pushButton_applysignalplc.setIconSize(QtCore.QSize(22, 22))
         self.pushButton_applysignalplc.setObjectName("pushButton_applysignalplc")
         self.gridLayout_11.addWidget(self.pushButton_applysignalplc, 0, 5, 1, 1)
@@ -1712,7 +532,9 @@ class Ui_MainWindow(object):
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
         self.pushButton_clear_table.setText("")
-        self.pushButton_clear_table.setIcon(icon)
+        icon3 = QtGui.QIcon()
+        icon3.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/remove.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_clear_table.setIcon(icon3)
         self.pushButton_clear_table.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_clear_table.setObjectName("pushButton_clear_table")
         self.gridLayout_11.addWidget(self.pushButton_clear_table, 0, 3, 1, 1)
@@ -1735,7 +557,7 @@ class Ui_MainWindow(object):
         self.groupFunction.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupFunction.setFont(font)
@@ -1775,7 +597,7 @@ class Ui_MainWindow(object):
         self.groupSignalTransmission.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupSignalTransmission.setFont(font)
@@ -2267,7 +1089,7 @@ class Ui_MainWindow(object):
         self.groupDelayHandling.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupDelayHandling.setFont(font)
@@ -2768,8 +1590,8 @@ class Ui_MainWindow(object):
         self.label_33.setText("")
         self.label_33.setObjectName("label_33")
         self.gridLayout_12.addWidget(self.label_33, 0, 3, 1, 1)
-        spacerItem5 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_12.addItem(spacerItem5, 0, 0, 1, 1)
+        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_12.addItem(spacerItem1, 0, 0, 1, 1)
         self.pushButton_apply_tranmission_reception = QtWidgets.QPushButton(self.groupFunction)
         self.pushButton_apply_tranmission_reception.setMinimumSize(QtCore.QSize(0, 30))
         self.pushButton_apply_tranmission_reception.setMaximumSize(QtCore.QSize(30, 16777215))
@@ -2791,7 +1613,7 @@ class Ui_MainWindow(object):
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
         self.pushButton_apply_tranmission_reception.setText("")
-        self.pushButton_apply_tranmission_reception.setIcon(icon1)
+        self.pushButton_apply_tranmission_reception.setIcon(icon2)
         self.pushButton_apply_tranmission_reception.setIconSize(QtCore.QSize(22, 22))
         self.pushButton_apply_tranmission_reception.setObjectName("pushButton_apply_tranmission_reception")
         self.gridLayout_12.addWidget(self.pushButton_apply_tranmission_reception, 0, 4, 1, 1)
@@ -2825,14 +1647,1232 @@ class Ui_MainWindow(object):
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
         self.pushButton_load_tranmission_reception.setText("")
-        self.pushButton_load_tranmission_reception.setIcon(icon2)
+        icon4 = QtGui.QIcon()
+        icon4.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/apply-now.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_load_tranmission_reception.setIcon(icon4)
         self.pushButton_load_tranmission_reception.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_load_tranmission_reception.setObjectName("pushButton_load_tranmission_reception")
         self.gridLayout_12.addWidget(self.pushButton_load_tranmission_reception, 0, 2, 1, 1)
         self.gridLayout.addLayout(self.gridLayout_12, 1, 0, 1, 1)
         self.hlayout_midrow.addWidget(self.groupFunction)
         self.vlayout_midrow_container_wrap.addLayout(self.hlayout_midrow)
-        self.gridLayout_17.addLayout(self.vlayout_midrow_container_wrap, 5, 0, 1, 1)
+        self.gridLayout_32.addLayout(self.vlayout_midrow_container_wrap, 5, 0, 1, 2)
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout.setSpacing(12)
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.verticalLayout_2 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_2.setSpacing(12)
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.groupBox_5 = QtWidgets.QGroupBox(self.scrollAreaWidgetContents)
+        self.groupBox_5.setMinimumSize(QtCore.QSize(500, 0))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.groupBox_5.setFont(font)
+        self.groupBox_5.setStyleSheet("/* Khung chính của GroupBox */\n"
+"QGroupBox {\n"
+"    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */\n"
+"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
+"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
+"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
+"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
+"    color: #333333;            /* Màu chữ tiêu đề */\n"
+"}\n"
+"\n"
+"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
+"QGroupBox::title {\n"
+"    subcontrol-origin: margin;\n"
+"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
+"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
+"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
+"}\n"
+"")
+        self.groupBox_5.setObjectName("groupBox_5")
+        self.gridLayout_4 = QtWidgets.QGridLayout(self.groupBox_5)
+        self.gridLayout_4.setObjectName("gridLayout_4")
+        spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_4.addItem(spacerItem2, 1, 0, 1, 1)
+        self.verticalLayout_2.addWidget(self.groupBox_5)
+        self.horizontalLayout.addLayout(self.verticalLayout_2)
+        self.verticalLayout = QtWidgets.QVBoxLayout()
+        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout.setSpacing(12)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.groupBox_4 = QtWidgets.QGroupBox(self.scrollAreaWidgetContents)
+        self.groupBox_4.setMinimumSize(QtCore.QSize(0, 0))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.groupBox_4.setFont(font)
+        self.groupBox_4.setStyleSheet("/* Khung chính của GroupBox */\n"
+"QGroupBox {\n"
+"    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */\n"
+"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
+"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
+"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
+"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
+"    color: #333333;            /* Màu chữ tiêu đề */\n"
+"}\n"
+"\n"
+"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
+"QGroupBox::title {\n"
+"    subcontrol-origin: margin;\n"
+"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
+"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
+"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
+"}\n"
+"")
+        self.groupBox_4.setObjectName("groupBox_4")
+        self.gridLayout_24 = QtWidgets.QGridLayout(self.groupBox_4)
+        self.gridLayout_24.setObjectName("gridLayout_24")
+        self.gridLayout_14 = QtWidgets.QGridLayout()
+        self.gridLayout_14.setSpacing(0)
+        self.gridLayout_14.setObjectName("gridLayout_14")
+        self.pushButton_load_Set_mode = QtWidgets.QPushButton(self.groupBox_4)
+        self.pushButton_load_Set_mode.setMinimumSize(QtCore.QSize(0, 30))
+        self.pushButton_load_Set_mode.setMaximumSize(QtCore.QSize(30, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.pushButton_load_Set_mode.setFont(font)
+        self.pushButton_load_Set_mode.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
+        self.pushButton_load_Set_mode.setText("")
+        self.pushButton_load_Set_mode.setIcon(icon4)
+        self.pushButton_load_Set_mode.setIconSize(QtCore.QSize(25, 25))
+        self.pushButton_load_Set_mode.setObjectName("pushButton_load_Set_mode")
+        self.gridLayout_14.addWidget(self.pushButton_load_Set_mode, 0, 2, 1, 1)
+        self.label_36 = QtWidgets.QLabel(self.groupBox_4)
+        self.label_36.setMinimumSize(QtCore.QSize(20, 0))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.label_36.setFont(font)
+        self.label_36.setText("")
+        self.label_36.setObjectName("label_36")
+        self.gridLayout_14.addWidget(self.label_36, 0, 3, 1, 1)
+        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_14.addItem(spacerItem3, 0, 0, 1, 1)
+        self.pushButton_apply_Set_mode = QtWidgets.QPushButton(self.groupBox_4)
+        self.pushButton_apply_Set_mode.setMinimumSize(QtCore.QSize(0, 30))
+        self.pushButton_apply_Set_mode.setMaximumSize(QtCore.QSize(30, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.pushButton_apply_Set_mode.setFont(font)
+        self.pushButton_apply_Set_mode.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
+        self.pushButton_apply_Set_mode.setText("")
+        self.pushButton_apply_Set_mode.setIcon(icon2)
+        self.pushButton_apply_Set_mode.setIconSize(QtCore.QSize(22, 22))
+        self.pushButton_apply_Set_mode.setObjectName("pushButton_apply_Set_mode")
+        self.gridLayout_14.addWidget(self.pushButton_apply_Set_mode, 0, 4, 1, 1)
+        self.label_37 = QtWidgets.QLabel(self.groupBox_4)
+        self.label_37.setMinimumSize(QtCore.QSize(20, 0))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.label_37.setFont(font)
+        self.label_37.setText("")
+        self.label_37.setObjectName("label_37")
+        self.gridLayout_14.addWidget(self.label_37, 0, 1, 1, 1)
+        self.gridLayout_24.addLayout(self.gridLayout_14, 3, 0, 1, 1)
+        self.groupBox_2 = QtWidgets.QGroupBox(self.groupBox_4)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.groupBox_2.setFont(font)
+        self.groupBox_2.setStyleSheet("/* Khung chính của GroupBox */\n"
+"QGroupBox {\n"
+"    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */\n"
+"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
+"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
+"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
+"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
+"    color: #333333;            /* Màu chữ tiêu đề */\n"
+"}\n"
+"\n"
+"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
+"QGroupBox::title {\n"
+"    subcontrol-origin: margin;\n"
+"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
+"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
+"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
+"}\n"
+"")
+        self.groupBox_2.setTitle("")
+        self.groupBox_2.setObjectName("groupBox_2")
+        self.gridLayout_8 = QtWidgets.QGridLayout(self.groupBox_2)
+        self.gridLayout_8.setObjectName("gridLayout_8")
+        self.gridLayout_13 = QtWidgets.QGridLayout()
+        self.gridLayout_13.setContentsMargins(40, 10, -1, 10)
+        self.gridLayout_13.setHorizontalSpacing(10)
+        self.gridLayout_13.setVerticalSpacing(20)
+        self.gridLayout_13.setObjectName("gridLayout_13")
+        self.comboBox_set_trigger_logging = QtWidgets.QComboBox(self.groupBox_2)
+        self.comboBox_set_trigger_logging.setMinimumSize(QtCore.QSize(0, 30))
+        self.comboBox_set_trigger_logging.setMaximumSize(QtCore.QSize(16777215, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_set_trigger_logging.setFont(font)
+        self.comboBox_set_trigger_logging.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 50px; \n"
+"}\n"
+"")
+        self.comboBox_set_trigger_logging.setObjectName("comboBox_set_trigger_logging")
+        self.comboBox_set_trigger_logging.addItem("")
+        self.gridLayout_13.addWidget(self.comboBox_set_trigger_logging, 4, 4, 1, 1)
+        self.comboBox_set_completed_mirror = QtWidgets.QComboBox(self.groupBox_2)
+        self.comboBox_set_completed_mirror.setMinimumSize(QtCore.QSize(0, 30))
+        self.comboBox_set_completed_mirror.setMaximumSize(QtCore.QSize(16777215, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_set_completed_mirror.setFont(font)
+        self.comboBox_set_completed_mirror.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 50px; \n"
+"}\n"
+"")
+        self.comboBox_set_completed_mirror.setObjectName("comboBox_set_completed_mirror")
+        self.comboBox_set_completed_mirror.addItem("")
+        self.gridLayout_13.addWidget(self.comboBox_set_completed_mirror, 3, 8, 1, 1)
+        self.label_22 = QtWidgets.QLabel(self.groupBox_2)
+        self.label_22.setMinimumSize(QtCore.QSize(0, 30))
+        self.label_22.setMaximumSize(QtCore.QSize(16777215, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_22.setFont(font)
+        self.label_22.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_22.setObjectName("label_22")
+        self.gridLayout_13.addWidget(self.label_22, 0, 6, 1, 1)
+        self.line_18 = QtWidgets.QFrame(self.groupBox_2)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.line_18.setFont(font)
+        self.line_18.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_18.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_18.setObjectName("line_18")
+        self.gridLayout_13.addWidget(self.line_18, 2, 3, 3, 1)
+        self.comboBox_set_component_logging = QtWidgets.QComboBox(self.groupBox_2)
+        self.comboBox_set_component_logging.setMinimumSize(QtCore.QSize(0, 30))
+        self.comboBox_set_component_logging.setMaximumSize(QtCore.QSize(16777215, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_set_component_logging.setFont(font)
+        self.comboBox_set_component_logging.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 50px; \n"
+"}\n"
+"")
+        self.comboBox_set_component_logging.setObjectName("comboBox_set_component_logging")
+        self.comboBox_set_component_logging.addItem("")
+        self.gridLayout_13.addWidget(self.comboBox_set_component_logging, 4, 6, 1, 1)
+        self.comboBox_set_trigger_automatic = QtWidgets.QComboBox(self.groupBox_2)
+        self.comboBox_set_trigger_automatic.setMinimumSize(QtCore.QSize(0, 30))
+        self.comboBox_set_trigger_automatic.setMaximumSize(QtCore.QSize(16777215, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_set_trigger_automatic.setFont(font)
+        self.comboBox_set_trigger_automatic.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 50px; \n"
+"}\n"
+"")
+        self.comboBox_set_trigger_automatic.setObjectName("comboBox_set_trigger_automatic")
+        self.comboBox_set_trigger_automatic.addItem("")
+        self.gridLayout_13.addWidget(self.comboBox_set_trigger_automatic, 2, 4, 1, 1)
+        self.label_23 = QtWidgets.QLabel(self.groupBox_2)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_23.setFont(font)
+        self.label_23.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_23.setObjectName("label_23")
+        self.gridLayout_13.addWidget(self.label_23, 0, 8, 1, 1)
+        self.label_21 = QtWidgets.QLabel(self.groupBox_2)
+        self.label_21.setMinimumSize(QtCore.QSize(0, 30))
+        self.label_21.setMaximumSize(QtCore.QSize(16777215, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_21.setFont(font)
+        self.label_21.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_21.setObjectName("label_21")
+        self.gridLayout_13.addWidget(self.label_21, 0, 4, 1, 1)
+        self.comboBox_set_trigger_mirror = QtWidgets.QComboBox(self.groupBox_2)
+        self.comboBox_set_trigger_mirror.setMinimumSize(QtCore.QSize(0, 30))
+        self.comboBox_set_trigger_mirror.setMaximumSize(QtCore.QSize(16777215, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_set_trigger_mirror.setFont(font)
+        self.comboBox_set_trigger_mirror.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 50px; \n"
+"}\n"
+"")
+        self.comboBox_set_trigger_mirror.setObjectName("comboBox_set_trigger_mirror")
+        self.comboBox_set_trigger_mirror.addItem("")
+        self.gridLayout_13.addWidget(self.comboBox_set_trigger_mirror, 3, 4, 1, 1)
+        self.comboBox_set_completed_automatic = QtWidgets.QComboBox(self.groupBox_2)
+        self.comboBox_set_completed_automatic.setMinimumSize(QtCore.QSize(0, 30))
+        self.comboBox_set_completed_automatic.setMaximumSize(QtCore.QSize(16777215, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_set_completed_automatic.setFont(font)
+        self.comboBox_set_completed_automatic.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 50px; \n"
+"}\n"
+"")
+        self.comboBox_set_completed_automatic.setObjectName("comboBox_set_completed_automatic")
+        self.comboBox_set_completed_automatic.addItem("")
+        self.gridLayout_13.addWidget(self.comboBox_set_completed_automatic, 2, 8, 1, 1)
+        self.comboBox_set_completed_logging = QtWidgets.QComboBox(self.groupBox_2)
+        self.comboBox_set_completed_logging.setMinimumSize(QtCore.QSize(0, 30))
+        self.comboBox_set_completed_logging.setMaximumSize(QtCore.QSize(16777215, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_set_completed_logging.setFont(font)
+        self.comboBox_set_completed_logging.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 50px; \n"
+"}\n"
+"")
+        self.comboBox_set_completed_logging.setObjectName("comboBox_set_completed_logging")
+        self.comboBox_set_completed_logging.addItem("")
+        self.gridLayout_13.addWidget(self.comboBox_set_completed_logging, 4, 8, 1, 1)
+        self.label_17 = QtWidgets.QLabel(self.groupBox_2)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.label_17.setFont(font)
+        self.label_17.setObjectName("label_17")
+        self.gridLayout_13.addWidget(self.label_17, 3, 0, 1, 1)
+        self.comboBox_automatic_mode = QtWidgets.QComboBox(self.groupBox_2)
+        self.comboBox_automatic_mode.setMinimumSize(QtCore.QSize(0, 30))
+        self.comboBox_automatic_mode.setMaximumSize(QtCore.QSize(16777215, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_automatic_mode.setFont(font)
+        self.comboBox_automatic_mode.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 50px; \n"
+"}\n"
+"")
+        self.comboBox_automatic_mode.setObjectName("comboBox_automatic_mode")
+        self.comboBox_automatic_mode.addItem("")
+        self.comboBox_automatic_mode.addItem("")
+        self.comboBox_automatic_mode.addItem("")
+        self.gridLayout_13.addWidget(self.comboBox_automatic_mode, 2, 2, 1, 1)
+        self.label_8 = QtWidgets.QLabel(self.groupBox_2)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.label_8.setFont(font)
+        self.label_8.setObjectName("label_8")
+        self.gridLayout_13.addWidget(self.label_8, 2, 0, 1, 1)
+        self.line_19 = QtWidgets.QFrame(self.groupBox_2)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.line_19.setFont(font)
+        self.line_19.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_19.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_19.setObjectName("line_19")
+        self.gridLayout_13.addWidget(self.line_19, 2, 5, 3, 1)
+        self.line_17 = QtWidgets.QFrame(self.groupBox_2)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.line_17.setFont(font)
+        self.line_17.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_17.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_17.setObjectName("line_17")
+        self.gridLayout_13.addWidget(self.line_17, 2, 1, 3, 1)
+        self.label_18 = QtWidgets.QLabel(self.groupBox_2)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.label_18.setFont(font)
+        self.label_18.setObjectName("label_18")
+        self.gridLayout_13.addWidget(self.label_18, 4, 0, 1, 1)
+        self.comboBox_set_component_mirror = QtWidgets.QComboBox(self.groupBox_2)
+        self.comboBox_set_component_mirror.setMinimumSize(QtCore.QSize(0, 30))
+        self.comboBox_set_component_mirror.setMaximumSize(QtCore.QSize(16777215, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_set_component_mirror.setFont(font)
+        self.comboBox_set_component_mirror.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 50px; \n"
+"}\n"
+"")
+        self.comboBox_set_component_mirror.setObjectName("comboBox_set_component_mirror")
+        self.comboBox_set_component_mirror.addItem("")
+        self.gridLayout_13.addWidget(self.comboBox_set_component_mirror, 3, 6, 1, 1)
+        self.label_40 = QtWidgets.QLabel(self.groupBox_2)
+        self.label_40.setMinimumSize(QtCore.QSize(0, 30))
+        self.label_40.setMaximumSize(QtCore.QSize(16777215, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_40.setFont(font)
+        self.label_40.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_40.setObjectName("label_40")
+        self.gridLayout_13.addWidget(self.label_40, 0, 2, 1, 1)
+        self.comboBox_set_component_automatic = QtWidgets.QComboBox(self.groupBox_2)
+        self.comboBox_set_component_automatic.setMinimumSize(QtCore.QSize(0, 30))
+        self.comboBox_set_component_automatic.setMaximumSize(QtCore.QSize(16777215, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_set_component_automatic.setFont(font)
+        self.comboBox_set_component_automatic.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 50px; \n"
+"}\n"
+"")
+        self.comboBox_set_component_automatic.setObjectName("comboBox_set_component_automatic")
+        self.comboBox_set_component_automatic.addItem("")
+        self.gridLayout_13.addWidget(self.comboBox_set_component_automatic, 2, 6, 1, 1)
+        self.comboBox_logging_mode = QtWidgets.QComboBox(self.groupBox_2)
+        self.comboBox_logging_mode.setMinimumSize(QtCore.QSize(0, 30))
+        self.comboBox_logging_mode.setMaximumSize(QtCore.QSize(16777215, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_logging_mode.setFont(font)
+        self.comboBox_logging_mode.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 50px; \n"
+"}\n"
+"")
+        self.comboBox_logging_mode.setObjectName("comboBox_logging_mode")
+        self.comboBox_logging_mode.addItem("")
+        self.comboBox_logging_mode.addItem("")
+        self.comboBox_logging_mode.addItem("")
+        self.gridLayout_13.addWidget(self.comboBox_logging_mode, 4, 2, 1, 1)
+        self.line_16 = QtWidgets.QFrame(self.groupBox_2)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.line_16.setFont(font)
+        self.line_16.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_16.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_16.setObjectName("line_16")
+        self.gridLayout_13.addWidget(self.line_16, 1, 0, 1, 9)
+        self.comboBox_mirror_mode = QtWidgets.QComboBox(self.groupBox_2)
+        self.comboBox_mirror_mode.setMinimumSize(QtCore.QSize(0, 30))
+        self.comboBox_mirror_mode.setMaximumSize(QtCore.QSize(16777215, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_mirror_mode.setFont(font)
+        self.comboBox_mirror_mode.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 50px; \n"
+"}\n"
+"")
+        self.comboBox_mirror_mode.setObjectName("comboBox_mirror_mode")
+        self.comboBox_mirror_mode.addItem("")
+        self.comboBox_mirror_mode.addItem("")
+        self.comboBox_mirror_mode.addItem("")
+        self.gridLayout_13.addWidget(self.comboBox_mirror_mode, 3, 2, 1, 1)
+        self.label_6 = QtWidgets.QLabel(self.groupBox_2)
+        self.label_6.setMinimumSize(QtCore.QSize(0, 30))
+        self.label_6.setMaximumSize(QtCore.QSize(16777215, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_6.setFont(font)
+        self.label_6.setObjectName("label_6")
+        self.gridLayout_13.addWidget(self.label_6, 0, 0, 1, 1)
+        self.line_20 = QtWidgets.QFrame(self.groupBox_2)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.line_20.setFont(font)
+        self.line_20.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_20.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_20.setObjectName("line_20")
+        self.gridLayout_13.addWidget(self.line_20, 2, 7, 3, 1)
+        self.line_21 = QtWidgets.QFrame(self.groupBox_2)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.line_21.setFont(font)
+        self.line_21.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_21.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_21.setObjectName("line_21")
+        self.gridLayout_13.addWidget(self.line_21, 0, 1, 1, 1)
+        self.line_22 = QtWidgets.QFrame(self.groupBox_2)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.line_22.setFont(font)
+        self.line_22.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_22.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_22.setObjectName("line_22")
+        self.gridLayout_13.addWidget(self.line_22, 0, 3, 1, 1)
+        self.line_23 = QtWidgets.QFrame(self.groupBox_2)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.line_23.setFont(font)
+        self.line_23.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_23.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_23.setObjectName("line_23")
+        self.gridLayout_13.addWidget(self.line_23, 0, 5, 1, 1)
+        self.line_24 = QtWidgets.QFrame(self.groupBox_2)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.line_24.setFont(font)
+        self.line_24.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_24.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_24.setObjectName("line_24")
+        self.gridLayout_13.addWidget(self.line_24, 0, 7, 1, 1)
+        self.gridLayout_8.addLayout(self.gridLayout_13, 0, 0, 1, 1)
+        self.gridLayout_24.addWidget(self.groupBox_2, 1, 0, 1, 1)
+        self.line_15 = QtWidgets.QFrame(self.groupBox_4)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.line_15.setFont(font)
+        self.line_15.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_15.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_15.setObjectName("line_15")
+        self.gridLayout_24.addWidget(self.line_15, 2, 0, 1, 1)
+        self.verticalLayout.addWidget(self.groupBox_4)
+        self.horizontalLayout.addLayout(self.verticalLayout)
+        self.gridLayout_32.addLayout(self.horizontalLayout, 7, 0, 1, 2)
+        self.vlayout_bottomrow_container_wrap = QtWidgets.QVBoxLayout()
+        self.vlayout_bottomrow_container_wrap.setContentsMargins(0, 0, 0, 0)
+        self.vlayout_bottomrow_container_wrap.setObjectName("vlayout_bottomrow_container_wrap")
+        self.hlayout_bottomrow = QtWidgets.QHBoxLayout()
+        self.hlayout_bottomrow.setSpacing(12)
+        self.hlayout_bottomrow.setObjectName("hlayout_bottomrow")
+        self.groupAssignShot = QtWidgets.QGroupBox(self.scrollAreaWidgetContents)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(1)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.groupAssignShot.sizePolicy().hasHeightForWidth())
+        self.groupAssignShot.setSizePolicy(sizePolicy)
+        self.groupAssignShot.setMaximumSize(QtCore.QSize(16777215, 350))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.groupAssignShot.setFont(font)
+        self.groupAssignShot.setStyleSheet("/* Khung chính của GroupBox */\n"
+"QGroupBox {\n"
+"    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */\n"
+"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
+"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
+"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
+"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
+"    color: #333333;            /* Màu chữ tiêu đề */\n"
+"}\n"
+"\n"
+"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
+"QGroupBox::title {\n"
+"    subcontrol-origin: margin;\n"
+"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
+"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
+"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
+"}\n"
+"")
+        self.groupAssignShot.setObjectName("groupAssignShot")
+        self.gridLayout_22 = QtWidgets.QGridLayout(self.groupAssignShot)
+        self.gridLayout_22.setObjectName("gridLayout_22")
+        self.vlayout_shot_v = QtWidgets.QVBoxLayout()
+        self.vlayout_shot_v.setSpacing(8)
+        self.vlayout_shot_v.setObjectName("vlayout_shot_v")
+        self.tableWidget_shotxmodel = QtWidgets.QTableWidget(self.groupAssignShot)
+        self.tableWidget_shotxmodel.setMinimumSize(QtCore.QSize(0, 0))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.tableWidget_shotxmodel.setFont(font)
+        self.tableWidget_shotxmodel.setStyleSheet("/* Khung chính của bảng TableView */\n"
+"QTableView {\n"
+"    background-color: #F7FFFA; /* Màu xanh lá nhạt dịu mắt (Mint Light) */\n"
+"    border: 1px solid #c6c6c6;  /* Viền xám mảnh đồng bộ */\n"
+"    border-radius: 4px;         /* Bo tròn góc 4px */\n"
+"    gridline-color: #d0ebd5;    /* Màu của các đường lưới ngăn cách ô (xanh lá rất nhạt) */\n"
+"}\n"
+"\n"
+"/* Màu nền của từng ô dữ liệu bên trong bảng */\n"
+"QTableView::item {\n"
+"    background-color: #F7FFFA; /* Đồng bộ màu xanh lá nhạt cho các ô */\n"
+"    color: #2c3e50;            /* Màu chữ tối để dễ đọc */\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột qua một dòng/ô */\n"
+"QTableView::item:hover {\n"
+"    background-color: #F5FFE1; /* Xanh lá đậm hơn một chút khi di chuột */\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi NGƯỜI DÙNG CLICK CHỌN một dòng/ô */\n"
+"QTableView::item:selected {\n"
+"    background-color: #E9F8FF; /* Đổi thành màu xanh lá đậm khi được chọn */\n"
+"    color: black;              /* Chữ chuyển sang trắng để nổi bật */\n"
+"}\n"
+"")
+        self.tableWidget_shotxmodel.setEditTriggers(QtWidgets.QAbstractItemView.DoubleClicked|QtWidgets.QAbstractItemView.EditKeyPressed)
+        self.tableWidget_shotxmodel.setAlternatingRowColors(True)
+        self.tableWidget_shotxmodel.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.tableWidget_shotxmodel.setRowCount(0)
+        self.tableWidget_shotxmodel.setColumnCount(3)
+        self.tableWidget_shotxmodel.setObjectName("tableWidget_shotxmodel")
+        item = QtWidgets.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(11)
+        item.setFont(font)
+        self.tableWidget_shotxmodel.setHorizontalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(11)
+        item.setFont(font)
+        self.tableWidget_shotxmodel.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(11)
+        item.setFont(font)
+        self.tableWidget_shotxmodel.setHorizontalHeaderItem(2, item)
+        self.tableWidget_shotxmodel.horizontalHeader().setCascadingSectionResizes(True)
+        self.tableWidget_shotxmodel.horizontalHeader().setDefaultSectionSize(280)
+        self.tableWidget_shotxmodel.horizontalHeader().setHighlightSections(True)
+        self.tableWidget_shotxmodel.horizontalHeader().setSortIndicatorShown(True)
+        self.tableWidget_shotxmodel.horizontalHeader().setStretchLastSection(True)
+        self.tableWidget_shotxmodel.verticalHeader().setCascadingSectionResizes(True)
+        self.tableWidget_shotxmodel.verticalHeader().setDefaultSectionSize(40)
+        self.tableWidget_shotxmodel.verticalHeader().setHighlightSections(True)
+        self.tableWidget_shotxmodel.verticalHeader().setSortIndicatorShown(True)
+        self.tableWidget_shotxmodel.verticalHeader().setStretchLastSection(False)
+        self.vlayout_shot_v.addWidget(self.tableWidget_shotxmodel)
+        self.line_12 = QtWidgets.QFrame(self.groupAssignShot)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.line_12.setFont(font)
+        self.line_12.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_12.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_12.setObjectName("line_12")
+        self.vlayout_shot_v.addWidget(self.line_12)
+        self.gridLayout_22.addLayout(self.vlayout_shot_v, 0, 0, 1, 1)
+        self.gridLayout_21 = QtWidgets.QGridLayout()
+        self.gridLayout_21.setSpacing(0)
+        self.gridLayout_21.setObjectName("gridLayout_21")
+        self.pushButton_clear_shotx = QtWidgets.QPushButton(self.groupAssignShot)
+        self.pushButton_clear_shotx.setMinimumSize(QtCore.QSize(0, 30))
+        self.pushButton_clear_shotx.setMaximumSize(QtCore.QSize(30, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.pushButton_clear_shotx.setFont(font)
+        self.pushButton_clear_shotx.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
+        self.pushButton_clear_shotx.setText("")
+        self.pushButton_clear_shotx.setIcon(icon3)
+        self.pushButton_clear_shotx.setIconSize(QtCore.QSize(25, 25))
+        self.pushButton_clear_shotx.setObjectName("pushButton_clear_shotx")
+        self.gridLayout_21.addWidget(self.pushButton_clear_shotx, 0, 2, 1, 1)
+        self.label_38 = QtWidgets.QLabel(self.groupAssignShot)
+        self.label_38.setMinimumSize(QtCore.QSize(20, 0))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.label_38.setFont(font)
+        self.label_38.setText("")
+        self.label_38.setObjectName("label_38")
+        self.gridLayout_21.addWidget(self.label_38, 0, 3, 1, 1)
+        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_21.addItem(spacerItem4, 0, 0, 1, 1)
+        self.pushButton_applyshotxmodel = QtWidgets.QPushButton(self.groupAssignShot)
+        self.pushButton_applyshotxmodel.setMinimumSize(QtCore.QSize(0, 30))
+        self.pushButton_applyshotxmodel.setMaximumSize(QtCore.QSize(30, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.pushButton_applyshotxmodel.setFont(font)
+        self.pushButton_applyshotxmodel.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
+        self.pushButton_applyshotxmodel.setText("")
+        self.pushButton_applyshotxmodel.setIcon(icon2)
+        self.pushButton_applyshotxmodel.setIconSize(QtCore.QSize(22, 22))
+        self.pushButton_applyshotxmodel.setObjectName("pushButton_applyshotxmodel")
+        self.gridLayout_21.addWidget(self.pushButton_applyshotxmodel, 0, 4, 1, 1)
+        self.label_39 = QtWidgets.QLabel(self.groupAssignShot)
+        self.label_39.setMinimumSize(QtCore.QSize(20, 0))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.label_39.setFont(font)
+        self.label_39.setText("")
+        self.label_39.setObjectName("label_39")
+        self.gridLayout_21.addWidget(self.label_39, 0, 1, 1, 1)
+        self.gridLayout_22.addLayout(self.gridLayout_21, 1, 0, 1, 1)
+        self.hlayout_bottomrow.addWidget(self.groupAssignShot)
+        self.groupAnimationEffect = QtWidgets.QGroupBox(self.scrollAreaWidgetContents)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(1)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.groupAnimationEffect.sizePolicy().hasHeightForWidth())
+        self.groupAnimationEffect.setSizePolicy(sizePolicy)
+        self.groupAnimationEffect.setMinimumSize(QtCore.QSize(0, 350))
+        self.groupAnimationEffect.setMaximumSize(QtCore.QSize(16777215, 350))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.groupAnimationEffect.setFont(font)
+        self.groupAnimationEffect.setStyleSheet("/* Khung chính của GroupBox */\n"
+"QGroupBox {\n"
+"    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */\n"
+"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
+"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
+"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
+"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
+"    color: #333333;            /* Màu chữ tiêu đề */\n"
+"}\n"
+"\n"
+"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
+"QGroupBox::title {\n"
+"    subcontrol-origin: margin;\n"
+"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
+"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
+"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
+"}\n"
+"")
+        self.groupAnimationEffect.setTitle("")
+        self.groupAnimationEffect.setObjectName("groupAnimationEffect")
+        self.gridLayout_23 = QtWidgets.QGridLayout(self.groupAnimationEffect)
+        self.gridLayout_23.setObjectName("gridLayout_23")
+        self.groupBox_3 = QtWidgets.QGroupBox(self.groupAnimationEffect)
+        self.groupBox_3.setMinimumSize(QtCore.QSize(0, 0))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.groupBox_3.setFont(font)
+        self.groupBox_3.setStyleSheet("/* Khung chính của GroupBox */\n"
+"QGroupBox {\n"
+"    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */\n"
+"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
+"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
+"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
+"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
+"    color: #333333;            /* Màu chữ tiêu đề */\n"
+"}\n"
+"\n"
+"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
+"QGroupBox::title {\n"
+"    subcontrol-origin: margin;\n"
+"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
+"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
+"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
+"}\n"
+"")
+        self.groupBox_3.setObjectName("groupBox_3")
+        self.gridLayout_5 = QtWidgets.QGridLayout(self.groupBox_3)
+        self.gridLayout_5.setObjectName("gridLayout_5")
+        self.radioButton_counter_plc = QtWidgets.QRadioButton(self.groupBox_3)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.radioButton_counter_plc.setFont(font)
+        self.radioButton_counter_plc.setObjectName("radioButton_counter_plc")
+        self.gridLayout_5.addWidget(self.radioButton_counter_plc, 1, 2, 1, 1)
+        self.comboBox_increment_counter_signal_selected = QtWidgets.QComboBox(self.groupBox_3)
+        self.comboBox_increment_counter_signal_selected.setMinimumSize(QtCore.QSize(0, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_increment_counter_signal_selected.setFont(font)
+        self.comboBox_increment_counter_signal_selected.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 60px; \n"
+"}\n"
+"")
+        self.comboBox_increment_counter_signal_selected.setObjectName("comboBox_increment_counter_signal_selected")
+        self.comboBox_increment_counter_signal_selected.addItem("")
+        self.gridLayout_5.addWidget(self.comboBox_increment_counter_signal_selected, 1, 7, 1, 1)
+        self.radioButton_condition_plc_pc = QtWidgets.QRadioButton(self.groupBox_3)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.radioButton_condition_plc_pc.setFont(font)
+        self.radioButton_condition_plc_pc.setObjectName("radioButton_condition_plc_pc")
+        self.gridLayout_5.addWidget(self.radioButton_condition_plc_pc, 1, 4, 1, 1)
+        self.label_24 = QtWidgets.QLabel(self.groupBox_3)
+        self.label_24.setMaximumSize(QtCore.QSize(100, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_24.setFont(font)
+        self.label_24.setObjectName("label_24")
+        self.gridLayout_5.addWidget(self.label_24, 1, 6, 1, 1)
+        self.radioButton_counter_pc = QtWidgets.QRadioButton(self.groupBox_3)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.radioButton_counter_pc.setFont(font)
+        self.radioButton_counter_pc.setChecked(True)
+        self.radioButton_counter_pc.setObjectName("radioButton_counter_pc")
+        self.gridLayout_5.addWidget(self.radioButton_counter_pc, 1, 1, 1, 1)
+        self.label_10 = QtWidgets.QLabel(self.groupBox_3)
+        self.label_10.setMaximumSize(QtCore.QSize(50, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.label_10.setFont(font)
+        self.label_10.setText("")
+        self.label_10.setObjectName("label_10")
+        self.gridLayout_5.addWidget(self.label_10, 1, 0, 1, 1)
+        self.line_25 = QtWidgets.QFrame(self.groupBox_3)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.line_25.setFont(font)
+        self.line_25.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_25.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_25.setObjectName("line_25")
+        self.gridLayout_5.addWidget(self.line_25, 1, 5, 1, 1)
+        self.gridLayout_23.addWidget(self.groupBox_3, 0, 0, 1, 2)
+        self.gridLayout_20 = QtWidgets.QGridLayout()
+        self.gridLayout_20.setSpacing(0)
+        self.gridLayout_20.setObjectName("gridLayout_20")
+        self.pushButton_load_setting_for_counter = QtWidgets.QPushButton(self.groupAnimationEffect)
+        self.pushButton_load_setting_for_counter.setMinimumSize(QtCore.QSize(0, 30))
+        self.pushButton_load_setting_for_counter.setMaximumSize(QtCore.QSize(30, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.pushButton_load_setting_for_counter.setFont(font)
+        self.pushButton_load_setting_for_counter.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
+        self.pushButton_load_setting_for_counter.setText("")
+        self.pushButton_load_setting_for_counter.setIcon(icon4)
+        self.pushButton_load_setting_for_counter.setIconSize(QtCore.QSize(25, 25))
+        self.pushButton_load_setting_for_counter.setObjectName("pushButton_load_setting_for_counter")
+        self.gridLayout_20.addWidget(self.pushButton_load_setting_for_counter, 0, 2, 1, 1)
+        self.label_34 = QtWidgets.QLabel(self.groupAnimationEffect)
+        self.label_34.setMinimumSize(QtCore.QSize(20, 0))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.label_34.setFont(font)
+        self.label_34.setText("")
+        self.label_34.setObjectName("label_34")
+        self.gridLayout_20.addWidget(self.label_34, 0, 3, 1, 1)
+        spacerItem5 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_20.addItem(spacerItem5, 0, 0, 1, 1)
+        self.pushButton_apply_setting_for_counter = QtWidgets.QPushButton(self.groupAnimationEffect)
+        self.pushButton_apply_setting_for_counter.setMinimumSize(QtCore.QSize(0, 30))
+        self.pushButton_apply_setting_for_counter.setMaximumSize(QtCore.QSize(30, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.pushButton_apply_setting_for_counter.setFont(font)
+        self.pushButton_apply_setting_for_counter.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
+        self.pushButton_apply_setting_for_counter.setText("")
+        self.pushButton_apply_setting_for_counter.setIcon(icon2)
+        self.pushButton_apply_setting_for_counter.setIconSize(QtCore.QSize(22, 22))
+        self.pushButton_apply_setting_for_counter.setObjectName("pushButton_apply_setting_for_counter")
+        self.gridLayout_20.addWidget(self.pushButton_apply_setting_for_counter, 0, 4, 1, 1)
+        self.label_35 = QtWidgets.QLabel(self.groupAnimationEffect)
+        self.label_35.setMinimumSize(QtCore.QSize(20, 0))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.label_35.setFont(font)
+        self.label_35.setText("")
+        self.label_35.setObjectName("label_35")
+        self.gridLayout_20.addWidget(self.label_35, 0, 1, 1, 1)
+        self.gridLayout_23.addLayout(self.gridLayout_20, 4, 0, 1, 1)
+        self.line_14 = QtWidgets.QFrame(self.groupAnimationEffect)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.line_14.setFont(font)
+        self.line_14.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_14.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_14.setObjectName("line_14")
+        self.gridLayout_23.addWidget(self.line_14, 3, 0, 1, 2)
+        self.groupBox = QtWidgets.QGroupBox(self.groupAnimationEffect)
+        self.groupBox.setMinimumSize(QtCore.QSize(0, 0))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.groupBox.setFont(font)
+        self.groupBox.setStyleSheet("/* Khung chính của GroupBox */\n"
+"QGroupBox {\n"
+"    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */\n"
+"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
+"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
+"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
+"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
+"    color: #333333;            /* Màu chữ tiêu đề */\n"
+"}\n"
+"\n"
+"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
+"QGroupBox::title {\n"
+"    subcontrol-origin: margin;\n"
+"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
+"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
+"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
+"}\n"
+"")
+        self.groupBox.setObjectName("groupBox")
+        self.gridLayout_7 = QtWidgets.QGridLayout(self.groupBox)
+        self.gridLayout_7.setObjectName("gridLayout_7")
+        self.radioButton_reset = QtWidgets.QRadioButton(self.groupBox)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.radioButton_reset.setFont(font)
+        self.radioButton_reset.setChecked(True)
+        self.radioButton_reset.setObjectName("radioButton_reset")
+        self.gridLayout_7.addWidget(self.radioButton_reset, 0, 1, 1, 1)
+        self.label_13 = QtWidgets.QLabel(self.groupBox)
+        self.label_13.setMaximumSize(QtCore.QSize(50, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.label_13.setFont(font)
+        self.label_13.setText("")
+        self.label_13.setObjectName("label_13")
+        self.gridLayout_7.addWidget(self.label_13, 0, 0, 1, 1)
+        self.line_26 = QtWidgets.QFrame(self.groupBox)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.line_26.setFont(font)
+        self.line_26.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_26.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_26.setObjectName("line_26")
+        self.gridLayout_7.addWidget(self.line_26, 0, 4, 1, 1)
+        self.comboBox_reset_counter_signal_selected = QtWidgets.QComboBox(self.groupBox)
+        self.comboBox_reset_counter_signal_selected.setMinimumSize(QtCore.QSize(0, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_reset_counter_signal_selected.setFont(font)
+        self.comboBox_reset_counter_signal_selected.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 60px; \n"
+"}\n"
+"")
+        self.comboBox_reset_counter_signal_selected.setObjectName("comboBox_reset_counter_signal_selected")
+        self.comboBox_reset_counter_signal_selected.addItem("")
+        self.gridLayout_7.addWidget(self.comboBox_reset_counter_signal_selected, 0, 6, 1, 1)
+        self.label_19 = QtWidgets.QLabel(self.groupBox)
+        self.label_19.setMaximumSize(QtCore.QSize(100, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_19.setFont(font)
+        self.label_19.setObjectName("label_19")
+        self.gridLayout_7.addWidget(self.label_19, 0, 5, 1, 1)
+        self.radioButton_none_1 = QtWidgets.QRadioButton(self.groupBox)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.radioButton_none_1.setFont(font)
+        self.radioButton_none_1.setObjectName("radioButton_none_1")
+        self.gridLayout_7.addWidget(self.radioButton_none_1, 0, 3, 1, 1)
+        self.radioButton_none_reset = QtWidgets.QRadioButton(self.groupBox)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.radioButton_none_reset.setFont(font)
+        self.radioButton_none_reset.setObjectName("radioButton_none_reset")
+        self.gridLayout_7.addWidget(self.radioButton_none_reset, 0, 2, 1, 1)
+        self.gridLayout_23.addWidget(self.groupBox, 1, 0, 1, 2)
+        self.groupBox_6 = QtWidgets.QGroupBox(self.groupAnimationEffect)
+        self.groupBox_6.setMinimumSize(QtCore.QSize(0, 0))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.groupBox_6.setFont(font)
+        self.groupBox_6.setStyleSheet("/* Khung chính của GroupBox */\n"
+"QGroupBox {\n"
+"    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */\n"
+"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
+"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
+"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
+"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
+"    color: #333333;            /* Màu chữ tiêu đề */\n"
+"}\n"
+"\n"
+"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
+"QGroupBox::title {\n"
+"    subcontrol-origin: margin;\n"
+"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
+"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
+"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
+"}\n"
+"")
+        self.groupBox_6.setObjectName("groupBox_6")
+        self.gridLayout_25 = QtWidgets.QGridLayout(self.groupBox_6)
+        self.gridLayout_25.setObjectName("gridLayout_25")
+        self.line_27 = QtWidgets.QFrame(self.groupBox_6)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.line_27.setFont(font)
+        self.line_27.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_27.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_27.setObjectName("line_27")
+        self.gridLayout_25.addWidget(self.line_27, 0, 4, 1, 1)
+        self.comboBox_method_use_signal_selected = QtWidgets.QComboBox(self.groupBox_6)
+        self.comboBox_method_use_signal_selected.setMinimumSize(QtCore.QSize(0, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_method_use_signal_selected.setFont(font)
+        self.comboBox_method_use_signal_selected.setStyleSheet("QComboBox {\n"
+"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
+"    padding-left: 60px; \n"
+"}\n"
+"")
+        self.comboBox_method_use_signal_selected.setObjectName("comboBox_method_use_signal_selected")
+        self.comboBox_method_use_signal_selected.addItem("")
+        self.gridLayout_25.addWidget(self.comboBox_method_use_signal_selected, 0, 6, 1, 1)
+        self.radioButton_cycle_frame = QtWidgets.QRadioButton(self.groupBox_6)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.radioButton_cycle_frame.setFont(font)
+        self.radioButton_cycle_frame.setChecked(True)
+        self.radioButton_cycle_frame.setObjectName("radioButton_cycle_frame")
+        self.gridLayout_25.addWidget(self.radioButton_cycle_frame, 0, 2, 1, 1)
+        self.label_15 = QtWidgets.QLabel(self.groupBox_6)
+        self.label_15.setMaximumSize(QtCore.QSize(50, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.label_15.setFont(font)
+        self.label_15.setText("")
+        self.label_15.setObjectName("label_15")
+        self.gridLayout_25.addWidget(self.label_15, 0, 0, 1, 1)
+        self.radioButton_single_frame = QtWidgets.QRadioButton(self.groupBox_6)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.radioButton_single_frame.setFont(font)
+        self.radioButton_single_frame.setObjectName("radioButton_single_frame")
+        self.gridLayout_25.addWidget(self.radioButton_single_frame, 0, 1, 1, 1)
+        self.label_41 = QtWidgets.QLabel(self.groupBox_6)
+        self.label_41.setMaximumSize(QtCore.QSize(100, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_41.setFont(font)
+        self.label_41.setObjectName("label_41")
+        self.gridLayout_25.addWidget(self.label_41, 0, 5, 1, 1)
+        self.radioButton_none_2 = QtWidgets.QRadioButton(self.groupBox_6)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.radioButton_none_2.setFont(font)
+        self.radioButton_none_2.setObjectName("radioButton_none_2")
+        self.gridLayout_25.addWidget(self.radioButton_none_2, 0, 3, 1, 1)
+        self.gridLayout_23.addWidget(self.groupBox_6, 2, 0, 1, 2)
+        self.hlayout_bottomrow.addWidget(self.groupAnimationEffect)
+        self.vlayout_bottomrow_container_wrap.addLayout(self.hlayout_bottomrow)
+        self.gridLayout_32.addLayout(self.vlayout_bottomrow_container_wrap, 6, 0, 1, 1)
+        self.label_14 = QtWidgets.QLabel(self.scrollAreaWidgetContents)
+        self.label_14.setMinimumSize(QtCore.QSize(0, 50))
+        self.label_14.setMaximumSize(QtCore.QSize(16777215, 60))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(22)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_14.setFont(font)
+        self.label_14.setStyleSheet("QLabel {\n"
+"    color: #ffffff; /* Chữ màu đen xám hiện đại, tương phản cao trên nền trắng */\n"
+"    \n"
+"    background-color:  qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #0B1E36, stop:1 #0F3B63); /* Nền màu trắng */\n"
+"    border: 2px solid #7A7A7A; /* Viền xám rất nhạt để định hình khối */\n"
+"    border-radius: 15px; /* Bo tròn góc mạnh hơn, tạo cảm giác mềm mại */\n"
+"    \n"
+"    padding: 12px 25px;\n"
+"    qproperty-alignment: AlignCenter; /* Căn chữ ra chính giữa label */\n"
+"}\n"
+"")
+        self.label_14.setObjectName("label_14")
+        self.gridLayout_32.addWidget(self.label_14, 0, 0, 1, 2)
         self.hlayout_toprow = QtWidgets.QHBoxLayout()
         self.hlayout_toprow.setSpacing(12)
         self.hlayout_toprow.setObjectName("hlayout_toprow")
@@ -2844,7 +2884,7 @@ class Ui_MainWindow(object):
         self.groupModeOption.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupModeOption.setFont(font)
@@ -3057,7 +3097,7 @@ class Ui_MainWindow(object):
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
         self.pushButton_add_mode.setText("")
-        self.pushButton_add_mode.setIcon(icon4)
+        self.pushButton_add_mode.setIcon(icon1)
         self.pushButton_add_mode.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_add_mode.setObjectName("pushButton_add_mode")
         self.gridLayout_9.addWidget(self.pushButton_add_mode, 0, 1, 1, 1)
@@ -3093,7 +3133,7 @@ class Ui_MainWindow(object):
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
         self.pushButton_set_save_mode.setText("")
-        self.pushButton_set_save_mode.setIcon(icon1)
+        self.pushButton_set_save_mode.setIcon(icon2)
         self.pushButton_set_save_mode.setIconSize(QtCore.QSize(22, 22))
         self.pushButton_set_save_mode.setObjectName("pushButton_set_save_mode")
         self.gridLayout_9.addWidget(self.pushButton_set_save_mode, 0, 5, 1, 1)
@@ -3118,7 +3158,7 @@ class Ui_MainWindow(object):
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
         self.pushButton_load_params_from_mode.setText("")
-        self.pushButton_load_params_from_mode.setIcon(icon2)
+        self.pushButton_load_params_from_mode.setIcon(icon4)
         self.pushButton_load_params_from_mode.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_load_params_from_mode.setObjectName("pushButton_load_params_from_mode")
         self.gridLayout_9.addWidget(self.pushButton_load_params_from_mode, 0, 3, 1, 1)
@@ -3141,7 +3181,7 @@ class Ui_MainWindow(object):
         self.groupItemLineCode.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupItemLineCode.setFont(font)
@@ -3336,7 +3376,7 @@ class Ui_MainWindow(object):
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
         self.pushButton_load_itemcode_assign.setText("")
-        self.pushButton_load_itemcode_assign.setIcon(icon2)
+        self.pushButton_load_itemcode_assign.setIcon(icon4)
         self.pushButton_load_itemcode_assign.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_load_itemcode_assign.setObjectName("pushButton_load_itemcode_assign")
         self.gridLayout_10.addWidget(self.pushButton_load_itemcode_assign, 0, 2, 1, 1)
@@ -3372,7 +3412,7 @@ class Ui_MainWindow(object):
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
         self.pushButton_apply_itemcode_assign.setText("")
-        self.pushButton_apply_itemcode_assign.setIcon(icon1)
+        self.pushButton_apply_itemcode_assign.setIcon(icon2)
         self.pushButton_apply_itemcode_assign.setIconSize(QtCore.QSize(22, 22))
         self.pushButton_apply_itemcode_assign.setObjectName("pushButton_apply_itemcode_assign")
         self.gridLayout_10.addWidget(self.pushButton_apply_itemcode_assign, 0, 4, 1, 1)
@@ -3395,7 +3435,7 @@ class Ui_MainWindow(object):
         self.groupIndexCamera.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupIndexCamera.setFont(font)
@@ -3552,7 +3592,7 @@ class Ui_MainWindow(object):
         self.groupDeviceProtocol.setMaximumSize(QtCore.QSize(350, 16777215))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupDeviceProtocol.setFont(font)
@@ -3680,7 +3720,7 @@ class Ui_MainWindow(object):
         self.groupControlPanel.setMaximumSize(QtCore.QSize(350, 16777215))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupControlPanel.setFont(font)
@@ -3867,47 +3907,212 @@ class Ui_MainWindow(object):
         self.infoRow_2.addWidget(self.frameGraph)
         self.gridLayout_2.addLayout(self.infoRow_2, 2, 0, 1, 1)
         self.hlayout_toprow.addWidget(self.groupControlPanel)
-        self.gridLayout_17.addLayout(self.hlayout_toprow, 4, 0, 1, 3)
-        self.label_5 = QtWidgets.QLabel(self.scrollAreaWidgetContents)
-        self.label_5.setMaximumSize(QtCore.QSize(16777215, 1))
+        self.gridLayout_32.addLayout(self.hlayout_toprow, 4, 0, 1, 2)
+        self.vlayout_bottomrow_container_wrap_2 = QtWidgets.QVBoxLayout()
+        self.vlayout_bottomrow_container_wrap_2.setContentsMargins(0, 0, 0, 0)
+        self.vlayout_bottomrow_container_wrap_2.setObjectName("vlayout_bottomrow_container_wrap_2")
+        self.hlayout_bottomrow_2 = QtWidgets.QHBoxLayout()
+        self.hlayout_bottomrow_2.setSpacing(12)
+        self.hlayout_bottomrow_2.setObjectName("hlayout_bottomrow_2")
+        self.groupAssignShot_2 = QtWidgets.QGroupBox(self.scrollAreaWidgetContents)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(1)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.groupAssignShot_2.sizePolicy().hasHeightForWidth())
+        self.groupAssignShot_2.setSizePolicy(sizePolicy)
+        self.groupAssignShot_2.setMaximumSize(QtCore.QSize(16777215, 350))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_5.setFont(font)
-        self.label_5.setText("")
-        self.label_5.setObjectName("label_5")
-        self.gridLayout_17.addWidget(self.label_5, 1, 0, 1, 1)
-        self.label_14 = QtWidgets.QLabel(self.scrollAreaWidgetContents)
-        self.label_14.setMinimumSize(QtCore.QSize(0, 50))
-        self.label_14.setMaximumSize(QtCore.QSize(16777215, 60))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(22)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
-        self.label_14.setFont(font)
-        self.label_14.setStyleSheet("QLabel {\n"
-"    color: #ffffff; /* Chữ màu đen xám hiện đại, tương phản cao trên nền trắng */\n"
-"    \n"
-"    background-color:  qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #0B1E36, stop:1 #0F3B63); /* Nền màu trắng */\n"
-"    border: 2px solid #7A7A7A; /* Viền xám rất nhạt để định hình khối */\n"
-"    border-radius: 15px; /* Bo tròn góc mạnh hơn, tạo cảm giác mềm mại */\n"
-"    \n"
-"    padding: 12px 25px;\n"
-"    qproperty-alignment: AlignCenter; /* Căn chữ ra chính giữa label */\n"
+        self.groupAssignShot_2.setFont(font)
+        self.groupAssignShot_2.setStyleSheet("/* Khung chính của GroupBox */\n"
+"QGroupBox {\n"
+"    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */\n"
+"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
+"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
+"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
+"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
+"    color: #333333;            /* Màu chữ tiêu đề */\n"
+"}\n"
+"\n"
+"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
+"QGroupBox::title {\n"
+"    subcontrol-origin: margin;\n"
+"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
+"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
+"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
 "}\n"
 "")
-        self.label_14.setObjectName("label_14")
-        self.gridLayout_17.addWidget(self.label_14, 0, 0, 1, 1)
-        self.label_25 = QtWidgets.QLabel(self.scrollAreaWidgetContents)
-        self.label_25.setMaximumSize(QtCore.QSize(16777215, 1))
+        self.groupAssignShot_2.setTitle("")
+        self.groupAssignShot_2.setObjectName("groupAssignShot_2")
+        self.gridLayout_26 = QtWidgets.QGridLayout(self.groupAssignShot_2)
+        self.gridLayout_26.setObjectName("gridLayout_26")
+        self.gridLayout_27 = QtWidgets.QGridLayout()
+        self.gridLayout_27.setSpacing(0)
+        self.gridLayout_27.setObjectName("gridLayout_27")
+        spacerItem10 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_27.addItem(spacerItem10, 0, 0, 1, 1)
+        self.gridLayout_26.addLayout(self.gridLayout_27, 0, 0, 1, 1)
+        self.hlayout_bottomrow_2.addWidget(self.groupAssignShot_2)
+        self.groupProgramSignalReady = QtWidgets.QGroupBox(self.scrollAreaWidgetContents)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(1)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.groupProgramSignalReady.sizePolicy().hasHeightForWidth())
+        self.groupProgramSignalReady.setSizePolicy(sizePolicy)
+        self.groupProgramSignalReady.setMinimumSize(QtCore.QSize(0, 350))
+        self.groupProgramSignalReady.setMaximumSize(QtCore.QSize(16777215, 350))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.groupProgramSignalReady.setFont(font)
+        self.groupProgramSignalReady.setStyleSheet("/* Khung chính của GroupBox */\n"
+"QGroupBox {\n"
+"    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */\n"
+"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
+"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
+"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
+"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
+"    color: #333333;            /* Màu chữ tiêu đề */\n"
+"}\n"
+"\n"
+"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
+"QGroupBox::title {\n"
+"    subcontrol-origin: margin;\n"
+"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
+"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
+"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
+"}\n"
+"")
+        self.groupProgramSignalReady.setObjectName("groupProgramSignalReady")
+        self.gridLayout_28 = QtWidgets.QGridLayout(self.groupProgramSignalReady)
+        self.gridLayout_28.setObjectName("gridLayout_28")
+        self.scrollArea_ProgramSignalReady = QtWidgets.QScrollArea(self.groupProgramSignalReady)
+        self.scrollArea_ProgramSignalReady.setStyleSheet("/* Khung ngoài của ScrollArea */\n"
+"QScrollArea {\n"
+"    background-color: #F7FFFD; /* Màu vàng nhạt (Soft Yellow) */\n"
+"    border: 1px solid #c6c6c6;  /* Viền xám mảnh đồng bộ */\n"
+"    border-radius: 4px;         /* Bo tròn góc 4px */\n"
+"}\n"
+"\n"
+"/* BẮT BUỘC: Đổi nền của widget con bên trong sang suốt \n"
+"   để màu vàng nhạt của khung ngoài được hiển thị hoàn toàn */\n"
+"QScrollArea > QWidget > QWidget {\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"/* Tùy chỉnh thanh cuộn dọc (Nếu bạn muốn tinh tế hơn) */\n"
+"QScrollBar:vertical {\n"
+"    background-color: #f5f5f5;\n"
+"    width: 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical {\n"
+"    background-color: #dcdde1; /* Cục kéo màu xám nhạt */\n"
+"    border-radius: 4px;\n"
+"    min-height: 20px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical:hover {\n"
+"    background-color: #c6c6c6; /* Cục kéo đậm hơn khi di chuột */\n"
+"}\n"
+"")
+        self.scrollArea_ProgramSignalReady.setWidgetResizable(True)
+        self.scrollArea_ProgramSignalReady.setObjectName("scrollArea_ProgramSignalReady")
+        self.scrollAreaWidgetContents_2 = QtWidgets.QWidget()
+        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 848, 269))
+        self.scrollAreaWidgetContents_2.setObjectName("scrollAreaWidgetContents_2")
+        self.scrollArea_ProgramSignalReady.setWidget(self.scrollAreaWidgetContents_2)
+        self.gridLayout_28.addWidget(self.scrollArea_ProgramSignalReady, 0, 0, 1, 1)
+        self.gridLayout_29 = QtWidgets.QGridLayout()
+        self.gridLayout_29.setSpacing(0)
+        self.gridLayout_29.setObjectName("gridLayout_29")
+        spacerItem11 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_29.addItem(spacerItem11, 0, 0, 1, 1)
+        self.pushButton_load_setting_ProgramSignalReady = QtWidgets.QPushButton(self.groupProgramSignalReady)
+        self.pushButton_load_setting_ProgramSignalReady.setMinimumSize(QtCore.QSize(0, 30))
+        self.pushButton_load_setting_ProgramSignalReady.setMaximumSize(QtCore.QSize(30, 16777215))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
-        self.label_25.setFont(font)
-        self.label_25.setText("")
-        self.label_25.setObjectName("label_25")
-        self.gridLayout_17.addWidget(self.label_25, 3, 0, 1, 1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.pushButton_load_setting_ProgramSignalReady.setFont(font)
+        self.pushButton_load_setting_ProgramSignalReady.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
+        self.pushButton_load_setting_ProgramSignalReady.setText("")
+        self.pushButton_load_setting_ProgramSignalReady.setIcon(icon4)
+        self.pushButton_load_setting_ProgramSignalReady.setIconSize(QtCore.QSize(25, 25))
+        self.pushButton_load_setting_ProgramSignalReady.setObjectName("pushButton_load_setting_ProgramSignalReady")
+        self.gridLayout_29.addWidget(self.pushButton_load_setting_ProgramSignalReady, 0, 2, 1, 1)
+        self.label_45 = QtWidgets.QLabel(self.groupProgramSignalReady)
+        self.label_45.setMinimumSize(QtCore.QSize(20, 0))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.label_45.setFont(font)
+        self.label_45.setText("")
+        self.label_45.setObjectName("label_45")
+        self.gridLayout_29.addWidget(self.label_45, 0, 3, 1, 1)
+        self.label_46 = QtWidgets.QLabel(self.groupProgramSignalReady)
+        self.label_46.setMinimumSize(QtCore.QSize(20, 0))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.label_46.setFont(font)
+        self.label_46.setText("")
+        self.label_46.setObjectName("label_46")
+        self.gridLayout_29.addWidget(self.label_46, 0, 1, 1, 1)
+        self.pushButton_apply_setting_ProgramSignalReady = QtWidgets.QPushButton(self.groupProgramSignalReady)
+        self.pushButton_apply_setting_ProgramSignalReady.setMinimumSize(QtCore.QSize(0, 30))
+        self.pushButton_apply_setting_ProgramSignalReady.setMaximumSize(QtCore.QSize(30, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.pushButton_apply_setting_ProgramSignalReady.setFont(font)
+        self.pushButton_apply_setting_ProgramSignalReady.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
+        self.pushButton_apply_setting_ProgramSignalReady.setText("")
+        self.pushButton_apply_setting_ProgramSignalReady.setIcon(icon2)
+        self.pushButton_apply_setting_ProgramSignalReady.setIconSize(QtCore.QSize(22, 22))
+        self.pushButton_apply_setting_ProgramSignalReady.setObjectName("pushButton_apply_setting_ProgramSignalReady")
+        self.gridLayout_29.addWidget(self.pushButton_apply_setting_ProgramSignalReady, 0, 4, 1, 1)
+        self.gridLayout_28.addLayout(self.gridLayout_29, 2, 0, 1, 1)
+        self.line_28 = QtWidgets.QFrame(self.groupProgramSignalReady)
+        self.line_28.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_28.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_28.setObjectName("line_28")
+        self.gridLayout_28.addWidget(self.line_28, 1, 0, 1, 1)
+        self.hlayout_bottomrow_2.addWidget(self.groupProgramSignalReady)
+        self.vlayout_bottomrow_container_wrap_2.addLayout(self.hlayout_bottomrow_2)
+        self.gridLayout_32.addLayout(self.vlayout_bottomrow_container_wrap_2, 8, 0, 1, 1)
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         self.gridLayout_15.addWidget(self.scrollArea, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
@@ -3927,67 +4132,6 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Camera/PLC Control Panel"))
-        self.groupAssignShot.setTitle(_translate("MainWindow", "Shot x Model"))
-        item = self.tableWidget_shotxmodel.horizontalHeaderItem(0)
-        item.setText(_translate("MainWindow", "Shot Reference"))
-        item = self.tableWidget_shotxmodel.horizontalHeaderItem(1)
-        item.setText(_translate("MainWindow", "Model Link to Shot"))
-        item = self.tableWidget_shotxmodel.horizontalHeaderItem(2)
-        item.setText(_translate("MainWindow", "Discription"))
-        self.pushButton_clear_shotx.setToolTip(_translate("MainWindow", "Load Parameter from Mode selected"))
-        self.pushButton_applyshotxmodel.setToolTip(_translate("MainWindow", "Save Parameters for Mode selected"))
-        self.groupBox_3.setTitle(_translate("MainWindow", "Increment Counter"))
-        self.radioButton_counter_plc.setText(_translate("MainWindow", "PLC"))
-        self.comboBox_increment_counter_signal_selected.setItemText(0, _translate("MainWindow", "None"))
-        self.radioButton_condition_plc_pc.setText(_translate("MainWindow", "PLC 🗲 PC"))
-        self.label_24.setText(_translate("MainWindow", "Signal:"))
-        self.radioButton_counter_pc.setText(_translate("MainWindow", "PC"))
-        self.pushButton_load_setting_for_counter.setToolTip(_translate("MainWindow", "Load Parameter from Mode selected"))
-        self.pushButton_apply_setting_for_counter.setToolTip(_translate("MainWindow", "Save Parameters for Mode selected"))
-        self.groupBox.setTitle(_translate("MainWindow", "Reset Counter"))
-        self.radioButton_reset.setText(_translate("MainWindow", "Reset "))
-        self.comboBox_reset_counter_signal_selected.setItemText(0, _translate("MainWindow", "None"))
-        self.label_19.setText(_translate("MainWindow", "Signal:"))
-        self.radioButton_none_1.setText(_translate("MainWindow", "None"))
-        self.radioButton_none_reset.setText(_translate("MainWindow", "No Reset"))
-        self.groupBox_6.setTitle(_translate("MainWindow", "Method Complete"))
-        self.comboBox_method_use_signal_selected.setItemText(0, _translate("MainWindow", "None"))
-        self.radioButton_cycle_frame.setText(_translate("MainWindow", "Cycle"))
-        self.radioButton_single_frame.setText(_translate("MainWindow", "Single"))
-        self.label_41.setText(_translate("MainWindow", "Signal:"))
-        self.radioButton_none_2.setText(_translate("MainWindow", "None"))
-        self.groupBox_5.setTitle(_translate("MainWindow", "Transmit Result Signals"))
-        self.groupBox_4.setTitle(_translate("MainWindow", "Mode Configuration"))
-        self.pushButton_load_Set_mode.setToolTip(_translate("MainWindow", "Load Parameter from Mode selected"))
-        self.pushButton_apply_Set_mode.setToolTip(_translate("MainWindow", "Save Parameters for Mode selected"))
-        self.comboBox_set_trigger_logging.setItemText(0, _translate("MainWindow", "None"))
-        self.comboBox_set_completed_mirror.setItemText(0, _translate("MainWindow", "None"))
-        self.label_22.setText(_translate("MainWindow", "Component"))
-        self.comboBox_set_component_logging.setItemText(0, _translate("MainWindow", "None"))
-        self.comboBox_set_trigger_automatic.setItemText(0, _translate("MainWindow", "None"))
-        self.label_23.setText(_translate("MainWindow", "Completed"))
-        self.label_21.setText(_translate("MainWindow", "Trigger Selected"))
-        self.comboBox_set_trigger_mirror.setItemText(0, _translate("MainWindow", "None"))
-        self.comboBox_set_completed_automatic.setItemText(0, _translate("MainWindow", "None"))
-        self.comboBox_set_completed_logging.setItemText(0, _translate("MainWindow", "None"))
-        self.label_17.setText(_translate("MainWindow", "⬥ Mirror"))
-        self.comboBox_automatic_mode.setItemText(0, _translate("MainWindow", "Auto 1"))
-        self.comboBox_automatic_mode.setItemText(1, _translate("MainWindow", "Auto 2"))
-        self.comboBox_automatic_mode.setItemText(2, _translate("MainWindow", "Auto 3"))
-        self.label_8.setText(_translate("MainWindow", "⬥ Automatic"))
-        self.label_18.setText(_translate("MainWindow", "⬥ Logging"))
-        self.comboBox_set_component_mirror.setItemText(0, _translate("MainWindow", "None"))
-        self.label_40.setText(_translate("MainWindow", "Mapping Mode"))
-        self.comboBox_set_component_automatic.setItemText(0, _translate("MainWindow", "None"))
-        self.comboBox_logging_mode.setCurrentText(_translate("MainWindow", "Auto 3"))
-        self.comboBox_logging_mode.setItemText(0, _translate("MainWindow", "Auto 1"))
-        self.comboBox_logging_mode.setItemText(1, _translate("MainWindow", "Auto 2"))
-        self.comboBox_logging_mode.setItemText(2, _translate("MainWindow", "Auto 3"))
-        self.comboBox_mirror_mode.setCurrentText(_translate("MainWindow", "Auto 2"))
-        self.comboBox_mirror_mode.setItemText(0, _translate("MainWindow", "Auto 1"))
-        self.comboBox_mirror_mode.setItemText(1, _translate("MainWindow", "Auto 2"))
-        self.comboBox_mirror_mode.setItemText(2, _translate("MainWindow", "Auto 3"))
-        self.label_6.setText(_translate("MainWindow", "Mode Name"))
         self.pushButton_admin.setText(_translate("MainWindow", "Administrator"))
         self.groupAssignPLC.setTitle(_translate("MainWindow", "PC 🡮 🡬 PLC"))
         item = self.tableWidget.verticalHeaderItem(0)
@@ -4079,6 +4223,68 @@ class Ui_MainWindow(object):
         self.lineEdit_timer_ready_3.setText(_translate("MainWindow", "0"))
         self.pushButton_apply_tranmission_reception.setToolTip(_translate("MainWindow", "Save Parameters for Mode selected"))
         self.pushButton_load_tranmission_reception.setToolTip(_translate("MainWindow", "Load Parameter from Mode selected"))
+        self.groupBox_5.setTitle(_translate("MainWindow", "Transmit Result Signals"))
+        self.groupBox_4.setTitle(_translate("MainWindow", "Mode Configuration"))
+        self.pushButton_load_Set_mode.setToolTip(_translate("MainWindow", "Load Parameter from Mode selected"))
+        self.pushButton_apply_Set_mode.setToolTip(_translate("MainWindow", "Save Parameters for Mode selected"))
+        self.comboBox_set_trigger_logging.setItemText(0, _translate("MainWindow", "None"))
+        self.comboBox_set_completed_mirror.setItemText(0, _translate("MainWindow", "None"))
+        self.label_22.setText(_translate("MainWindow", "Component"))
+        self.comboBox_set_component_logging.setItemText(0, _translate("MainWindow", "None"))
+        self.comboBox_set_trigger_automatic.setItemText(0, _translate("MainWindow", "None"))
+        self.label_23.setText(_translate("MainWindow", "Completed"))
+        self.label_21.setText(_translate("MainWindow", "Trigger Selected"))
+        self.comboBox_set_trigger_mirror.setItemText(0, _translate("MainWindow", "None"))
+        self.comboBox_set_completed_automatic.setItemText(0, _translate("MainWindow", "None"))
+        self.comboBox_set_completed_logging.setItemText(0, _translate("MainWindow", "None"))
+        self.label_17.setText(_translate("MainWindow", "⬥ Mirror"))
+        self.comboBox_automatic_mode.setItemText(0, _translate("MainWindow", "Auto 1"))
+        self.comboBox_automatic_mode.setItemText(1, _translate("MainWindow", "Auto 2"))
+        self.comboBox_automatic_mode.setItemText(2, _translate("MainWindow", "Auto 3"))
+        self.label_8.setText(_translate("MainWindow", "⬥ Automatic"))
+        self.label_18.setText(_translate("MainWindow", "⬥ Logging"))
+        self.comboBox_set_component_mirror.setItemText(0, _translate("MainWindow", "None"))
+        self.label_40.setText(_translate("MainWindow", "Mapping Mode"))
+        self.comboBox_set_component_automatic.setItemText(0, _translate("MainWindow", "None"))
+        self.comboBox_logging_mode.setCurrentText(_translate("MainWindow", "Auto 3"))
+        self.comboBox_logging_mode.setItemText(0, _translate("MainWindow", "Auto 1"))
+        self.comboBox_logging_mode.setItemText(1, _translate("MainWindow", "Auto 2"))
+        self.comboBox_logging_mode.setItemText(2, _translate("MainWindow", "Auto 3"))
+        self.comboBox_mirror_mode.setCurrentText(_translate("MainWindow", "Auto 2"))
+        self.comboBox_mirror_mode.setItemText(0, _translate("MainWindow", "Auto 1"))
+        self.comboBox_mirror_mode.setItemText(1, _translate("MainWindow", "Auto 2"))
+        self.comboBox_mirror_mode.setItemText(2, _translate("MainWindow", "Auto 3"))
+        self.label_6.setText(_translate("MainWindow", "Mode Name"))
+        self.groupAssignShot.setTitle(_translate("MainWindow", "Shot x Model"))
+        item = self.tableWidget_shotxmodel.horizontalHeaderItem(0)
+        item.setText(_translate("MainWindow", "Shot Reference"))
+        item = self.tableWidget_shotxmodel.horizontalHeaderItem(1)
+        item.setText(_translate("MainWindow", "Model Link to Shot"))
+        item = self.tableWidget_shotxmodel.horizontalHeaderItem(2)
+        item.setText(_translate("MainWindow", "Discription"))
+        self.pushButton_clear_shotx.setToolTip(_translate("MainWindow", "Load Parameter from Mode selected"))
+        self.pushButton_applyshotxmodel.setToolTip(_translate("MainWindow", "Save Parameters for Mode selected"))
+        self.groupBox_3.setTitle(_translate("MainWindow", "Increment Counter"))
+        self.radioButton_counter_plc.setText(_translate("MainWindow", "PLC"))
+        self.comboBox_increment_counter_signal_selected.setItemText(0, _translate("MainWindow", "None"))
+        self.radioButton_condition_plc_pc.setText(_translate("MainWindow", "PLC 🗲 PC"))
+        self.label_24.setText(_translate("MainWindow", "Signal:"))
+        self.radioButton_counter_pc.setText(_translate("MainWindow", "PC"))
+        self.pushButton_load_setting_for_counter.setToolTip(_translate("MainWindow", "Load Parameter from Mode selected"))
+        self.pushButton_apply_setting_for_counter.setToolTip(_translate("MainWindow", "Save Parameters for Mode selected"))
+        self.groupBox.setTitle(_translate("MainWindow", "Reset Counter"))
+        self.radioButton_reset.setText(_translate("MainWindow", "Reset "))
+        self.comboBox_reset_counter_signal_selected.setItemText(0, _translate("MainWindow", "None"))
+        self.label_19.setText(_translate("MainWindow", "Signal:"))
+        self.radioButton_none_1.setText(_translate("MainWindow", "None"))
+        self.radioButton_none_reset.setText(_translate("MainWindow", "No Reset"))
+        self.groupBox_6.setTitle(_translate("MainWindow", "Method Complete"))
+        self.comboBox_method_use_signal_selected.setItemText(0, _translate("MainWindow", "None"))
+        self.radioButton_cycle_frame.setText(_translate("MainWindow", "Cycle"))
+        self.radioButton_single_frame.setText(_translate("MainWindow", "Single"))
+        self.label_41.setText(_translate("MainWindow", "Signal:"))
+        self.radioButton_none_2.setText(_translate("MainWindow", "None"))
+        self.label_14.setText(_translate("MainWindow", "SINALS  TRANMISSION SECTION"))
         self.groupModeOption.setTitle(_translate("MainWindow", "Register 🡺 Mode"))
         self.labelModeSector.setText(_translate("MainWindow", "⬥ Mode Sector:"))
         self.label_9.setText(_translate("MainWindow", "🔴 Bit OFF:"))
@@ -4206,7 +4412,9 @@ class Ui_MainWindow(object):
         self.labelSendTitle_2.setText(_translate("MainWindow", "Send:"))
         self.labelRecvValue_2.setText(_translate("MainWindow", "0 Kbps"))
         self.labelConnStatus.setText(_translate("MainWindow", "🔴 Disconnect"))
-        self.label_14.setText(_translate("MainWindow", "SINALS  TRANMISSION SECTION"))
+        self.groupProgramSignalReady.setTitle(_translate("MainWindow", " Program Signal Ready"))
+        self.pushButton_load_setting_ProgramSignalReady.setToolTip(_translate("MainWindow", "Load Parameter from Mode selected"))
+        self.pushButton_apply_setting_ProgramSignalReady.setToolTip(_translate("MainWindow", "Save Parameters for Mode selected"))
 
 
 if __name__ == "__main__":

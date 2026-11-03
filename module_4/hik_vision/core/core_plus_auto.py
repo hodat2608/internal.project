@@ -47,6 +47,8 @@ class Initial_Device_Auto(QObject):
                                 'index': index,
                                 'PORT': self.port_connect
                             })
+
+        self.chModelName = chModelName
         
     def open_device_camera(self):
         nSelCamIndex = self.dict_device[self.serial][0]['index']

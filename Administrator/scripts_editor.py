@@ -31,6 +31,10 @@ import hashlib
 import keyword
 import builtins
 from datetime import datetime
+import stat
+import tempfile
+import ctypes
+from ctypes import wintypes
 
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPlainTextEdit, QTextEdit,
@@ -159,6 +163,190 @@ def iter_project_files(root, exts=TEXT_EXTS, limit=20000):
 
 def norm(path):
     return os.path.normcase(os.path.abspath(path))
+
+
+def is_path_writable(target_path):
+    """
+    Kiểm tra xem file hoặc thư mục có quyền ghi hay không bằng cách tạo file tạm.
+    Khắc phục việc os.access(W_OK) báo sai trên Windows NTFS khi UAC chặn.
+    """
+    if not target_path:
+        return False
+    check_dir = target_path if os.path.isdir(target_path) else os.path.dirname(target_path)
+    if not os.path.exists(check_dir):
+        try:
+            os.makedirs(check_dir, exist_ok=True)
+        except Exception:
+            return False
+            
+    test_file = os.path.join(check_dir, f".perm_check_{os.getpid()}_{int(time.time() * 1000)}.tmp")
+    try:
+        with open(test_file, "w") as f:
+            f.write("test")
+        os.remove(test_file)
+        return True
+    except (PermissionError, OSError):
+        return False
+
+
+def get_app_install_root(current_path=None):
+    """
+    Xác định thư mục gốc cài đặt của ứng dụng (chứa file .exe hoặc _internal).
+    """
+    if getattr(sys, "frozen", False):
+        exe_dir = os.path.dirname(os.path.abspath(sys.executable))
+        return exe_dir
+    if current_path and os.path.exists(current_path):
+        return os.path.abspath(current_path if os.path.isdir(current_path) else os.path.dirname(current_path))
+    return os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+
+
+def unlock_windows_directory_permissions(target_dir):
+    """
+    Kích hoạt UAC của Windows để chạy lệnh attrib & icacls với quyền Administrator,
+    cấp toàn quyền Modify (M) cho nhóm người dùng (Users / Everyone) trên thư mục cài đặt.
+    Sau khi chạy 1 lần duy nhất, toàn bộ thư mục và file con sẽ lưu được bình thường,
+    loại bỏ triệt để lỗi 'Permission denied'.
+    """
+    if not sys.platform.startswith("win"):
+        return True, "Hệ điều hành không phải Windows"
+
+    target_dir = os.path.abspath(target_dir)
+    if not os.path.exists(target_dir):
+        return False, f"Thư mục không tồn tại: {target_dir}"
+
+    cmd_args = (
+        f'/c attrib -R "{target_dir}\\*.*" /S /D & '
+        f'icacls "{target_dir}" /grant *S-1-5-32-545:(OI)(CI)M /grant *S-1-1-0:(OI)(CI)M /grant Users:(OI)(CI)M /T /C'
+    )
+
+    SEE_MASK_NOCLOSEPROCESS = 0x00000040
+    INFINITE = 0xFFFFFFFF
+
+    class SHELLEXECUTEINFO(ctypes.Structure):
+        _fields_ = [
+            ("cbSize", wintypes.DWORD),
+            ("fMask", wintypes.ULONG),
+            ("hwnd", wintypes.HWND),
+            ("lpVerb", wintypes.LPCWSTR),
+            ("lpFile", wintypes.LPCWSTR),
+            ("lpParameters", wintypes.LPCWSTR),
+            ("lpDirectory", wintypes.LPCWSTR),
+            ("nShow", ctypes.c_int),
+            ("hInstApp", wintypes.HINSTANCE),
+            ("lpIDList", wintypes.LPVOID),
+            ("lpClass", wintypes.LPCWSTR),
+            ("hkeyClass", wintypes.HKEY),
+            ("dwHotKey", wintypes.DWORD),
+            ("hIconOrMonitor", wintypes.HANDLE),
+            ("hProcess", wintypes.HANDLE)
+        ]
+
+    sei = SHELLEXECUTEINFO()
+    sei.cbSize = ctypes.sizeof(sei)
+    sei.fMask = SEE_MASK_NOCLOSEPROCESS
+    sei.hwnd = None
+    sei.lpVerb = "runas"  # Kích hoạt UAC Administrator
+    sei.lpFile = "cmd.exe"
+    sei.lpParameters = cmd_args
+    sei.lpDirectory = target_dir
+    sei.nShow = 0  # SW_HIDE
+
+    try:
+        success = ctypes.windll.shell32.ShellExecuteExW(ctypes.byref(sei))
+        if not success:
+            err_code = ctypes.GetLastError()
+            if err_code in (1223, 5):
+                return False, "Người dùng đã từ chối cấp quyền Administrator tại hộp thoại UAC."
+            return False, f"Không thể kích hoạt quyền Administrator (Mã lỗi: {err_code})."
+
+        if sei.hProcess:
+            ctypes.windll.kernel32.WaitForSingleObject(sei.hProcess, INFINITE)
+            exit_code = wintypes.DWORD()
+            ctypes.windll.kernel32.GetExitCodeProcess(sei.hProcess, ctypes.byref(exit_code))
+            ctypes.windll.kernel32.CloseHandle(sei.hProcess)
+
+        if is_path_writable(target_dir):
+            return True, "Đã mở khóa quyền ghi thư mục thành công!"
+        else:
+            return True, "Lệnh cấp quyền đã hoàn tất."
+    except Exception as e:
+        return False, f"Lỗi khi thực thi cấp quyền: {e}"
+
+
+def save_file_elevated(target_file, text_content, encoding="utf-8", eol="\n"):
+    """
+    Lưu file khẩn cấp bằng quyền Administrator khi gặp Permission denied.
+    Ghi nội dung ra file tạm trong %TEMP%, sau đó dùng lệnh copy nâng cao qua UAC.
+    """
+    target_file = os.path.abspath(target_file)
+    temp_dir = tempfile.gettempdir()
+    temp_name = f"vision_elevated_save_{os.getpid()}_{int(time.time() * 1000)}.tmp"
+    temp_path = os.path.join(temp_dir, temp_name)
+
+    try:
+        with open(temp_path, "w", encoding=encoding, newline="") as f:
+            f.write(text_content.replace("\n", eol))
+    except Exception as e:
+        return False, f"Không thể tạo file tạm: {e}"
+
+    cmd_args = (
+        f'/c attrib -R "{target_file}" & '
+        f'copy /Y "{temp_path}" "{target_file}" & '
+        f'icacls "{target_file}" /grant *S-1-5-32-545:M /grant *S-1-1-0:M & '
+        f'del "{temp_path}"'
+    )
+
+    SEE_MASK_NOCLOSEPROCESS = 0x00000040
+    INFINITE = 0xFFFFFFFF
+
+    class SHELLEXECUTEINFO(ctypes.Structure):
+        _fields_ = [
+            ("cbSize", wintypes.DWORD),
+            ("fMask", wintypes.ULONG),
+            ("hwnd", wintypes.HWND),
+            ("lpVerb", wintypes.LPCWSTR),
+            ("lpFile", wintypes.LPCWSTR),
+            ("lpParameters", wintypes.LPCWSTR),
+            ("lpDirectory", wintypes.LPCWSTR),
+            ("nShow", ctypes.c_int),
+            ("hInstApp", wintypes.HINSTANCE),
+            ("lpIDList", wintypes.LPVOID),
+            ("lpClass", wintypes.LPCWSTR),
+            ("hkeyClass", wintypes.HKEY),
+            ("dwHotKey", wintypes.DWORD),
+            ("hIconOrMonitor", wintypes.HANDLE),
+            ("hProcess", wintypes.HANDLE)
+        ]
+
+    sei = SHELLEXECUTEINFO()
+    sei.cbSize = ctypes.sizeof(sei)
+    sei.fMask = SEE_MASK_NOCLOSEPROCESS
+    sei.hwnd = None
+    sei.lpVerb = "runas"
+    sei.lpFile = "cmd.exe"
+    sei.lpParameters = cmd_args
+    sei.lpDirectory = os.path.dirname(target_file)
+    sei.nShow = 0
+
+    try:
+        success = ctypes.windll.shell32.ShellExecuteExW(ctypes.byref(sei))
+        if not success:
+            try: os.remove(temp_path)
+            except Exception: pass
+            return False, "Người dùng đã từ chối quyền Administrator tại hộp thoại UAC."
+
+        if sei.hProcess:
+            ctypes.windll.kernel32.WaitForSingleObject(sei.hProcess, INFINITE)
+            ctypes.windll.kernel32.CloseHandle(sei.hProcess)
+
+        if os.path.exists(temp_path):
+            try: os.remove(temp_path)
+            except Exception: pass
+
+        return True, "Đã lưu file thành công với quyền Administrator!"
+    except Exception as e:
+        return False, f"Lỗi lưu elevated: {e}"
 
 
 # =========================================================================
@@ -1351,6 +1539,7 @@ class IDEWindow(QMainWindow):
         self._create_statusbar()
         self.apply_theme(self.theme_name)
         self._restore_session()
+        self.check_and_update_permission_status()
         self.status.showMessage("Ready")
 
     # =====================================================================
@@ -1364,6 +1553,36 @@ class IDEWindow(QMainWindow):
 
         self.vsplit = QSplitter(Qt.Vertical)
         self.hsplit = QSplitter(Qt.Horizontal)
+
+        # --- PERMISSION BANNER (Hiển thị khi thư mục bị chặn quyền ghi) ---
+        self.perm_banner = QWidget()
+        banner_layout = QHBoxLayout(self.perm_banner)
+        banner_layout.setContentsMargins(12, 6, 12, 6)
+        banner_layout.setSpacing(10)
+        self.lbl_perm_warning = QLabel(
+            "🛡️ <b>Chế độ chỉ đọc (Read-Only):</b> Thư mục cài đặt đang được Windows bảo vệ "
+            "(Program Files). Bạn có thể mở khóa quyền ghi để lưu và chỉnh sửa code trực tiếp:"
+        )
+        self.lbl_perm_warning.setStyleSheet("color: #92400E; font-size: 11px;")
+        self.btn_unlock_perm = QPushButton("🔓 Mở khóa quyền ghi thư mục")
+        self.btn_unlock_perm.setStyleSheet(
+            "background-color: #2563EB; color: white; font-weight: bold; "
+            "padding: 4px 12px; border-radius: 4px; border: none;"
+        )
+        self.btn_unlock_perm.setCursor(Qt.PointingHandCursor)
+        self.btn_unlock_perm.clicked.connect(self.action_unlock_folder_permissions)
+        self.btn_close_banner = QPushButton("✕")
+        self.btn_close_banner.setFixedWidth(24)
+        self.btn_close_banner.setStyleSheet("border: none; font-weight: bold; color: #78350F; font-size: 13px;")
+        self.btn_close_banner.setCursor(Qt.PointingHandCursor)
+        self.btn_close_banner.clicked.connect(lambda: self.perm_banner.setVisible(False))
+        banner_layout.addWidget(self.lbl_perm_warning, 1)
+        banner_layout.addWidget(self.btn_unlock_perm)
+        banner_layout.addWidget(self.btn_close_banner)
+        self.perm_banner.setStyleSheet("background-color: #FEF3C7; border-bottom: 1px solid #F59E0B;")
+        self.perm_banner.setVisible(False)
+        v.addWidget(self.perm_banner)
+
         v.addWidget(self.vsplit)
 
         # --- SIDEBAR: Explorer + Outline ---
@@ -1603,6 +1822,7 @@ class IDEWindow(QMainWindow):
         # Tools
         self.act_interp = A("Select Interpreter...", lambda: self.select_interpreter())
         self.act_pip = A("Install Package (pip)...", lambda: self.pip_install())
+        self.act_unlock_perm = A("🛡️ Unlock Folder Permissions...", lambda: self.action_unlock_folder_permissions())
         self.act_clear_out = A("Clear Output", lambda: self.console.clear_output())
 
     def _create_menus(self):
@@ -1610,6 +1830,7 @@ class IDEWindow(QMainWindow):
         m = mb.addMenu("File")
         for a in (self.act_open_folder, self.act_reset_project, self.act_open_file, self.act_new_file, self.act_new_untitled,
                   None, self.act_save, self.act_save_as, self.act_save_all, None,
+                  self.act_unlock_perm, None,
                   self.act_quick_open, self.act_close_tab):
             m.addAction(a) if a else m.addSeparator()
         m = mb.addMenu("Edit")
@@ -1631,14 +1852,14 @@ class IDEWindow(QMainWindow):
         m = mb.addMenu("Build")
         m.addAction(self.act_check)
         m = mb.addMenu("Tools")
-        for a in (self.act_interp, self.act_pip, self.act_format, self.act_clear_out):
+        for a in (self.act_interp, self.act_pip, self.act_format, self.act_unlock_perm, self.act_clear_out):
             m.addAction(a)
 
     def _create_toolbar(self):
         tb = QToolBar("Main Toolbar")
         tb.setObjectName("mainToolbar")
         self.addToolBar(tb)
-        for a in (self.act_open_folder, self.act_reset_project, self.act_open_file, self.act_new_file, self.act_save, None,
+        for a in (self.act_open_folder, self.act_reset_project, self.act_open_file, self.act_new_file, self.act_save, self.act_unlock_perm, None,
                   self.act_undo, self.act_redo, None, self.act_find, self.act_format, None,
                   self.act_run, self.act_debug, self.act_stop, None, self.act_check):
             tb.addAction(a) if a else tb.addSeparator()
@@ -1689,6 +1910,7 @@ class IDEWindow(QMainWindow):
         folder_name = os.path.basename(os.path.abspath(path)) or path
         self.side_tabs.setTabText(0, f"📁 {folder_name}")
         self.side_tabs.setTabToolTip(0, f"Folder: {path}")
+        self.check_and_update_permission_status()
 
     def _path_of(self, proxy_index):
         return self.file_model.filePath(self.proxy_model.mapToSource(proxy_index))
@@ -1714,6 +1936,8 @@ class IDEWindow(QMainWindow):
             menu.addSeparator()
             menu.addAction("Copy Path", lambda: QApplication.clipboard().setText(path))
         menu.addAction("Reveal in File Manager", lambda: QDesktopServices.openUrl(QUrl.fromLocalFile(target_dir)))
+        menu.addSeparator()
+        menu.addAction("🛡️ Mở khóa quyền ghi thư mục...", self.action_unlock_folder_permissions)
         menu.exec_(self.tree_view.viewport().mapToGlobal(pos))
 
     def new_folder(self, base):
@@ -1721,6 +1945,12 @@ class IDEWindow(QMainWindow):
         if ok and name:
             try:
                 os.makedirs(os.path.join(base, name), exist_ok=True)
+            except (PermissionError, OSError) as e:
+                def _do_folder():
+                    os.makedirs(os.path.join(base, name), exist_ok=True)
+                    return True
+                if not self._prompt_unlock_and_retry(base, f"Tạo thư mục '{name}'", _do_folder):
+                    QMessageBox.critical(self, "Lỗi", f"Không thể tạo thư mục:\n{e}")
             except Exception as e:
                 QMessageBox.critical(self, "Lỗi", f"Không thể tạo thư mục:\n{e}")
 
@@ -1731,6 +1961,13 @@ class IDEWindow(QMainWindow):
         new = os.path.join(os.path.dirname(path), name)
         try:
             os.rename(path, new)
+        except (PermissionError, OSError) as e:
+            def _do_rename():
+                os.rename(path, new)
+                return True
+            if not self._prompt_unlock_and_retry(os.path.dirname(path), f"Đổi tên '{os.path.basename(path)}'", _do_rename):
+                QMessageBox.critical(self, "Lỗi", f"Không thể đổi tên:\n{e}")
+                return
         except Exception as e:
             QMessageBox.critical(self, "Lỗi", f"Không thể đổi tên:\n{e}")
             return
@@ -1747,6 +1984,13 @@ class IDEWindow(QMainWindow):
             return
         try:
             shutil.rmtree(path) if os.path.isdir(path) else os.remove(path)
+        except (PermissionError, OSError) as e:
+            def _do_delete():
+                shutil.rmtree(path) if os.path.isdir(path) else os.remove(path)
+                return True
+            if not self._prompt_unlock_and_retry(os.path.dirname(path), f"Xóa '{os.path.basename(path)}'", _do_delete):
+                QMessageBox.critical(self, "Lỗi", f"Không thể xóa:\n{e}")
+                return
         except Exception as e:
             QMessageBox.critical(self, "Lỗi", f"Không thể xóa:\n{e}")
             return
@@ -1943,6 +2187,16 @@ class IDEWindow(QMainWindow):
                     f.write("")
                 self.open_path(new_path)
                 self.status.showMessage(f"Đã tạo file: {file_name}")
+            except (PermissionError, OSError) as e:
+                def _do_new():
+                    os.makedirs(os.path.dirname(new_path), exist_ok=True)
+                    with open(new_path, "w", encoding="utf-8") as f:
+                        f.write("")
+                    self.open_path(new_path)
+                    self.status.showMessage(f"Đã tạo file: {file_name}")
+                    return True
+                if not self._prompt_unlock_and_retry(target_dir, f"Tạo file '{file_name}'", _do_new):
+                    QMessageBox.critical(self, "Lỗi", f"Không thể tạo file:\n{e}")
             except Exception as e:
                 QMessageBox.critical(self, "Lỗi", f"Không thể tạo file:\n{e}")
 
@@ -1951,19 +2205,39 @@ class IDEWindow(QMainWindow):
         if not os.path.exists(path):
             return None
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-        bak = os.path.join(os.path.dirname(path), f"{os.path.basename(path)}.{ts}.bak")
-        shutil.copy2(path, bak)
-        olds = sorted(glob.glob(glob.escape(path) + ".*.bak"))
-        for old in olds[:-MAX_BACKUPS]:
+        try:
+            bak = os.path.join(os.path.dirname(path), f"{os.path.basename(path)}.{ts}.bak")
+            shutil.copy2(path, bak)
+            olds = sorted(glob.glob(glob.escape(path) + ".*.bak"))
+            for old in olds[:-MAX_BACKUPS]:
+                try:
+                    os.remove(old)
+                except OSError:
+                    pass
+            return bak
+        except (PermissionError, OSError):
+            # Nếu thư mục gốc bị khóa quyền ghi (như Program Files), lưu backup an toàn vào AppData
             try:
-                os.remove(old)
-            except OSError:
-                pass
-        return bak
+                app_data = os.environ.get('LOCALAPPDATA') or os.environ.get('APPDATA') or os.path.expanduser('~')
+                backup_dir = os.path.join(app_data, 'MBC_Vision_Inspector', '.ide_backups')
+                os.makedirs(backup_dir, exist_ok=True)
+                bak = os.path.join(backup_dir, f"{os.path.basename(path)}.{ts}.bak")
+                shutil.copy2(path, bak)
+                return bak
+            except Exception:
+                return None
 
     def save_editor(self, ed):
         if ed.path is None:
             return self.save_editor_as(ed)
+
+        # Xóa thuộc tính Read-Only nếu file đang bị đánh dấu chỉ đọc
+        if os.path.exists(ed.path):
+            try:
+                os.chmod(ed.path, stat.S_IWRITE | stat.S_IREAD)
+            except Exception:
+                pass
+
         try:
             bak = self._backup(ed.path)
             with open(ed.path, "w", encoding=ed.encoding, newline="") as f:
@@ -1977,8 +2251,158 @@ class IDEWindow(QMainWindow):
             if ed is self.current_editor():
                 self.run_lint()
             return True
+        except (PermissionError, OSError) as e:
+            # Tự động xử lý lỗi quyền truy cập (Permission Denied) khi cài trong Program Files
+            return self._handle_permission_denied_save(ed, e)
         except Exception as e:
             QMessageBox.critical(self, "Lỗi", f"Không thể lưu file:\n{e}")
+            return False
+
+    def check_and_update_permission_status(self):
+        """Kiểm tra quyền ghi trên thư mục gốc hiện tại, nếu bị khóa thì hiện banner hướng dẫn."""
+        target_dir = self.tree_root or self.root_path
+        if not is_path_writable(target_dir):
+            if hasattr(self, 'perm_banner') and self.perm_banner:
+                self.perm_banner.setVisible(True)
+        else:
+            if hasattr(self, 'perm_banner') and self.perm_banner:
+                self.perm_banner.setVisible(False)
+
+    def action_unlock_folder_permissions(self):
+        """Mở khóa quyền ghi toàn bộ thư mục ứng dụng qua UAC."""
+        install_root = get_app_install_root(self.tree_root)
+        reply = QMessageBox.question(
+            self,
+            "Xác nhận mở khóa quyền ghi thư mục",
+            f"Bạn có muốn cấp quyền ghi (Modify) cho nhóm người dùng trên thư mục:<br>"
+            f"<code>{install_root}</code><br><br>"
+            f"Việc này giúp mở khóa toàn bộ quyền sửa, lưu code, tạo file mới trong thư mục "
+            f"(kể cả khi phần mềm được cài đặt trong <b>C:\\Program Files</b>).<br><br>"
+            f"Hộp thoại UAC của Windows sẽ xuất hiện để xác nhận quyền Quản trị viên (Administrator).",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.Yes
+        )
+        if reply != QMessageBox.Yes:
+            return
+
+        self.status.showMessage("Đang mở khóa quyền ghi thư mục qua UAC...", 5000)
+        ok, msg = unlock_windows_directory_permissions(install_root)
+        if ok:
+            if hasattr(self, 'perm_banner') and self.perm_banner:
+                self.lbl_perm_warning.setText("✅ Đã mở khóa quyền ghi thư mục thành công! Bạn có thể chỉnh sửa và lưu code bình thường.")
+                self.lbl_perm_warning.setStyleSheet("font-weight: bold; color: #16A34A; font-size: 11px;")
+                self.perm_banner.setStyleSheet("background-color: #DCFCE7; border-bottom: 1px solid #22C55E;")
+                self.btn_unlock_perm.setVisible(False)
+                QTimer.singleShot(4000, lambda: self.perm_banner.setVisible(False))
+            QMessageBox.information(
+                self,
+                "Thành công",
+                f"Đã mở khóa quyền ghi thành công cho thư mục:<br><code>{install_root}</code><br><br>"
+                f"Bây giờ bạn có thể tự do chỉnh sửa, tạo file, lưu code mà không bị lỗi 'Permission denied' nữa."
+            )
+            self.status.showMessage("✅ Đã mở khóa quyền ghi thư mục thành công!", 6000)
+        else:
+            QMessageBox.warning(self, "Thất bại", f"Không thể mở khóa quyền ghi:\n{msg}")
+
+    def _prompt_unlock_and_retry(self, target_dir, operation_name, retry_fn):
+        """Hỗ trợ tự động gợi ý mở khóa quyền thư mục khi các thao tác file gặp PermissionError."""
+        reply = QMessageBox.warning(
+            self,
+            "Quyền truy cập bị từ chối (Permission Denied)",
+            f"Không thể thực hiện thao tác <b>'{operation_name}'</b> vì thư mục đang được "
+            f"Windows bảo vệ (thường là trong <b>Program Files</b>):<br>"
+            f"<code>{target_dir}</code><br><br>"
+            f"Bạn có muốn cấp quyền ghi (Modify) cho thư mục để tiếp tục không?<br>"
+            f"(Hộp thoại UAC của Windows sẽ xuất hiện để xác nhận quyền Quản trị viên)",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.Yes
+        )
+        if reply == QMessageBox.Yes:
+            install_root = get_app_install_root(target_dir)
+            ok, msg = unlock_windows_directory_permissions(install_root)
+            if ok:
+                try:
+                    return retry_fn()
+                except Exception as ex:
+                    QMessageBox.critical(self, "Lỗi", f"Thao tác thất bại sau khi cấp quyền:\n{ex}")
+            else:
+                QMessageBox.warning(self, "Chưa cấp được quyền", msg)
+        return False
+
+    def _handle_permission_denied_save(self, ed, err):
+        """Xử lý ngoại lệ Permission denied khi lưu file bằng hộp thoại tương tác thông minh."""
+        fname = os.path.basename(ed.path)
+        install_root = get_app_install_root(ed.path)
+
+        box = QMessageBox(self)
+        box.setIcon(QMessageBox.Warning)
+        box.setWindowTitle("Quyền truy cập bị từ chối (Permission Denied)")
+        box.setText(f"<h3>Không thể lưu file: {fname}</h3>")
+        box.setInformativeText(
+            f"Tệp tin nằm trong thư mục được Windows bảo vệ (thường là <b>Program Files</b>):<br>"
+            f"<code>{ed.path}</code><br><br>"
+            f"<b>Nguyên nhân:</b> Windows chặn quyền ghi của người dùng thông thường.<br><br>"
+            f"<b>Lựa chọn xử lý:</b><br>"
+            f"• <b>Mở khóa toàn bộ thư mục:</b> Cấp quyền Modify cho thư mục cài đặt để từ nay về sau có thể chỉnh sửa và lưu code bình thường mà không bị hỏi lại.<br>"
+            f"• <b>Lưu riêng file này (Admin):</b> Ghi đè file này bằng quyền Administrator tạm thời."
+        )
+        btn_unlock = box.addButton("🔓 Mở khóa quyền ghi thư mục (Khuyên dùng)", QMessageBox.AcceptRole)
+        btn_elevated = box.addButton("💾 Lưu file này với quyền Admin", QMessageBox.ActionRole)
+        btn_cancel = box.addButton("Hủy bỏ", QMessageBox.RejectRole)
+        box.setDefaultButton(btn_unlock)
+
+        box.exec_()
+        clicked = box.clickedButton()
+
+        if clicked == btn_unlock:
+            ok, msg = unlock_windows_directory_permissions(install_root)
+            if ok:
+                try:
+                    bak = self._backup(ed.path)
+                    with open(ed.path, "w", encoding=ed.encoding, newline="") as f:
+                        f.write(ed.toPlainText().replace("\n", ed.eol))
+                    ed.mtime = os.path.getmtime(ed.path)
+                    ed.document().setModified(False)
+                    if ed.path not in self.watcher.files():
+                        self.watcher.addPath(ed.path)
+                    self.status.showMessage(f"✅ Đã mở khóa & lưu thành công: {fname}", 6000)
+                    QMessageBox.information(
+                        self, "Thành công",
+                        f"Đã mở khóa quyền ghi thành công cho thư mục:<br><code>{install_root}</code><br><br>"
+                        f"File <b>{fname}</b> đã được lưu! Bây giờ bạn có thể tự do chỉnh sửa và lưu mọi file code."
+                    )
+                    if hasattr(self, 'perm_banner') and self.perm_banner:
+                        self.perm_banner.setVisible(False)
+                    return True
+                except Exception:
+                    return self._do_elevated_save(ed)
+            else:
+                QMessageBox.warning(self, "Chưa cấp được quyền", f"{msg}\n\nĐang chuyển sang lưu trực tiếp bằng quyền Admin...")
+                return self._do_elevated_save(ed)
+
+        elif clicked == btn_elevated:
+            return self._do_elevated_save(ed)
+
+        return False
+
+    def _do_elevated_save(self, ed):
+        """Lưu khẩn cấp một file riêng lẻ qua UAC."""
+        fname = os.path.basename(ed.path)
+        ok, msg = save_file_elevated(ed.path, ed.toPlainText(), ed.encoding, ed.eol)
+        if ok:
+            try:
+                ed.mtime = os.path.getmtime(ed.path)
+            except Exception:
+                ed.mtime = time.time()
+            ed.document().setModified(False)
+            if ed.path not in self.watcher.files():
+                self.watcher.addPath(ed.path)
+            self.status.showMessage(f"✅ Đã lưu bằng quyền Admin: {fname}", 5000)
+            if ed is self.current_editor():
+                self.run_lint()
+            return True
+        else:
+            QMessageBox.critical(self, "Lỗi lưu file", f"Không thể lưu file với quyền Admin:\n{msg}")
             return False
 
     def save_editor_as(self, ed):

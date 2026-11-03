@@ -9,7 +9,8 @@ from ultralytics import YOLO
 import numpy as np
 import cv2,time
 
-from _source.v5.v5 import v5s, _read_model_config, COLOR_OK, COLOR_NG, draw_detections, _normalize_key_model
+import torch
+from _source.v5.v5 import v5s, _read_model_config, get_model_config, COLOR_OK, COLOR_NG, draw_detections, _normalize_key_model
 from module_3.handle_option_models import COLUMN_MAPPING
 
 LOGO_WATERMARK = "Detected by YOLO V8 Architecture"
@@ -19,24 +20,29 @@ class v8s(v5s):
         self.keys_mapping = list(COLUMN_MAPPING.keys())
         self.params           = ['xmax', 'xmin', 'ymax', 'ymin']
 
-    def run_model(self, image: np.ndarray, model_loader, pyuic,camera,key_model):
+    def run_model(self, image: np.ndarray, model_loader, pyuic, camera, key_model):
         if camera:
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) 
         
-        results = model_loader(
-            image,
-            imgsz=int(pyuic.comboBox_imgsz.currentText()),
-            conf=int(pyuic.spinBox_confidenc_score.value()) / 100,
-        )
+        imgsz = int(pyuic.comboBox_imgsz.currentText())
+        conf_thr_global = int(pyuic.spinBox_confidenc_score.value()) / 100
+
+        # Tối ưu: inference_mode không theo dõi gradient, tiết kiệm GPU RAM và tăng tốc độ forward
+        with torch.inference_mode():
+            results = model_loader(
+                image,
+                imgsz=imgsz,
+                conf=conf_thr_global,
+            )
         
-        boxes_dict = results[0].boxes.cpu().numpy()
-        # YOLOv8 provides xyxy format directly: [xmin, ymin, xmax, ymax]
-        xyxy_list = boxes_dict.xyxy.tolist()
-        cls_list = boxes_dict.cls.tolist()
-        conf_list = boxes_dict.conf.tolist()
+        boxes = results[0].boxes
+        xyxy_arr = boxes.xyxy.cpu().numpy()
+        cls_arr = boxes.cls.cpu().numpy()
+        conf_arr = boxes.conf.cpu().numpy()
         names = results[0].names
         
-        cfg_rows = _read_model_config(pyuic.model, pyuic.model_column, self.keys_mapping)
+        # Tối ưu: Đọc cấu hình từ cache RAM
+        cfg_rows = get_model_config(pyuic, self.keys_mapping)
  
         label_cfg: dict[str, dict] = {}
         for cfg in cfg_rows:
@@ -46,23 +52,24 @@ class v8s(v5s):
         valid_names: list[str] = []
         draw_candidates: list[dict] = []   
 
-        for xyxy, cls, conf in zip(xyxy_list, cls_list, conf_list):
-            label_name = names[int(cls)]
+        num_dets = len(cls_arr)
+        for i in range(num_dets):
+            cls_id = int(cls_arr[i])
+            label_name = names[cls_id] if isinstance(names, (list, tuple)) and cls_id < len(names) else names.get(cls_id, str(cls_id)) if isinstance(names, dict) else str(cls_id)
             cfg = label_cfg.get(label_name)
  
             if cfg is None or not cfg['join']:
                 continue
  
-            xmin, ymin, xmax, ymax = xyxy
+            xmin, ymin, xmax, ymax = xyxy_arr[i]
             width      = xmax - xmin
             height     = ymax - ymin
-            confidence = conf
+            confidence = float(conf_arr[i])
  
-            out_of_conf = confidence < cfg['conf_thr']
-            out_of_size = (width  < cfg['wmin'] or width  > cfg['wmax'] or
-                           height < cfg['hmin'] or height > cfg['hmax'])
-
-            if out_of_conf or out_of_size:
+            if confidence < cfg['conf_thr']:
+                continue
+            if (width  < cfg['wmin'] or width  > cfg['wmax'] or
+                height < cfg['hmin'] or height > cfg['hmax']):
                 continue
 
             valid_names.append(label_name)
@@ -80,13 +87,16 @@ class v8s(v5s):
         list_register = {}
         fail_labels   = set()
 
-        # ── Per-label OK / NG quantity check (from UI config table) ──────────
+        # ── Per-label OK / NG quantity check (Tối ưu: Counter O(1) lookup) ────
+        from collections import Counter
+        name_counts = Counter(valid_names)
+
         for cfg in cfg_rows:
             if not cfg['join']:
                 continue
 
             label    = cfg['label']
-            ok_count = valid_names.count(label)
+            ok_count = name_counts.get(label, 0)
 
             if cfg['ok'] and ok_count != cfg['quantity']:
                 flag = False
@@ -95,7 +105,7 @@ class v8s(v5s):
                 if reg:
                     list_register[reg] = cfg.get('value', 1)
 
-            if cfg['ng'] and label in valid_names:
+            if cfg['ng'] and ok_count > 0:
                 flag = False
                 fail_labels.add(f'* {label}')
                 reg = str(cfg.get('register') or '').strip()

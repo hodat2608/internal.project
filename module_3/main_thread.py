@@ -177,16 +177,24 @@ class Ui_MainWindow(object):
             self._setup_camera_interface(camera_id, camera_name, item_code_id,total_models,total_cameras, base_progress, step_progress)
             
         self.plc_handler.set_built_in_config(self.camera_manager.built_in_objects, self.camera_manager.built_in_mapping_mode)
-        self.plc_handler.set_item_code_display(self.camera_manager.ui_mother)
         
     def get_num_models(self, camera_id):
         models = self.db_manager.get_models_for_camera(camera_id)
         return models
 
-            
+    def _apply_tab_bar_font(self, tabWidget):
+        """Cài đặt font Segoe UI, size 10 cho QTabBar của tab_widget_2."""
+        if tabWidget is not None:
+            font = QtGui.QFont("Segoe UI", 10)
+            tab_bar = tabWidget.tabBar()
+            if tab_bar:
+                tab_bar.setFont(font)
+            tabWidget.setFont(font)
+      
     def _setup_camera_interface(self, camera_id, camera_name, item_code_id,total_models,total_cameras, base_progress=0, step_progress=0):
         tab = self.camera_manager.create_camera_tab()
         self.tabWidget.addTab(tab, f"🟢 Camera {camera_name}")
+        self._apply_tab_bar_font(self.tabWidget)
         self.tabWidget_2 = tab.findChild(QtWidgets.QTabWidget)
         models = self.db_manager.get_models_for_camera(camera_id)
         _log.info("Found %s models for camera %s", len(models), camera_name)
@@ -206,12 +214,18 @@ class Ui_MainWindow(object):
         if self.progress_callback:
             self.progress_callback(base_progress + int(step_progress * 0.6), f"Đang kết nối vật lý camera {camera_name}...")
             
-        self.device, self.dev = self.camera_manager.create_camera_device_interface_manual(camera_id, camera_name, item_code_id, self.tabWidget_2, self.product_code_forms)
+        self.device, self.dev, _device_tab_ui = self.camera_manager.create_camera_device_interface_manual(camera_id, camera_name, item_code_id, self.tabWidget_2, self.product_code_forms)
         if self.mode_init:
             if self.progress_callback:
                 self.progress_callback(base_progress + int(step_progress * 0.7), f"Đang kiểm tra kết nối Camera {camera_name} và PLC...")
             self.camera_manager.set_signals_device_camera(camera_name, dict_signals)
             self.device = self.camera_manager.auto_initial_device(camera_id, camera_name, item_code_id, self.tabWidget_2, self.product_code_forms, dict_signals, progress_callback=self.progress_callback)
+            # --- update thông tin camera lên tab Camera Device ---
+            _device_tab_ui.label_dev_name.setText(self.camera_manager.device_type if self.camera_manager.device_type else "#N/A")
+            _device_tab_ui.label_PartNo.setText(self.camera_manager.PartNo if self.camera_manager.PartNo else "#N/A")
+            _device_tab_ui.label_SerialNo.setText(self.camera_manager.identifier if self.camera_manager.identifier else "#N/A")
+            _device_tab_ui.label_Port.setText(self.camera_manager.conn_mode if self.camera_manager.conn_mode else "#N/A")
+            _device_tab_ui.label_IP.setText(self.camera_manager.ip_address if self.camera_manager.ip_address else "#N/A")
             # --- Khởi tạo và kiểm tra kết nối PLC ---
             plc_driver = getattr(self.camera_manager.connect_plc, 'driver_loader', None)
             is_connected = bool(plc_driver and plc_driver.connect())
@@ -268,7 +282,6 @@ class Ui_MainWindow(object):
         self.camera_manager.set_camera_data(camera_name, ui_instances, ui_modelloader, path_instances, dict_signals, shot_complete, dict_shot, parameter_models, automation_ui, self.device, self.dev,auto_logging_ui)
         self.camera_manager.set_mode_data(camera_name, mode_dict, self.device)
         self.camera_manager.set_list_mapping_mode(camera_name, list_mode)
-        # self.camera_manager.create_single_tab_detect(self.tabWidget_2,self.camera_manager.built_in_objects,self.camera_manager.processor,self.camera_manager.total_key,self.product_code_forms)
         _log.info("Camera %s initialization completed", camera_name)
 
     def cleanup(self):

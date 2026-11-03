@@ -17,8 +17,8 @@ from typing import Final, Any, Optional, Dict
 COLUMN_MAPPING: Final[dict[str, str]] = {
     "Label Name":     "`Label_Name`",
     "Enable":        "`Join`",
-    "OK 🟢":             "`OK`",
-    "NG 🔴":             "`NG`",
+    "OK ✔":             "`OK`",
+    "NG ✘":             "`NG`",
     "Qty":       "`Quantity`",
     "Min Width":      "`Width_Min`",
     "Max Width":      "`Width_Max`",
@@ -897,6 +897,8 @@ class Process_Model:
 
     def format_all_table_items(self):
         """Đảm bảo tất cả các ô trong bảng và tiêu đề cột/hàng đều có font 11, in đậm và căn giữa."""
+        if hasattr(self.uic, '_cached_model_config'):
+            self.uic._cached_model_config = None
         if not hasattr(self.uic, 'model') or self.uic.model is None:
             return
         model = self.uic.model
@@ -984,6 +986,8 @@ class Process_Model:
 
     def _on_table_item_changed(self, item):
         """Đảm bảo cột Register luôn có tiền tố 'DM', và toàn bộ ô nhập vào đều có font 11 Bold và căn giữa."""
+        if hasattr(self.uic, '_cached_model_config'):
+            self.uic._cached_model_config = None
         if not hasattr(self.uic, 'model_column') or item is None:
             return
         
@@ -1525,6 +1529,8 @@ class Process_Model:
             return
         
     def populateTable(self):
+        if hasattr(self.uic, '_cached_model_config'):
+            self.uic._cached_model_config = None
         if hasattr(self, 'slider_controller') and self.slider_controller:
             self.slider_controller.popup.hide()
         self.uic.model.removeRows(0, self.uic.model.rowCount())
@@ -1838,6 +1844,8 @@ class Process_Model:
             """, (camera_id, model))
             result = cursor.fetchall()
             if result:
+                if hasattr(self.uic, '_cached_model_config'):
+                    self.uic._cached_model_config = None
                 self.uic.model.removeRows(0, self.uic.model.rowCount())
                 
                 # Check an toàn tránh lỗi 'NoneType' object has no attribute 'names'

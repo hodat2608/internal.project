@@ -7,7 +7,7 @@ Fix list (so với bản gốc):
   FIX-1   Thread-safe counter per-key          (_increment_counter / _reset_counter)
   FIX-2   Per-key processing guard             (_try_acquire_key / _release_key)
   FIX-3   TOCTOU: write-OFF trước khi submit
-  FIX-4   Data race _active_triggers/mode_kick (_mode_lock + snapshot)
+  FIX-4   Data race _active_triggers/default_mode (_mode_lock + snapshot)
   FIX-5   QMessageBox từ worker thread         (show_warning signal)
   FIX-6   return → continue trong _set_mode_reg_process
   FIX-7   list_size dùng chung → dict per key  (_label_sizes)
@@ -258,8 +258,7 @@ class PLCHandler:
         self.worker_thread    = PLCWorkerModeAuto1(self)
         self.built_in_objects = {}
         self.built_in_mapping_mode = {}
-        self.ui_itemcode      = None
-        self.mode_kick        = None  # được set từ mapping 'automatic' trong set_built_in_mapping_mode
+        self.default_mode        = None  # được set từ mapping 'automatic' trong set_built_in_mapping_mode
 
         self._label_sizes: dict = {}
         self._last_results_map: dict = {}
@@ -276,12 +275,6 @@ class PLCHandler:
 
         self._flag_logging: defaultdict[str, bool] = defaultdict(bool)
         self.register_table_logging: dict = {}
-
-        self._item_code_tick  = 0
-        self._last_item_code: str | None = None
-        self.ITEM_CODE_POLL_EVERY = 100
-
-        self.mode_load_jumper = False
 
         self.register_table_logging = {}
 
@@ -320,16 +313,23 @@ class PLCHandler:
         Kiểm tra chế độ giao tiếp PLC được cấu hình:
         - True: Chế độ mô phỏng qua LOG (indirect_from_log = True hoặc direct_to_plc = False)
         - False: Chế độ kết nối trực tiếp thiết bị PLC (direct_to_plc = True)
+        Tối ưu: Cache giá trị trên RAM để tránh liên tục truy vấn MySQL SELECT mỗi frame.
         """
+        cached = getattr(self, '_cached_indirect_log_mode', None)
+        if cached is not None:
+            return cached
+
         # 1. Kiểm tra cấu hình lưu trên layer_core (module_2.main_core)
         if self.layer_core is not None:
-            # Nếu chỉ định rõ direct_to_plc = True và indirect_from_log = False
-            if bool(getattr(self.layer_core, 'direct_to_plc', False)) is True and not bool(getattr(self.layer_core, 'indirect_from_log', False)):
-                return False
-            if bool(getattr(self.layer_core, 'indirect_from_log', False)) is True:
-                return True
-            if hasattr(self.layer_core, 'direct_to_plc') and bool(getattr(self.layer_core, 'direct_to_plc')) is False:
-                return True
+            if hasattr(self.layer_core, 'direct_to_plc') or hasattr(self.layer_core, 'indirect_from_log'):
+                direct_to_plc = getattr(self.layer_core, 'direct_to_plc', None)
+                indirect_from_log = getattr(self.layer_core, 'indirect_from_log', None)
+                if bool(direct_to_plc) is True and not bool(indirect_from_log):
+                    self._cached_indirect_log_mode = False
+                    return False
+                if bool(indirect_from_log) is True or (direct_to_plc is not None and bool(direct_to_plc) is False):
+                    self._cached_indirect_log_mode = True
+                    return True
 
         # 2. Kiểm tra từ CSDL DATA_IP_ADDRESS.INFOR_ADDRESS nếu có db_manager hoặc connection
         try:
@@ -341,11 +341,27 @@ class PLCHandler:
                 cursor.close()
                 if row:
                     direct_to_plc, indirect_from_log = bool(row[0]), bool(row[1])
-                    return indirect_from_log or (not direct_to_plc)
+                    mode = indirect_from_log or (not direct_to_plc)
+                    self._cached_indirect_log_mode = mode
+                    return mode
         except Exception:
             pass
 
         return False
+
+    def invalidate_plc_mode_cache(self):
+        """Xoá cache chế độ PLC để cập nhật cấu hình mới khi user thay đổi cài đặt."""
+        self._cached_indirect_log_mode = None
+
+    def _dispatch_plc_writes(self, write_tasks: list) -> None:
+        """
+        Thực hiện tuần tự danh sách các lệnh ghi PLC theo đúng thứ tự:
+        Gửi các thanh ghi NG hoặc Reset OK trước, sau đó gửi tín hiệu Complete.
+        Đảm bảo không phá vỡ logic giao thức điều khiển dây chuyền PLC.
+        """
+        for reg, val in write_tasks:
+            if reg and str(reg).strip():
+                self._safe_write_plc(str(reg).strip(), val)
 
     def _safe_read_plc(self, register: str):
         """
@@ -555,9 +571,8 @@ class PLCHandler:
     def set_built_in_config(self, objects, mapping):
         self.built_in_objects = objects
         self.built_in_mapping_mode = mapping
-        if self.mode_kick is None:
-            # Mặc định: mode đang map cho 'automatic' (lấy từ camera đầu tiên có cấu hình)
-            self.mode_kick = next(
+        if self.default_mode is None:
+            self.default_mode = next(
                 (cam.get('mapping', {}).get('automatic', {}).get('mapping_mode')
                  for cam in mapping.values()
                  if cam.get('mapping', {}).get('automatic', {}).get('mapping_mode')),
@@ -565,7 +580,6 @@ class PLCHandler:
             )
         self._update_trigger_cache()
         self._set_mode_reg_process()
-        # self._update_counter_settings()
 
     def _update_counter_settings(self,automation_ui):
         if automation_ui:
@@ -576,59 +590,69 @@ class PLCHandler:
             elif automation_ui.radioButton_condition_plc_pc.isChecked():
                 return 'PLC_TO_PC'
                 
-    def set_item_code_display(self, obj):
-        self.ui_itemcode = obj
-
-
     # -----------------------------------------------------------------------
     # reset counter from PLC
     # -----------------------------------------------------------------------
     def reset_counter_from_plc(self):
         if not self.built_in_objects or not self.dict_signal_complete:
-            pass
+            return
 
-        for key, value in self.built_in_objects.items():
+        with self._signal_rwlock.read():
+            for key, value in self.built_in_objects.items():
                 automation_ui = value.get('automation_ui')
-                if automation_ui and automation_ui.radioButton_reset.isChecked():
-                    signals_selected = automation_ui.comboBox_reset_counter_signal_selected.currentText()
-                    signals = dict(self.dict_signal_complete.get(key, {}))
-                    if signals_selected not in signals:
-                        return 
-                    reg = signals.get(signals_selected, {}).get('reg')
-                    if not reg:
-                        return
-                    
-                    if self._safe_read_plc(reg) != 0 :
-                        self._reset_counter(key)
-                        _log.info("[PLCHandler] Reset counter %s", key)
-                        off_val = signals.get(signals_selected, {}).get('off')
-                        if off_val is not None and str(off_val).strip() != "" and str(off_val).strip().lower() not in ('none', 'no value'):
-                            try:
-                                self._safe_write_plc(reg, int(off_val))
-                            except (ValueError, TypeError):
-                                pass
+                if not automation_ui or not automation_ui.radioButton_reset.isChecked():
+                    continue
+
+                signals_selected = automation_ui.comboBox_reset_counter_signal_selected.currentText().strip()
+                if not signals_selected:
+                    continue
+
+                signals = self.dict_signal_complete.get(key, {})
+                if signals_selected not in signals:
+                    continue
+
+                sig_info = signals.get(signals_selected, {})
+                reg = sig_info.get('reg')
+                if not reg:
+                    continue
+
+                plc_val = self._safe_read_plc(reg)
+                try:
+                    val_int = int(plc_val) if plc_val is not None else 0
+                except (ValueError, TypeError):
+                    val_int = 0
+
+                if val_int != 0:
+                    self._reset_counter(key)
+                    _log.info("[PLCHandler] Reset counter %s via register %s", key, reg)
+                    off_val = sig_info.get('off')
+                    if off_val is not None and str(off_val).strip() != "" and str(off_val).strip().lower() not in ('none', 'no value'):
+                        try:
+                            self._safe_write_plc(reg, int(off_val))
+                        except (ValueError, TypeError):
+                            pass
 
     # -----------------------------------------------------------------------
     # Mode reg / trigger cache
     # -----------------------------------------------------------------------
 
     def _set_mode_reg_process(self):
-        if not self.built_in_objects or not self.mode_kick:
+        if not self.built_in_objects or not self.default_mode:
             _log.error("[PLCHandler] _set_mode_reg_process failed for built_in_objects: %s", self.built_in_objects)
-            _log.error("[PLCHandler] _set_mode_reg_process failed for mode_kick: %s", self.mode_kick)
+            _log.error("[PLCHandler] _set_mode_reg_process failed for default_mode: %s", self.default_mode)
             return
 
         new_dict: dict = {}
         try:
             for key, values in self.built_in_objects.items():
                 signals = values.get('signals')
-                if not isinstance(signals, dict) or not isinstance(signals.get(self.mode_kick), dict):
-                    _log.warning("[PLCHandler] Signals not found or invalid for mode: %s", self.mode_kick)
+                if not isinstance(signals, dict) or not isinstance(signals.get(self.default_mode), dict):
+                    _log.warning("[PLCHandler] Signals not found or invalid for mode: %s", self.default_mode)
                     continue
 
-                values_signals = signals[self.mode_kick].get('values_signals')
+                values_signals = signals[self.default_mode].get('values_signals')
                 if not isinstance(values_signals, dict):
-                    _log.warning("[PLCHandler] values_signals is missing or invalid for mode: %s", self.mode_kick)
+                    _log.warning("[PLCHandler] values_signals is missing or invalid for mode: %s", self.default_mode)
                     continue
                 for reg, target_reg in values_signals.items():
                     if target_reg.get('read_register'):
@@ -651,10 +675,9 @@ class PLCHandler:
         with self._signal_rwlock.write():
             self.dict_signal_complete = new_dict
 
-        _log.info("[PLCHandler] Updated dict_signal_complete for mode: %s", self.mode_kick)
+        _log.info("[PLCHandler] Updated dict_signal_complete for mode: %s", self.default_mode)
 
     def _find_mode_mapping(self, camera_key, mode_key):
-        """Trả về (mode_name, config) của camera có mapping_mode == mode_key, hoặc (None, {})."""
         mapping = self.built_in_mapping_mode.get(camera_key, {}).get('mapping', {})
         for mode_name, cfg in mapping.items():
             if cfg.get('mapping_mode') == mode_key:
@@ -662,10 +685,7 @@ class PLCHandler:
         return None, {}
 
     def _resolve_signal(self, key, field):
-        """Signal dict của `field` ('trigger_selected'/'component'/'completed') theo mapping
-        của (key, self.mode_kick). Trả None nếu chưa cấu hình ('None'/rỗng).
-        Gọi bên trong _signal_rwlock.read(); KeyError nếu signal không có trong dict_signal_complete."""
-        name = self._find_mode_mapping(key, self.mode_kick)[1].get(field)
+        name = self._find_mode_mapping(key, self.default_mode)[1].get(field)
         if not name or name == 'None':
             return None
         if name in self.dict_signal_complete[key]:
@@ -674,20 +694,19 @@ class PLCHandler:
             return None
 
     def _update_trigger_cache(self, trigger_selected=None):
-        """trigger_selected: dict {camera_key: tên trigger}. None -> tự tính theo self.mode_kick."""
         new_triggers = []
-        mode_kick = self.mode_kick
+        default_mode = self.default_mode
         try:
-            if self.built_in_objects and mode_kick:
+            if self.built_in_objects and default_mode:
                 for key, values in self.built_in_objects.items():
                     signals = values.get('signals')
-                    mode_signals = signals.get(mode_kick) if isinstance(signals, dict) else None
+                    mode_signals = signals.get(default_mode) if isinstance(signals, dict) else None
                     if not isinstance(mode_signals, dict):
-                        _log.warning("[PLCHandler] Signals not found or invalid for mode: %s", mode_kick)
+                        _log.warning("[PLCHandler] Signals not found or invalid for mode: %s", default_mode)
                         continue
 
                     if trigger_selected is None:
-                        trigger = self._find_mode_mapping(key, mode_kick)[1].get('trigger_selected')
+                        trigger = self._find_mode_mapping(key, default_mode)[1].get('trigger_selected')
                     else:
                         trigger = trigger_selected.get(key)
 
@@ -703,7 +722,6 @@ class PLCHandler:
                         _log.warning("[PLCHandler] Target register ON value not found for key: %s", trigger)
                         continue
 
-                    # Nếu read_value_off khác trống (có số) thì lưu int, nếu để trống thì lưu None (chỉ đọc không cần ghi)
                     off_val = None
                     if read_value_off is not None and str(read_value_off).strip() != "" and str(read_value_off).strip().lower() != 'none':
                         try:
@@ -725,7 +743,7 @@ class PLCHandler:
             self._active_triggers = new_triggers
 
         _log.info("[PLCHandler] Trigger cache updated for mode: %s (Count: %s)",
-                  mode_kick, len(new_triggers))
+                  default_mode, len(new_triggers))
 
     # -----------------------------------------------------------------------
     # Node / mode switching
@@ -754,7 +772,7 @@ class PLCHandler:
                             continue
 
                         with self._mode_lock:
-                            self.mode_kick = mode_key
+                            self.default_mode = mode_key
 
                         mode_name, _ = self._find_mode_mapping(_k, mode_key)
                         if mode_name:
@@ -782,7 +800,7 @@ class PLCHandler:
 
     def load_params_from_activated_mode(self, mode_name=None):
         with self._mode_lock:
-            current_mode = mode_name or self.mode_kick
+            current_mode = mode_name or self.default_mode
         if current_mode:
             if threading.current_thread() is threading.main_thread():
                 self._load_params_signals_mode(current_mode)
@@ -867,7 +885,7 @@ class PLCHandler:
 
     def load_user_set_selector_from_mode(self):
         with self._mode_lock:
-            current_mode = self.mode_kick
+            current_mode = self.default_mode
 
         for camera, values in self.processor.built_in_modes.items():
             modes = values.get('modes', {}).get(current_mode, {})
@@ -911,7 +929,7 @@ class PLCHandler:
     def _run_trigger_from_activated_mode(self) -> int:
         with self._mode_lock:
             triggers     = list(self._active_triggers)
-            current_mode = self.mode_kick
+            current_mode = self.default_mode
 
         any_camera_in_logging = False
         for k, v in self.built_in_mapping_mode.items():
@@ -998,70 +1016,93 @@ class PLCHandler:
 
     @staticmethod
     def snapshot_capture_config(automation_ui) -> dict:
-        """Snapshot toàn bộ trạng thái UI trên Main Thread thành dict thuần Python.
-        Hàm này PHẢI được gọi từ main thread trước khi submit vào executor."""
-        def _safe_float(text: str) -> float:
+        """Snapshot toàn bộ trạng thái UI thành dict thuần Python với in-memory caching."""
+        cached = getattr(automation_ui, '_cached_capture_cfg', None)
+        if cached is not None:
+            return cached
+
+        def _safe_float(widget) -> float:
             try:
-                return float(text.strip())
+                txt = widget.text().strip()
+                return float(txt) if txt else 0.0
             except (ValueError, AttributeError):
                 return 0.0
 
-        return {
+        def _safe_int(widget, default=0) -> int:
+            try:
+                if hasattr(widget, 'value') and callable(widget.value):
+                    return int(widget.value())
+                if hasattr(widget, 'currentText') and callable(widget.currentText):
+                    txt = widget.currentText().strip()
+                    return int(txt) if txt else default
+                if hasattr(widget, 'text') and callable(widget.text):
+                    txt = widget.text().strip()
+                    return int(txt) if txt else default
+            except Exception:
+                pass
+            return default
+
+        cfg = {
             'gate':  {
                 'pre':  {
                     'enabled': automation_ui.checkBox_join_gate_2.isChecked(),
-                    'value':   int(automation_ui.comboBox_value_gate_2.currentText()),
-                    'ordinal': getattr(automation_ui.spinBox_Ordinal_gate_2, 'value', lambda: getattr(automation_ui.spinBox_Ordinal_gate_2, 'text', lambda: getattr(automation_ui.spinBox_Ordinal_gate_2, 'currentText', lambda: 0)())())(),
+                    'value':   _safe_int(automation_ui.comboBox_value_gate_2),
+                    'ordinal': _safe_int(automation_ui.spinBox_Ordinal_gate_2),
                     'before':  automation_ui.checkBox_before_gate_2.isChecked(),
                     'after':   automation_ui.checkBox_after_gate_2.isChecked(),
-                    'delay':   _safe_float(automation_ui.lineEdit_timer_gate_2.text()),
+                    'delay':   _safe_float(automation_ui.lineEdit_timer_gate_2),
                 },
                 'post': {
                     'enabled': automation_ui.checkBox_join_gate_3.isChecked(),
-                    'value':   int(automation_ui.comboBox_value_gate_3.currentText()),
-                    'ordinal': getattr(automation_ui.spinBox_Ordinal_gate_3, 'value', lambda: getattr(automation_ui.spinBox_Ordinal_gate_3, 'text', lambda: getattr(automation_ui.spinBox_Ordinal_gate_3, 'currentText', lambda: 0)())())(),
+                    'value':   _safe_int(automation_ui.comboBox_value_gate_3),
+                    'ordinal': _safe_int(automation_ui.spinBox_Ordinal_gate_3),
                     'before':  automation_ui.checkBox_before_gate_3.isChecked(),
                     'after':   automation_ui.checkBox_after_gate_3.isChecked(),
-                    'delay':   _safe_float(automation_ui.lineEdit_timer_gate_3.text()),
+                    'delay':   _safe_float(automation_ui.lineEdit_timer_gate_3),
                 },
             },
             'busy':  {
                 'pre':  {
                     'enabled': automation_ui.checkBox_join_busy_2.isChecked(),
-                    'value':   int(automation_ui.comboBox_value_busy_2.currentText()),
-                    'ordinal': getattr(automation_ui.spinBox_Ordinal_busy_2, 'value', lambda: getattr(automation_ui.spinBox_Ordinal_busy_2, 'text', lambda: getattr(automation_ui.spinBox_Ordinal_busy_2, 'currentText', lambda: 0)())())(),
+                    'value':   _safe_int(automation_ui.comboBox_value_busy_2),
+                    'ordinal': _safe_int(automation_ui.spinBox_Ordinal_busy_2),
                     'before':  automation_ui.checkBox_before_busy_2.isChecked(),
                     'after':   automation_ui.checkBox_after_busy_2.isChecked(),
-                    'delay':   _safe_float(automation_ui.lineEdit_timer_busy_2.text()),
+                    'delay':   _safe_float(automation_ui.lineEdit_timer_busy_2),
                 },
                 'post': {
                     'enabled': automation_ui.checkBox_join_busy_3.isChecked(),
-                    'value':   int(automation_ui.comboBox_value_busy_3.currentText()),
-                    'ordinal': getattr(automation_ui.spinBox_Ordinal_busy_3, 'value', lambda: getattr(automation_ui.spinBox_Ordinal_busy_3, 'text', lambda: getattr(automation_ui.spinBox_Ordinal_busy_3, 'currentText', lambda: 0)())())(),
+                    'value':   _safe_int(automation_ui.comboBox_value_busy_3),
+                    'ordinal': _safe_int(automation_ui.spinBox_Ordinal_busy_3),
                     'before':  automation_ui.checkBox_before_busy_3.isChecked(),
                     'after':   automation_ui.checkBox_after_busy_3.isChecked(),
-                    'delay':   _safe_float(automation_ui.lineEdit_timer_busy_3.text()),
+                    'delay':   _safe_float(automation_ui.lineEdit_timer_busy_3),
                 },
             },
             'ready': {
                 'pre':  {
                     'enabled': automation_ui.checkBox_join_ready_2.isChecked(),
-                    'value':   int(automation_ui.comboBox_value_ready_2.currentText()),
-                    'ordinal': getattr(automation_ui.spinBox_Ordinal_ready_2, 'value', lambda: getattr(automation_ui.spinBox_Ordinal_ready_2, 'text', lambda: getattr(automation_ui.spinBox_Ordinal_ready_2, 'currentText', lambda: 0)())())(),
+                    'value':   _safe_int(automation_ui.comboBox_value_ready_2),
+                    'ordinal': _safe_int(automation_ui.spinBox_Ordinal_ready_2),
                     'before':  automation_ui.checkBox_before_ready_2.isChecked(),
                     'after':   automation_ui.checkBox_after_ready_2.isChecked(),
-                    'delay':   _safe_float(automation_ui.lineEdit_timer_ready_2.text()),
+                    'delay':   _safe_float(automation_ui.lineEdit_timer_ready_2),
                 },
                 'post': {
                     'enabled': automation_ui.checkBox_join_ready_3.isChecked(),
-                    'value':   int(automation_ui.comboBox_value_ready_3.currentText()),
-                    'ordinal': getattr(automation_ui.spinBox_Ordinal_ready_3, 'value', lambda: getattr(automation_ui.spinBox_Ordinal_ready_3, 'text', lambda: getattr(automation_ui.spinBox_Ordinal_ready_3, 'currentText', lambda: 0)())())(),
+                    'value':   _safe_int(automation_ui.comboBox_value_ready_3),
+                    'ordinal': _safe_int(automation_ui.spinBox_Ordinal_ready_3),
                     'before':  automation_ui.checkBox_before_ready_3.isChecked(),
                     'after':   automation_ui.checkBox_after_ready_3.isChecked(),
-                    'delay':   _safe_float(automation_ui.lineEdit_timer_ready_3.text()),
+                    'delay':   _safe_float(automation_ui.lineEdit_timer_ready_3),
                 },
             },
         }
+        try:
+            automation_ui._cached_capture_cfg = cfg
+        except Exception:
+            pass
+        return cfg
 
     def _apply_signal_phase(self, cfg: dict, signals: dict, phase: str, sig_keys: list) -> None:
         """Gửi tín hiệu PLC theo cấu hình phase (pre/post), có delay trước hoặc sau.
@@ -1254,57 +1295,58 @@ class PLCHandler:
                     self._reset_counter(key)
                     return
 
+                plc_tasks = []
                 if all_registers:
                     _log.info('[%s] NG registers: %s', key, all_registers)
                     if isinstance(all_registers, dict):
                         for reg, val in all_registers.items():
-                            if reg and str(reg).strip():
-                                self._safe_write_plc(str(reg).strip(), val)
+                            plc_tasks.append((reg, val))
                     else:
                         for reg in all_registers:
-                            if reg and str(reg).strip():
-                                self._safe_write_plc(str(reg).strip(), 1)
+                            plc_tasks.append((reg, 1))
                 else:
                     if reset_sig:
                         _log.info(f'Send Reset Signal OK {reset_sig}')
-                        self._safe_write_plc(str(reset_sig['reg']), int(reset_sig['on']))
+                        plc_tasks.append((reset_sig.get('reg'), int(reset_sig.get('on', 1))))
 
                 if comp_sig:
                     _log.info(f'Send Complete Signal {comp_sig}')
-                    self._safe_write_plc(str(comp_sig['reg']), int(comp_sig['on']))
+                    plc_tasks.append((comp_sig.get('reg'), int(comp_sig.get('on', 1))))
+
+                self._dispatch_plc_writes(plc_tasks)
                 self._reset_counter(key)
-                _log.info('[%s] Complete Cycle Shot %s | registers: %s',key, current_count, len(all_registers))
+                _log.info('[%s] Complete Cycle Shot %s | registers: %s', key, current_count, len(all_registers))
 
         elif automation_ui.radioButton_single_frame.isChecked():
             try:
                 with self._signal_rwlock.read():
-                        comp_sig  = self._resolve_signal(key, 'completed')
-                        reset_sig = self._resolve_signal(key, 'component')
+                    comp_sig  = self._resolve_signal(key, 'completed')
+                    reset_sig = self._resolve_signal(key, 'component')
             except KeyError:
                 _log.exception('[%s] Missing complete/reset signal in dict_signal_complete', key)
                 self._reset_counter(key)
                 return
 
+            plc_tasks = []
             if list_register:
                 _log.info('[%s] NG registers: %s', key, list_register)
                 if isinstance(list_register, dict):
                     for reg, val in list_register.items():
-                        if reg and str(reg).strip():
-                            self._safe_write_plc(str(reg).strip(), val)
+                        plc_tasks.append((reg, val))
                 else:
                     for reg in list_register:
-                        if reg and str(reg).strip():
-                            self._safe_write_plc(str(reg).strip(), 1)
+                        plc_tasks.append((reg, 1))
             else:
                 if reset_sig:
                     _log.info(f'Send Reset Signal OK {reset_sig}')
-                    self._safe_write_plc(str(reset_sig['reg']), int(reset_sig['on']))
+                    plc_tasks.append((reset_sig.get('reg'), int(reset_sig.get('on', 1))))
 
             if comp_sig:
                 _log.info(f'Send Complete Signal {comp_sig}')
-                self._safe_write_plc(str(comp_sig['reg']), int(comp_sig['on']))
+                plc_tasks.append((comp_sig.get('reg'), int(comp_sig.get('on', 1))))
 
-            _log.info('[%s] Complete Single frame %s | registers: %s',key, current_count, len(list_register))
+            self._dispatch_plc_writes(plc_tasks)
+            _log.info('[%s] Complete Single frame %s | registers: %s', key, current_count, len(list_register))
 
         state_str = 'OK' if flag else 'NG'
         chk_orig = pyuic.checkBox_OK_image_original if flag else pyuic.checkBox_NG_image_original
@@ -1316,9 +1358,10 @@ class PLCHandler:
                 save_det = chk_det.isChecked()
                 image_format = pyuic.Image_format.currentText().strip() if hasattr(pyuic, 'Image_format') else 'PNG'
                 
+                # Tối ưu: raw_image từ take_image() là mảng độc lập, không dùng lại sau bước này -> không cần raw_image.copy()
                 self.executor.submit(
                     self._save_ng_image, 
-                    raw_image.copy(), 
+                    raw_image, 
                     path_save, 
                     key, 
                     state_str, 
@@ -1382,10 +1425,7 @@ class PLCHandler:
             if not model_processor or not model_processor.process_image_func:
                 _log.error('[%s] process_image_func is missing for key_model=%s', key, key_model)
                 return
-            result_img, flag, list_register,logo_text = model_processor.process_image_func(
-                raw_image, model_loader, pyuic, camera, key_model, current_count,
-                mode_load_jumper=self.mode_load_jumper,
-            )
+            result_img, flag, list_register,logo_text = model_processor.process_image_func(raw_image, model_loader, pyuic, camera, key_model)
         except Exception:
             _log.exception('[%s] process_image_func failed at shot %s', key, current_count)
             return
@@ -1433,7 +1473,7 @@ class PLCHandler:
                 
                 self.executor.submit(
                     self._save_ng_image, 
-                    raw_image.copy(), 
+                    raw_image, 
                     path_save, 
                     key, 
                     state_str, 
@@ -1804,10 +1844,12 @@ class PLCHandler:
     # -----------------------------------------------------------------------
     def cleanup(self):
         self.stop_monitoring()
+        if self.processor and hasattr(self.processor, 'stop_continuous_signals_worker'):
+            self.processor.stop_continuous_signals_worker()
 
         # Turn off PLC ready & run signals upon exit
         with self._mode_lock:
-            current_mode = self.mode_kick
+            current_mode = self.default_mode
 
         if self.processor and hasattr(self.processor, 'built_in_dict_device'):
             for key in list(self.processor.built_in_dict_device.keys()):
@@ -1980,6 +2022,19 @@ class CameraTabManager:
         self.total_key = []
         self.device = None
         self.camera_colors = {}
+        self._continuous_signals_lock = threading.Lock()
+        self._continuous_signals_dict = {}
+        self._continuous_signals_running = False
+        self.status_signal_interval = 0.1
+
+    def _apply_tab_bar_font(self, tab_widget_2):
+        """Cài đặt font Segoe UI, size 10 cho QTabBar của tab_widget_2."""
+        if tab_widget_2 is not None:
+            font = QtGui.QFont("Segoe UI", 10)
+            tab_bar = tab_widget_2.tabBar()
+            if tab_bar:
+                tab_bar.setFont(font)
+            tab_widget_2.setFont(font)
 
     def get_camera_frame_style(self, camera_id):
         """Trả về stylesheet màu nền sáng, nhạt, dịu mắt đồng bộ cho các frame cùng camera."""
@@ -2411,7 +2466,8 @@ class CameraTabManager:
             
             self._connect_model_signals(ui_child, self.processor)
             
-            tab_widget_2.addTab(new_tab, f"Model {model_number}")
+            tab_widget_2.addTab(new_tab, f"📌 Model {model_number}")
+            self._apply_tab_bar_font(tab_widget_2)
             product_code_forms.append(new_tab)
 
         return ui_instances, ui_modelloader, path_instances, parameter_models
@@ -2466,7 +2522,8 @@ class CameraTabManager:
         automation_tab = QtWidgets.QMainWindow()
         self.automation_ui = AutomationInterface()
         self.automation_ui.setupUi(automation_tab)
-        tab_widget_2.addTab(automation_tab, "PLC Settings")
+        tab_widget_2.addTab(automation_tab, "🔷 PLC Device")
+        self._apply_tab_bar_font(tab_widget_2)
         
         _signals_processor = signals(self.automation_ui)
         self.automation_ui.signals_processor = _signals_processor
@@ -2529,8 +2586,12 @@ class CameraTabManager:
         self.automation_ui.pushButton_load_Set_mode.clicked.connect(lambda _: _signals_processor.load_mapping_mode(self.db_manager.cursor, camera_id))
         list_mode = _signals_processor.load_mapping_mode(self.db_manager.cursor, camera_id)
         #save_signal_transmission_and_receptions
-        self.automation_ui.pushButton_apply_tranmission_reception.clicked.connect(lambda _: _signals_processor.save_all_data(self.db_manager.cursor, self.db_manager.connect_db,camera_id))
-        self.automation_ui.pushButton_load_tranmission_reception.clicked.connect(lambda _: _signals_processor.load_all_data(self.db_manager.cursor, camera_id))
+        def _clear_capture_cache(*_):
+            if hasattr(self.automation_ui, '_cached_capture_cfg'):
+                self.automation_ui._cached_capture_cfg = None
+
+        self.automation_ui.pushButton_apply_tranmission_reception.clicked.connect(lambda _: (_clear_capture_cache(), _signals_processor.save_all_data(self.db_manager.cursor, self.db_manager.connect_db, camera_id)))
+        self.automation_ui.pushButton_load_tranmission_reception.clicked.connect(lambda _: (_clear_capture_cache(), _signals_processor.load_all_data(self.db_manager.cursor, camera_id)))
         _signals_processor.load_all_data(self.db_manager.cursor,camera_id)
 
         # Quét trạng thái CSDL ban đầu và hiển thị lên log realtime
@@ -2561,7 +2622,8 @@ class CameraTabManager:
         device_tab = QtWidgets.QMainWindow()
         _device_tab_ui = Camera_Device()
         _device_tab_ui.setupUi(device_tab)
-        tab_widget_2.addTab(device_tab, "Camera Device Setting")
+        tab_widget_2.addTab(device_tab, "🔷 Camera Device")
+        self._apply_tab_bar_font(tab_widget_2)
         _mirror_tab_widget,dev = self.create_mirror_gui(tab_widget_2)
         driver = Process_Camera_Device(self.db_manager.connect_db, self.db_manager.cursor,self.automation_ui)
         device_launch = DICT_DEVICE_MANUAL[driver.query_camera_type(item_code_id, camera_name)[0]]
@@ -2616,14 +2678,15 @@ class CameraTabManager:
         _mirror_tab_widget.pushButton_appl_setting.clicked.connect(lambda _: dev.save_params(item_code_id,camera_name))
         dev.load_params(item_code_id,camera_name)
         product_code_forms.append(device_tab)
-        return device_camera,dev
+        return device_camera,dev,_device_tab_ui
 
     def create_mirror_gui(self,tab_widget_2):
         _translate = QtCore.QCoreApplication.translate
         mirror_tab_widget = QtWidgets.QMainWindow()
         self._mirror_tab_widget = Mirror_Tab_Detect()
         self._mirror_tab_widget.setupUi(mirror_tab_widget)
-        tab_widget_2.addTab(mirror_tab_widget, "Mirror Settings")
+        tab_widget_2.addTab(mirror_tab_widget, "🔷 Mirror")
+        self._apply_tab_bar_font(tab_widget_2)
         dev = Process_Mirror_Device(self._mirror_tab_widget,self.db_manager.connect_db,self.db_manager.cursor)
         tab_widget_2.mirror_device = dev
         self._mirror_tab_widget.mirror_device = dev
@@ -2636,6 +2699,11 @@ class CameraTabManager:
         device_launch = DICT_DEVICE_AUTO[device_type]
         identifier = ip_address if conn_type == 'GigE' else serial
         conn_mode = 'GigE' if conn_type == 'GigE' else 'USB'
+        self.device_type = device_type
+        self.PartNo = "#N/A"
+        self.identifier = identifier
+        self.conn_mode = conn_mode
+        self.ip_address = ip_address
         plc_signals = {}
         for sig in ['run', 'ready', 'busy']:
             addr, _, _, _, write_reg, val_on, val_off = self.return_reg(camera_name, name_signal=sig, mode_name='Auto 1')
@@ -2665,30 +2733,32 @@ class CameraTabManager:
                     self.device.enum_devices_class()
                     self.device.open_device_camera_class()
                     self.device.start_grabbing_array_class()
-                    if plc_signals['ready']['reg'] and plc_signals['ready']['on']:
-                        plc.write_plc(str(plc_signals['ready']['reg']), int(plc_signals['ready']['on']))
-                    if plc_signals['run']['reg'] and plc_signals['run']['on']:
-                        plc.write_plc(str(plc_signals['run']['reg']),   int(plc_signals['run']['on']))
-                    if plc_signals['busy']['reg'] and plc_signals['busy']['off']:
-                        plc.write_plc(str(plc_signals['busy']['reg']),   int(plc_signals['busy']['off']))
+                    model_name = getattr(self.device, 'chModelName', None) or getattr(self.device, 'PartNo', None)
+                    if not model_name and hasattr(self.device, 'dict_device'):
+                        try:
+                            for dev_entries in self.device.dict_device.values():
+                                if dev_entries and isinstance(dev_entries, list) and 'model_name' in dev_entries[0]:
+                                    model_name = dev_entries[0]['model_name']
+                                    break
+                        except Exception:
+                            pass
+                    if model_name:
+                        self.PartNo = str(model_name).strip()
                     
                     _log.info("[Camera %s] ✅ Kết nối thành công sau %s lần thử!", camera_name, attempt)
+                    self.set_camera_continuous_status(camera_name, plc_signals, status=True)
                     return self.device
                     
                 except Exception as e:
                     _log.warning("[Camera %s] ❌ Lần thử %s thất bại: %s", camera_name, attempt, e)
                     if progress_callback:
                         progress_callback(None, f"Camera {camera_name} kết nối thất bại (Lần {attempt}). Đang thử lại...")
-                    if plc_signals['ready']['reg'] and plc_signals['ready']['off']:
-                        plc.write_plc(str(plc_signals['ready']['reg']), int(plc_signals['ready']['off']))
-                    if plc_signals['run']['reg'] and plc_signals['run']['off']:
-                        plc.write_plc(str(plc_signals['run']['reg']),   int(plc_signals['run']['off']))
-                    if plc_signals['busy']['reg'] and plc_signals['busy']['off']:
-                        plc.write_plc(str(plc_signals['busy']['reg']),   int(plc_signals['busy']['on']))
+                    self._write_camera_signals_now(plc_signals, status=False)
                     _log.info("[Camera %s] Thử lại sau %s giây...", camera_name, retry_interval)
                     time.sleep(retry_interval)
                     if attempt == 3:
                         _log.error("[Camera %s] Kết nối thất bại sau %s lần thử!", camera_name, attempt)
+                        self.set_camera_continuous_status(camera_name, plc_signals, status=False)
                         return
             else:
                 _log.warning("[Camera %s] PLC Driver chưa sẵn sàng...", camera_name)
@@ -2696,7 +2766,106 @@ class CameraTabManager:
                     progress_callback(None, f"PLC Driver chưa sẵn sàng (Lần {attempt}). Đang đợi...")
                 if attempt == 3:
                     _log.error("[Camera %s] PLC Driver chưa sẵn sàng sau %s lần thử!", camera_name, attempt)
+                    self.set_camera_continuous_status(camera_name, plc_signals, status=False)
                     return
+
+    def set_camera_continuous_status(self, camera_name, plc_signals, status=True):
+        """
+        Cập nhật trạng thái tín hiệu (run, ready, busy) của camera và kích hoạt luồng gửi liên tục (heartbeat) về PLC.
+        - status=True: Khởi động thành công -> ready=ON, run=ON, busy=OFF
+        - status=False: Khởi động thất bại / mất kết nối -> ready=OFF, run=OFF, busy=ON
+        """
+        if not hasattr(self, '_continuous_signals_lock'):
+            self._continuous_signals_lock = threading.Lock()
+        if not hasattr(self, '_continuous_signals_dict'):
+            self._continuous_signals_dict = {}
+
+        with self._continuous_signals_lock:
+            self._continuous_signals_dict[str(camera_name)] = {
+                'signals': plc_signals,
+                'status': bool(status)
+            }
+
+        # Gửi ngay lập tức 1 lần ban đầu
+        self._write_camera_signals_now(plc_signals, status)
+
+        # Đảm bảo luồng gửi liên tục đang chạy
+        self._ensure_continuous_signals_worker_started()
+
+    def _write_camera_signals_now(self, plc_signals, status: bool):
+        """Ghi ngay lập tức bộ tín hiệu (run, ready, busy) của 1 camera tới PLC."""
+        try:
+            plc = getattr(self.connect_plc, 'driver_loader', None)
+            if not plc or not plc_signals:
+                return
+
+            def _write(reg_key, val_key):
+                item = plc_signals.get(reg_key, {})
+                reg = item.get('reg')
+                val = item.get(val_key)
+                if reg is not None and val is not None:
+                    val_str = str(val).strip()
+                    if val_str != "" and val_str.lower() not in ("none", "no value"):
+                        try:
+                            if hasattr(self, 'plc_handler') and self.plc_handler:
+                                self.plc_handler._safe_write_plc(str(reg), int(val))
+                            else:
+                                plc.write_plc(str(reg), int(val))
+                        except Exception:
+                            pass
+
+            if status:
+                _write('ready', 'on')
+                _write('run',   'on')
+                _write('busy',  'off')
+            else:
+                _write('ready', 'off')
+                _write('run',   'off')
+                _write('busy',  'on')
+        except Exception:
+            pass
+
+    def _ensure_continuous_signals_worker_started(self):
+        """Khởi động luồng nền gửi tín hiệu liên tục (heartbeat) tới PLC nếu chưa chạy."""
+        if not hasattr(self, '_continuous_signals_running'):
+            self._continuous_signals_running = False
+
+        if not self._continuous_signals_running:
+            self._continuous_signals_running = True
+            t = threading.Thread(
+                target=self._continuous_signals_worker,
+                name="ContinuousPLCSignalsWorker",
+                daemon=True
+            )
+            t.start()
+
+    def _continuous_signals_worker(self):
+        """
+        Luồng nền gửi liên tục (heartbeat) các tín hiệu run, ready, busy của các camera tới PLC.
+        Đảm bảo PLC luôn duy trì đúng trạng thái ON/OFF trong suốt thời gian hệ thống hoạt động.
+        """
+        _log.info("[ContinuousPLCSignalsWorker] Luồng gửi tín hiệu PLC liên tục (ready, run, busy) đã bắt đầu.")
+        interval = getattr(self, 'status_signal_interval', 0.1)
+
+        while getattr(self, '_continuous_signals_running', False):
+            try:
+                plc = getattr(self.connect_plc, 'driver_loader', None)
+                if plc:
+                    with getattr(self, '_continuous_signals_lock', threading.Lock()):
+                        snapshot = list(getattr(self, '_continuous_signals_dict', {}).values())
+
+                    for cam_cfg in snapshot:
+                        plc_signals = cam_cfg.get('signals', {})
+                        status = cam_cfg.get('status', False)
+                        self._write_camera_signals_now(plc_signals, status)
+            except Exception:
+                _log.exception("[ContinuousPLCSignalsWorker] Lỗi trong vòng lặp gửi tín hiệu PLC liên tục")
+
+            time.sleep(interval)
+
+    def stop_continuous_signals_worker(self):
+        """Dừng luồng gửi tín hiệu PLC liên tục khi đóng ứng dụng."""
+        self._continuous_signals_running = False
     
     def get_mode(self,signals_processor,camera_id):
         return signals_processor.collect_dict_from_mode_auto(self.db_manager.cursor, camera_id)
@@ -2706,7 +2875,8 @@ class CameraTabManager:
         auto_log_tab = QtWidgets.QMainWindow()
         auto_log_tab_ui = Auto_Logging()
         auto_log_tab_ui.setupUi(auto_log_tab)
-        tab_widget_2.addTab(auto_log_tab, "Auto Logging")
+        tab_widget_2.addTab(auto_log_tab, "🔷 Auto Logging")
+        self._apply_tab_bar_font(tab_widget_2)
         product_code_forms.append(auto_log_tab)
         auto_log_tab_ui.comboBox_item_code.clear()
         auto_log_tab_ui.comboBox_item_code.addItem(str(self.i_code))
