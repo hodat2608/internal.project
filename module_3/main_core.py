@@ -1035,7 +1035,7 @@ class PLCHandler:
             key = item['key']
             try:
                 if not self._try_acquire_key(key):
-                    # _log.debug('Key %s đang xử lý, bỏ qua trigger', key)
+                    _log.debug('Key %s đang xử lý, bỏ qua trigger', key)
                     continue        
                 current_value = self._safe_read_plc(str(item['reg']))
                 if current_value is None or str(current_value).strip() == "":

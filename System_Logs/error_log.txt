@@ -2286,3 +2286,16 @@ TypeError: '>' not supported between instances of 'MagicMock' and 'int'
 2026-11-04 13:55:41 [DEBUG] legion.module_3.main_core: [built-in-camera-3] Accumulated 2 registers (total: 2)
 2026-11-04 13:55:41 [DEBUG] legion.module_3.main_core: [built-in-camera-3] Accumulated cfg registers (total: 4)
 2026-11-04 13:56:15 [INFO] legion.module_2.main_core: Success to check hardware key
+2026-11-04 14:00:04 [INFO] legion.module_2.main_core: Success to check hardware key
+2026-11-04 14:03:15 [INFO] legion.module_2.hardware_key_guard: HardwareKeyGuard đã dừng.
+2026-11-04 14:03:16 [INFO] legion.module_2.main_core: Stopping CoreWorker...
+2026-11-04 14:03:16 [INFO] legion.module_2.main_core: Reloading program: Closing existing instance for item code: None
+2026-11-04 14:03:16 [INFO] legion.module_3.main_thread: Closing window and cleaning up camera resources...
+2026-11-04 14:03:16 [INFO] legion.module_3.main_thread: Cleaning up resources...
+2026-11-04 14:03:16 [INFO] legion.module_3.main_core: [PLCHandler] Executors shut down.
+2026-11-04 14:03:16 [INFO] legion.module_3.main_core: [Cleanup PLC] Gửi toàn bộ tín hiệu OFF cho Camera 3: ['ready', 'run', 'busy']
+2026-11-04 14:03:16 [INFO] legion.module_3.main_core: Cleanup: Closing camera built-in-camera-3
+2026-11-04 14:03:16 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Stop Grabbing MVS DRIVER Succesfully!
+2026-11-04 14:03:16 [INFO] legion.module_4.hik_vision.core.core_plus_auto: Close device camera HIK successfully
+2026-11-04 14:03:16 [INFO] legion.module_3.main_thread: Cleanup completed
+2026-11-04 14:03:16 [INFO] legion.module_2.main_core: Success to stop monitoring
