@@ -118,7 +118,7 @@ class Ui_MainWindow(object):
         self.groupAssignPLC.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(-1)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.groupAssignPLC.setFont(font)
@@ -557,7 +557,7 @@ class Ui_MainWindow(object):
         self.groupFunction.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(-1)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.groupFunction.setFont(font)
@@ -597,7 +597,7 @@ class Ui_MainWindow(object):
         self.groupSignalTransmission.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(-1)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.groupSignalTransmission.setFont(font)
@@ -1089,7 +1089,7 @@ class Ui_MainWindow(object):
         self.groupDelayHandling.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(-1)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.groupDelayHandling.setFont(font)
@@ -1185,10 +1185,7 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.checkBox_before_gate_2.setFont(font)
-        self.checkBox_before_gate_2.setStyleSheet("QCheckBox {\n"
-"    background-color: transparent;\n"
-"}\n"
-"\n"
+        self.checkBox_before_gate_2.setStyleSheet("\n"
 "/* Căn giữa ô vuông tích check */\n"
 "QCheckBox::indicator {\n"
 "    subcontrol-origin: padding;\n"
@@ -1240,10 +1237,7 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.checkBox_before_busy_2.setFont(font)
-        self.checkBox_before_busy_2.setStyleSheet("QCheckBox {\n"
-"    background-color: transparent;\n"
-"}\n"
-"\n"
+        self.checkBox_before_busy_2.setStyleSheet("\n"
 "/* Căn giữa ô vuông tích check */\n"
 "QCheckBox::indicator {\n"
 "    subcontrol-origin: padding;\n"
@@ -1295,10 +1289,7 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.checkBox_before_ready_2.setFont(font)
-        self.checkBox_before_ready_2.setStyleSheet("QCheckBox {\n"
-"    background-color: transparent;\n"
-"}\n"
-"\n"
+        self.checkBox_before_ready_2.setStyleSheet("\n"
 "/* Căn giữa ô vuông tích check */\n"
 "QCheckBox::indicator {\n"
 "    subcontrol-origin: padding;\n"
@@ -1413,10 +1404,7 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.checkBox_before_gate_3.setFont(font)
-        self.checkBox_before_gate_3.setStyleSheet("QCheckBox {\n"
-"    background-color: transparent;\n"
-"}\n"
-"\n"
+        self.checkBox_before_gate_3.setStyleSheet("\n"
 "/* Căn giữa ô vuông tích check */\n"
 "QCheckBox::indicator {\n"
 "    subcontrol-origin: padding;\n"
@@ -1468,10 +1456,7 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.checkBox_before_busy_3.setFont(font)
-        self.checkBox_before_busy_3.setStyleSheet("QCheckBox {\n"
-"    background-color: transparent;\n"
-"}\n"
-"\n"
+        self.checkBox_before_busy_3.setStyleSheet("\n"
 "/* Căn giữa ô vuông tích check */\n"
 "QCheckBox::indicator {\n"
 "    subcontrol-origin: padding;\n"
@@ -1523,10 +1508,7 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.checkBox_before_ready_3.setFont(font)
-        self.checkBox_before_ready_3.setStyleSheet("QCheckBox {\n"
-"    background-color: transparent;\n"
-"}\n"
-"\n"
+        self.checkBox_before_ready_3.setStyleSheet("\n"
 "/* Căn giữa ô vuông tích check */\n"
 "QCheckBox::indicator {\n"
 "    subcontrol-origin: padding;\n"
@@ -1668,7 +1650,7 @@ class Ui_MainWindow(object):
         self.groupBox_5.setMinimumSize(QtCore.QSize(500, 0))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(-1)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_5.setFont(font)
@@ -1706,7 +1688,7 @@ class Ui_MainWindow(object):
         self.groupBox_4.setMinimumSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(-1)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_4.setFont(font)
@@ -1809,7 +1791,7 @@ class Ui_MainWindow(object):
         self.groupBox_2 = QtWidgets.QGroupBox(self.groupBox_4)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(-1)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_2.setFont(font)
@@ -2239,7 +2221,7 @@ class Ui_MainWindow(object):
         self.groupAssignShot.setMaximumSize(QtCore.QSize(16777215, 350))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(-1)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.groupAssignShot.setFont(font)
@@ -2429,7 +2411,7 @@ class Ui_MainWindow(object):
         self.groupAnimationEffect.setMaximumSize(QtCore.QSize(16777215, 350))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(-1)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.groupAnimationEffect.setFont(font)
@@ -2460,7 +2442,7 @@ class Ui_MainWindow(object):
         self.groupBox_3.setMinimumSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(-1)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_3.setFont(font)
@@ -2646,7 +2628,7 @@ class Ui_MainWindow(object):
         self.groupBox.setMinimumSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(-1)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox.setFont(font)
@@ -2749,7 +2731,7 @@ class Ui_MainWindow(object):
         self.groupBox_6.setMinimumSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(-1)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_6.setFont(font)
@@ -2884,7 +2866,7 @@ class Ui_MainWindow(object):
         self.groupModeOption.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(-1)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.groupModeOption.setFont(font)
@@ -3181,7 +3163,7 @@ class Ui_MainWindow(object):
         self.groupItemLineCode.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(-1)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.groupItemLineCode.setFont(font)
@@ -3435,7 +3417,7 @@ class Ui_MainWindow(object):
         self.groupIndexCamera.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(-1)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.groupIndexCamera.setFont(font)
@@ -3592,7 +3574,7 @@ class Ui_MainWindow(object):
         self.groupDeviceProtocol.setMaximumSize(QtCore.QSize(350, 16777215))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(-1)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.groupDeviceProtocol.setFont(font)
@@ -3720,7 +3702,7 @@ class Ui_MainWindow(object):
         self.groupControlPanel.setMaximumSize(QtCore.QSize(350, 16777215))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(-1)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.groupControlPanel.setFont(font)
@@ -3923,7 +3905,7 @@ class Ui_MainWindow(object):
         self.groupAssignShot_2.setMaximumSize(QtCore.QSize(16777215, 350))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(-1)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.groupAssignShot_2.setFont(font)
@@ -3967,7 +3949,7 @@ class Ui_MainWindow(object):
         self.groupProgramSignalReady.setMaximumSize(QtCore.QSize(16777215, 350))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(-1)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.groupProgramSignalReady.setFont(font)

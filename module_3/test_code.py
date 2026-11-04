@@ -109,9 +109,12 @@
 #     print(cgg['register'])
 
 
-dict_signal_complete = {'built-in-camera-1': {'run': {'reg': 'DM29000', 'on': '1', 'off': '0'}, 'trigger': {'reg': 'DM29006', 'on': '1', 'off': '0'}, 'busy': {'reg': 'DM29004', 'on': '1', 'off': '0'}, 'complete': {'reg': 'DM29010', 'on': '1', 'off': '0'}}, 'built-in-camera-2': {'ready': {'reg': 'DM2001', 'on': '1', 'off': '0'}, 'run': {'reg': 'DM2002', 'on': '1', 'off': '0'}, 'trigger': {'reg': 'DM2003', 'on': '1', 'off': '0'}, 'busy': {'reg': 'DM2004', 'on': '1', 'off': '0'}, 'gate': {'reg': 'DM2005', 'on': '1', 'off': '0'}, 'complete': {'reg': 'DM2006', 'on': '1', 'off': '0'}, 'reset_ok': {'reg': 'DM2007', 'on': '1', 'off': '0'}, 'reset_counter': {'reg': 'DM2008', 'on': '1', 'off': '0'}, 'counter_plc': {'reg': 'DM2009', 'on': '1', 'off': '0'}}, 'built-in-camera-3': {'ready': {'reg': 'DM3001', 'on': '1', 'off': '0'}, 'run': {'reg': 'DM3002', 'on': '1', 'off': '0'}, 'trigger': {'reg': 'DM3003', 'on': '1', 'off': '0'}, 'busy': {'reg': 'DM3004', 'on': '1', 'off': '0'}, 'gate': {'reg': 'DM3005', 'on': '1', 'off': '0'}, 'complete': {'reg': 'R3006', 'on': '1', 'off': '0'}, 'reset_ok': {'reg': 'DM3007', 'on': '1', 'off': '0'}, 'reset_counter': {'reg': 'DM3009', 'on': '1', 'off': '0'}, 'counter_plc': {'reg': 'DM3010', 'on': '1', 'off': '0'}}}
-signals_selected = 'reset_counter'
+# dict_signal_complete = {'built-in-camera-1': {'run': {'reg': 'DM29000', 'on': '1', 'off': '0'}, 'trigger': {'reg': 'DM29006', 'on': '1', 'off': '0'}, 'busy': {'reg': 'DM29004', 'on': '1', 'off': '0'}, 'complete': {'reg': 'DM29010', 'on': '1', 'off': '0'}}, 'built-in-camera-2': {'ready': {'reg': 'DM2001', 'on': '1', 'off': '0'}, 'run': {'reg': 'DM2002', 'on': '1', 'off': '0'}, 'trigger': {'reg': 'DM2003', 'on': '1', 'off': '0'}, 'busy': {'reg': 'DM2004', 'on': '1', 'off': '0'}, 'gate': {'reg': 'DM2005', 'on': '1', 'off': '0'}, 'complete': {'reg': 'DM2006', 'on': '1', 'off': '0'}, 'reset_ok': {'reg': 'DM2007', 'on': '1', 'off': '0'}, 'reset_counter': {'reg': 'DM2008', 'on': '1', 'off': '0'}, 'counter_plc': {'reg': 'DM2009', 'on': '1', 'off': '0'}}, 'built-in-camera-3': {'ready': {'reg': 'DM3001', 'on': '1', 'off': '0'}, 'run': {'reg': 'DM3002', 'on': '1', 'off': '0'}, 'trigger': {'reg': 'DM3003', 'on': '1', 'off': '0'}, 'busy': {'reg': 'DM3004', 'on': '1', 'off': '0'}, 'gate': {'reg': 'DM3005', 'on': '1', 'off': '0'}, 'complete': {'reg': 'R3006', 'on': '1', 'off': '0'}, 'reset_ok': {'reg': 'DM3007', 'on': '1', 'off': '0'}, 'reset_counter': {'reg': 'DM3009', 'on': '1', 'off': '0'}, 'counter_plc': {'reg': 'DM3010', 'on': '1', 'off': '0'}}}
+# signals_selected = 'reset_counter'
+# key = 'built-in-camera-3'
+# signals = dict(dict_signal_complete.get(key, {}))
+# if signals_selected  in signals:
+#     print('ccccccc')
+
 key = 'built-in-camera-3'
-signals = dict(dict_signal_complete.get(key, {}))
-if signals_selected  in signals:
-    print('ccccccc')
+print(key[3])

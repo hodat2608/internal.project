@@ -2375,10 +2375,7 @@ QGroupBox::title {
                              </font>
                             </property>
                             <property name="styleSheet">
-                             <string notr="true">QCheckBox {
-    background-color: transparent;
-}
-
+                             <string notr="true">
 /* Căn giữa ô vuông tích check */
 QCheckBox::indicator {
     subcontrol-origin: padding;
@@ -2477,10 +2474,7 @@ QCheckBox::indicator {
                              </font>
                             </property>
                             <property name="styleSheet">
-                             <string notr="true">QCheckBox {
-    background-color: transparent;
-}
-
+                             <string notr="true">
 /* Căn giữa ô vuông tích check */
 QCheckBox::indicator {
     subcontrol-origin: padding;
@@ -2579,10 +2573,7 @@ QCheckBox::indicator {
                              </font>
                             </property>
                             <property name="styleSheet">
-                             <string notr="true">QCheckBox {
-    background-color: transparent;
-}
-
+                             <string notr="true">
 /* Căn giữa ô vuông tích check */
 QCheckBox::indicator {
     subcontrol-origin: padding;
@@ -2820,10 +2811,7 @@ QCheckBox::indicator {
                              </font>
                             </property>
                             <property name="styleSheet">
-                             <string notr="true">QCheckBox {
-    background-color: transparent;
-}
-
+                             <string notr="true">
 /* Căn giữa ô vuông tích check */
 QCheckBox::indicator {
     subcontrol-origin: padding;
@@ -2922,10 +2910,7 @@ QCheckBox::indicator {
                              </font>
                             </property>
                             <property name="styleSheet">
-                             <string notr="true">QCheckBox {
-    background-color: transparent;
-}
-
+                             <string notr="true">
 /* Căn giữa ô vuông tích check */
 QCheckBox::indicator {
     subcontrol-origin: padding;
@@ -3024,10 +3009,7 @@ QCheckBox::indicator {
                              </font>
                             </property>
                             <property name="styleSheet">
-                             <string notr="true">QCheckBox {
-    background-color: transparent;
-}
-
+                             <string notr="true">
 /* Căn giữa ô vuông tích check */
 QCheckBox::indicator {
     subcontrol-origin: padding;

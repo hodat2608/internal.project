@@ -432,7 +432,7 @@ class v5s:
                 key_model=key_model
             )
 
-        return result_image_rgb, flag, list_register,LOGO_WATERMARK
+        return result_image_rgb, flag, list_register,LOGO_WATERMARK, cfg_rows
 
     def evaluate_task_calculator(
         self,

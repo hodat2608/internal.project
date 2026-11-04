@@ -69,6 +69,12 @@ class PLCConfigStatusLogger:
             'name': 'Lưu UserSet Camera Cho Mode',
             'default_msg': 'Chưa nhấn lưu UserSet cho mode',
         },
+        {
+            'id': 'program_signal_ready',
+            'order': 9,
+            'name': 'Lưu Tín Hiệu Khởi Đầu Ready',
+            'default_msg': 'Chưa nhấn lưu tín hiệu khởi đầu Ready',
+        },
     ]
 
     def __init__(self, text_widget=None):
@@ -251,6 +257,25 @@ class PLCConfigStatusLogger:
                     'message': "Chưa nhấn lưu thiết lập Mapping Mode",
                     'updated_at': ''
                 }
+
+            # 9. Program Signal Ready
+            try:
+                cursor.execute("SELECT COUNT(*) FROM program_signal_ready WHERE camera_id = %s", (camera_id,))
+                cnt_ready = cursor.fetchone()[0]
+                if cnt_ready > 0:
+                    self.status['program_signal_ready'] = {
+                        'state': 'success',
+                        'message': f"Đã lưu thành công {cnt_ready} tín hiệu khởi đầu Ready",
+                        'updated_at': 'CSDL'
+                    }
+                else:
+                    self.status['program_signal_ready'] = {
+                        'state': 'pending',
+                        'message': "Chưa nhấn lưu tín hiệu khởi đầu Ready",
+                        'updated_at': ''
+                    }
+            except Exception:
+                pass
 
             # 8. UserSet Camera (liên kết với mode_id)
             if mode_id:

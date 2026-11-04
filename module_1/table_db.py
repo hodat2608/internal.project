@@ -197,6 +197,20 @@ TABLES = [
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     """,
     """
+    CREATE TABLE IF NOT EXISTS program_signal_ready (
+        id                  INT AUTO_INCREMENT PRIMARY KEY,
+        camera_id           INT NOT NULL,
+        signal_name         VARCHAR(100) NOT NULL,
+        val_on              VARCHAR(50) NOT NULL DEFAULT '1',
+        val_off             VARCHAR(50) NOT NULL DEFAULT '0',
+        is_enabled          TINYINT(1) NOT NULL DEFAULT 1,
+        is_continuous       TINYINT(1) NOT NULL DEFAULT 1,
+        order_index         INT NOT NULL DEFAULT 0,
+        INDEX idx_camera_ready (camera_id),
+        FOREIGN KEY (camera_id) REFERENCES NUMS_CAMERA(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    """,
+    """
     CREATE TABLE IF NOT EXISTS mode_display (
         id              INT AUTO_INCREMENT PRIMARY KEY,
         display_mode    VARCHAR(255) NOT NULL,

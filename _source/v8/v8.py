@@ -8,7 +8,7 @@ if ultralytics_path not in sys.path:
 from ultralytics import YOLO
 import numpy as np
 import cv2,time
-
+from module_3.task_calculator_engine import evaluate_task_calculator as _eval_engine
 import torch
 from _source.v5.v5 import v5s, _read_model_config, get_model_config, COLOR_OK, COLOR_NG, draw_detections, _normalize_key_model
 from module_3.handle_option_models import COLUMN_MAPPING
@@ -149,7 +149,7 @@ class v8s(v5s):
                 key_model=key_model
             )
 
-        return result_image_rgb, flag, list_register,LOGO_WATERMARK
+        return result_image_rgb, flag, list_register, LOGO_WATERMARK, cfg_rows
 
     def evaluate_task_calculator(
         self,
@@ -193,7 +193,6 @@ class v8s(v5s):
             return image_rgb, flag, list_register
 
         try:
-            from module_3.task_calculator_engine import evaluate_task_calculator as _eval_engine
             valid_boxes = []
             for d in draw_candidates:
                 valid_boxes.append({

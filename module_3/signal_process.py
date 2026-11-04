@@ -19,6 +19,7 @@ from module_3.animation import PLCSignalScene
 from module_1.root_path import resource_path
 import re
 from module_3.config_status_logger import PLCConfigStatusLogger
+from module_3.program_signal_ready import ProgramSignalReadyManager, _ensure_program_signal_ready_table
 
 
 def create_table_item(text=""):
@@ -271,6 +272,7 @@ class DataProcessSignal:
 
         self.generate_table()
         self.table_signal_up_to_selected_trigger_signals()
+        self.program_signal_ready_mgr = ProgramSignalReadyManager(self.uic, self.signal_table, self)
         self.is_unlocked = False
         self.set_ui_enabled(False)
         self._setup_config_status_log_ui()
@@ -1084,7 +1086,7 @@ class DataProcessSignal:
     
 
     def collect_dict_from_mode_auto(self,cursor,camera_id):
-        a = {}
+        dict_mode = {}
         cursor.execute("""
                 SELECT id,mode_name,assign_register,value_bit_on,value_bit_off FROM MODE_AUTO
                 WHERE camera_id = %s
@@ -1093,10 +1095,10 @@ class DataProcessSignal:
         results = cursor.fetchall()
         if results:
             for result in results:
-                b={}
+                data_mode={}
                 mode_id = result[0]
                 mode_name = result[1]
-                a[mode_name] = {}
+                dict_mode[mode_name] = {}
                 assign = result[2]
                 value_bit_on = result[3]
                 value_bit_off = result[4]
@@ -1108,25 +1110,25 @@ class DataProcessSignal:
                 if results:
                     index_userset = results[0]
                     usersetselector = results[1]
-                    b['register']=assign
-                    b['value_bit_on']=value_bit_on
-                    b['value_bit_off']=value_bit_off
-                    b['usersetcamera']=usersetselector
-                    b['index']=index_userset
-                    a[mode_name] = b
+                    data_mode['register']=assign
+                    data_mode['value_bit_on']=value_bit_on
+                    data_mode['value_bit_off']=value_bit_off
+                    data_mode['usersetcamera']=usersetselector
+                    data_mode['index']=index_userset
+                    dict_mode[mode_name] = data_mode
                 else:
                     index_userset = None
                     usersetselector = None
-                    b['register']=assign
-                    b['value_bit_on']=value_bit_on
-                    b['value_bit_off']=value_bit_off
-                    b['usersetcamera']=usersetselector
-                    b['index']=index_userset
-                    a[mode_name] = b
+                    data_mode['register']=assign
+                    data_mode['value_bit_on']=value_bit_on
+                    data_mode['value_bit_off']=value_bit_off
+                    data_mode['usersetcamera']=usersetselector
+                    data_mode['index']=index_userset
+                    dict_mode[mode_name] = data_mode
                     _log.warning(f'Non Initialized index_userset and usersetselector for {mode_name}!')
         else:
             _log.warning(f'Non Initialize mode auto!')
-        return a
+        return dict_mode
             
     def connect_plc(self, dict, connect_db=None):
         p1 = self.uic.lineEditIP1.text().strip()
@@ -1203,6 +1205,7 @@ class DataProcessSignal:
         try:
             self.save_signal_transmission_and_reception(cursor,connect_db,camera_id)
             self.save_signal_timing_config(cursor,connect_db,camera_id)
+            self.save_program_signal_ready(cursor,connect_db,camera_id)
             if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
                 self.uic.config_logger.set_status('transmission_timing', 'success', "Đã lưu thành công dữ liệu truyền nhận & timing")
         except Exception as e:
@@ -1212,6 +1215,17 @@ class DataProcessSignal:
     def load_all_data(self,cursor,camera_id):
         self.load_data_signal_transmission_and_reception(cursor,camera_id)
         self.load_signal_timing_config(cursor,camera_id)
+        self.load_program_signal_ready(cursor,camera_id)
+
+    def save_program_signal_ready(self, cursor, connect_db, camera_id):
+        if hasattr(self, 'program_signal_ready_mgr') and self.program_signal_ready_mgr:
+            return self.program_signal_ready_mgr.save_to_db(cursor, connect_db, camera_id)
+        return False
+
+    def load_program_signal_ready(self, cursor, camera_id):
+        if hasattr(self, 'program_signal_ready_mgr') and self.program_signal_ready_mgr:
+            return self.program_signal_ready_mgr.load_from_db(cursor, camera_id)
+        return False
 
 
     def save_signal_transmission_and_reception(self, cursor, connect_db, camera_id):
@@ -1572,7 +1586,9 @@ class DataProcessSignal:
                 
         index = self.uic.comboBox_set_trigger_automatic.findText(current_text)
         if index >= 0:
-            self.uic.comboBox_set_trigger_automatic.setCurrentIndex(index)           
+            self.uic.comboBox_set_trigger_automatic.setCurrentIndex(index)
+        if hasattr(self, 'program_signal_ready_mgr') and self.program_signal_ready_mgr:
+            self.program_signal_ready_mgr.refresh_available_signals()           
 
     MAPPING_MODE_NAMES = ('automatic', 'mirror', 'logging')
 
