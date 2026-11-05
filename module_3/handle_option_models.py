@@ -1,4 +1,5 @@
 
+import re
 import torch
 from module_2 import root
 from PyQt5.QtWidgets import (QMessageBox,QFileDialog)
@@ -25,13 +26,17 @@ COLUMN_MAPPING: Final[dict[str, str]] = {
     "Min Height":     "`Height_Min`",
     "Max Height":     "`Height_Max`",
     "Register": "`Assign_Value`",
-    "Value": "`Value`",
+    "Value State": "`Value_State`",
+    "Value OK":  "`Value_OK`",
+    "Value NG":  "`Value_NG`",
     "Confidence":     "`Confidence`",
 }
 
 # CẤU HÌNH GIÁ TRỊ MẶC ĐỊNH CHO BẢNG THÔNG SỐ MODEL
 DEFAULT_ROW_VALUES: Final[dict[str, Any]] = {
-    "Enable": True,       # Mặc định có tích vào ô
+    "Enable": True,           # Mặc định có tích vào ô
+    "OK ✔": False,            # Mặc định bỏ tích
+    "NG ✘": False,            # Mặc định bỏ tích
     "OK 🟢": False,          # Mặc định bỏ tích
     "NG 🔴": False,          # Mặc định bỏ tích
     "Qty": "1",               # Mặc định là 1
@@ -39,8 +44,11 @@ DEFAULT_ROW_VALUES: Final[dict[str, Any]] = {
     "Max Width": "10000",     # Mặc định là 10000
     "Min Height": "1",        # Mặc định là 1
     "Max Height": "10000",    # Mặc định là 10000
-    "Register": "DM",         # Mặc định có 2 chữ cái đầu là DM
-    "Value": "1",             # Mặc định là 1
+    "Register": "",           # Không cố định auto DM, để trống cho người dùng tự do nhập các tiền tố (DM, MR, R, T, C)
+    "Value State": "1",       # Mặc định là 1
+    "Value OK": "1",          # Mặc định là 1
+    "Value NG": "1",          # Mặc định là 1
+    "Value": "1",             # Mặc định là 1 (tương thích ngược)
     "Confidence": "30",       # Mặc định là 30
 }
 import time
@@ -146,11 +154,11 @@ class CenteredItemDelegate(QStyledItemDelegate):
 class RegisterDelegate(QStyledItemDelegate):
     """
     Delegate cho cột Register (thanh ghi PLC).
-    Tự động chuẩn hóa tiền tố 'DM', cỡ chữ 11, font Segoe UI in đậm và căn giữa.
+    Cho phép tự do nhập các tiền tố thanh ghi [DM, MR, R, T, C], cỡ chữ 11, font Segoe UI in đậm và căn giữa.
     """
     def createEditor(self, parent, option, index):
         editor = QtWidgets.QLineEdit(parent)
-        editor.setPlaceholderText("VD: 1009 hoặc DM1009")
+        editor.setPlaceholderText("VD: DM1009, MR100, R20, T0, C1")
         editor.setAlignment(Qt.AlignCenter)
         font = QtGui.QFont("Segoe UI", 11)
         font.setBold(True)
@@ -159,21 +167,13 @@ class RegisterDelegate(QStyledItemDelegate):
 
     def setEditorData(self, editor, index):
         val = str(index.data() or "").strip()
-        if not val:
-            val = "DM"
         editor.setText(val)
         editor.setCursorPosition(len(val))
 
     def setModelData(self, editor, model, index):
         raw = editor.text().strip()
-        if not raw:
-            formatted = "DM"
-        else:
-            upper = raw.upper()
-            if not upper.startswith("DM"):
-                formatted = f"DM{upper}"
-            else:
-                formatted = upper
+        # Chuẩn hóa viết hoa cho thanh ghi, không tự động ép tiền tố DM
+        formatted = raw.upper() if raw else ""
         model.setData(index, formatted, Qt.EditRole)
 
 
@@ -231,9 +231,36 @@ SLIDER_COLUMN_CONFIGS: Final[dict[str, dict[str, Any]]] = {
         "max": 9999,
         "step": 1,
         "unit": "",
-        "prefix": "DM",
+        "prefix": "",
         "presets": [1000, 1010, 2000, 2001, 3000],
         "title": "🔌 Thanh ghi PLC (Register)",
+    },
+    "Value State": {
+        "min": 0,
+        "max": 1000,
+        "step": 1,
+        "unit": "",
+        "prefix": "",
+        "presets": [0, 1, 2, 5, 10, 100],
+        "title": "🎯 Giá trị trạng thái (Value State)",
+    },
+    "Value OK": {
+        "min": 0,
+        "max": 1000,
+        "step": 1,
+        "unit": "",
+        "prefix": "",
+        "presets": [0, 1, 2, 5, 10, 100],
+        "title": "✔ Giá trị OK (Value OK)",
+    },
+    "Value NG": {
+        "min": 0,
+        "max": 1000,
+        "step": 1,
+        "unit": "",
+        "prefix": "",
+        "presets": [0, 1, 2, 5, 10, 100],
+        "title": "✘ Giá trị NG (Value NG)",
     },
     "Value": {
         "min": 0,
@@ -456,9 +483,13 @@ class CellSliderPopup(QtWidgets.QWidget):
         raw_val = str(index.data() or "").strip()
         num_val = cfg["min"]
         if col_name == "Register":
-            clean_str = raw_val.upper().replace("DM", "").strip()
+            # Tự động tách tiền tố động (DM, MR, R, T, C...) và số địa chỉ
+            match = re.match(r'^([A-Za-z]+)?\s*(\d*)$', raw_val.strip().upper())
+            prefix = match.group(1) if match and match.group(1) else ""
+            clean_str = match.group(2) if match and match.group(2) else ""
             if clean_str.isdigit():
                 num_val = int(clean_str)
+            self._current_register_prefix = prefix
         else:
             digits = "".join([c for c in raw_val if c.isdigit()])
             if digits:
@@ -481,7 +512,10 @@ class CellSliderPopup(QtWidgets.QWidget):
                 child.widget().deleteLater()
 
         presets = cfg.get("presets", [])
-        pfx = cfg.get("prefix", "")
+        if col_name == "Register":
+            pfx = getattr(self, '_current_register_prefix', '') or "DM"
+        else:
+            pfx = cfg.get("prefix", "")
         unit = cfg.get("unit", "")
         for p in presets:
             btn = QtWidgets.QPushButton(f"{pfx}{p}{unit}")
@@ -495,7 +529,10 @@ class CellSliderPopup(QtWidgets.QWidget):
         self.show()
 
     def _update_display(self, val, cfg):
-        prefix = cfg.get("prefix", "")
+        if self.current_col_name == "Register":
+            prefix = getattr(self, '_current_register_prefix', '')
+        else:
+            prefix = cfg.get("prefix", "")
         unit = cfg.get("unit", "")
         self.lbl_value.setText(f"{prefix}{val}{unit}")
 
@@ -518,7 +555,10 @@ class CellSliderPopup(QtWidgets.QWidget):
             cfg = SLIDER_COLUMN_CONFIGS.get(self.current_col_name, {})
             self._update_display(val, cfg)
 
-            prefix = cfg.get("prefix", "")
+            if self.current_col_name == "Register":
+                prefix = getattr(self, '_current_register_prefix', '')
+            else:
+                prefix = cfg.get("prefix", "")
             formatted = f"{prefix}{val}"
             model = self.table.model()
             if model and not sip.isdeleted(model):
@@ -850,6 +890,9 @@ class Process_Model:
             "Min Height": 90,
             "Max Height": 90,
             "Register": 105,
+            "Value State": 85,
+            "Value OK": 85,
+            "Value NG": 85,
             "Value": 75,
             "Confidence": 95,
         }
@@ -966,19 +1009,14 @@ class Process_Model:
                 val = values_dict.get(col_name)
                 # Nếu không có giá trị từ custom_values hoặc giá trị là 0 cho các cột cần mặc định khác 0
                 if val is None or str(val).strip() == "" or (str(val).strip() == "0" and col_name in (
-                    "Max Width", "Max Height", "Register", "Qty", "Value", "Confidence", "Min Width", "Min Height"
+                    "Max Width", "Max Height", "Qty", "Value State", "Value OK", "Value NG", "Value", "Confidence", "Min Width", "Min Height"
                 )):
                     val_str = str(DEFAULT_ROW_VALUES.get(col_name, "0"))
                 else:
                     val_str = str(val).strip()
 
                 if col_name == "Register":
-                    if not val_str or val_str == "0":
-                        val_str = "DM"
-                    elif not val_str.upper().startswith("DM"):
-                        val_str = f"DM{val_str.upper()}"
-                    else:
-                        val_str = val_str.upper()
+                    val_str = val_str.upper() if val_str else ""
 
                 item.setText(val_str)
             row_items.append(item)
@@ -1002,11 +1040,8 @@ class Process_Model:
                 reg_idx = self.uic.model_column.index("Register")
                 if item.column() == reg_idx:
                     txt = item.text().strip()
-                    if not txt:
-                        item.setText("DM")
-                    elif not txt.upper().startswith("DM"):
-                        item.setText(f"DM{txt.upper()}")
-                    elif txt != txt.upper():
+                    # Không tự động ép tiền tố DM, chỉ tự động viết hoa (UPPER) cho chuẩn định dạng
+                    if txt and txt != txt.upper():
                         item.setText(txt.upper())
         finally:
             self.uic.model.blockSignals(False)
@@ -1567,6 +1602,60 @@ class Process_Model:
                         row_data[header] = None
                 if not is_empty_row:
                     list_insert.append(row_data)
+
+            # -------------------------------------------------------------------------
+            # KIỂM SOÁT DỮ LIỆU ĐẦU VÀO TRƯỚC KHI THỰC HIỆN BẤT KỲ THAO TÁC CSDL NÀO
+            # Nếu có lỗi (tiền tố thanh ghi, kiểu số nguyên, confidence), báo lỗi ngay và DỪNG!
+            # -------------------------------------------------------------------------
+            VALID_PLC_PREFIXES = ("DM", "MR", "R", "T", "C")
+            if list_insert:
+                for row_idx, row_dict in enumerate(list_insert):
+                    label_name = row_dict.get(self.keys_mapping[0], f"Hàng {row_idx + 1}")
+                    is_enabled = bool(row_dict.get(self.keys_mapping[1], False)) if len(self.keys_mapping) > 1 else bool(row_dict.get("Enable", False))
+
+                    if "Register" in row_dict:
+                        val = row_dict["Register"]
+                        val_str = str(val).strip().upper() if val is not None else ""
+
+                        # Bắt buộc kiểm tra nếu nhãn đang Enable HOẶC người dùng có nhập dữ liệu vào ô Register
+                        if is_enabled or val_str:
+                            match = re.match(r'^(DM|MR|R|T|C)\s*(\d+(\.\d+)?)$', val_str)
+                            if not match:
+                                QMessageBox.warning(
+                                    None,
+                                    "Lỗi Nhập Liệu",
+                                    f"Dòng {row_idx + 1} (Nhãn '{label_name}'): Cột 'Register' có giá trị '{val_str or 'để trống'}' không hợp lệ!\n\n"
+                                    f"Thanh ghi PLC bắt buộc phải bắt đầu bằng một trong các tiền tố: DM, MR, R, T, C kèm theo số địa chỉ.\n"
+                                    f"(Ví dụ hợp lệ: DM1000, MR50, R20, T0, C1)"
+                                )
+                                return
+                            row_dict["Register"] = f"{match.group(1)}{match.group(2)}"
+                        else:
+                            row_dict["Register"] = ""
+
+                    for val_col in ["Value State", "Value OK", "Value NG", "Value"]:
+                        if val_col in row_dict:
+                            val = row_dict[val_col]
+                            if val is not None and str(val).strip() != "":
+                                if not str(val).lstrip('-').isdigit():
+                                    QMessageBox.warning(None, "Lỗi Nhập Liệu", f"Dòng {row_idx + 1} (Nhãn '{label_name}'): Cột '{val_col}' phải là số nguyên.")
+                                    return
+
+                    if "Confidence" in row_dict:
+                        val = row_dict["Confidence"]
+                        if val is not None and str(val).strip() != "":
+                            if not str(val).lstrip('-').isdigit() or not (0 <= int(val) <= 100):
+                                QMessageBox.warning(None, "Lỗi Nhập Liệu", f"Dòng {row_idx + 1} (Nhãn '{label_name}'): Cột 'Confidence' phải là số nguyên từ 0 đến 100.")
+                                return
+
+                    for size_col in ["Min Width", "Max Width", "Min Height", "Max Height"]:
+                        if size_col in row_dict:
+                            val = row_dict[size_col]
+                            if val is not None and str(val).strip() != "":
+                                if not str(val).lstrip('-').isdigit():
+                                    QMessageBox.warning(None, "Lỗi Nhập Liệu", f"Dòng {row_idx + 1} (Nhãn '{label_name}'): Cột '{size_col}' phải là số nguyên (không chứa dấu thập phân hoặc chữ).")
+                                    return
+
             cursor.execute("""
                 SELECT id FROM NUMS_MODEL
                 WHERE camera_id = %s AND nums_model = %s
@@ -1636,6 +1725,26 @@ class Process_Model:
                     cursor.execute("ALTER TABLE WEIGHTS ADD COLUMN Image_format VARCHAR(255) DEFAULT 'PNG' AFTER Max_Detections")
             except Exception:
                 pass
+            # Tự động đồng bộ và nâng cấp cấu trúc bảng PARAMETERSET nếu CSDL cũ chưa có các cột mới
+            try:
+                cursor.execute("SHOW COLUMNS FROM PARAMETERSET LIKE 'Value_State'")
+                if not cursor.fetchone():
+                    cursor.execute("SHOW COLUMNS FROM PARAMETERSET LIKE 'Value'")
+                    if cursor.fetchone():
+                        cursor.execute("ALTER TABLE PARAMETERSET CHANGE COLUMN `Value` `Value_State` INT DEFAULT 0")
+                    else:
+                        cursor.execute("ALTER TABLE PARAMETERSET ADD COLUMN `Value_State` INT DEFAULT 0 AFTER `Assign_Value`")
+
+                cursor.execute("SHOW COLUMNS FROM PARAMETERSET LIKE 'Value_OK'")
+                if not cursor.fetchone():
+                    cursor.execute("ALTER TABLE PARAMETERSET ADD COLUMN `Value_OK` INT DEFAULT 0 AFTER `Value_State`")
+
+                cursor.execute("SHOW COLUMNS FROM PARAMETERSET LIKE 'Value_NG'")
+                if not cursor.fetchone():
+                    cursor.execute("ALTER TABLE PARAMETERSET ADD COLUMN `Value_NG` INT DEFAULT 0 AFTER `Value_OK`")
+            except Exception as _e_mig:
+                _log.warning("Kiểm tra tự động nâng cấp cột PARAMETERSET: %s", _e_mig)
+
 
             cursor.execute(
                     f"DELETE FROM WEIGHTS WHERE model_id = %s",
@@ -1655,33 +1764,6 @@ class Process_Model:
                 )
 
             if list_insert:
-                for row_idx, row_dict in enumerate(list_insert):
-                    if "Register" in row_dict:
-                        val = row_dict["Register"]
-                        if val is not None and str(val).strip() != "":
-                            val_str = str(val).strip().upper()
-                            if not val_str.startswith("DM"):
-                                val_str = f"DM{val_str}"
-                            row_dict["Register"] = val_str
-                    if "Value" in row_dict:
-                        val = row_dict["Value"]
-                        if val is not None and str(val).strip() != "":
-                            if not str(val).lstrip('-').isdigit():
-                                QMessageBox.warning(None, "Loi Nhap Lieu", f"Dong {row_idx + 1}: Cot 'Value' phai la so nguyen.")
-                                return
-                    if "Confidence" in row_dict:
-                        val = row_dict["Confidence"]
-                        if val is not None and str(val).strip() != "":
-                            if not str(val).lstrip('-').isdigit() or not (0 <= int(val) <= 100):
-                                QMessageBox.warning(None, "Loi Nhap Lieu", f"Dong {row_idx + 1}: Cot 'Confidence' phai la so nguyen tu 0 den 100.")
-                                return
-                    for size_col in ["Min Width", "Max Width", "Min Height", "Max Height"]:
-                        if size_col in row_dict:
-                            val = row_dict[size_col]
-                            if val is not None and str(val).strip() != "":
-                                if not str(val).lstrip('-').isdigit():
-                                    QMessageBox.warning(None, "Loi Nhap Lieu", f"Dong {row_idx + 1}: Cot '{size_col}' phai la so nguyen (khong chua dau thap phan hoac chu).")
-                                    return
                 param_fields = list(COLUMN_MAPPING.values())
                 sql = f"""
                     INSERT IGNORE INTO PARAMETERSET 
@@ -1767,6 +1849,26 @@ class Process_Model:
                     cursor.execute("ALTER TABLE WEIGHTS ADD COLUMN Image_format VARCHAR(255) DEFAULT 'PNG' AFTER Max_Detections")
             except Exception:
                 pass
+            # Tự động đồng bộ và nâng cấp cấu trúc bảng PARAMETERSET nếu CSDL cũ chưa có các cột mới
+            try:
+                cursor.execute("SHOW COLUMNS FROM PARAMETERSET LIKE 'Value_State'")
+                if not cursor.fetchone():
+                    cursor.execute("SHOW COLUMNS FROM PARAMETERSET LIKE 'Value'")
+                    if cursor.fetchone():
+                        cursor.execute("ALTER TABLE PARAMETERSET CHANGE COLUMN `Value` `Value_State` INT DEFAULT 0")
+                    else:
+                        cursor.execute("ALTER TABLE PARAMETERSET ADD COLUMN `Value_State` INT DEFAULT 0 AFTER `Assign_Value`")
+
+                cursor.execute("SHOW COLUMNS FROM PARAMETERSET LIKE 'Value_OK'")
+                if not cursor.fetchone():
+                    cursor.execute("ALTER TABLE PARAMETERSET ADD COLUMN `Value_OK` INT DEFAULT 0 AFTER `Value_State`")
+
+                cursor.execute("SHOW COLUMNS FROM PARAMETERSET LIKE 'Value_NG'")
+                if not cursor.fetchone():
+                    cursor.execute("ALTER TABLE PARAMETERSET ADD COLUMN `Value_NG` INT DEFAULT 0 AFTER `Value_OK`")
+            except Exception as _e_mig:
+                _log.warning("Kiểm tra tự động nâng cấp cột PARAMETERSET: %s", _e_mig)
+
 
             weight_path = None
             cursor.execute("""

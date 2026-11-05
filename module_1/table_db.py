@@ -61,7 +61,9 @@ TABLES = [
         Height_Min INT DEFAULT 0,
         Height_Max INT DEFAULT 0,
         Assign_Value VARCHAR(255) DEFAULT 0,
-        Value INT DEFAULT 0,
+        Value_State INT DEFAULT 0,
+        Value_OK INT DEFAULT 0,
+        Value_NG INT DEFAULT 0,
         Confidence INT DEFAULT 0,
         model_id INT NOT NULL,
         FOREIGN KEY (model_id) REFERENCES NUMS_MODEL(id) ON DELETE CASCADE

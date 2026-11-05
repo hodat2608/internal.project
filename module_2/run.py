@@ -18,10 +18,14 @@ import ctypes
 import datetime
 import traceback
 
+
 # Thiết lập đường dẫn thư mục gốc dự án
 _ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if _ROOT_DIR not in sys.path:
     sys.path.insert(0, _ROOT_DIR)
+    
+from module_1.root_path import _setup_external_code_override
+_setup_external_code_override()
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QShortcut

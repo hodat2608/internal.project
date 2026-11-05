@@ -274,6 +274,9 @@ class PLCHandler:
 
         self._register_store: defaultdict[str, dict]                 = defaultdict(dict)
         self._cfg_registers_store: defaultdict[str, set]             = defaultdict(set)
+        self._cfg_registers_values: defaultdict[str, dict]            = defaultdict(dict)
+        self._cycle_flags: defaultdict[str, bool]                    = defaultdict(lambda: True)
+        self._pending_trigger_off: dict[str, dict]                   = {}
         self._register_store_locks: defaultdict[str, threading.Lock] = defaultdict(threading.Lock)
         self._register_store_meta_lock = threading.Lock()
 
@@ -524,6 +527,12 @@ class PLCHandler:
         with self._get_register_lock(key):
             if hasattr(self, '_cfg_registers_store'):
                 self._cfg_registers_store[key].clear()
+            if hasattr(self, '_cfg_registers_values'):
+                self._cfg_registers_values[key].clear()
+            if hasattr(self, '_cycle_flags'):
+                self._cycle_flags[key] = True
+            if hasattr(self, '_pending_trigger_off'):
+                self._pending_trigger_off.pop(key, None)
             self._register_store[key].clear()
 
     def _get_counter(self, key) -> int:
@@ -553,10 +562,14 @@ class PLCHandler:
         with self._register_store_meta_lock:
             return self._register_store_locks[key]
 
-    def _accumulate_registers(self, key: str, registers: dict | list):
-        if not registers:
-            return
+    def _accumulate_registers(self, key: str, registers: dict | list, is_shot_ok: bool = True):
         with self._get_register_lock(key):
+            if not is_shot_ok:
+                if hasattr(self, '_cycle_flags'):
+                    self._cycle_flags[key] = False
+
+            if not registers:
+                return
             if isinstance(registers, dict):
                 self._register_store[key].update(registers)
             elif isinstance(registers, (list, tuple, set)):
@@ -565,6 +578,15 @@ class PLCHandler:
                         self._register_store[key][str(r).strip()] = 1
         _log.debug('[%s] Accumulated %s registers (total: %s)',
                    key, len(registers), len(self._register_store[key]))
+
+    def _pop_cycle_flag(self, key: str) -> bool:
+        """Lấy cờ trạng thái toàn bộ chu kỳ của camera (True nếu tất cả các shot đều OK)."""
+        with self._get_register_lock(key):
+            if hasattr(self, '_cycle_flags'):
+                flag = self._cycle_flags.get(key, True)
+                self._cycle_flags[key] = True
+                return flag
+            return True
 
     def _pop_registers(self, key: str) -> dict:
         with self._get_register_lock(key):
@@ -576,6 +598,7 @@ class PLCHandler:
         """
         Tích lũy các thanh ghi cấu hình cfg_rows theo key camera cho từng shot của chu kỳ.
         Có khử trùng lặp, lọc thanh ghi hợp lệ và an toàn luồng qua _get_register_lock(key).
+        Đồng thời ghi nhận giá trị value_state (mặc định 1) của từng thanh ghi.
         """
         if not cfg_rows:
             return
@@ -585,6 +608,8 @@ class PLCHandler:
                     reg = str(cfg.get('register') or '').strip()
                     if reg and reg.lower() not in ('none', 'no value') and any(c.isdigit() for c in reg):
                         self._cfg_registers_store[key].add(reg)
+                        val_state = cfg.get('value_state', cfg.get('value', 1))
+                        self._cfg_registers_values[key][reg] = val_state
         _log.debug('[%s] Accumulated cfg registers (total: %s)',
                    key, len(self._cfg_registers_store[key]))
 
@@ -597,19 +622,27 @@ class PLCHandler:
 
     def _init_cfg_registers(self, key: str, cfg_rows: list = None, value: int = 1) -> set:
         """
-        Ghi tất cả các thanh ghi cfg_rows đã tích lũy của camera 'key' lên giá trị mặc định (mặc định là 1).
+        Ghi tất cả các thanh ghi cfg_rows đã tích lũy của camera 'key' lên giá trị trạng thái Value State (mặc định là 1).
         Nếu có truyền cfg_rows trực tiếp (như ở single frame) thì tích lũy thêm trước khi pop và ghi.
         Đảm bảo định danh theo key camera, khử trùng lặp và an toàn luồng tuyệt đối.
         """
         if cfg_rows:
             self._accumulate_cfg_registers(key, cfg_rows)
 
-        regs_to_write = self._pop_cfg_registers(key)
+        with self._get_register_lock(key):
+            regs_to_write = set(self._cfg_registers_store[key])
+            reg_vals = dict(self._cfg_registers_values[key])
+            self._cfg_registers_store[key].clear()
+            self._cfg_registers_values[key].clear()
+
         for reg in regs_to_write:
-            self._safe_write_plc(reg, value)
+            target_val = reg_vals.get(reg, value)
+            self._safe_write_plc(reg, target_val)
 
         if regs_to_write:
-            _log.info('[%s] Đã ghi tất cả thanh ghi thành phần của %s lên %s: %s', key, key.removeprefix('built-in-') ,value, list(regs_to_write))
+            written_pairs = [f"{r}={reg_vals.get(r, value)}" for r in sorted(regs_to_write)]
+            _log.info('[%s] Đã ghi tất cả thanh ghi thành phần của %s theo Value State: %s',
+                      key, key.removeprefix('built-in-'), written_pairs)
         return regs_to_write
 
     # -----------------------------------------------------------------------
@@ -1043,12 +1076,8 @@ class PLCHandler:
                     continue
 
                 if int(current_value) == item['on']:
-                    off_val = item.get('off')
-                    if off_val is not None and str(off_val).strip() != "" and str(off_val).strip().lower() not in ('none', 'no value'):
-                        try:
-                            self._safe_write_plc(str(item['reg']), int(off_val))
-                        except (ValueError, TypeError):
-                            pass
+                    self._get_reg_trigger_off(key,item)
+                    self._off_camera_trigger(key)
                     
                     with self._mode_lock:
                         cam_mode = self.camera_modes.get(key, self.default_mode)
@@ -1089,6 +1118,33 @@ class PLCHandler:
                 self._release_key(key)
 
         return activated
+
+    def _off_camera_trigger(self, key: str):
+        """
+        Tat thanh ghi trigger dich danh cua camera 'key' sau khi hoan tat chu trinh gui tin hieu post trong take_image().
+        Su dung pop() trong lock de dam bao nguyen tu, chong tat dup va khong tat nham camera khac.
+        """
+        with self._get_register_lock(key):
+            trigger_info = getattr(self, '_pending_trigger_off', {}).pop(key, None)
+
+        if trigger_info:
+            reg = trigger_info.get('reg')
+            off_val = trigger_info.get('off')
+            if reg and off_val is not None:
+                try:
+                    self._safe_write_plc(str(reg), int(off_val))
+                    _log.info('[%s] Da tat trigger %s -> %s', key, reg, off_val)
+                except Exception as e:
+                    _log.error('[%s] Loi khi tat trigger %s -> %s: %s', key, reg, off_val, e)
+
+    def _get_reg_trigger_off(self,key,item):
+        off_val = item.get('off')
+        if off_val is not None and str(off_val).strip() != "" and str(off_val).strip().lower() not in ('none', 'no value'):
+            with self._get_register_lock(key):
+                self._pending_trigger_off[key] = {
+                    'reg': str(item['reg']),
+                    'off': int(off_val)
+                }
 
     def _run_handler_with_release(self, handler, key, data):
         try:
@@ -1315,8 +1371,6 @@ class PLCHandler:
             self.handle_camera_disconnect(key)
             return None
 
-        # self._ensure_camera_connected_status(key)
-
         self._apply_signal_phase(capture_cfg, signals, 'post', ['gate', 'busy', 'ready'])
 
         return raw_image_rgb
@@ -1424,7 +1478,7 @@ class PLCHandler:
             return
 
         if automation_ui.radioButton_cycle_frame.isChecked():
-            self._accumulate_registers(key, list_register or [])
+            self._accumulate_registers(key, list_register or {}, is_shot_ok=bool(flag))
             self._accumulate_cfg_registers(key, cfg_rows)
 
             shot_complete = values.get('shot_complete', 0)
@@ -1432,6 +1486,7 @@ class PLCHandler:
             if current_count >= shot_complete:
                 self._init_cfg_registers(key, value=1)
                 all_registers = self._pop_registers(key)
+                is_all_ok = self._pop_cycle_flag(key)
 
                 try:
                     with self._signal_rwlock.read():
@@ -1443,18 +1498,20 @@ class PLCHandler:
                     return
 
                 plc_tasks = []
+                # Không phân biệt có giá trị hay không, ghi tất cả các thanh ghi đã setup (cả OK và NG)
                 if all_registers:
-                    _log.info('[%s] NG registers: %s', key, all_registers)
+                    _log.info('[%s] Registers to write (OK/NG): %s', key, all_registers)
                     if isinstance(all_registers, dict):
                         for reg, val in all_registers.items():
                             plc_tasks.append((reg, val))
                     else:
                         for reg in all_registers:
                             plc_tasks.append((reg, 1))
-                else:
-                    if reset_sig:
-                        _log.info(f'Send Reset Signal OK {reset_sig}')
-                        plc_tasks.append((reset_sig.get('reg'), int(reset_sig.get('on', 1))))
+
+                # Chỉ khi tất cả các label đều OK trong suốt chu kỳ thì mới gửi thêm tín hiệu reset_sig
+                if is_all_ok and reset_sig:
+                    _log.info(f'Send Reset Signal OK {reset_sig}')
+                    plc_tasks.append((reset_sig.get('reg'), int(reset_sig.get('on', 1))))
 
                 if comp_sig:
                     _log.info(f'Send Complete Signal {comp_sig}')
@@ -1462,7 +1519,7 @@ class PLCHandler:
 
                 self._dispatch_plc_writes(plc_tasks)
                 self._reset_counter(key)
-                _log.info('[%s] Complete Cycle Shot %s | registers: %s', key, current_count, len(all_registers))
+                _log.info('[%s] Complete Cycle Shot %s | registers written: %s', key, current_count, len(all_registers))
                 _log.info(f'_____________COMPLETE A CYCLE FRAME FROM {key.upper()}_____________')
                 _log.info(f'* Restart New Cycle')
 
@@ -1478,25 +1535,27 @@ class PLCHandler:
                 return
 
             plc_tasks = []
+            # Ghi tất cả các thanh ghi trong list_register (bao gồm cả thanh ghi OK và NG)
             if list_register:
-                _log.info('[%s] NG registers: %s', key, list_register)
+                _log.info('[%s] Single frame registers to write (OK/NG): %s', key, list_register)
                 if isinstance(list_register, dict):
                     for reg, val in list_register.items():
                         plc_tasks.append((reg, val))
                 else:
                     for reg in list_register:
                         plc_tasks.append((reg, 1))
-            else:
-                if reset_sig:
-                    _log.info(f'Send Reset Signal OK {reset_sig}')
-                    plc_tasks.append((reset_sig.get('reg'), int(reset_sig.get('on', 1))))
+
+            # Chỉ khi tất cả các label đều OK thì mới gửi thêm tín hiệu reset_sig
+            if flag and reset_sig:
+                _log.info(f'Send Reset Signal OK {reset_sig}')
+                plc_tasks.append((reset_sig.get('reg'), int(reset_sig.get('on', 1))))
 
             if comp_sig:
                 _log.info(f'Send Complete Signal {comp_sig}')
                 plc_tasks.append((comp_sig.get('reg'), int(comp_sig.get('on', 1))))
 
             self._dispatch_plc_writes(plc_tasks)
-            _log.info('[%s] Complete Single frame %s | registers: %s', key, current_count, len(list_register))
+            _log.info('[%s] Complete Single frame %s | registers written: %s', key, current_count, len(list_register))
             _log.info(f'_____________COMPLETE A SINGLE FRAME FROM {key.upper()}_____________')
             _log.info(f'* Restart New Single Frame')
 

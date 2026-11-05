@@ -163,20 +163,42 @@ class _DeepCopier:
             )
 
     def _copy_parameterset(self, old_model_id: int, new_model_id: int):
-        self._cur.execute(
-            f"SELECT Label_Name, `Join`, OK, NG, Quantity, "
-            f"Width_Min, Width_Max, Height_Min, Height_Max, Assign_Value, Confidence "
-            f"FROM {self._t('PARAMETERSET')} WHERE model_id = %s",
-            (old_model_id,)
-        )
-        for row in self._cur.fetchall():
+        try:
+            self._cur.execute("SHOW COLUMNS FROM PARAMETERSET LIKE 'Value_State'")
+            has_value_state = bool(self._cur.fetchone())
+        except Exception:
+            has_value_state = False
+
+        if has_value_state:
             self._cur.execute(
-                f"""INSERT INTO {self._t('PARAMETERSET')}
-                   (Label_Name, `Join`, OK, NG, Quantity,
-                    Width_Min, Width_Max, Height_Min, Height_Max, Assign_Value, Confidence, model_id)
-                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-                (*row, new_model_id)
+                f"SELECT Label_Name, `Join`, OK, NG, Quantity, "
+                f"Width_Min, Width_Max, Height_Min, Height_Max, Assign_Value, Value_State, Value_OK, Value_NG, Confidence "
+                f"FROM {self._t('PARAMETERSET')} WHERE model_id = %s",
+                (old_model_id,)
             )
+            for row in self._cur.fetchall():
+                self._cur.execute(
+                    f"""INSERT INTO {self._t('PARAMETERSET')}
+                       (Label_Name, `Join`, OK, NG, Quantity,
+                        Width_Min, Width_Max, Height_Min, Height_Max, Assign_Value, Value_State, Value_OK, Value_NG, Confidence, model_id)
+                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+                    (*row, new_model_id)
+                )
+        else:
+            self._cur.execute(
+                f"SELECT Label_Name, `Join`, OK, NG, Quantity, "
+                f"Width_Min, Width_Max, Height_Min, Height_Max, Assign_Value, Confidence "
+                f"FROM {self._t('PARAMETERSET')} WHERE model_id = %s",
+                (old_model_id,)
+            )
+            for row in self._cur.fetchall():
+                self._cur.execute(
+                    f"""INSERT INTO {self._t('PARAMETERSET')}
+                       (Label_Name, `Join`, OK, NG, Quantity,
+                        Width_Min, Width_Max, Height_Min, Height_Max, Assign_Value, Confidence, model_id)
+                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+                    (*row, new_model_id)
+                )
 
     def _copy_modes(self, old_cam_id: int, new_cam_id: int):
         try:

@@ -97,20 +97,23 @@ class v8s(v5s):
 
             label    = cfg['label']
             ok_count = name_counts.get(label, 0)
+            reg      = str(cfg.get('register') or '').strip()
 
+            is_label_ng = False
             if cfg['ok'] and ok_count != cfg['quantity']:
-                flag = False
-                fail_labels.add(f'* {label}')
-                reg = str(cfg.get('register') or '').strip()
-                if reg:
-                    list_register[reg] = cfg.get('value', 1)
+                is_label_ng = True
 
             if cfg['ng'] and ok_count > 0:
+                is_label_ng = True
+
+            if is_label_ng:
                 flag = False
                 fail_labels.add(f'* {label}')
-                reg = str(cfg.get('register') or '').strip()
-                if reg:
-                    list_register[reg] = cfg.get('value', 1)
+                if reg and any(c.isdigit() for c in reg):
+                    list_register[reg] = cfg.get('value_ng', 1)
+            else:
+                if reg and any(c.isdigit() for c in reg):
+                    list_register[reg] = cfg.get('value_ok', 1)
 
         # ── Colour failing boxes red ──────────────────────────────────────────
         for d in draw_candidates:

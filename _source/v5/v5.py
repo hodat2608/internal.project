@@ -210,19 +210,25 @@ def _read_model_config(model, model_column: list, keys_mapping: list) -> list:
  
     rows = []
     for i in range(model.rowCount()):
+        val_state = to_int(i, "Value State", default=to_int(i, "Value", default=1))
+        val_ok    = to_int(i, "Value OK",    default=1)
+        val_ng    = to_int(i, "Value NG",    default=1)
         rows.append({
-            'label'    : text(i,    keys_mapping[0]),
-            'join'     : checked(i, keys_mapping[1]),
-            'ok'       : checked(i, keys_mapping[2]),
-            'ng'       : checked(i, keys_mapping[3]),
-            'quantity' : to_int(i,  keys_mapping[4]),
-            'wmin'     : to_int(i,  keys_mapping[5]),
-            'wmax'     : to_int(i,  keys_mapping[6]),
-            'hmin'     : to_int(i,  keys_mapping[7]),
-            'hmax'     : to_int(i,  keys_mapping[8]),
-            'conf_thr' : to_int(i,  keys_mapping[-1]) / 100,
-            'register' : text(i,    keys_mapping[9]),
-            'value'    : to_int(i,  keys_mapping[10], default=1),
+            'label'       : text(i,    keys_mapping[0]),
+            'join'        : checked(i, keys_mapping[1]),
+            'ok'          : checked(i, keys_mapping[2]),
+            'ng'          : checked(i, keys_mapping[3]),
+            'quantity'    : to_int(i,  keys_mapping[4]),
+            'wmin'        : to_int(i,  keys_mapping[5]),
+            'wmax'        : to_int(i,  keys_mapping[6]),
+            'hmin'        : to_int(i,  keys_mapping[7]),
+            'hmax'        : to_int(i,  keys_mapping[8]),
+            'conf_thr'    : to_int(i,  keys_mapping[-1]) / 100,
+            'register'    : text(i,    keys_mapping[9] if len(keys_mapping) > 9 else "Register"),
+            'value_state' : val_state,
+            'value_ok'    : val_ok,
+            'value_ng'    : val_ng,
+            'value'       : val_state,
         })
     return rows
 
@@ -380,20 +386,24 @@ class v5s:
 
             label    = cfg['label']
             ok_count = name_counts.get(label, 0)
+            reg      = str(cfg.get('register') or '').strip()
 
+            is_label_ng = False
             if cfg['ok'] and ok_count != cfg['quantity']:
-                flag = False
-                fail_labels.add(f'* {label}')
-                reg = str(cfg.get('register') or '').strip()
-                if reg:
-                    list_register[reg] = cfg.get('value', 1)
+                is_label_ng = True
 
             if cfg['ng'] and ok_count > 0:
+                is_label_ng = True
+
+            if is_label_ng:
                 flag = False
                 fail_labels.add(f'* {label}')
-                reg = str(cfg.get('register') or '').strip()
-                if reg:
-                    list_register[reg] = cfg.get('value', 1)
+                if reg and any(c.isdigit() for c in reg):
+                    list_register[reg] = cfg.get('value_ng', 1)
+            else:
+                # Nhãn đạt điều kiện OK
+                if reg and any(c.isdigit() for c in reg):
+                    list_register[reg] = cfg.get('value_ok', 1)
 
         # ── Colour failing boxes red ──────────────────────────────────────────
         for d in draw_candidates:

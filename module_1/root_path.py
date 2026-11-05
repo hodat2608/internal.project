@@ -147,3 +147,79 @@ def get_trigger_file_path(register: str = "", for_writing: bool = False, auto_cr
             pass
 
     return target_file
+
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Bộ nạp ưu tiên mã nguồn ngoài ổ đĩa (External Code Hot-Patching)
+# Khi chạy file đóng gói (.exe), cơ chế này phát hiện các file .py được sửa đổi
+# bên ngoài ổ đĩa (ví dụ: _internal/ hoặc internal/) và nạp trực tiếp chúng thay
+# vì sử dụng mã bytecode PYZ đóng băng bên trong file .exe.
+# ─────────────────────────────────────────────────────────────────────────────
+def _setup_external_code_override():
+    if not getattr(sys, 'frozen', False):
+        return
+
+    import importlib.abc
+    import importlib.machinery
+    import importlib.util
+
+    PROJECT_MODULES = {
+        'module_1', 'module_2', 'module_3', 'module_4',
+        'module_5', 'module_6', 'Administrator', 'app_logger', 'app_utils'
+    }
+
+    exe_dir = os.path.dirname(os.path.abspath(sys.executable))
+    potential_dirs = [
+        os.path.join(exe_dir, '_internal'),
+        os.path.join(exe_dir, 'internal'),
+        exe_dir,
+    ]
+    meipass = getattr(sys, '_MEIPASS', None)
+    if meipass and meipass not in potential_dirs:
+        potential_dirs.append(meipass)
+
+    valid_dirs = [os.path.abspath(d) for d in potential_dirs if os.path.isdir(d)]
+
+    # Cập nhật sys.path
+    for d in reversed(valid_dirs):
+        if d not in sys.path:
+            sys.path.insert(0, d)
+
+    class ProjectDiskOverrideFinder(importlib.abc.MetaPathFinder):
+        def __init__(self, search_dirs):
+            self.search_dirs = search_dirs
+
+        def find_spec(self, fullname, path=None, target=None):
+            parts = fullname.split('.')
+            if parts[0] not in PROJECT_MODULES:
+                return None
+
+            for search_dir in self.search_dirs:
+                # 1. Module file: search_dir/module_3/main_core.py
+                py_file = os.path.join(search_dir, *parts) + '.py'
+                if os.path.isfile(py_file):
+                    loader = importlib.machinery.SourceFileLoader(fullname, py_file)
+                    return importlib.util.spec_from_file_location(fullname, py_file, loader=loader)
+
+                # 2. Package file: search_dir/Administrator/__init__.py
+                init_file = os.path.join(search_dir, *parts, '__init__.py')
+                if os.path.isfile(init_file):
+                    pkg_dir = os.path.join(search_dir, *parts)
+                    loader = importlib.machinery.SourceFileLoader(fullname, init_file)
+                    return importlib.util.spec_from_file_location(
+                        fullname, init_file, loader=loader, submodule_search_locations=[pkg_dir]
+                    )
+
+                # 3. Namespace package: search_dir/module_3/
+                pkg_dir = os.path.join(search_dir, *parts)
+                if os.path.isdir(pkg_dir):
+                    return importlib.util.spec_from_file_location(
+                        fullname, None, submodule_search_locations=[pkg_dir]
+                    )
+
+            return None
+
+    # Chèn vào đầu sys.meta_path để đứng TRƯỚC PyiFrozenImporter
+    sys.meta_path.insert(0, ProjectDiskOverrideFinder(valid_dirs))
+

@@ -1511,12 +1511,17 @@ class IDEWindow(QMainWindow):
 
         # Base directory (thư mục code gốc của dự án phần mềm)
         if getattr(sys, "frozen", False):
-            if hasattr(sys, "_MEIPASS") and os.path.isdir(sys._MEIPASS):
+            exe_dir = os.path.dirname(os.path.abspath(sys.executable))
+            internal_dir = os.path.join(exe_dir, "_internal")
+            if not os.path.isdir(internal_dir):
+                internal_dir = os.path.join(exe_dir, "internal")
+            
+            if os.path.isdir(internal_dir):
+                self.root_path = internal_dir
+            elif hasattr(sys, "_MEIPASS") and os.path.isdir(sys._MEIPASS):
                 self.root_path = os.path.abspath(sys._MEIPASS)
             else:
-                exe_dir = os.path.dirname(os.path.abspath(sys.executable))
-                internal_dir = os.path.join(exe_dir, "_internal")
-                self.root_path = internal_dir if os.path.isdir(internal_dir) else exe_dir
+                self.root_path = exe_dir
         else:
             self.root_path = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
         self.default_project_root = self.root_path

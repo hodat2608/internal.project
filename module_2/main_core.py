@@ -1,7 +1,7 @@
 
 import mysql.connector
 from module_3.main_thread import intermediate_layer
-import sys
+import sys,os
 import threading
 import time
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QThread, Qt
