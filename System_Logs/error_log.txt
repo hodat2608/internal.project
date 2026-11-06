@@ -1,369 +1,148 @@
-2026-11-05 10:28:36 [DEBUG] legion.module_3.main_core: [camera-1] Accumulated cfg registers (total: 2)
-2026-11-05 10:28:36 [INFO] legion.module_3.main_core: [camera-1] Đã ghi tất cả thanh ghi thành phần của camera-1 theo Value State: ['DM100=10', 'DM200=20']
-2026-11-05 10:36:12 [INFO] legion.module_2.main_core: [core.__init__] START
-2026-11-05 10:36:12 [INFO] legion.module_2.main_core: [core.__init__] Creating CoreWorker...
-2026-11-05 10:36:12 [INFO] legion.module_2.main_core: [core.__init__] CoreWorker created. Connecting to MySQL...
-2026-11-05 10:36:12 [INFO] legion.module_2.main_core: [connect_to_mysql] Calling connect_mysql_from_log...
-2026-11-05 10:36:12 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Reading config from C:\Users\VDM\AppData\Local\MBC_Vision_Inspector\mysql_config.log
-2026-11-05 10:36:12 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Attempt 1/15: Connecting to MySQL (127.0.0.1:3306, user=root)...
-2026-11-05 10:36:12 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Success to connect mysql on attempt 1
-2026-11-05 10:36:12 [INFO] legion.module_2.main_core: [connect_to_mysql] connect_mysql_from_log returned: <mysql.connector.connection.MySQLConnection object at 0x000001F1257CB500>
-2026-11-05 10:36:12 [INFO] legion.module_2.main_core: [connect_to_mysql] Creating default table...
-2026-11-05 10:36:12 [INFO] legion.module_2.main_core: [connect_to_mysql] Success to connect MySQL (Auto-login enabled)
-2026-11-05 10:36:12 [INFO] legion.module_2.main_core: [core.__init__] connect_to_mysql done. connect_result=<mysql.connector.connection.MySQLConnection object at 0x000001F1257CB500>
-2026-11-05 10:36:12 [INFO] legion.module_2.main_core: Success to initialize connections
-2026-11-05 10:36:12 [INFO] legion.module_2.main_core: [core.__init__] init_plc_data...
-2026-11-05 10:36:12 [INFO] legion.module_2.main_core: PLC Simulation via Log Mode ACTIVE [indirect_from_log=True] for KEYENCE (192.168.42.37:8501)
-2026-11-05 10:36:12 [INFO] legion.module_2.main_core: [core.__init__] Connecting trigger signal...
-2026-11-05 10:36:12 [INFO] legion.module_2.main_core: [core.__init__] collect_dict_item...
-2026-11-05 10:36:12 [INFO] legion.module_2.main_core: Mode Automatic Login in MySQL (Optimized)
-2026-11-05 10:36:12 [INFO] legion.module_2.main_core: Successfully loaded items from 1 databases
-2026-11-05 10:36:12 [INFO] legion.module_2.main_core: [core.__init__] reload_system_action_configs...
-2026-11-05 10:36:12 [INFO] legion.module_2.main_core: System action configs reloaded successfully: ['RESTART', 'CLOSE']
-2026-11-05 10:36:12 [INFO] legion.module_2.main_core: [core.__init__] DONE
-2026-11-05 10:36:13 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 10:36:13 [INFO] legion.module_2.main_core: Success to start monitoring
-2026-11-05 10:36:13 [INFO] legion.module_2.main_core: [CoreWorker] Running in thread: Dummy-3
-2026-11-05 10:36:13 [INFO] legion.module_2.main_core: Auto-restoring from last saved state: 50-E22AA-A, tbnq_plate_b (saved at 2026-11-04 13:27:52)
-2026-11-05 10:36:14 [INFO] legion.module_2.hardware_key_guard: HardwareKeyGuard đã khởi động. Tần số quét định kỳ: 180 - 300 giây (3-5 phút).
-2026-11-05 10:36:14 [INFO] legion.module_3.main_thread: Khởi động Legion Vision App - ItemCode: 50-E22AA-A
-2026-11-05 10:36:14 [INFO] legion.module_3.main_core: Select database: tbnq_plate_b
-2026-11-05 10:36:14 [INFO] legion.module_3.main_core: Get item code id: 50-E22AA-A
-2026-11-05 10:36:14 [INFO] legion.module_3.main_core: Get camera records for item code: 1
-2026-11-05 10:36:14 [INFO] legion.module_3.main_thread: Found 3 cameras for item code: 50-E22AA-A
-2026-11-05 10:36:14 [INFO] legion.module_3.main_core: Get models for camera: 1
-2026-11-05 10:36:14 [INFO] legion.module_3.main_core: Get models for camera: 2
-2026-11-05 10:36:14 [INFO] legion.module_3.main_core: Get models for camera: 3
-2026-11-05 10:36:14 [INFO] legion.module_3.main_thread: Setting up camera: 1 (ID: 1)
-2026-11-05 10:36:14 [INFO] legion.module_3.main_core: Get models for camera: 1
-2026-11-05 10:36:14 [INFO] legion.module_3.main_thread: Found 5 models for camera 1
-2026-11-05 10:36:14 [INFO] legion.module_3.handle_option_models: Loaded 1 active geometric tasks for key_model=('camera-1', 'model-1') (camera_id=1, model_id=1)
-2026-11-05 10:36:14 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
-2026-11-05 10:36:14 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
-2026-11-05 10:36:14 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
-2026-11-05 10:36:14 [INFO] legion.module_3.handle_option_models: Loaded 0 active geometric tasks for key_model=('camera-1', 'model-2') (camera_id=1, model_id=2)
-2026-11-05 10:36:14 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
-2026-11-05 10:36:14 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
-2026-11-05 10:36:14 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
-2026-11-05 10:36:14 [INFO] legion.module_3.handle_option_models: Loaded 0 active geometric tasks for key_model=('camera-1', 'model-3') (camera_id=1, model_id=3)
-2026-11-05 10:36:14 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
-2026-11-05 10:36:14 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
-2026-11-05 10:36:14 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
-2026-11-05 10:36:14 [INFO] legion.module_3.handle_option_models: Loaded 0 active geometric tasks for key_model=('camera-1', 'model-4') (camera_id=1, model_id=4)
-2026-11-05 10:36:15 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
-2026-11-05 10:36:15 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
-2026-11-05 10:36:15 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
-2026-11-05 10:36:15 [INFO] legion.module_3.handle_option_models: Loaded 0 active geometric tasks for key_model=('camera-1', 'model-5') (camera_id=1, model_id=5)
-2026-11-05 10:36:15 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
-2026-11-05 10:36:15 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
-2026-11-05 10:36:15 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
-2026-11-05 10:36:15 [INFO] legion.module_3.main_core: [get_camera_program_signals] Camera 1: Tín hiệu 'run' không được tích 'Kích hoạt' (is_enabled=False) -> Bỏ qua
-2026-11-05 10:36:15 [INFO] legion.module_3.main_core: [get_camera_program_signals] Camera 1: Tín hiệu 'busy' không được tích 'Kích hoạt' (is_enabled=False) -> Bỏ qua
-2026-11-05 10:36:15 [WARNING] legion.module_3.main_core: [auto_initial_device] Camera 1: Không tìm thấy tín hiệu PLC nào để gửi. Hãy thiết lập Program Signal Ready hoặc MODE_AUTO.
-2026-11-05 10:36:15 [INFO] legion.module_3.main_core: [Camera 1] Lần thử 1: Đang kết nối (USB - DB2254099)...
-2026-11-05 10:36:16 [WARNING] legion.module_3.main_core: [Camera 1] ❌ Lần thử 1 thất bại: cannot access local variable 'chModelName' where it is not associated with a value
-2026-11-05 10:36:16 [INFO] legion.module_3.main_core: [Camera 1] Thử lại sau 1 giây...
-2026-11-05 10:36:17 [INFO] legion.module_3.main_core: [Camera 1] Lần thử 2: Đang kết nối (USB - DB2254099)...
-2026-11-05 10:36:17 [WARNING] legion.module_3.main_core: [Camera 1] ❌ Lần thử 2 thất bại: cannot access local variable 'chModelName' where it is not associated with a value
-2026-11-05 10:36:17 [INFO] legion.module_3.main_core: [Camera 1] Thử lại sau 1 giây...
-2026-11-05 10:36:18 [INFO] legion.module_3.main_core: [Camera 1] Lần thử 3: Đang kết nối (USB - DB2254099)...
-2026-11-05 10:36:18 [WARNING] legion.module_3.main_core: [Camera 1] ❌ Lần thử 3 thất bại: cannot access local variable 'chModelName' where it is not associated with a value
-2026-11-05 10:36:18 [INFO] legion.module_3.main_core: [Camera 1] Thử lại sau 1 giây...
-2026-11-05 10:36:19 [ERROR] legion.module_3.main_core: [Camera 1] Kết nối thất bại sau 3 lần thử!
-2026-11-05 10:36:19 [INFO] legion.module_3.main_core: [ContinuousPLCSignalsWorker] Luồng gửi tín hiệu PLC liên tục (ready, run, busy) đã bắt đầu.
-2026-11-05 10:36:19 [INFO] legion.module_6.keyence.initial: [+] Kết nối tới Keyence PLC 192.168.42.37:8501 qua pymcprotocol
-2026-11-05 10:36:21 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.37:8501 (Attempt 1/3) -> [WinError 10061] No connection could be made because the target machine actively refused it
-2026-11-05 10:36:24 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.37:8501 (Attempt 2/3) -> [WinError 10061] No connection could be made because the target machine actively refused it
-2026-11-05 10:36:27 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.37:8501 (Attempt 3/3) -> [WinError 10061] No connection could be made because the target machine actively refused it
-2026-11-05 10:36:27 [ERROR] legion.module_6.keyence.initial: Connection failed after 3 attempts to Keyence PLC 192.168.42.37:8501
-2026-11-05 10:36:27 [INFO] legion.module_3.main_thread: Camera 1 initialization completed
-2026-11-05 10:36:27 [INFO] legion.module_3.main_thread: Setting up camera: 2 (ID: 2)
-2026-11-05 10:36:27 [INFO] legion.module_3.main_core: Get models for camera: 2
-2026-11-05 10:36:27 [INFO] legion.module_3.main_thread: Found 4 models for camera 2
-2026-11-05 10:36:27 [INFO] legion.module_3.handle_option_models: Loaded 0 active geometric tasks for key_model=('camera-2', 'model-1') (camera_id=2, model_id=1)
-2026-11-05 10:36:27 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
-2026-11-05 10:36:27 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
-2026-11-05 10:36:27 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
-2026-11-05 10:36:27 [INFO] legion.module_3.handle_option_models: Loaded 0 active geometric tasks for key_model=('camera-2', 'model-2') (camera_id=2, model_id=2)
-2026-11-05 10:36:27 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
-2026-11-05 10:36:27 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
-2026-11-05 10:36:27 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
-2026-11-05 10:36:27 [INFO] legion.module_3.handle_option_models: Loaded 0 active geometric tasks for key_model=('camera-2', 'model-3') (camera_id=2, model_id=3)
-2026-11-05 10:36:27 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
-2026-11-05 10:36:27 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
-2026-11-05 10:36:27 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
-2026-11-05 10:36:27 [INFO] legion.module_3.handle_option_models: Loaded 0 active geometric tasks for key_model=('camera-2', 'model-4') (camera_id=2, model_id=4)
-2026-11-05 10:36:27 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
-2026-11-05 10:36:28 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
-2026-11-05 10:36:28 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
-2026-11-05 10:36:28 [INFO] legion.module_3.main_core: [get_camera_program_signals] Camera 2: Tín hiệu 'ready' không được tích 'Kích hoạt' (is_enabled=False) -> Bỏ qua
-2026-11-05 10:36:28 [INFO] legion.module_3.main_core: [get_camera_program_signals] Camera 2: Tín hiệu 'run' không được tích 'Kích hoạt' (is_enabled=False) -> Bỏ qua
-2026-11-05 10:36:28 [INFO] legion.module_3.main_core: [get_camera_program_signals] Camera 2: Tín hiệu 'busy' không được tích 'Kích hoạt' (is_enabled=False) -> Bỏ qua
-2026-11-05 10:36:28 [WARNING] legion.module_3.main_core: [auto_initial_device] Camera 2: Không tìm thấy tín hiệu PLC nào để gửi. Hãy thiết lập Program Signal Ready hoặc MODE_AUTO.
-2026-11-05 10:36:28 [INFO] legion.module_3.main_core: [Camera 2] Lần thử 1: Đang kết nối (USB - DB2254101)...
-2026-11-05 10:36:28 [WARNING] legion.module_3.main_core: [Camera 2] ❌ Lần thử 1 thất bại: cannot access local variable 'chModelName' where it is not associated with a value
-2026-11-05 10:36:28 [INFO] legion.module_3.main_core: [Camera 2] Thử lại sau 1 giây...
-2026-11-05 10:36:29 [INFO] legion.module_3.main_core: [Camera 2] Lần thử 2: Đang kết nối (USB - DB2254101)...
-2026-11-05 10:36:29 [WARNING] legion.module_3.main_core: [Camera 2] ❌ Lần thử 2 thất bại: cannot access local variable 'chModelName' where it is not associated with a value
-2026-11-05 10:36:29 [INFO] legion.module_3.main_core: [Camera 2] Thử lại sau 1 giây...
-2026-11-05 10:36:30 [INFO] legion.module_3.main_core: [Camera 2] Lần thử 3: Đang kết nối (USB - DB2254101)...
-2026-11-05 10:36:30 [WARNING] legion.module_3.main_core: [Camera 2] ❌ Lần thử 3 thất bại: cannot access local variable 'chModelName' where it is not associated with a value
-2026-11-05 10:36:30 [INFO] legion.module_3.main_core: [Camera 2] Thử lại sau 1 giây...
-2026-11-05 10:36:31 [ERROR] legion.module_3.main_core: [Camera 2] Kết nối thất bại sau 3 lần thử!
-2026-11-05 10:36:31 [INFO] legion.module_6.keyence.initial: [+] Kết nối tới Keyence PLC 192.168.42.37:8501 qua pymcprotocol
-2026-11-05 10:36:33 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.37:8501 (Attempt 1/3) -> [WinError 10061] No connection could be made because the target machine actively refused it
-2026-11-05 10:36:36 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.37:8501 (Attempt 2/3) -> [WinError 10061] No connection could be made because the target machine actively refused it
-2026-11-05 10:36:39 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.37:8501 (Attempt 3/3) -> [WinError 10061] No connection could be made because the target machine actively refused it
-2026-11-05 10:36:39 [ERROR] legion.module_6.keyence.initial: Connection failed after 3 attempts to Keyence PLC 192.168.42.37:8501
-2026-11-05 10:36:39 [INFO] legion.module_3.main_thread: Camera 2 initialization completed
-2026-11-05 10:36:39 [INFO] legion.module_3.main_thread: Setting up camera: 3 (ID: 3)
-2026-11-05 10:36:39 [INFO] legion.module_3.main_core: Get models for camera: 3
-2026-11-05 10:36:39 [INFO] legion.module_3.main_thread: Found 1 models for camera 3
-2026-11-05 10:36:39 [INFO] legion.module_3.handle_option_models: Loaded 0 active geometric tasks for key_model=('camera-3', 'model-1') (camera_id=3, model_id=1)
-2026-11-05 10:36:39 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
-2026-11-05 10:36:39 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
-2026-11-05 10:36:39 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
-2026-11-05 10:36:40 [INFO] legion.module_3.main_core: [Camera 3] Lần thử 1: Đang kết nối (USB - DB2254102)...
-2026-11-05 10:36:40 [WARNING] legion.module_3.main_core: [Camera 3] ❌ Lần thử 1 thất bại: cannot access local variable 'chModelName' where it is not associated with a value
-2026-11-05 10:36:40 [INFO] legion.module_3.main_core: [Camera 3] Thử lại sau 1 giây...
-2026-11-05 10:36:41 [INFO] legion.module_3.main_core: [Camera 3] Lần thử 2: Đang kết nối (USB - DB2254102)...
-2026-11-05 10:36:41 [WARNING] legion.module_3.main_core: [Camera 3] ❌ Lần thử 2 thất bại: cannot access local variable 'chModelName' where it is not associated with a value
-2026-11-05 10:36:41 [INFO] legion.module_3.main_core: [Camera 3] Thử lại sau 1 giây...
-2026-11-05 10:36:42 [INFO] legion.module_3.main_core: [Camera 3] Lần thử 3: Đang kết nối (USB - DB2254102)...
-2026-11-05 10:36:42 [WARNING] legion.module_3.main_core: [Camera 3] ❌ Lần thử 3 thất bại: cannot access local variable 'chModelName' where it is not associated with a value
-2026-11-05 10:36:42 [INFO] legion.module_3.main_core: [Camera 3] Thử lại sau 1 giây...
-2026-11-05 10:36:43 [ERROR] legion.module_3.main_core: [Camera 3] Kết nối thất bại sau 3 lần thử!
-2026-11-05 10:36:43 [INFO] legion.module_6.keyence.initial: [+] Kết nối tới Keyence PLC 192.168.42.37:8501 qua pymcprotocol
-2026-11-05 10:36:45 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.37:8501 (Attempt 1/3) -> [WinError 10061] No connection could be made because the target machine actively refused it
-2026-11-05 10:36:48 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.37:8501 (Attempt 2/3) -> [WinError 10061] No connection could be made because the target machine actively refused it
-2026-11-05 10:36:51 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.37:8501 (Attempt 3/3) -> [WinError 10061] No connection could be made because the target machine actively refused it
-2026-11-05 10:36:51 [ERROR] legion.module_6.keyence.initial: Connection failed after 3 attempts to Keyence PLC 192.168.42.37:8501
-2026-11-05 10:36:51 [INFO] legion.module_3.main_thread: Camera 3 initialization completed
-2026-11-05 10:36:51 [INFO] legion.module_3.main_core: [PLCHandler] Trigger cache updated (target_camera=ALL, count=3)
-2026-11-05 10:36:51 [INFO] legion.module_3.main_core: [PLCHandler] Updated dict_signal_complete (target_camera=ALL)
-2026-11-05 10:36:51 [INFO] legion.module_3.main_core: [PLCWorkerModeAuto1] Running in thread: Dummy-4
-2026-11-05 10:40:21 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 10:45:21 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 10:48:58 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 10:52:37 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 10:57:35 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 11:01:19 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 11:06:01 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 11:09:25 [DEBUG] legion.module_3.main_core: [cam-1] Accumulated 12 registers (total: 12)
-2026-11-05 11:09:25 [DEBUG] legion.module_3.main_core: [cam-1] Accumulated 12 registers (total: 12)
-2026-11-05 11:09:31 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 11:12:55 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 11:16:37 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 11:20:05 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 11:24:33 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 11:29:09 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 11:33:58 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 11:37:31 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 11:40:43 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 11:44:01 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 11:48:03 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 11:51:55 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 11:56:29 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 11:57:09 [INFO] legion.module_3.main_core: [built-in-camera-1] Da tat trigger D100 -> 0 sau khi gui xong tin hieu post
-2026-11-05 11:57:09 [INFO] legion.module_3.main_core: [built-in-camera-2] Da tat trigger D200 -> 0 sau khi gui xong tin hieu post
-2026-11-05 11:57:09 [INFO] legion.module_3.main_core: [built-in-camera-1] Da tat trigger D100 -> 0 sau khi gui xong tin hieu post
-2026-11-05 11:57:09 [DEBUG] legion.module_3.main_core: [take_image] Retrieve latency (attempt 1): 0.02ms
-2026-11-05 11:57:09 [DEBUG] legion.module_3.main_core: [take_image] Retrieve latency (attempt 2): 0.05ms
-2026-11-05 11:57:09 [DEBUG] legion.module_3.main_core: [take_image] Retrieve latency (attempt 3): 0.11ms
-2026-11-05 11:57:09 [WARNING] legion.module_3.main_core: [built-in-camera-1] First grab failed — attempting camera soft reset...
-2026-11-05 11:57:09 [DEBUG] legion.module_3.main_core: [take_image] Retrieve latency (attempt 1): 0.05ms
-2026-11-05 11:57:09 [DEBUG] legion.module_3.main_core: [take_image] Retrieve latency (attempt 2): 0.05ms
-2026-11-05 11:57:09 [DEBUG] legion.module_3.main_core: [take_image] Retrieve latency (attempt 3): 0.09ms
-2026-11-05 11:57:09 [ERROR] legion.module_3.main_core: [built-in-camera-1] Lấy ảnh từ camera thất bại (Mất kết nối Camera / lỗi phần cứng)!
-2026-11-05 11:57:09 [INFO] legion.module_3.main_core: [built-in-camera-1] Da tat trigger D100 -> 0 sau khi gui xong tin hieu post
-2026-11-05 11:57:09 [DEBUG] legion.module_3.main_core: [take_image] Retrieve latency (attempt 1): 0.02ms
-2026-11-05 11:57:09 [INFO] legion.module_3.main_core: [built-in-camera-1] Da tat trigger D100 -> 0 sau khi gui xong tin hieu post
-2026-11-05 11:57:24 [ERROR] legion.module_3.main_core: [_run_trigger_from_activated_mode] Error processing key: built-in-camera-1
-Traceback (most recent call last):
-  File "C:\project_vision\intenal\module_3\main_core.py", line 1070, in _run_trigger_from_activated_mode
-    if not self._try_acquire_key(key):
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\project_vision\intenal\module_3\main_core.py", line 547, in _try_acquire_key
-    with self._processing_lock:
-         ^^^^^^^^^^^^^^^^^^^^^
-AttributeError: 'PLCHandler' object has no attribute '_processing_lock'
-2026-11-05 11:57:37 [WARNING] legion.module_3.main_core: [built-in-camera-1] No handler mapped for camera mode: automatic
-2026-11-05 11:57:50 [ERROR] legion.module_3.main_core: [_run_trigger_from_activated_mode] Error processing key: built-in-camera-1
-Traceback (most recent call last):
-  File "C:\project_vision\intenal\module_3\main_core.py", line 1120, in _run_trigger_from_activated_mode
-    self.executor,
-    ^^^^^^^^^^^^^
-AttributeError: 'PLCHandler' object has no attribute 'executor'
-2026-11-05 12:00:31 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 12:05:23 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 12:10:04 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 12:14:03 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 12:17:51 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 12:22:49 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 12:26:20 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 12:30:46 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 12:31:55 [ERROR] legion.module_3.handle_option_models: Save parameter failed: name 're' is not defined
-2026-11-05 12:31:55 [ERROR] legion.module_3.handle_option_models: Save parameter failed: name 're' is not defined
-2026-11-05 12:32:13 [ERROR] legion.module_3.handle_option_models: Save parameter failed: Không tìm thấy model_id tương ứng.
-2026-11-05 12:32:13 [ERROR] legion.module_3.handle_option_models: Save parameter failed: Không tìm thấy model_id tương ứng.
-2026-11-05 12:32:13 [ERROR] legion.module_3.handle_option_models: Save parameter failed: Không tìm thấy model_id tương ứng.
-2026-11-05 12:32:13 [ERROR] legion.module_3.handle_option_models: Save parameter failed: Không tìm thấy model_id tương ứng.
-2026-11-05 12:32:13 [ERROR] legion.module_3.handle_option_models: Save parameter failed: Không tìm thấy model_id tương ứng.
-2026-11-05 12:32:13 [ERROR] legion.module_3.handle_option_models: Save parameter failed: Không tìm thấy model_id tương ứng.
-2026-11-05 12:34:18 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 12:39:11 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 12:44:10 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 12:47:20 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 12:51:33 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 12:55:39 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 12:59:37 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 12:59:59 [INFO] legion.module_2.main_core: Stopping CoreWorker...
-2026-11-05 12:59:59 [INFO] legion.module_2.main_core: Reloading program: Closing existing instance for item code: None
-2026-11-05 12:59:59 [INFO] legion.module_3.main_thread: Closing window and cleaning up camera resources...
-2026-11-05 12:59:59 [INFO] legion.module_3.main_thread: Cleaning up resources...
-2026-11-05 12:59:59 [INFO] legion.module_3.main_core: [PLCHandler] Executors shut down.
-2026-11-05 12:59:59 [INFO] legion.module_3.main_core: [Cleanup PLC] Gửi toàn bộ tín hiệu OFF cho Camera 3: ['ready', 'run', 'busy']
-2026-11-05 12:59:59 [INFO] legion.module_3.main_thread: Cleanup completed
-2026-11-05 12:59:59 [INFO] legion.module_2.main_core: Success to stop monitoring
-2026-11-05 13:00:02 [INFO] legion.module_2.main_core: [core.__init__] START
-2026-11-05 13:00:02 [INFO] legion.module_2.main_core: [core.__init__] Creating CoreWorker...
-2026-11-05 13:00:02 [INFO] legion.module_2.main_core: [core.__init__] CoreWorker created. Connecting to MySQL...
-2026-11-05 13:00:02 [INFO] legion.module_2.main_core: [connect_to_mysql] Calling connect_mysql_from_log...
-2026-11-05 13:00:02 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Reading config from C:\Users\VDM\AppData\Local\MBC_Vision_Inspector\mysql_config.log
-2026-11-05 13:00:02 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Attempt 1/15: Connecting to MySQL (127.0.0.1:3306, user=root)...
-2026-11-05 13:00:03 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Success to connect mysql on attempt 1
-2026-11-05 13:00:03 [INFO] legion.module_2.main_core: [connect_to_mysql] connect_mysql_from_log returned: <mysql.connector.connection.MySQLConnection object at 0x000002D3FA6DBB00>
-2026-11-05 13:00:03 [INFO] legion.module_2.main_core: [connect_to_mysql] Creating default table...
-2026-11-05 13:00:03 [INFO] legion.module_2.main_core: [connect_to_mysql] Success to connect MySQL (Auto-login enabled)
-2026-11-05 13:00:03 [INFO] legion.module_2.main_core: [core.__init__] connect_to_mysql done. connect_result=<mysql.connector.connection.MySQLConnection object at 0x000002D3FA6DBB00>
-2026-11-05 13:00:03 [INFO] legion.module_2.main_core: Success to initialize connections
-2026-11-05 13:00:03 [INFO] legion.module_2.main_core: [core.__init__] init_plc_data...
-2026-11-05 13:00:03 [INFO] legion.module_2.main_core: PLC Simulation via Log Mode ACTIVE [indirect_from_log=True] for KEYENCE (192.168.42.37:8501)
-2026-11-05 13:00:03 [INFO] legion.module_2.main_core: [core.__init__] Connecting trigger signal...
-2026-11-05 13:00:03 [INFO] legion.module_2.main_core: [core.__init__] collect_dict_item...
-2026-11-05 13:00:03 [INFO] legion.module_2.main_core: Mode Automatic Login in MySQL (Optimized)
-2026-11-05 13:00:03 [INFO] legion.module_2.main_core: Successfully loaded items from 1 databases
-2026-11-05 13:00:03 [INFO] legion.module_2.main_core: [core.__init__] reload_system_action_configs...
-2026-11-05 13:00:03 [INFO] legion.module_2.main_core: System action configs reloaded successfully: ['RESTART', 'CLOSE']
-2026-11-05 13:00:03 [INFO] legion.module_2.main_core: [core.__init__] DONE
-2026-11-05 13:00:03 [INFO] legion.module_2.main_core: Success to check hardware key
-2026-11-05 13:00:03 [INFO] legion.module_2.main_core: Success to start monitoring
-2026-11-05 13:00:03 [INFO] legion.module_2.main_core: [CoreWorker] Running in thread: Dummy-3
-2026-11-05 13:00:03 [INFO] legion.module_2.main_core: Auto-restoring from last saved state: 50-E22AA-A, tbnq_plate_b (saved at 2026-11-04 13:27:52)
-2026-11-05 13:00:03 [INFO] legion.module_2.hardware_key_guard: HardwareKeyGuard đã khởi động. Tần số quét định kỳ: 180 - 300 giây (3-5 phút).
-2026-11-05 13:00:04 [INFO] legion.module_3.main_thread: Khởi động Legion Vision App - ItemCode: 50-E22AA-A
-2026-11-05 13:00:04 [INFO] legion.module_3.main_core: Select database: tbnq_plate_b
-2026-11-05 13:00:04 [INFO] legion.module_3.main_core: Get item code id: 50-E22AA-A
-2026-11-05 13:00:04 [INFO] legion.module_3.main_core: Get camera records for item code: 1
-2026-11-05 13:00:04 [INFO] legion.module_3.main_thread: Found 3 cameras for item code: 50-E22AA-A
-2026-11-05 13:00:04 [INFO] legion.module_3.main_core: Get models for camera: 1
-2026-11-05 13:00:04 [INFO] legion.module_3.main_core: Get models for camera: 2
-2026-11-05 13:00:04 [INFO] legion.module_3.main_core: Get models for camera: 3
-2026-11-05 13:00:04 [INFO] legion.module_3.main_thread: Setting up camera: 1 (ID: 1)
-2026-11-05 13:00:04 [INFO] legion.module_3.main_core: Get models for camera: 1
-2026-11-05 13:00:04 [INFO] legion.module_3.main_thread: Found 5 models for camera 1
-2026-11-05 13:00:04 [INFO] legion.module_3.handle_option_models: Loaded 1 active geometric tasks for key_model=('camera-1', 'model-1') (camera_id=1, model_id=1)
-2026-11-05 13:00:04 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
-2026-11-05 13:00:04 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
-2026-11-05 13:00:04 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
-2026-11-05 13:00:04 [INFO] legion.module_3.handle_option_models: Loaded 0 active geometric tasks for key_model=('camera-1', 'model-2') (camera_id=1, model_id=2)
-2026-11-05 13:00:04 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
-2026-11-05 13:00:04 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
-2026-11-05 13:00:04 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
-2026-11-05 13:00:04 [INFO] legion.module_3.handle_option_models: Loaded 0 active geometric tasks for key_model=('camera-1', 'model-3') (camera_id=1, model_id=3)
-2026-11-05 13:00:04 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
-2026-11-05 13:00:04 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
-2026-11-05 13:00:04 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
-2026-11-05 13:00:04 [INFO] legion.module_3.handle_option_models: Loaded 0 active geometric tasks for key_model=('camera-1', 'model-4') (camera_id=1, model_id=4)
-2026-11-05 13:00:04 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
-2026-11-05 13:00:04 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
-2026-11-05 13:00:04 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
-2026-11-05 13:00:04 [INFO] legion.module_3.handle_option_models: Loaded 0 active geometric tasks for key_model=('camera-1', 'model-5') (camera_id=1, model_id=5)
-2026-11-05 13:00:04 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
-2026-11-05 13:00:04 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
-2026-11-05 13:00:04 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
-2026-11-05 13:00:05 [INFO] legion.module_3.main_core: [get_camera_program_signals] Camera 1: Tín hiệu 'run' không được tích 'Kích hoạt' (is_enabled=False) -> Bỏ qua
-2026-11-05 13:00:05 [INFO] legion.module_3.main_core: [get_camera_program_signals] Camera 1: Tín hiệu 'busy' không được tích 'Kích hoạt' (is_enabled=False) -> Bỏ qua
-2026-11-05 13:00:05 [WARNING] legion.module_3.main_core: [auto_initial_device] Camera 1: Không tìm thấy tín hiệu PLC nào để gửi. Hãy thiết lập Program Signal Ready hoặc MODE_AUTO.
-2026-11-05 13:00:05 [INFO] legion.module_3.main_core: [Camera 1] Lần thử 1: Đang kết nối (USB - DB2254099)...
-2026-11-05 13:00:05 [WARNING] legion.module_3.main_core: [Camera 1] ❌ Lần thử 1 thất bại: cannot access local variable 'chModelName' where it is not associated with a value
-2026-11-05 13:00:05 [INFO] legion.module_3.main_core: [Camera 1] Thử lại sau 1 giây...
-2026-11-05 13:00:06 [INFO] legion.module_3.main_core: [Camera 1] Lần thử 2: Đang kết nối (USB - DB2254099)...
-2026-11-05 13:00:06 [WARNING] legion.module_3.main_core: [Camera 1] ❌ Lần thử 2 thất bại: cannot access local variable 'chModelName' where it is not associated with a value
-2026-11-05 13:00:06 [INFO] legion.module_3.main_core: [Camera 1] Thử lại sau 1 giây...
-2026-11-05 13:00:07 [INFO] legion.module_3.main_core: [Camera 1] Lần thử 3: Đang kết nối (USB - DB2254099)...
-2026-11-05 13:00:07 [WARNING] legion.module_3.main_core: [Camera 1] ❌ Lần thử 3 thất bại: cannot access local variable 'chModelName' where it is not associated with a value
-2026-11-05 13:00:07 [INFO] legion.module_3.main_core: [Camera 1] Thử lại sau 1 giây...
-2026-11-05 13:00:08 [ERROR] legion.module_3.main_core: [Camera 1] Kết nối thất bại sau 3 lần thử!
-2026-11-05 13:00:08 [INFO] legion.module_3.main_core: [ContinuousPLCSignalsWorker] Luồng gửi tín hiệu PLC liên tục (ready, run, busy) đã bắt đầu.
-2026-11-05 13:00:08 [INFO] legion.module_6.keyence.initial: [+] Kết nối tới Keyence PLC 192.168.42.37:8501 qua pymcprotocol
-2026-11-05 13:00:10 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.37:8501 (Attempt 1/3) -> [WinError 10061] No connection could be made because the target machine actively refused it
-2026-11-05 13:00:13 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.37:8501 (Attempt 2/3) -> [WinError 10061] No connection could be made because the target machine actively refused it
-2026-11-05 13:00:16 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.37:8501 (Attempt 3/3) -> [WinError 10061] No connection could be made because the target machine actively refused it
-2026-11-05 13:00:16 [ERROR] legion.module_6.keyence.initial: Connection failed after 3 attempts to Keyence PLC 192.168.42.37:8501
-2026-11-05 13:00:16 [INFO] legion.module_3.main_thread: Camera 1 initialization completed
-2026-11-05 13:00:16 [INFO] legion.module_3.main_thread: Setting up camera: 2 (ID: 2)
-2026-11-05 13:00:16 [INFO] legion.module_3.main_core: Get models for camera: 2
-2026-11-05 13:00:16 [INFO] legion.module_3.main_thread: Found 4 models for camera 2
-2026-11-05 13:00:16 [INFO] legion.module_3.handle_option_models: Loaded 0 active geometric tasks for key_model=('camera-2', 'model-1') (camera_id=2, model_id=1)
-2026-11-05 13:00:16 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
-2026-11-05 13:00:16 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
-2026-11-05 13:00:16 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
-2026-11-05 13:00:17 [INFO] legion.module_3.handle_option_models: Loaded 0 active geometric tasks for key_model=('camera-2', 'model-2') (camera_id=2, model_id=2)
-2026-11-05 13:00:17 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
-2026-11-05 13:00:17 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
-2026-11-05 13:00:17 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
-2026-11-05 13:00:17 [INFO] legion.module_3.handle_option_models: Loaded 0 active geometric tasks for key_model=('camera-2', 'model-3') (camera_id=2, model_id=3)
-2026-11-05 13:00:17 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
-2026-11-05 13:00:17 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
-2026-11-05 13:00:17 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
-2026-11-05 13:00:17 [INFO] legion.module_3.handle_option_models: Loaded 0 active geometric tasks for key_model=('camera-2', 'model-4') (camera_id=2, model_id=4)
-2026-11-05 13:00:17 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
-2026-11-05 13:00:17 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
-2026-11-05 13:00:17 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
-2026-11-05 13:00:17 [INFO] legion.module_3.main_core: [get_camera_program_signals] Camera 2: Tín hiệu 'ready' không được tích 'Kích hoạt' (is_enabled=False) -> Bỏ qua
-2026-11-05 13:00:17 [INFO] legion.module_3.main_core: [get_camera_program_signals] Camera 2: Tín hiệu 'run' không được tích 'Kích hoạt' (is_enabled=False) -> Bỏ qua
-2026-11-05 13:00:17 [INFO] legion.module_3.main_core: [get_camera_program_signals] Camera 2: Tín hiệu 'busy' không được tích 'Kích hoạt' (is_enabled=False) -> Bỏ qua
-2026-11-05 13:00:17 [WARNING] legion.module_3.main_core: [auto_initial_device] Camera 2: Không tìm thấy tín hiệu PLC nào để gửi. Hãy thiết lập Program Signal Ready hoặc MODE_AUTO.
-2026-11-05 13:00:17 [INFO] legion.module_3.main_core: [Camera 2] Lần thử 1: Đang kết nối (USB - DB2254101)...
-2026-11-05 13:00:17 [WARNING] legion.module_3.main_core: [Camera 2] ❌ Lần thử 1 thất bại: cannot access local variable 'chModelName' where it is not associated with a value
-2026-11-05 13:00:17 [INFO] legion.module_3.main_core: [Camera 2] Thử lại sau 1 giây...
-2026-11-05 13:00:18 [INFO] legion.module_3.main_core: [Camera 2] Lần thử 2: Đang kết nối (USB - DB2254101)...
-2026-11-05 13:00:18 [WARNING] legion.module_3.main_core: [Camera 2] ❌ Lần thử 2 thất bại: cannot access local variable 'chModelName' where it is not associated with a value
-2026-11-05 13:00:18 [INFO] legion.module_3.main_core: [Camera 2] Thử lại sau 1 giây...
-2026-11-05 13:00:19 [INFO] legion.module_3.main_core: [Camera 2] Lần thử 3: Đang kết nối (USB - DB2254101)...
-2026-11-05 13:00:19 [WARNING] legion.module_3.main_core: [Camera 2] ❌ Lần thử 3 thất bại: cannot access local variable 'chModelName' where it is not associated with a value
-2026-11-05 13:00:20 [INFO] legion.module_3.main_core: [Camera 2] Thử lại sau 1 giây...
-2026-11-05 13:00:21 [ERROR] legion.module_3.main_core: [Camera 2] Kết nối thất bại sau 3 lần thử!
-2026-11-05 13:00:21 [INFO] legion.module_6.keyence.initial: [+] Kết nối tới Keyence PLC 192.168.42.37:8501 qua pymcprotocol
-2026-11-05 13:00:23 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.37:8501 (Attempt 1/3) -> [WinError 10061] No connection could be made because the target machine actively refused it
-2026-11-05 13:00:26 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.37:8501 (Attempt 2/3) -> [WinError 10061] No connection could be made because the target machine actively refused it
-2026-11-05 13:00:29 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.37:8501 (Attempt 3/3) -> [WinError 10061] No connection could be made because the target machine actively refused it
-2026-11-05 13:00:29 [ERROR] legion.module_6.keyence.initial: Connection failed after 3 attempts to Keyence PLC 192.168.42.37:8501
-2026-11-05 13:00:29 [INFO] legion.module_3.main_thread: Camera 2 initialization completed
-2026-11-05 13:00:29 [INFO] legion.module_3.main_thread: Setting up camera: 3 (ID: 3)
-2026-11-05 13:00:29 [INFO] legion.module_3.main_core: Get models for camera: 3
-2026-11-05 13:00:29 [INFO] legion.module_3.main_thread: Found 1 models for camera 3
-2026-11-05 13:00:29 [INFO] legion.module_3.handle_option_models: Loaded 0 active geometric tasks for key_model=('camera-3', 'model-1') (camera_id=3, model_id=1)
-2026-11-05 13:00:29 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
-2026-11-05 13:00:29 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
-2026-11-05 13:00:29 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
-2026-11-05 13:00:29 [INFO] legion.module_3.main_core: [Camera 3] Lần thử 1: Đang kết nối (USB - DB2254102)...
-2026-11-05 13:00:29 [WARNING] legion.module_3.main_core: [Camera 3] ❌ Lần thử 1 thất bại: cannot access local variable 'chModelName' where it is not associated with a value
-2026-11-05 13:00:29 [INFO] legion.module_3.main_core: [Camera 3] Thử lại sau 1 giây...
-2026-11-05 13:00:30 [INFO] legion.module_3.main_core: [Camera 3] Lần thử 2: Đang kết nối (USB - DB2254102)...
-2026-11-05 13:00:30 [WARNING] legion.module_3.main_core: [Camera 3] ❌ Lần thử 2 thất bại: cannot access local variable 'chModelName' where it is not associated with a value
-2026-11-05 13:00:30 [INFO] legion.module_3.main_core: [Camera 3] Thử lại sau 1 giây...
-2026-11-05 13:00:31 [INFO] legion.module_3.main_core: [Camera 3] Lần thử 3: Đang kết nối (USB - DB2254102)...
-2026-11-05 13:00:31 [WARNING] legion.module_3.main_core: [Camera 3] ❌ Lần thử 3 thất bại: cannot access local variable 'chModelName' where it is not associated with a value
-2026-11-05 13:00:31 [INFO] legion.module_3.main_core: [Camera 3] Thử lại sau 1 giây...
-2026-11-05 13:00:32 [ERROR] legion.module_3.main_core: [Camera 3] Kết nối thất bại sau 3 lần thử!
-2026-11-05 13:00:32 [INFO] legion.module_6.keyence.initial: [+] Kết nối tới Keyence PLC 192.168.42.37:8501 qua pymcprotocol
-2026-11-05 13:00:34 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.37:8501 (Attempt 1/3) -> [WinError 10061] No connection could be made because the target machine actively refused it
-2026-11-05 13:00:37 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.37:8501 (Attempt 2/3) -> [WinError 10061] No connection could be made because the target machine actively refused it
-2026-11-05 13:00:41 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.37:8501 (Attempt 3/3) -> [WinError 10061] No connection could be made because the target machine actively refused it
-2026-11-05 13:00:41 [ERROR] legion.module_6.keyence.initial: Connection failed after 3 attempts to Keyence PLC 192.168.42.37:8501
-2026-11-05 13:00:41 [INFO] legion.module_3.main_thread: Camera 3 initialization completed
-2026-11-05 13:00:41 [INFO] legion.module_3.main_core: [PLCHandler] Trigger cache updated (target_camera=ALL, count=3)
-2026-11-05 13:00:41 [INFO] legion.module_3.main_core: [PLCHandler] Updated dict_signal_complete (target_camera=ALL)
-2026-11-05 13:00:41 [INFO] legion.module_3.main_core: [PLCWorkerModeAuto1] Running in thread: Dummy-4
+2026-11-06 09:17:52 [INFO] legion.module_2.main_core: [core.__init__] START
+2026-11-06 09:17:52 [INFO] legion.module_2.main_core: [core.__init__] Creating CoreWorker...
+2026-11-06 09:17:52 [INFO] legion.module_2.main_core: [core.__init__] CoreWorker created. Connecting to MySQL...
+2026-11-06 09:17:52 [INFO] legion.module_2.main_core: [connect_to_mysql] Calling connect_mysql_from_log...
+2026-11-06 09:17:52 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Reading config from C:\Users\VDM\AppData\Local\MBC_Vision_Inspector\mysql_config.log
+2026-11-06 09:17:52 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Attempt 1/15: Connecting to MySQL (127.0.0.1:3306, user=root)...
+2026-11-06 09:17:52 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Success to connect mysql on attempt 1
+2026-11-06 09:17:52 [INFO] legion.module_2.main_core: [connect_to_mysql] connect_mysql_from_log returned: <mysql.connector.connection.MySQLConnection object at 0x00000297CFD0E480>
+2026-11-06 09:17:52 [INFO] legion.module_2.main_core: [connect_to_mysql] Creating default table...
+2026-11-06 09:17:52 [INFO] legion.module_2.main_core: [connect_to_mysql] Success to connect MySQL (Auto-login enabled)
+2026-11-06 09:17:52 [INFO] legion.module_2.main_core: [core.__init__] connect_to_mysql done. connect_result=<mysql.connector.connection.MySQLConnection object at 0x00000297CFD0E480>
+2026-11-06 09:17:52 [INFO] legion.module_2.main_core: Success to initialize connections
+2026-11-06 09:17:52 [INFO] legion.module_2.main_core: [core.__init__] init_plc_data...
+2026-11-06 09:17:52 [INFO] legion.module_2.main_core: PLC Simulation via Log Mode ACTIVE [indirect_from_log=True] for KEYENCE (192.168.42.37:8501)
+2026-11-06 09:17:52 [INFO] legion.module_2.main_core: [core.__init__] Connecting trigger signal...
+2026-11-06 09:17:52 [INFO] legion.module_2.main_core: [core.__init__] collect_dict_item...
+2026-11-06 09:17:52 [INFO] legion.module_2.main_core: Mode Automatic Login in MySQL (Optimized)
+2026-11-06 09:17:52 [INFO] legion.module_2.main_core: Successfully loaded items from 1 databases
+2026-11-06 09:17:52 [INFO] legion.module_2.main_core: [core.__init__] reload_system_action_configs...
+2026-11-06 09:17:52 [INFO] legion.module_2.main_core: System action configs reloaded successfully: ['RESTART', 'CLOSE']
+2026-11-06 09:17:52 [INFO] legion.module_2.main_core: [core.__init__] DONE
+2026-11-06 09:18:15 [INFO] legion.module_2.main_core: Success to check hardware key
+2026-11-06 09:18:15 [INFO] legion.module_2.main_core: Success to start monitoring
+2026-11-06 09:18:15 [INFO] legion.module_2.main_core: [CoreWorker] Running in thread: Dummy-7
+2026-11-06 09:18:15 [INFO] legion.module_2.main_core: Auto-restoring from last saved state: 50-E22AA-A, tbnq_plate_b (saved at 2026-11-04 13:27:52)
+2026-11-06 09:18:15 [INFO] legion.module_2.hardware_key_guard: HardwareKeyGuard đã khởi động. Tần số quét định kỳ: 180 - 300 giây (3-5 phút).
+2026-11-06 09:18:16 [INFO] legion.module_3.main_thread: Khởi động Legion Vision App - ItemCode: 50-E22AA-A
+2026-11-06 09:18:16 [INFO] legion.module_3.main_core: Select database: tbnq_plate_b
+2026-11-06 09:18:16 [INFO] legion.module_3.main_core: Get item code id: 50-E22AA-A
+2026-11-06 09:18:16 [INFO] legion.module_3.main_core: Get camera records for item code: 1
+2026-11-06 09:18:16 [INFO] legion.module_3.main_thread: Found 3 cameras for item code: 50-E22AA-A
+2026-11-06 09:18:16 [INFO] legion.module_3.main_core: Get models for camera: 1
+2026-11-06 09:18:16 [INFO] legion.module_3.main_core: Get models for camera: 2
+2026-11-06 09:18:16 [INFO] legion.module_3.main_core: Get models for camera: 3
+2026-11-06 09:18:16 [INFO] legion.module_3.main_thread: Setting up camera: 1 (ID: 1)
+2026-11-06 09:18:16 [INFO] legion.module_3.main_core: Get models for camera: 1
+2026-11-06 09:18:16 [INFO] legion.module_3.main_thread: Found 5 models for camera 1
+2026-11-06 09:18:16 [INFO] legion.module_3.handle_option_models: Loaded 1 active geometric tasks for key_model=('camera-1', 'model-1') (camera_id=1, model_id=1)
+2026-11-06 09:18:16 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-11-06 09:18:16 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-06 09:18:16 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-06 09:18:16 [INFO] legion.module_3.handle_option_models: Loaded 0 active geometric tasks for key_model=('camera-1', 'model-2') (camera_id=1, model_id=2)
+2026-11-06 09:18:16 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-11-06 09:18:16 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-06 09:18:16 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-06 09:18:16 [INFO] legion.module_3.handle_option_models: Loaded 0 active geometric tasks for key_model=('camera-1', 'model-3') (camera_id=1, model_id=3)
+2026-11-06 09:18:16 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-11-06 09:18:16 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-06 09:18:16 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-06 09:18:16 [INFO] legion.module_3.handle_option_models: Loaded 0 active geometric tasks for key_model=('camera-1', 'model-4') (camera_id=1, model_id=4)
+2026-11-06 09:18:16 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-11-06 09:18:16 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-06 09:18:16 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-06 09:18:16 [INFO] legion.module_3.handle_option_models: Loaded 0 active geometric tasks for key_model=('camera-1', 'model-5') (camera_id=1, model_id=5)
+2026-11-06 09:18:16 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-11-06 09:18:17 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-06 09:18:17 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-06 09:18:17 [INFO] legion.module_3.main_core: [get_camera_program_signals] Camera 1: Tín hiệu 'run' không được tích 'Kích hoạt' (is_enabled=False) -> Bỏ qua
+2026-11-06 09:18:17 [INFO] legion.module_3.main_core: [get_camera_program_signals] Camera 1: Tín hiệu 'busy' không được tích 'Kích hoạt' (is_enabled=False) -> Bỏ qua
+2026-11-06 09:18:17 [WARNING] legion.module_3.main_core: [auto_initial_device] Camera 1: Không tìm thấy tín hiệu PLC nào để gửi. Hãy thiết lập Program Signal Ready hoặc MODE_AUTO.
+2026-11-06 09:18:17 [INFO] legion.module_3.main_core: [Camera 1] Lần thử 1: Đang kết nối (USB - DB2254099)...
+2026-11-06 09:18:17 [WARNING] legion.module_3.main_core: [Camera 1] ❌ Lần thử 1 thất bại: cannot access local variable 'chModelName' where it is not associated with a value
+2026-11-06 09:18:17 [INFO] legion.module_3.main_core: [Camera 1] Thử lại sau 1 giây...
+2026-11-06 09:18:18 [INFO] legion.module_3.main_core: [Camera 1] Lần thử 2: Đang kết nối (USB - DB2254099)...
+2026-11-06 09:18:19 [WARNING] legion.module_3.main_core: [Camera 1] ❌ Lần thử 2 thất bại: cannot access local variable 'chModelName' where it is not associated with a value
+2026-11-06 09:18:19 [INFO] legion.module_3.main_core: [Camera 1] Thử lại sau 1 giây...
+2026-11-06 09:18:20 [INFO] legion.module_3.main_core: [Camera 1] Lần thử 3: Đang kết nối (USB - DB2254099)...
+2026-11-06 09:18:20 [WARNING] legion.module_3.main_core: [Camera 1] ❌ Lần thử 3 thất bại: cannot access local variable 'chModelName' where it is not associated with a value
+2026-11-06 09:18:20 [INFO] legion.module_3.main_core: [Camera 1] Thử lại sau 1 giây...
+2026-11-06 09:18:21 [ERROR] legion.module_3.main_core: [Camera 1] Kết nối thất bại sau 3 lần thử!
+2026-11-06 09:18:21 [INFO] legion.module_3.main_core: [ContinuousPLCSignalsWorker] Luồng gửi tín hiệu PLC liên tục (ready, run, busy) đã bắt đầu.
+2026-11-06 09:18:21 [INFO] legion.module_6.keyence.initial: [+] Kết nối tới Keyence PLC 192.168.42.37:8501 qua pymcprotocol
+2026-11-06 09:18:24 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.37:8501 (Attempt 1/3) -> timed out
+2026-11-06 09:18:28 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.37:8501 (Attempt 2/3) -> timed out
+2026-11-06 09:18:32 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.37:8501 (Attempt 3/3) -> timed out
+2026-11-06 09:18:32 [ERROR] legion.module_6.keyence.initial: Connection failed after 3 attempts to Keyence PLC 192.168.42.37:8501
+2026-11-06 09:18:32 [INFO] legion.module_3.main_thread: Camera 1 initialization completed
+2026-11-06 09:18:32 [INFO] legion.module_3.main_thread: Setting up camera: 2 (ID: 2)
+2026-11-06 09:18:32 [INFO] legion.module_3.main_core: Get models for camera: 2
+2026-11-06 09:18:32 [INFO] legion.module_3.main_thread: Found 4 models for camera 2
+2026-11-06 09:18:32 [INFO] legion.module_3.handle_option_models: Loaded 0 active geometric tasks for key_model=('camera-2', 'model-1') (camera_id=2, model_id=1)
+2026-11-06 09:18:32 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-11-06 09:18:32 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-06 09:18:32 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-06 09:18:32 [INFO] legion.module_3.handle_option_models: Loaded 0 active geometric tasks for key_model=('camera-2', 'model-2') (camera_id=2, model_id=2)
+2026-11-06 09:18:32 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-11-06 09:18:32 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-06 09:18:32 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-06 09:18:32 [INFO] legion.module_3.handle_option_models: Loaded 0 active geometric tasks for key_model=('camera-2', 'model-3') (camera_id=2, model_id=3)
+2026-11-06 09:18:32 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-11-06 09:18:32 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-06 09:18:32 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-06 09:18:32 [INFO] legion.module_3.handle_option_models: Loaded 0 active geometric tasks for key_model=('camera-2', 'model-4') (camera_id=2, model_id=4)
+2026-11-06 09:18:32 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-11-06 09:18:32 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-06 09:18:32 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-06 09:18:33 [INFO] legion.module_3.main_core: [get_camera_program_signals] Camera 2: Tín hiệu 'ready' không được tích 'Kích hoạt' (is_enabled=False) -> Bỏ qua
+2026-11-06 09:18:33 [INFO] legion.module_3.main_core: [get_camera_program_signals] Camera 2: Tín hiệu 'run' không được tích 'Kích hoạt' (is_enabled=False) -> Bỏ qua
+2026-11-06 09:18:33 [INFO] legion.module_3.main_core: [get_camera_program_signals] Camera 2: Tín hiệu 'busy' không được tích 'Kích hoạt' (is_enabled=False) -> Bỏ qua
+2026-11-06 09:18:33 [WARNING] legion.module_3.main_core: [auto_initial_device] Camera 2: Không tìm thấy tín hiệu PLC nào để gửi. Hãy thiết lập Program Signal Ready hoặc MODE_AUTO.
+2026-11-06 09:18:33 [INFO] legion.module_3.main_core: [Camera 2] Lần thử 1: Đang kết nối (USB - DB2254101)...
+2026-11-06 09:18:33 [WARNING] legion.module_3.main_core: [Camera 2] ❌ Lần thử 1 thất bại: cannot access local variable 'chModelName' where it is not associated with a value
+2026-11-06 09:18:33 [INFO] legion.module_3.main_core: [Camera 2] Thử lại sau 1 giây...
+2026-11-06 09:18:34 [INFO] legion.module_3.main_core: [Camera 2] Lần thử 2: Đang kết nối (USB - DB2254101)...
+2026-11-06 09:18:34 [WARNING] legion.module_3.main_core: [Camera 2] ❌ Lần thử 2 thất bại: cannot access local variable 'chModelName' where it is not associated with a value
+2026-11-06 09:18:34 [INFO] legion.module_3.main_core: [Camera 2] Thử lại sau 1 giây...
+2026-11-06 09:18:35 [INFO] legion.module_3.main_core: [Camera 2] Lần thử 3: Đang kết nối (USB - DB2254101)...
+2026-11-06 09:18:35 [WARNING] legion.module_3.main_core: [Camera 2] ❌ Lần thử 3 thất bại: cannot access local variable 'chModelName' where it is not associated with a value
+2026-11-06 09:18:35 [INFO] legion.module_3.main_core: [Camera 2] Thử lại sau 1 giây...
+2026-11-06 09:18:36 [ERROR] legion.module_3.main_core: [Camera 2] Kết nối thất bại sau 3 lần thử!
+2026-11-06 09:18:36 [INFO] legion.module_6.keyence.initial: [+] Kết nối tới Keyence PLC 192.168.42.37:8501 qua pymcprotocol
+2026-11-06 09:18:39 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.37:8501 (Attempt 1/3) -> timed out
+2026-11-06 09:18:43 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.37:8501 (Attempt 2/3) -> timed out
+2026-11-06 09:18:47 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.37:8501 (Attempt 3/3) -> timed out
+2026-11-06 09:18:47 [ERROR] legion.module_6.keyence.initial: Connection failed after 3 attempts to Keyence PLC 192.168.42.37:8501
+2026-11-06 09:18:47 [INFO] legion.module_3.main_thread: Camera 2 initialization completed
+2026-11-06 09:18:47 [INFO] legion.module_3.main_thread: Setting up camera: 3 (ID: 3)
+2026-11-06 09:18:47 [INFO] legion.module_3.main_core: Get models for camera: 3
+2026-11-06 09:18:47 [INFO] legion.module_3.main_thread: Found 1 models for camera 3
+2026-11-06 09:18:47 [INFO] legion.module_3.handle_option_models: Loaded 0 active geometric tasks for key_model=('camera-3', 'model-1') (camera_id=3, model_id=1)
+2026-11-06 09:18:47 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\f478d481_best.pt' device='cpu'
+2026-11-06 09:18:47 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-06 09:18:47 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-06 09:18:48 [INFO] legion.module_3.main_core: [Camera 3] Lần thử 1: Đang kết nối (USB - DB2254102)...
+2026-11-06 09:18:48 [WARNING] legion.module_3.main_core: [Camera 3] ❌ Lần thử 1 thất bại: cannot access local variable 'chModelName' where it is not associated with a value
+2026-11-06 09:18:48 [INFO] legion.module_3.main_core: [Camera 3] Thử lại sau 1 giây...
+2026-11-06 09:18:49 [INFO] legion.module_3.main_core: [Camera 3] Lần thử 2: Đang kết nối (USB - DB2254102)...
+2026-11-06 09:18:49 [WARNING] legion.module_3.main_core: [Camera 3] ❌ Lần thử 2 thất bại: cannot access local variable 'chModelName' where it is not associated with a value
+2026-11-06 09:18:49 [INFO] legion.module_3.main_core: [Camera 3] Thử lại sau 1 giây...
+2026-11-06 09:18:50 [INFO] legion.module_3.main_core: [Camera 3] Lần thử 3: Đang kết nối (USB - DB2254102)...
+2026-11-06 09:18:50 [WARNING] legion.module_3.main_core: [Camera 3] ❌ Lần thử 3 thất bại: cannot access local variable 'chModelName' where it is not associated with a value
+2026-11-06 09:18:50 [INFO] legion.module_3.main_core: [Camera 3] Thử lại sau 1 giây...
+2026-11-06 09:18:51 [ERROR] legion.module_3.main_core: [Camera 3] Kết nối thất bại sau 3 lần thử!
+2026-11-06 09:18:51 [INFO] legion.module_6.keyence.initial: [+] Kết nối tới Keyence PLC 192.168.42.37:8501 qua pymcprotocol
+2026-11-06 09:18:54 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.37:8501 (Attempt 1/3) -> timed out
+2026-11-06 09:18:58 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.37:8501 (Attempt 2/3) -> timed out
+2026-11-06 09:19:02 [WARNING] legion.module_6.keyence.initial: Cannot connect to PLC 192.168.42.37:8501 (Attempt 3/3) -> timed out
+2026-11-06 09:19:02 [ERROR] legion.module_6.keyence.initial: Connection failed after 3 attempts to Keyence PLC 192.168.42.37:8501
+2026-11-06 09:19:02 [INFO] legion.module_3.main_thread: Camera 3 initialization completed
+2026-11-06 09:19:02 [INFO] legion.module_3.main_core: [PLCHandler] Trigger cache updated (target_camera=ALL, count=3)
+2026-11-06 09:19:02 [INFO] legion.module_3.main_core: [PLCHandler] Updated dict_signal_complete (target_camera=ALL)
+2026-11-06 09:19:02 [INFO] legion.module_3.main_core: [PLCWorkerModeAuto1] Running in thread: Dummy-8
+2026-11-06 09:22:42 [INFO] legion.module_2.main_core: Success to check hardware key
+2026-11-06 09:27:29 [INFO] legion.module_2.main_core: Success to check hardware key
+2026-11-06 09:31:30 [INFO] legion.module_2.main_core: Success to check hardware key
+2026-11-06 09:34:38 [INFO] legion.module_2.main_core: Success to check hardware key
+2026-11-06 09:39:05 [INFO] legion.module_2.main_core: Success to check hardware key
+2026-11-06 09:42:36 [INFO] legion.module_2.main_core: Success to check hardware key
