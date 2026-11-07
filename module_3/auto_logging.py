@@ -9,7 +9,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+from module_1.root_path import resource_path
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -40,7 +40,7 @@ class Ui_MainWindow(object):
         self.vlayout_left.setObjectName("vlayout_left")
         self.groupBox_item = QtWidgets.QGroupBox(self.frame_2)
         font = QtGui.QFont()
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_item.setFont(font)
@@ -85,32 +85,62 @@ class Ui_MainWindow(object):
         self.comboBox_item_code.setObjectName("comboBox_item_code")
         self.hlayout_item_code.addWidget(self.comboBox_item_code)
         self.pushButton_set_load = QtWidgets.QPushButton(self.groupBox_item)
-        self.pushButton_set_load.setMinimumSize(QtCore.QSize(0, 30))
-        self.pushButton_set_load.setMaximumSize(QtCore.QSize(100, 16777215))
+        self.pushButton_set_load.setMinimumSize(QtCore.QSize(50, 40))
+        self.pushButton_set_load.setMaximumSize(QtCore.QSize(60, 16777215))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.pushButton_set_load.setFont(font)
-        self.pushButton_set_load.setStyleSheet("QPushButton { background-color:#0067c0; color:white; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#005ba1; }")
+        self.pushButton_set_load.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
+        self.pushButton_set_load.setText("")
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/upload.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_set_load.setIcon(icon)
+        self.pushButton_set_load.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_set_load.setObjectName("pushButton_set_load")
         self.hlayout_item_code.addWidget(self.pushButton_set_load)
         self.pushButton_set_save = QtWidgets.QPushButton(self.groupBox_item)
-        self.pushButton_set_save.setMinimumSize(QtCore.QSize(0, 30))
-        self.pushButton_set_save.setMaximumSize(QtCore.QSize(100, 16777215))
+        self.pushButton_set_save.setMinimumSize(QtCore.QSize(50, 40))
+        self.pushButton_set_save.setMaximumSize(QtCore.QSize(60, 16777215))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.pushButton_set_save.setFont(font)
-        self.pushButton_set_save.setStyleSheet("QPushButton { background-color:#0067c0; color:white; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#005ba1; }")
+        self.pushButton_set_save.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
+        self.pushButton_set_save.setText("")
+        icon1 = QtGui.QIcon()
+        icon1.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/save_mirror.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_set_save.setIcon(icon1)
+        self.pushButton_set_save.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_set_save.setObjectName("pushButton_set_save")
         self.hlayout_item_code.addWidget(self.pushButton_set_save)
         self.vlayout_item.addLayout(self.hlayout_item_code)
         self.vlayout_left.addWidget(self.groupBox_item)
         self.groupBox_path = QtWidgets.QGroupBox(self.frame_2)
         font = QtGui.QFont()
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_path.setFont(font)
@@ -155,28 +185,58 @@ class Ui_MainWindow(object):
         self.lineEdit_folder_path.setObjectName("lineEdit_folder_path")
         self.hlayout_folder.addWidget(self.lineEdit_folder_path)
         self.pushButton_broswer_folder = QtWidgets.QPushButton(self.groupBox_path)
-        self.pushButton_broswer_folder.setMinimumSize(QtCore.QSize(100, 30))
+        self.pushButton_broswer_folder.setMinimumSize(QtCore.QSize(60, 40))
         font = QtGui.QFont()
         font.setPointSize(10)
         self.pushButton_broswer_folder.setFont(font)
-        self.pushButton_broswer_folder.setStyleSheet("QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }")
+        self.pushButton_broswer_folder.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
+        self.pushButton_broswer_folder.setText("")
+        icon2 = QtGui.QIcon()
+        icon2.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/folder1.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_broswer_folder.setIcon(icon2)
+        self.pushButton_broswer_folder.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_broswer_folder.setObjectName("pushButton_broswer_folder")
         self.hlayout_folder.addWidget(self.pushButton_broswer_folder)
         self.pushButton_import = QtWidgets.QPushButton(self.groupBox_path)
-        self.pushButton_import.setMinimumSize(QtCore.QSize(100, 30))
+        self.pushButton_import.setMinimumSize(QtCore.QSize(60, 40))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.pushButton_import.setFont(font)
-        self.pushButton_import.setStyleSheet("QPushButton { background-color:#0067c0; color:white; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#005ba1; }")
+        self.pushButton_import.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
+        self.pushButton_import.setText("")
+        icon3 = QtGui.QIcon()
+        icon3.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/file-importqq.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_import.setIcon(icon3)
+        self.pushButton_import.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_import.setObjectName("pushButton_import")
         self.hlayout_folder.addWidget(self.pushButton_import)
         self.vlayout_path.addLayout(self.hlayout_folder)
         self.vlayout_left.addWidget(self.groupBox_path)
         self.groupBox_preview = QtWidgets.QGroupBox(self.frame_2)
         font = QtGui.QFont()
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_preview.setFont(font)
@@ -267,6 +327,32 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(10)
         self.tableWidget.setFont(font)
+        self.tableWidget.setStyleSheet("QTableWidget::item:selected {\n"
+"    background-color: #DCE8FF;\n"
+"    color: #1F2937;\n"
+"}\n"
+" \n"
+"QHeaderView::section {\n"
+"    background-color: #F1F4F9;\n"
+"    color: #374151;\n"
+"    padding: 8px;\n"
+"    border: none;\n"
+"    border-right: 1px solid #E5E9F0;\n"
+"    border-bottom: 1px solid #D9DEE7;\n"
+"    font-weight: bold;\n"
+"}\n"
+" \n"
+"/* Ô nhập khi nhấp đúp: rộng, chữ lớn, viền xanh rõ ràng */\n"
+"QTableWidget QLineEdit {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #111827;\n"
+"    border: 2px solid #2563EB;\n"
+"    padding: 0px 6px;\n"
+"    font-size: 16px;\n"
+"    font-weight: bold;\n"
+"    selection-background-color: #2563EB;\n"
+"    selection-color: #FFFFFF;\n"
+"}")
         self.tableWidget.setAlternatingRowColors(True)
         self.tableWidget.setGridStyle(QtCore.Qt.DashLine)
         self.tableWidget.setRowCount(1)
@@ -274,30 +360,84 @@ class Ui_MainWindow(object):
         self.tableWidget.setColumnCount(9)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget.setHorizontalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget.setHorizontalHeaderItem(1, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget.setHorizontalHeaderItem(2, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget.setHorizontalHeaderItem(3, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget.setHorizontalHeaderItem(4, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget.setHorizontalHeaderItem(5, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget.setHorizontalHeaderItem(6, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget.setHorizontalHeaderItem(7, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget.setHorizontalHeaderItem(8, item)
         self.tableWidget.horizontalHeader().setCascadingSectionResizes(True)
         self.tableWidget.horizontalHeader().setDefaultSectionSize(150)
@@ -329,12 +469,12 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "Auto Logging"))
         self.groupBox_item.setTitle(_translate("MainWindow", "Item Configuration"))
         self.label_2.setText(_translate("MainWindow", "Item Code:"))
-        self.pushButton_set_load.setText(_translate("MainWindow", "Set Load"))
-        self.pushButton_set_save.setText(_translate("MainWindow", "Set Save"))
+        self.pushButton_set_load.setToolTip(_translate("MainWindow", "Load Setting"))
+        self.pushButton_set_save.setToolTip(_translate("MainWindow", "Save Setting"))
         self.groupBox_path.setTitle(_translate("MainWindow", "Path to Image Logging"))
         self.label_3.setText(_translate("MainWindow", "Folder Path:"))
-        self.pushButton_broswer_folder.setText(_translate("MainWindow", "Browser"))
-        self.pushButton_import.setText(_translate("MainWindow", "Import"))
+        self.pushButton_broswer_folder.setToolTip(_translate("MainWindow", "Broswer"))
+        self.pushButton_import.setToolTip(_translate("MainWindow", "Import Data"))
         self.groupBox_preview.setTitle(_translate("MainWindow", "Image Preview"))
         self.label_image_prev.setText(_translate("MainWindow", "IMAGE PREVIEW"))
         self.pushButton_advanced_option.setText(_translate("MainWindow", "Advanced Options"))

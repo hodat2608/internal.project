@@ -659,7 +659,7 @@ class CameraOperation:
     #             nConvertSize = stOutFrame.stFrameInfo.nWidth * stOutFrame.stFrameInfo.nHeight
     #         elif self.IsImageColor(stOutFrame.stFrameInfo.enPixelType) == 'color':
     #             # print("color!")
-    #             stConvertParam.enDstPixelType = PixelType_Gvsp_BGR8_Packed  # opecv要用BGR，不能使用RGB
+    #             stConvertParam.enDstPixelType = PixelType_Gvsp_RGB8_Packed  # opecv要用BGR，不能使用RGB
     #             nConvertSize = stOutFrame.stFrameInfo.nWidth * stOutFrame.stFrameInfo.nHeight * 3
     #         else:
     #             print("not support!!!")

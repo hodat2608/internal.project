@@ -390,6 +390,7 @@ class AutoLoggingProcess:
         if result_image_rgb is None:
             _log.error("Lỗi đọc ảnh: %s", file_path)
             return
+        result_image_rgb = cv2.cvtColor(result_image_rgb, cv2.COLOR_BGR2RGB)
         
         self.target_width = self.ui_logging.label_image_prev.width()
         self.target_height = self.ui_logging.label_image_prev.height()

@@ -1498,7 +1498,6 @@ class PLCHandler:
                     return
 
                 plc_tasks = []
-                # Không phân biệt có giá trị hay không, ghi tất cả các thanh ghi đã setup (cả OK và NG)
                 if all_registers:
                     _log.info('[%s] Registers to write (OK/NG): %s', key, all_registers)
                     if isinstance(all_registers, dict):
@@ -1507,8 +1506,6 @@ class PLCHandler:
                     else:
                         for reg in all_registers:
                             plc_tasks.append((reg, 1))
-
-                # Chỉ khi tất cả các label đều OK trong suốt chu kỳ thì mới gửi thêm tín hiệu reset_sig
                 if is_all_ok and reset_sig:
                     _log.info(f'Send Reset Signal OK {reset_sig}')
                     plc_tasks.append((reset_sig.get('reg'), int(reset_sig.get('on', 1))))
@@ -1628,6 +1625,8 @@ class PLCHandler:
             raw_image = os.path.join(folder_path, random_image_name) 
                 
         raw_image = cv2.imread(raw_image)
+        if raw_image is not None:
+            raw_image = cv2.cvtColor(raw_image, cv2.COLOR_BGR2RGB)
 
         try:
             model_processor = self.processor.dict_processors.get(key_model)
@@ -1709,6 +1708,7 @@ class PLCHandler:
         device = values.get('device')
         if not device:
             _log.error('[handle_result_mode_geji][%s] device is None', key)
+            self._reset_counter(key)
             self._warn("Cảnh báo", "Kiểm tra kết nối thiết bị Camera")
             return
 
@@ -1719,12 +1719,14 @@ class PLCHandler:
 
         if pyuic is None:
             _log.error('[handle_result_mode_geji][%s] pyuic missing for key_model=%s', key, key_model)
+            self._reset_counter(key)
             return
 
         try:
             raw_image_rgb = device.Retrieve_Image_Buffer()
         except Exception:
             _log.exception('[handle_result_mode_geji][%s] Retrieve_Image_Buffer failed', key)
+            self._reset_counter(key)
             return
         # CẢNH BÁO LỖI LUỒNG: KHÔNG ĐƯỢC CHẠY get_value_from_table() Ở ĐÂY VÌ ĐANG Ở BACKGROUND THREAD.
         # Chúng ta chỉ lấy biến dict đã được lưu trữ sẵn từ Main Thread.
@@ -1736,6 +1738,7 @@ class PLCHandler:
             img, check, dict_data = obj.run(raw_image_rgb)
         except Exception:
             _log.exception('[handle_result_mode_geji][%s] KiemGuong.run failed', key)
+            self._reset_counter(key)
             return
 
         result_img = img
@@ -1747,13 +1750,42 @@ class PLCHandler:
                 reset_ok_sig = self._resolve_signal(key, 'component')
                 complete_sig = self._resolve_signal(key, 'completed')
         except KeyError:
-            _log.exception('[handle_result_mode_geji][%s] Missing signal config', key)
-            return
+            _log.exception('[handle_result_mode_geji][%s] Missing signal config in dict_signal_complete', key)
+            reset_ok_sig = None
+            complete_sig = None
 
-        if reset_ok_sig:
-            self._safe_write_plc(str(reset_ok_sig['reg']), int(reset_ok_sig['on']))
-        if complete_sig:
-            self._safe_write_plc(str(complete_sig['reg']), int(complete_sig['on']))
+        plc_tasks = []
+
+        # 1. Tín hiệu Component / Result (OK hoặc NG)
+        if reset_ok_sig and reset_ok_sig.get('reg'):
+            reg_target = str(reset_ok_sig['reg']).strip()
+            if flag:
+                # Trường hợp ĐẠT (OK): Gửi giá trị ON (mặc định 1)
+                val_on = reset_ok_sig.get('on', 1)
+                try:
+                    plc_tasks.append((reg_target, int(val_on)))
+                except (ValueError, TypeError):
+                    plc_tasks.append((reg_target, 1))
+            else:
+                # Trường hợp LỖI (NG): Kiểm tra xem có cấu hình giá trị OFF hợp lệ không
+                val_off = reset_ok_sig.get('off')
+                if val_off is not None and str(val_off).strip() != "" and str(val_off).strip().lower() not in ('none', 'no value'):
+                    try:
+                        plc_tasks.append((reg_target, int(val_off)))
+                    except (ValueError, TypeError):
+                        pass
+
+        # 2. Tín hiệu Hoàn thành Chu kỳ (Complete Signal) - Luôn gửi sau cùng
+        if complete_sig and complete_sig.get('reg'):
+            val_comp = complete_sig.get('on', 1)
+            try:
+                plc_tasks.append((str(complete_sig['reg']).strip(), int(val_comp)))
+            except (ValueError, TypeError):
+                plc_tasks.append((str(complete_sig['reg']).strip(), 1))
+
+        # 3. Gửi danh sách task PLC tuần tự an toàn (Component -> Complete)
+        if plc_tasks:
+            self._dispatch_plc_writes(plc_tasks)
 
         list_register = []
         elapsed       = (time.perf_counter() - start_time) * 1000
@@ -1762,7 +1794,6 @@ class PLCHandler:
             [(key_model, pyuic, result_img, flag, list_register, "Mirror (Use Mirror Model)")],
             f"⏱️: {elapsed:.2f} ms",
         )
-
 
     # -----------------------------------------------------------------------
     # auto_logging_ui
@@ -1778,7 +1809,6 @@ class PLCHandler:
         if not hasattr(self, 'register_table_logging') or not isinstance(self.register_table_logging, dict):
             self.register_table_logging = {}
 
-        # Dọn dẹp các cấu hình cũ của key này để tránh duplicate khi gọi lại hàm
         for reg in list(self.register_table_logging.keys()):
             self.register_table_logging[reg] = [
                 item for item in self.register_table_logging[reg] if item.get('key') != key
@@ -1835,72 +1865,120 @@ class PLCHandler:
                 continue
             
             for data_info in list_configs:
+                raw_target = data_info.get('value_on', data_info.get('value', 1))
                 try:
-                    target_val = int(data_info.get('value_on', data_info.get('value', 1)))
-                    value_off = int(data_info.get('value_off', 0))
+                    target_val = int(raw_target)
                 except (ValueError, TypeError):
                     continue
 
+                raw_off = data_info.get('value_off')
+                value_off = None
+                if raw_off is not None and str(raw_off).strip() != "" and str(raw_off).strip().lower() not in ('none', 'no value'):
+                    try:
+                        value_off = int(raw_off)
+                    except (ValueError, TypeError):
+                        value_off = None
+
                 if plc_val == target_val:
                     key = data_info['key']
-                    if self._flag_logging[key]:
-                        continue  # Already logging for this key
+                    if self._flag_logging.get(key, False):
+                        continue
                     self._flag_logging[key] = True
 
                     try:
                         start_time = time.perf_counter()
                         values = data_info['values']
-                        camera        = key.removeprefix('built-in-')
+                        camera = key.removeprefix('built-in-')
                         key_model = (data_info['selected_camera'], data_info['selected_model'])
                         path = data_info['path_image']
-                        model_loader  = values.get('model_loader', {}).get(key_model)
-                        pyuic         = values.get('pyuic', {}).get(key_model) 
+                        model_loader = values.get('model_loader', {}).get(key_model)
+                        pyuic = values.get('pyuic', {}).get(key_model)
                         current_count = 1
-                        
-                        #kiểm tra xem đường dãn có tồn tại không
+
                         if not os.path.exists(path):
                             _log.error('[%s] Đường dẫn không tồn tại: %s', key, path)
                             continue
 
                         if not pyuic:
-                            _log.error('[%s] pyuic is None', key)
+                            _log.error('[%s] pyuic is None for key_model=%s', key, key_model)
                             continue
                         
                         if not model_loader:
-                            _log.error('[%s] model_loader is None', key)
+                            _log.error('[%s] model_loader is None for key_model=%s', key, key_model)
                             continue
 
-                        _log.info('[%s] handle_image_logging — processing %s images', key, path)
+                        _log.info('[%s] handle_auto_logging_process_image — processing image: %s', key, path)
                         raw_image = cv2.imread(path)
                         if raw_image is None:
                             _log.error('[%s] cv2.imread returned None for: %s', key, path)
                             continue
 
-                        # raw_image = cv2.cvtColor(raw_image, cv2.COLOR_BGR2RGB)
+                        raw_image = cv2.cvtColor(raw_image, cv2.COLOR_BGR2RGB)
 
-                        result_img, flag, list_register,_ = self.processor.processor.process_image_func(
-                            raw_image, model_loader, pyuic, camera, key_model, current_count,
-                        )
-                        elapsed     = (time.perf_counter() - start_time) * 1000
-
-                        self._accumulate_registers(key, list_register or [])
-                        all_registers = self._pop_registers(key)
-
-                        if all_registers:
-                            _log.info('[%s] NG registers: %s', key, all_registers)
-                            if isinstance(all_registers, dict):
-                                for reg, val in all_registers.items():
-                                    if reg and str(reg).strip():
-                                        self._safe_write_plc(str(reg).strip(), val)
+                        model_processor = self.processor.dict_processors.get(key_model) if (self.processor and hasattr(self.processor, 'dict_processors')) else None
+                        if not model_processor or not getattr(model_processor, 'process_image_func', None):
+                            proc = getattr(self.processor, 'processor', self.processor)
+                            if hasattr(proc, 'process_image_func'):
+                                model_processor = proc
                             else:
-                                for reg in all_registers:
-                                    if reg and str(reg).strip():
-                                        self._safe_write_plc(str(reg).strip(), 1)
+                                _log.error('[%s] process_image_func is missing for key_model=%s', key, key_model)
+                                continue
 
-                        self._safe_write_plc(register, value_off)
+                        try:
+                            res_process = model_processor.process_image_func(raw_image, model_loader, pyuic, camera, key_model)
+                            if len(res_process) >= 5:
+                                result_img, flag, list_register, logo_text, cfg_rows = res_process[:5]
+                            else:
+                                result_img, flag, list_register, logo_text = res_process[:4]
+                                cfg_rows = getattr(pyuic, '_cached_model_config', [])
+                        except Exception:
+                            _log.exception('[%s] process_image_func failed for logging image %s', key, path)
+                            continue
+
+                        elapsed = (time.perf_counter() - start_time) * 1000
+                        self._init_cfg_registers(key, cfg_rows, 1)
+                        try:
+                            with self._signal_rwlock.read():
+                                comp_sig  = self._resolve_signal(key, 'completed')
+                                reset_sig = self._resolve_signal(key, 'component')
+                        except KeyError:
+                            _log.exception('[handle_auto_logging][%s] Missing signal config in dict_signal_complete', key)
+                            comp_sig = None
+                            reset_sig = None
+
+                        plc_tasks = []
+        
+                        if list_register:
+                            _log.info('[%s] Logging registers to write (OK/NG): %s', key, list_register)
+                            if isinstance(list_register, dict):
+                                for reg_addr, reg_val in list_register.items():
+                                    plc_tasks.append((reg_addr, reg_val))
+                            else:
+                                for reg_addr in list_register:
+                                    plc_tasks.append((reg_addr, 1))
+
+                        if flag and reset_sig:
+                            _log.info('[%s] Send Reset Signal OK %s', key, reset_sig)
+                            plc_tasks.append((reset_sig.get('reg'), int(reset_sig.get('on', 1))))
+
+                        if comp_sig:
+                            _log.info('[%s] Send Complete Signal %s', key, comp_sig)
+                            plc_tasks.append((comp_sig.get('reg'), int(comp_sig.get('on', 1))))
+
+                        if plc_tasks:
+                            self._dispatch_plc_writes(plc_tasks)
+
+                        if value_off is not None:
+                            try:
+                                self._safe_write_plc(str(register), int(value_off))
+                                _log.info('[%s] Đã tắt bit kích hoạt trigger logging %s -> %s (Handshake PLC OK)', key, register, value_off)
+                            except Exception as e:
+                                _log.error('[%s] Lỗi khi tắt trigger logging %s -> %s: %s', key, register, value_off, e)
+                        else:
+                            _log.debug('[%s] Không cấu hình value_off cho %s, bỏ qua tắt bit trigger', key, register)
 
                         self.signals.update_display.emit(
-                            [(key_model, pyuic, result_img, flag, list_register, "Logging (Model Representation Mapping)")],
+                            [(key_model, pyuic, result_img, flag, list_register, logo_text or "Logging (Model Representation Mapping)")],
                             f"⏱️: {elapsed:.2f} ms",
                         )
 
@@ -1908,20 +1986,6 @@ class PLCHandler:
                             _log.info('[%s] NG detected for image: %s', key, path)
                     finally:
                         self._flag_logging[key] = False
-                    
-                    # NOTE: PLC write PHẢI ngoài read-lock để tránh deadlock
-                    try:
-                        with self._signal_rwlock.read():
-                            reset_ok_sig = self._resolve_signal(key, 'component')
-                            complete_sig = self._resolve_signal(key, 'completed')
-                    except KeyError:
-                        _log.exception('[handle_result_mode_logging][%s] Missing signal config', key)
-                        return
-
-                    if reset_ok_sig:
-                        self._safe_write_plc(str(reset_ok_sig['reg']), int(reset_ok_sig['on']))
-                    if complete_sig:
-                        self._safe_write_plc(str(complete_sig['reg']), int(complete_sig['on']))
 
 
     # -----------------------------------------------------------------------
@@ -2236,7 +2300,6 @@ class CameraTabManager:
 
         cam_key = str(camera_id).strip()
         if cam_key not in self.camera_colors:
-            # Danh sách các tone màu hơi trầm nhã nhặn, dịu mắt, không quá nổi bật nhưng phân biệt rõ ràng giữa các camera
             palette = [
                 {"bg": "#CAD2DA", "border": "#364554"},  # Xanh xám thép (Slate Blue)
                 {"bg": "#CAD4CB", "border": "#354A3A"},  # Xanh rêu xám (Sage Green)
@@ -2254,7 +2317,6 @@ class CameraTabManager:
             if not available:
                 available = palette
 
-            # Ưu tiên gán màu cố định theo camera_id để nhất quán và phân biệt tối ưu giữa các camera
             try:
                 digits = ''.join(filter(str.isdigit, cam_key))
                 if digits:

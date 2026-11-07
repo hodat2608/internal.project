@@ -51,7 +51,7 @@ class Ui_MainWindow(object):
         self.groupBox_camera_action = QtWidgets.QGroupBox(self.frame_2)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_camera_action.setFont(font)
@@ -87,11 +87,22 @@ class Ui_MainWindow(object):
         font.setBold(True)
         font.setWeight(75)
         self.pushButton_start_grab.setFont(font)
-        self.pushButton_start_grab.setStyleSheet("QPushButton { background-color:#0067c0; color:white; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#005ba1; }")
+        self.pushButton_start_grab.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
         self.pushButton_start_grab.setText("")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/play.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/play-button.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.pushButton_start_grab.setIcon(icon)
+        self.pushButton_start_grab.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_start_grab.setObjectName("pushButton_start_grab")
         self.hlayout_camera_action.addWidget(self.pushButton_start_grab)
         self.pushButton_stop_grab = QtWidgets.QPushButton(self.groupBox_camera_action)
@@ -100,11 +111,22 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.pushButton_stop_grab.setFont(font)
-        self.pushButton_stop_grab.setStyleSheet("QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }")
+        self.pushButton_stop_grab.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
         self.pushButton_stop_grab.setText("")
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/stop.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/stop-button_mirror.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.pushButton_stop_grab.setIcon(icon1)
+        self.pushButton_stop_grab.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_stop_grab.setObjectName("pushButton_stop_grab")
         self.hlayout_camera_action.addWidget(self.pushButton_stop_grab)
         self.pushButton_streaming = QtWidgets.QPushButton(self.groupBox_camera_action)
@@ -113,11 +135,22 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.pushButton_streaming.setFont(font)
-        self.pushButton_streaming.setStyleSheet("QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }")
+        self.pushButton_streaming.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
         self.pushButton_streaming.setText("")
         icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/stream.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon2.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/live-streaming.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.pushButton_streaming.setIcon(icon2)
+        self.pushButton_streaming.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_streaming.setObjectName("pushButton_streaming")
         self.hlayout_camera_action.addWidget(self.pushButton_streaming)
         self.pushButton_capture = QtWidgets.QPushButton(self.groupBox_camera_action)
@@ -126,18 +159,29 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.pushButton_capture.setFont(font)
-        self.pushButton_capture.setStyleSheet("QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }")
+        self.pushButton_capture.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
         self.pushButton_capture.setText("")
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/capture.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/capture_mirror.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.pushButton_capture.setIcon(icon3)
+        self.pushButton_capture.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_capture.setObjectName("pushButton_capture")
         self.hlayout_camera_action.addWidget(self.pushButton_capture)
         self.hlayout_top_row.addWidget(self.groupBox_camera_action)
         self.groupBox_image_path = QtWidgets.QGroupBox(self.frame_2)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_image_path.setFont(font)
@@ -171,18 +215,31 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.lineEdit_input_img_file.setFont(font)
+        self.lineEdit_input_img_file.setText("")
         self.lineEdit_input_img_file.setObjectName("lineEdit_input_img_file")
         self.horizontalLayout.addWidget(self.lineEdit_input_img_file)
         self.pushButton_broswer_file_img = QtWidgets.QPushButton(self.groupBox_image_path)
-        self.pushButton_broswer_file_img.setMinimumSize(QtCore.QSize(100, 35))
+        self.pushButton_broswer_file_img.setMinimumSize(QtCore.QSize(20, 20))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.pushButton_broswer_file_img.setFont(font)
-        self.pushButton_broswer_file_img.setStyleSheet("QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }")
+        self.pushButton_broswer_file_img.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
+        self.pushButton_broswer_file_img.setText("")
         icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/folder.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon4.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/folder1.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.pushButton_broswer_file_img.setIcon(icon4)
+        self.pushButton_broswer_file_img.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_broswer_file_img.setObjectName("pushButton_broswer_file_img")
         self.horizontalLayout.addWidget(self.pushButton_broswer_file_img)
         self.hlayout_top_row.addWidget(self.groupBox_image_path)
@@ -193,7 +250,7 @@ class Ui_MainWindow(object):
         self.groupBox_run_check = QtWidgets.QGroupBox(self.frame_2)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_run_check.setFont(font)
@@ -229,7 +286,22 @@ class Ui_MainWindow(object):
         font.setBold(True)
         font.setWeight(75)
         self.pushButton_run_check.setFont(font)
-        self.pushButton_run_check.setStyleSheet("QPushButton { background-color:#0067c0; color:white; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#005ba1; }")
+        self.pushButton_run_check.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
+        self.pushButton_run_check.setText("")
+        icon5 = QtGui.QIcon()
+        icon5.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/code11.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_run_check.setIcon(icon5)
+        self.pushButton_run_check.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_run_check.setObjectName("pushButton_run_check")
         self.horizontalLayout_2.addWidget(self.pushButton_run_check)
         self.pushButton_save_result = QtWidgets.QPushButton(self.groupBox_run_check)
@@ -238,11 +310,22 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.pushButton_save_result.setFont(font)
-        self.pushButton_save_result.setStyleSheet("QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }")
+        self.pushButton_save_result.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
         self.pushButton_save_result.setText("")
-        icon5 = QtGui.QIcon()
-        icon5.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/save-data1.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_save_result.setIcon(icon5)
+        icon6 = QtGui.QIcon()
+        icon6.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/save_mirror.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_save_result.setIcon(icon6)
+        self.pushButton_save_result.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_save_result.setObjectName("pushButton_save_result")
         self.horizontalLayout_2.addWidget(self.pushButton_save_result)
         self.pushButton_export_cfg = QtWidgets.QPushButton(self.groupBox_run_check)
@@ -251,11 +334,22 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.pushButton_export_cfg.setFont(font)
-        self.pushButton_export_cfg.setStyleSheet("QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }")
+        self.pushButton_export_cfg.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
         self.pushButton_export_cfg.setText("")
-        icon6 = QtGui.QIcon()
-        icon6.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/import-export.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_export_cfg.setIcon(icon6)
+        icon7 = QtGui.QIcon()
+        icon7.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/file-export.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_export_cfg.setIcon(icon7)
+        self.pushButton_export_cfg.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_export_cfg.setObjectName("pushButton_export_cfg")
         self.horizontalLayout_2.addWidget(self.pushButton_export_cfg)
         self.pushButton_import_cfg = QtWidgets.QPushButton(self.groupBox_run_check)
@@ -264,18 +358,29 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.pushButton_import_cfg.setFont(font)
-        self.pushButton_import_cfg.setStyleSheet("QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }")
+        self.pushButton_import_cfg.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
         self.pushButton_import_cfg.setText("")
-        icon7 = QtGui.QIcon()
-        icon7.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/file-import.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_import_cfg.setIcon(icon7)
+        icon8 = QtGui.QIcon()
+        icon8.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/file-importqq.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_import_cfg.setIcon(icon8)
+        self.pushButton_import_cfg.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_import_cfg.setObjectName("pushButton_import_cfg")
         self.horizontalLayout_2.addWidget(self.pushButton_import_cfg)
         self.hlayout_tools_row.addWidget(self.groupBox_run_check)
         self.groupBox_tools_draw = QtWidgets.QGroupBox(self.frame_2)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_tools_draw.setFont(font)
@@ -309,11 +414,22 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.pushButton_show_crossline.setFont(font)
-        self.pushButton_show_crossline.setStyleSheet("QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }")
+        self.pushButton_show_crossline.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
         self.pushButton_show_crossline.setText("")
-        icon8 = QtGui.QIcon()
-        icon8.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/aim.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_show_crossline.setIcon(icon8)
+        icon9 = QtGui.QIcon()
+        icon9.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/focus.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_show_crossline.setIcon(icon9)
+        self.pushButton_show_crossline.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_show_crossline.setObjectName("pushButton_show_crossline")
         self.horizontalLayout_6.addWidget(self.pushButton_show_crossline)
         self.pushButton_reset_cross = QtWidgets.QPushButton(self.groupBox_tools_draw)
@@ -322,11 +438,22 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.pushButton_reset_cross.setFont(font)
-        self.pushButton_reset_cross.setStyleSheet("QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }")
+        self.pushButton_reset_cross.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
         self.pushButton_reset_cross.setText("")
-        icon9 = QtGui.QIcon()
-        icon9.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/circular.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_reset_cross.setIcon(icon9)
+        icon10 = QtGui.QIcon()
+        icon10.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/undo.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_reset_cross.setIcon(icon10)
+        self.pushButton_reset_cross.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_reset_cross.setObjectName("pushButton_reset_cross")
         self.horizontalLayout_6.addWidget(self.pushButton_reset_cross)
         self.pushButton_drag_crossline = QtWidgets.QPushButton(self.groupBox_tools_draw)
@@ -335,11 +462,22 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.pushButton_drag_crossline.setFont(font)
-        self.pushButton_drag_crossline.setStyleSheet("QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }")
+        self.pushButton_drag_crossline.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
         self.pushButton_drag_crossline.setText("")
-        icon10 = QtGui.QIcon()
-        icon10.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/move.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_drag_crossline.setIcon(icon10)
+        icon11 = QtGui.QIcon()
+        icon11.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/move-selection.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_drag_crossline.setIcon(icon11)
+        self.pushButton_drag_crossline.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_drag_crossline.setObjectName("pushButton_drag_crossline")
         self.horizontalLayout_6.addWidget(self.pushButton_drag_crossline)
         self.pushButton_show_gridline = QtWidgets.QPushButton(self.groupBox_tools_draw)
@@ -348,11 +486,22 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.pushButton_show_gridline.setFont(font)
-        self.pushButton_show_gridline.setStyleSheet("QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }")
+        self.pushButton_show_gridline.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
         self.pushButton_show_gridline.setText("")
-        icon11 = QtGui.QIcon()
-        icon11.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/grid_line.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_show_gridline.setIcon(icon11)
+        icon12 = QtGui.QIcon()
+        icon12.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/grid.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_show_gridline.setIcon(icon12)
+        self.pushButton_show_gridline.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_show_gridline.setObjectName("pushButton_show_gridline")
         self.horizontalLayout_6.addWidget(self.pushButton_show_gridline)
         self.hlayout_tools_row.addWidget(self.groupBox_tools_draw)
@@ -361,7 +510,7 @@ class Ui_MainWindow(object):
         self.groupBox_3.setMinimumSize(QtCore.QSize(0, 200))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_3.setFont(font)
@@ -393,6 +542,32 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.tableWidget_center_mirror.setFont(font)
+        self.tableWidget_center_mirror.setStyleSheet("QTableWidget::item:selected {\n"
+"    background-color: #DCE8FF;\n"
+"    color: #1F2937;\n"
+"}\n"
+" \n"
+"QHeaderView::section {\n"
+"    background-color: #F1F4F9;\n"
+"    color: #374151;\n"
+"    padding: 8px;\n"
+"    border: none;\n"
+"    border-right: 1px solid #E5E9F0;\n"
+"    border-bottom: 1px solid #D9DEE7;\n"
+"    font-weight: bold;\n"
+"}\n"
+" \n"
+"/* Ô nhập khi nhấp đúp: rộng, chữ lớn, viền xanh rõ ràng */\n"
+"QTableWidget QLineEdit {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #111827;\n"
+"    border: 2px solid #2563EB;\n"
+"    padding: 0px 6px;\n"
+"    font-size: 16px;\n"
+"    font-weight: bold;\n"
+"    selection-background-color: #2563EB;\n"
+"    selection-color: #FFFFFF;\n"
+"}")
         self.tableWidget_center_mirror.setAlternatingRowColors(True)
         self.tableWidget_center_mirror.setGridStyle(QtCore.Qt.DashDotLine)
         self.tableWidget_center_mirror.setObjectName("tableWidget_center_mirror")
@@ -400,26 +575,80 @@ class Ui_MainWindow(object):
         self.tableWidget_center_mirror.setRowCount(5)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setVerticalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setVerticalHeaderItem(1, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setVerticalHeaderItem(2, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setVerticalHeaderItem(3, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setVerticalHeaderItem(4, item)
         item = QtWidgets.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setHorizontalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setHorizontalHeaderItem(1, item)
         item = QtWidgets.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setHorizontalHeaderItem(2, item)
         item = QtWidgets.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setHorizontalHeaderItem(3, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
@@ -496,7 +725,7 @@ class Ui_MainWindow(object):
         self.groupBox_4 = QtWidgets.QGroupBox(self.frame_2)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_4.setFont(font)
@@ -528,6 +757,32 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.tableWidget_iris.setFont(font)
+        self.tableWidget_iris.setStyleSheet("QTableWidget::item:selected {\n"
+"    background-color: #DCE8FF;\n"
+"    color: #1F2937;\n"
+"}\n"
+" \n"
+"QHeaderView::section {\n"
+"    background-color: #F1F4F9;\n"
+"    color: #374151;\n"
+"    padding: 8px;\n"
+"    border: none;\n"
+"    border-right: 1px solid #E5E9F0;\n"
+"    border-bottom: 1px solid #D9DEE7;\n"
+"    font-weight: bold;\n"
+"}\n"
+" \n"
+"/* Ô nhập khi nhấp đúp: rộng, chữ lớn, viền xanh rõ ràng */\n"
+"QTableWidget QLineEdit {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #111827;\n"
+"    border: 2px solid #2563EB;\n"
+"    padding: 0px 6px;\n"
+"    font-size: 16px;\n"
+"    font-weight: bold;\n"
+"    selection-background-color: #2563EB;\n"
+"    selection-color: #FFFFFF;\n"
+"}")
         self.tableWidget_iris.setAlternatingRowColors(True)
         self.tableWidget_iris.setGridStyle(QtCore.Qt.DashDotLine)
         self.tableWidget_iris.setObjectName("tableWidget_iris")
@@ -535,23 +790,71 @@ class Ui_MainWindow(object):
         self.tableWidget_iris.setRowCount(4)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_iris.setVerticalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_iris.setVerticalHeaderItem(1, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_iris.setVerticalHeaderItem(2, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_iris.setVerticalHeaderItem(3, item)
         item = QtWidgets.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_iris.setHorizontalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_iris.setHorizontalHeaderItem(1, item)
         item = QtWidgets.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_iris.setHorizontalHeaderItem(2, item)
         item = QtWidgets.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_iris.setHorizontalHeaderItem(3, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
@@ -607,7 +910,7 @@ class Ui_MainWindow(object):
         self.tableWidget_iris.horizontalHeader().setSortIndicatorShown(True)
         self.tableWidget_iris.horizontalHeader().setStretchLastSection(True)
         self.tableWidget_iris.verticalHeader().setCascadingSectionResizes(True)
-        self.tableWidget_iris.verticalHeader().setDefaultSectionSize(30)
+        self.tableWidget_iris.verticalHeader().setDefaultSectionSize(33)
         self.tableWidget_iris.verticalHeader().setMinimumSectionSize(30)
         self.tableWidget_iris.verticalHeader().setSortIndicatorShown(True)
         self.tableWidget_iris.verticalHeader().setStretchLastSection(True)
@@ -616,7 +919,7 @@ class Ui_MainWindow(object):
         self.groupBox_5 = QtWidgets.QGroupBox(self.frame_2)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_5.setFont(font)
@@ -648,26 +951,100 @@ class Ui_MainWindow(object):
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.tableWidget_focuss.setFont(font)
+        self.tableWidget_focuss.setStyleSheet("QTableWidget::item:selected {\n"
+"    background-color: #DCE8FF;\n"
+"    color: #1F2937;\n"
+"}\n"
+" \n"
+"QHeaderView::section {\n"
+"    background-color: #F1F4F9;\n"
+"    color: #374151;\n"
+"    padding: 8px;\n"
+"    border: none;\n"
+"    border-right: 1px solid #E5E9F0;\n"
+"    border-bottom: 1px solid #D9DEE7;\n"
+"    font-weight: bold;\n"
+"}\n"
+" \n"
+"/* Ô nhập khi nhấp đúp: rộng, chữ lớn, viền xanh rõ ràng */\n"
+"QTableWidget QLineEdit {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #111827;\n"
+"    border: 2px solid #2563EB;\n"
+"    padding: 0px 6px;\n"
+"    font-size: 16px;\n"
+"    font-weight: bold;\n"
+"    selection-background-color: #2563EB;\n"
+"    selection-color: #FFFFFF;\n"
+"}")
         self.tableWidget_focuss.setAlternatingRowColors(True)
         self.tableWidget_focuss.setGridStyle(QtCore.Qt.DashDotLine)
         self.tableWidget_focuss.setObjectName("tableWidget_focuss")
         self.tableWidget_focuss.setColumnCount(4)
         self.tableWidget_focuss.setRowCount(4)
         item = QtWidgets.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_focuss.setVerticalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_focuss.setVerticalHeaderItem(1, item)
         item = QtWidgets.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_focuss.setVerticalHeaderItem(2, item)
         item = QtWidgets.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_focuss.setVerticalHeaderItem(3, item)
         item = QtWidgets.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_focuss.setHorizontalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_focuss.setHorizontalHeaderItem(1, item)
         item = QtWidgets.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_focuss.setHorizontalHeaderItem(2, item)
         item = QtWidgets.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_focuss.setHorizontalHeaderItem(3, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
@@ -723,7 +1100,7 @@ class Ui_MainWindow(object):
         self.tableWidget_focuss.horizontalHeader().setSortIndicatorShown(True)
         self.tableWidget_focuss.horizontalHeader().setStretchLastSection(True)
         self.tableWidget_focuss.verticalHeader().setCascadingSectionResizes(True)
-        self.tableWidget_focuss.verticalHeader().setDefaultSectionSize(30)
+        self.tableWidget_focuss.verticalHeader().setDefaultSectionSize(33)
         self.tableWidget_focuss.verticalHeader().setMinimumSectionSize(30)
         self.tableWidget_focuss.verticalHeader().setSortIndicatorShown(True)
         self.tableWidget_focuss.verticalHeader().setStretchLastSection(True)
@@ -735,31 +1112,53 @@ class Ui_MainWindow(object):
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.hlayout_settings_btns.addItem(spacerItem)
         self.pushButton_load_setting = QtWidgets.QPushButton(self.frame_2)
-        self.pushButton_load_setting.setMinimumSize(QtCore.QSize(120, 35))
+        self.pushButton_load_setting.setMinimumSize(QtCore.QSize(60, 35))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.pushButton_load_setting.setFont(font)
-        self.pushButton_load_setting.setStyleSheet("QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }")
-        icon12 = QtGui.QIcon()
-        icon12.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/system-update (1).png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_load_setting.setIcon(icon12)
+        self.pushButton_load_setting.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
+        self.pushButton_load_setting.setText("")
+        icon13 = QtGui.QIcon()
+        icon13.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/upload.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_load_setting.setIcon(icon13)
+        self.pushButton_load_setting.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_load_setting.setObjectName("pushButton_load_setting")
         self.hlayout_settings_btns.addWidget(self.pushButton_load_setting)
         self.pushButton_appl_setting = QtWidgets.QPushButton(self.frame_2)
-        self.pushButton_appl_setting.setMinimumSize(QtCore.QSize(120, 35))
+        self.pushButton_appl_setting.setMinimumSize(QtCore.QSize(60, 35))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.pushButton_appl_setting.setFont(font)
-        self.pushButton_appl_setting.setStyleSheet("QPushButton { background-color:#0067c0; color:white; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#005ba1; }")
-        icon13 = QtGui.QIcon()
-        icon13.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/save-data.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_appl_setting.setIcon(icon13)
+        self.pushButton_appl_setting.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
+        self.pushButton_appl_setting.setText("")
+        self.pushButton_appl_setting.setIcon(icon6)
+        self.pushButton_appl_setting.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_appl_setting.setObjectName("pushButton_appl_setting")
         self.hlayout_settings_btns.addWidget(self.pushButton_appl_setting)
         self.vlayout_left.addLayout(self.hlayout_settings_btns)
@@ -777,7 +1176,7 @@ class Ui_MainWindow(object):
         self.groupBox_preview.setMaximumSize(QtCore.QSize(900, 900))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_preview.setFont(font)
@@ -848,12 +1247,22 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Mirror Tab"))
         self.groupBox_camera_action.setTitle(_translate("MainWindow", "Camera Action"))
+        self.pushButton_start_grab.setToolTip(_translate("MainWindow", "Start camera "))
+        self.pushButton_stop_grab.setToolTip(_translate("MainWindow", "Stop camera"))
+        self.pushButton_streaming.setToolTip(_translate("MainWindow", "Streaming"))
+        self.pushButton_capture.setToolTip(_translate("MainWindow", "Capture image"))
         self.groupBox_image_path.setTitle(_translate("MainWindow", "Image Path"))
-        self.lineEdit_input_img_file.setText(_translate("MainWindow", " /*.jpg, png, bmp, jpeg,..."))
-        self.pushButton_broswer_file_img.setText(_translate("MainWindow", "Browser File"))
+        self.lineEdit_input_img_file.setPlaceholderText(_translate("MainWindow", " /*.jpg, png, bmp, jpeg,..."))
         self.groupBox_run_check.setTitle(_translate("MainWindow", "Run Check Mirror"))
-        self.pushButton_run_check.setText(_translate("MainWindow", "Run"))
+        self.pushButton_run_check.setToolTip(_translate("MainWindow", "Run Check Mirror"))
+        self.pushButton_save_result.setToolTip(_translate("MainWindow", "Save config"))
+        self.pushButton_export_cfg.setToolTip(_translate("MainWindow", "Export config"))
+        self.pushButton_import_cfg.setToolTip(_translate("MainWindow", "Import config"))
         self.groupBox_tools_draw.setTitle(_translate("MainWindow", "Tools Draw Line"))
+        self.pushButton_show_crossline.setToolTip(_translate("MainWindow", "Show Cross Line"))
+        self.pushButton_reset_cross.setToolTip(_translate("MainWindow", "Reset Cross Line"))
+        self.pushButton_drag_crossline.setToolTip(_translate("MainWindow", "Drag Cross Line"))
+        self.pushButton_show_gridline.setToolTip(_translate("MainWindow", "Show Grid Line"))
         self.groupBox_3.setTitle(_translate("MainWindow", "Center Mirror Parameters"))
         self.tableWidget_center_mirror.setSortingEnabled(True)
         item = self.tableWidget_center_mirror.verticalHeaderItem(0)
@@ -883,7 +1292,7 @@ class Ui_MainWindow(object):
         item = self.tableWidget_center_mirror.item(0, 2)
         item.setText(_translate("MainWindow", "0"))
         item = self.tableWidget_center_mirror.item(0, 3)
-        item.setText(_translate("MainWindow", "N/A"))
+        item.setText(_translate("MainWindow", "#N/A"))
         item = self.tableWidget_center_mirror.item(1, 0)
         item.setText(_translate("MainWindow", "-"))
         item = self.tableWidget_center_mirror.item(1, 1)
@@ -891,7 +1300,7 @@ class Ui_MainWindow(object):
         item = self.tableWidget_center_mirror.item(1, 2)
         item.setText(_translate("MainWindow", "0"))
         item = self.tableWidget_center_mirror.item(1, 3)
-        item.setText(_translate("MainWindow", "N/A"))
+        item.setText(_translate("MainWindow", "#N/A"))
         item = self.tableWidget_center_mirror.item(2, 0)
         item.setText(_translate("MainWindow", "-"))
         item = self.tableWidget_center_mirror.item(2, 1)
@@ -899,7 +1308,7 @@ class Ui_MainWindow(object):
         item = self.tableWidget_center_mirror.item(2, 2)
         item.setText(_translate("MainWindow", "0"))
         item = self.tableWidget_center_mirror.item(2, 3)
-        item.setText(_translate("MainWindow", "N/A"))
+        item.setText(_translate("MainWindow", "#N/A"))
         item = self.tableWidget_center_mirror.item(3, 0)
         item.setText(_translate("MainWindow", "342"))
         item = self.tableWidget_center_mirror.item(3, 1)
@@ -944,7 +1353,7 @@ class Ui_MainWindow(object):
         item = self.tableWidget_iris.item(0, 2)
         item.setText(_translate("MainWindow", "0"))
         item = self.tableWidget_iris.item(0, 3)
-        item.setText(_translate("MainWindow", "N/A"))
+        item.setText(_translate("MainWindow", "#N/A"))
         item = self.tableWidget_iris.item(1, 0)
         item.setText(_translate("MainWindow", "-"))
         item = self.tableWidget_iris.item(1, 1)
@@ -952,7 +1361,7 @@ class Ui_MainWindow(object):
         item = self.tableWidget_iris.item(1, 2)
         item.setText(_translate("MainWindow", "0"))
         item = self.tableWidget_iris.item(1, 3)
-        item.setText(_translate("MainWindow", "N/A"))
+        item.setText(_translate("MainWindow", "#N/A"))
         item = self.tableWidget_iris.item(2, 0)
         item.setText(_translate("MainWindow", "-"))
         item = self.tableWidget_iris.item(2, 1)
@@ -960,7 +1369,7 @@ class Ui_MainWindow(object):
         item = self.tableWidget_iris.item(2, 2)
         item.setText(_translate("MainWindow", "0"))
         item = self.tableWidget_iris.item(2, 3)
-        item.setText(_translate("MainWindow", "N/A"))
+        item.setText(_translate("MainWindow", "#N/A"))
         item = self.tableWidget_iris.item(3, 0)
         item.setText(_translate("MainWindow", "-"))
         item = self.tableWidget_iris.item(3, 1)
@@ -968,7 +1377,7 @@ class Ui_MainWindow(object):
         item = self.tableWidget_iris.item(3, 2)
         item.setText(_translate("MainWindow", "0"))
         item = self.tableWidget_iris.item(3, 3)
-        item.setText(_translate("MainWindow", "N/A"))
+        item.setText(_translate("MainWindow", "#N/A"))
         self.tableWidget_iris.setSortingEnabled(__sortingEnabled)
         self.groupBox_5.setTitle(_translate("MainWindow", "Focus Parameters"))
         self.tableWidget_focuss.setSortingEnabled(True)
@@ -997,7 +1406,7 @@ class Ui_MainWindow(object):
         item = self.tableWidget_focuss.item(0, 2)
         item.setText(_translate("MainWindow", "0"))
         item = self.tableWidget_focuss.item(0, 3)
-        item.setText(_translate("MainWindow", "N/A"))
+        item.setText(_translate("MainWindow", "#N/A"))
         item = self.tableWidget_focuss.item(1, 0)
         item.setText(_translate("MainWindow", "-"))
         item = self.tableWidget_focuss.item(1, 1)
@@ -1005,7 +1414,7 @@ class Ui_MainWindow(object):
         item = self.tableWidget_focuss.item(1, 2)
         item.setText(_translate("MainWindow", "0"))
         item = self.tableWidget_focuss.item(1, 3)
-        item.setText(_translate("MainWindow", "N/A"))
+        item.setText(_translate("MainWindow", "#N/A"))
         item = self.tableWidget_focuss.item(2, 0)
         item.setText(_translate("MainWindow", "-"))
         item = self.tableWidget_focuss.item(2, 1)
@@ -1013,7 +1422,7 @@ class Ui_MainWindow(object):
         item = self.tableWidget_focuss.item(2, 2)
         item.setText(_translate("MainWindow", "0"))
         item = self.tableWidget_focuss.item(2, 3)
-        item.setText(_translate("MainWindow", "N/A"))
+        item.setText(_translate("MainWindow", "#N/A"))
         item = self.tableWidget_focuss.item(3, 0)
         item.setText(_translate("MainWindow", "-"))
         item = self.tableWidget_focuss.item(3, 1)
@@ -1021,10 +1430,10 @@ class Ui_MainWindow(object):
         item = self.tableWidget_focuss.item(3, 2)
         item.setText(_translate("MainWindow", "0"))
         item = self.tableWidget_focuss.item(3, 3)
-        item.setText(_translate("MainWindow", "N/A"))
+        item.setText(_translate("MainWindow", "#N/A"))
         self.tableWidget_focuss.setSortingEnabled(__sortingEnabled)
-        self.pushButton_load_setting.setText(_translate("MainWindow", "Load Setting"))
-        self.pushButton_appl_setting.setText(_translate("MainWindow", "Apply Settings"))
+        self.pushButton_load_setting.setToolTip(_translate("MainWindow", "Load Settings"))
+        self.pushButton_appl_setting.setToolTip(_translate("MainWindow", "Save Settings"))
         self.groupBox_preview.setTitle(_translate("MainWindow", "Image Preview"))
         self.label_display_image.setStyleSheet(_translate("MainWindow", "background-color: rgb(0, 0, 0); color: rgb(255, 255, 255); border-radius:4px;"))
         self.label_display_image.setText(_translate("MainWindow", "Display Image"))

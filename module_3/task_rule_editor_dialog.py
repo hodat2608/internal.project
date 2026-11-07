@@ -70,7 +70,7 @@ class VisualBoxCanvas(QtWidgets.QWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setMinimumHeight(500)
+        self.setMinimumHeight(400)
         self.setMouseTracking(True)
         
         self.label_1_name = "Đối Tượng 1 (Label A)"
@@ -479,6 +479,11 @@ class VisualBoxCanvas(QtWidgets.QWidget):
 
         # 4. HUD Banner hiển thị Pixel thời gian thực khi kéo to thu nhỏ hoặc di chuyển
         self._paint_hud_banner(painter, w)
+
+        # 5. Viền định hình Viewport CAD (Không tô nền đè lên nội dung)
+        painter.setBrush(Qt.NoBrush)
+        painter.setPen(QPen(QColor("#cbd5e1"), 1.5))
+        painter.drawRect(self.rect().adjusted(0, 0, -1, -1))
 
     def _paint_master_container(self, painter: QPainter, rect: QRectF, label_name: str):
         """Vẽ Vùng Chứa Master sang trọng với nét đứt high-tech và badge."""
@@ -919,80 +924,87 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         )
         self.setWindowState(Qt.WindowMaximized)
 
-        # CẤU HÌNH GIAO DIỆN CHUYÊN NGHIỆP - TƯƠNG PHẢN CAO, CHỮ TRẮNG RÕ RÀNG
+        # CẤU HÌNH GIAO DIỆN CHUYÊN NGHIỆP - TÔNG SÁNG TRẦM, ÊM DỊU & CHUẨN CÔNG NGHIỆP (SLATE THEME)
         self.setStyleSheet("""
             QDialog {
-                background-color: #1e1e2e;
-                color: #ffffff;
+                background-color: #f1f5f9;
+                color: #1e293b;
                 font-family: 'Segoe UI', Arial, sans-serif;
             }
             QGroupBox {
-                border: 1px solid #45475a;
+                background-color: #ffffff;
+                border: 1px solid #cbd5e1;
                 border-radius: 8px;
-                margin-top: 12px;
-                padding-top: 14px;
+                margin-top: 14px;
+                padding-top: 16px;
                 font-weight: bold;
-                color: #89b4fa;
+                font-size: 13px;
+                color: #0f172a;
             }
             QGroupBox::title {
                 subcontrol-origin: margin;
-                left: 12px;
-                padding: 0 6px;
+                subcontrol-position: top left;
+                left: 14px;
+                padding: 0 8px;
+                background-color: #ffffff;
+                color: #0f172a;
+                font-weight: bold;
             }
             QLabel {
-                color: #e2e8f0;
+                color: #334155;
                 font-size: 13px;
+                font-weight: 500;
             }
             QLineEdit, QSpinBox, QDoubleSpinBox {
-                background-color: #2a2b3d;
-                border: 1px solid #45475a;
-                border-radius: 5px;
+                background-color: #ffffff;
+                border: 1px solid #cbd5e1;
+                border-radius: 6px;
                 padding: 6px 10px;
-                color: #ffffff;
+                color: #0f172a;
                 font-size: 13px;
             }
-            QLineEdit:focus, QSpinBox:focus {
-                border: 1px solid #89b4fa;
-                background-color: #313244;
+            QLineEdit:focus, QSpinBox:focus, QDoubleSpinBox:focus {
+                border: 1.5px solid #2563eb;
+                background-color: #f8fafc;
             }
 
-            /* COMBOBOX CHUYÊN NGHIỆP: NỀN TỐI, CHỮ TRẮNG, HOVER KHÔNG BỊ TRẮNG XÓA */
+            /* COMBOBOX CHUYÊN NGHIỆP: NỀN TRẮNG SẠCH, CHỮ ĐẬM RÕ NÉT, HOVER/FOCUS XANH DỊU */
             QComboBox {
-                background-color: #2a2b3d;
-                border: 1px solid #45475a;
-                border-radius: 5px;
+                background-color: #ffffff;
+                border: 1px solid #cbd5e1;
+                border-radius: 6px;
                 padding: 6px 10px;
-                color: #ffffff;
+                color: #0f172a;
                 font-size: 13px;
                 font-weight: 500;
             }
             QComboBox:hover {
-                border: 1px solid #89b4fa;
-                background-color: #383a52;
-                color: #ffffff;
+                border: 1px solid #3b82f6;
+                background-color: #f8fafc;
+                color: #0f172a;
             }
             QComboBox:focus {
-                border: 1px solid #89b4fa;
-                background-color: #313244;
-                color: #ffffff;
+                border: 1.5px solid #2563eb;
+                background-color: #ffffff;
+                color: #0f172a;
             }
             QComboBox:editable {
-                background-color: #2a2b3d;
-                color: #ffffff;
+                background-color: #ffffff;
+                color: #0f172a;
             }
             QComboBox:editable:hover {
-                background-color: #383a52;
-                border: 1px solid #89b4fa;
-                color: #ffffff;
+                background-color: #f8fafc;
+                border: 1px solid #3b82f6;
+                color: #0f172a;
             }
             QComboBox:editable:focus {
-                background-color: #313244;
-                border: 1px solid #89b4fa;
-                color: #ffffff;
+                background-color: #ffffff;
+                border: 1.5px solid #2563eb;
+                color: #0f172a;
             }
             QComboBox QLineEdit {
                 background-color: transparent;
-                color: #ffffff;
+                color: #0f172a;
                 selection-background-color: #2563eb;
                 selection-color: #ffffff;
                 border: none;
@@ -1000,32 +1012,32 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
             }
             QComboBox QLineEdit:hover {
                 background-color: transparent;
-                color: #ffffff;
+                color: #0f172a;
             }
             QComboBox QLineEdit:focus {
                 background-color: transparent;
-                color: #ffffff;
+                color: #0f172a;
             }
             QComboBox::drop-down {
                 subcontrol-origin: padding;
                 subcontrol-position: top right;
                 width: 26px;
-                border-left: 1px solid #45475a;
-                background-color: #242535;
+                border-left: 1px solid #cbd5e1;
+                background-color: #f1f5f9;
                 border-top-right-radius: 5px;
                 border-bottom-right-radius: 5px;
             }
             QComboBox::down-arrow {
                 width: 0;
                 height: 0;
-                border-left: 5px solid transparent;
-                border-right: 5px solid transparent;
-                border-top: 6px solid #89b4fa;
+                border-left: 4px solid transparent;
+                border-right: 4px solid transparent;
+                border-top: 5px solid #475569;
             }
             QComboBox QAbstractItemView, QComboBox QListView {
-                background-color: #1e1e2e;
-                color: #ffffff;
-                border: 1px solid #585b70;
+                background-color: #ffffff;
+                color: #0f172a;
+                border: 1px solid #cbd5e1;
                 selection-background-color: #2563eb;
                 selection-color: #ffffff;
                 padding: 4px;
@@ -1034,12 +1046,13 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
             QComboBox QAbstractItemView::item, QComboBox QListView::item {
                 min-height: 28px;
                 padding: 4px 10px;
-                color: #ffffff;
+                color: #1e293b;
                 background-color: transparent;
+                border-radius: 4px;
             }
             QComboBox QAbstractItemView::item:hover, QComboBox QListView::item:hover {
-                background-color: #383a52;
-                color: #ffffff;
+                background-color: #e2e8f0;
+                color: #0f172a;
             }
             QComboBox QAbstractItemView::item:selected, QComboBox QListView::item:selected {
                 background-color: #2563eb;
@@ -1049,25 +1062,30 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
 
             /* CÁC NÚT THAO TÁC CƠ BẢN */
             QPushButton {
-                background-color: #334155;
-                color: #ffffff;
+                background-color: #f8fafc;
+                color: #334155;
                 font-family: 'Segoe UI', Arial, sans-serif;
                 font-size: 13px;
                 font-weight: bold;
                 border-radius: 6px;
-                border: 1px solid #475569;
+                border: 1px solid #cbd5e1;
                 padding: 7px 15px;
             }
             QPushButton:hover {
-                background-color: #475569;
-                color: #ffffff;
+                background-color: #e2e8f0;
+                color: #0f172a;
+                border-color: #94a3b8;
+            }
+            QPushButton:pressed {
+                background-color: #cbd5e1;
+                color: #0f172a;
             }
 
-            /* CÁC NÚT THAO TÁC NỔI BẬT: CHỮ TRẮNG 100%, NỀN MÀU RÕ RÀNG */
+            /* CÁC NÚT THAO TÁC NỔI BẬT: CHỮ TRẮNG TƯƠNG PHẢN CAO, NỀN MÀU RÕ RÀNG */
             QPushButton#btnSave {
                 background-color: #2563eb;
                 color: #ffffff;
-                border: 1px solid #3b82f6;
+                border: 1px solid #1d4ed8;
                 border-radius: 6px;
                 padding: 9px 24px;
                 font-weight: bold;
@@ -1075,7 +1093,7 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
             }
             QPushButton#btnSave:hover {
                 background-color: #1d4ed8;
-                border: 1px solid #60a5fa;
+                border: 1px solid #1e40af;
                 color: #ffffff;
             }
             QPushButton#btnSave:pressed {
@@ -1086,7 +1104,7 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
             QPushButton#btnAddRule {
                 background-color: #16a34a;
                 color: #ffffff;
-                border: 1px solid #22c55e;
+                border: 1px solid #15803d;
                 border-radius: 6px;
                 padding: 8px 18px;
                 font-weight: bold;
@@ -1094,37 +1112,37 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
             }
             QPushButton#btnAddRule:hover {
                 background-color: #15803d;
-                border: 1px solid #4ade80;
+                border: 1px solid #166534;
                 color: #ffffff;
             }
             QPushButton#btnAddRule:pressed {
-                background-color: #14532d;
+                background-color: #166534;
                 color: #ffffff;
             }
 
             QPushButton#btnUpdateRule {
-                background-color: #d97706;
+                background-color: #ea580c;
                 color: #ffffff;
-                border: 1px solid #f59e0b;
+                border: 1px solid #c2410c;
                 border-radius: 6px;
                 padding: 8px 18px;
                 font-weight: bold;
                 font-size: 13px;
             }
             QPushButton#btnUpdateRule:hover {
-                background-color: #b45309;
-                border: 1px solid #fbbf24;
+                background-color: #c2410c;
+                border: 1px solid #9a3412;
                 color: #ffffff;
             }
             QPushButton#btnUpdateRule:pressed {
-                background-color: #92400e;
+                background-color: #9a3412;
                 color: #ffffff;
             }
 
             QPushButton#btnDeleteRule {
                 background-color: #dc2626;
                 color: #ffffff;
-                border: 1px solid #ef4444;
+                border: 1px solid #b91c1c;
                 border-radius: 6px;
                 padding: 9px 20px;
                 font-weight: bold;
@@ -1132,7 +1150,7 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
             }
             QPushButton#btnDeleteRule:hover {
                 background-color: #b91c1c;
-                border: 1px solid #f87171;
+                border: 1px solid #991b1b;
                 color: #ffffff;
             }
             QPushButton#btnDeleteRule:pressed {
@@ -1141,53 +1159,60 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
             }
 
             QPushButton#btnCancel {
-                background-color: #475569;
-                color: #ffffff;
-                border: 1px solid #64748b;
+                background-color: #ffffff;
+                color: #475569;
+                border: 1px solid #cbd5e1;
                 border-radius: 6px;
                 padding: 9px 20px;
                 font-weight: bold;
                 font-size: 13px;
             }
             QPushButton#btnCancel:hover {
-                background-color: #64748b;
-                color: #ffffff;
+                background-color: #f1f5f9;
+                color: #1e293b;
+                border-color: #94a3b8;
+            }
+            QPushButton#btnCancel:pressed {
+                background-color: #e2e8f0;
             }
 
             QPushButton#btnResetCanvas {
-                background-color: #334155;
-                color: #ffffff;
-                border: 1px solid #475569;
+                background-color: #ffffff;
+                color: #334155;
+                border: 1px solid #cbd5e1;
                 border-radius: 6px;
                 padding: 6px 14px;
                 font-weight: bold;
                 font-size: 12px;
             }
             QPushButton#btnResetCanvas:hover {
-                background-color: #475569;
-                border: 1px solid #89b4fa;
-                color: #ffffff;
+                background-color: #eff6ff;
+                border: 1px solid #3b82f6;
+                color: #1d4ed8;
+            }
+            QPushButton#btnResetCanvas:pressed {
+                background-color: #dbeafe;
             }
 
             /* BẢNG DANH SÁCH RULES */
             QTableWidget {
-                background-color: #181825;
-                alternate-background-color: #212234;
-                border: 1px solid #313244;
-                gridline-color: #313244;
-                color: #ffffff;
+                background-color: #ffffff;
+                alternate-background-color: #f8fafc;
+                border: 1px solid #cbd5e1;
+                gridline-color: #e2e8f0;
+                color: #0f172a;
                 border-radius: 6px;
                 selection-background-color: #2563eb;
                 selection-color: #ffffff;
             }
             QTableWidget::item {
-                color: #ffffff;
+                color: #0f172a;
                 padding: 6px;
-                border-bottom: 1px solid #262738;
+                border-bottom: 1px solid #e2e8f0;
             }
             QTableWidget::item:hover {
-                background-color: #383a52;
-                color: #ffffff;
+                background-color: #e0f2fe;
+                color: #0369a1;
             }
             QTableWidget::item:selected {
                 background-color: #2563eb;
@@ -1195,12 +1220,33 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
                 font-weight: bold;
             }
             QHeaderView::section {
-                background-color: #2b2c3d;
-                color: #89b4fa;
-                padding: 6px;
-                border: 1px solid #3b3d54;
+                background-color: #f1f5f9;
+                color: #1e293b;
+                padding: 7px;
+                border: 1px solid #cbd5e1;
                 font-weight: bold;
                 font-size: 12px;
+            }
+
+            /* THÔNG BÁO HỘP THOẠI MESSAGEBOX */
+            QMessageBox {
+                background-color: #f1f5f9;
+            }
+            QMessageBox QLabel {
+                color: #1e293b;
+                font-size: 13px;
+            }
+            QMessageBox QPushButton {
+                background-color: #ffffff;
+                color: #1e293b;
+                border: 1px solid #cbd5e1;
+                border-radius: 6px;
+                padding: 6px 18px;
+                font-size: 13px;
+                font-weight: bold;
+            }
+            QMessageBox QPushButton:hover {
+                background-color: #e2e8f0;
             }
         """)
 
@@ -1225,18 +1271,18 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
                 background-color: transparent;
             }
             QScrollBar:vertical {
-                background-color: #181825;
+                background-color: #f1f5f9;
                 width: 12px;
                 border-radius: 6px;
                 margin: 0px;
             }
             QScrollBar::handle:vertical {
-                background-color: #45475a;
+                background-color: #cbd5e1;
                 min-height: 30px;
                 border-radius: 6px;
             }
             QScrollBar::handle:vertical:hover {
-                background-color: #585b70;
+                background-color: #94a3b8;
             }
             QScrollBar::sub-line:vertical, QScrollBar::add-line:vertical {
                 height: 0px;
@@ -1252,7 +1298,7 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         content_layout.setContentsMargins(8, 8, 14, 8)
 
         # 1. GROUPBOX THÔNG TIN CHUNG TASK & PLC
-        group_task = QtWidgets.QGroupBox("1. Cấu hình Task & Tín hiệu PLC")
+        group_task = QtWidgets.QGroupBox("1. Cấu hình Task && Tín hiệu PLC")
         grid_task = QtWidgets.QGridLayout(group_task)
         grid_task.setSpacing(10)
 
@@ -1264,7 +1310,7 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
 
         self.chk_task_enabled = QtWidgets.QCheckBox("Kích hoạt [✓]")
         self.chk_task_enabled.setChecked(True)
-        self.chk_task_enabled.setStyleSheet("color: #a6e3a1; font-weight: bold;")
+        self.chk_task_enabled.setStyleSheet("color: #15803d; font-weight: bold;")
         task_name_box.addWidget(self.chk_task_enabled, 1)
         grid_task.addLayout(task_name_box, 0, 1)
 
@@ -1305,7 +1351,7 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         content_layout.addWidget(group_task)
 
         # 2. GROUPBOX MÔ HÌNH ĐỒ HỌA TRỰC QUAN & SOẠN THẢO LUẬT
-        group_rule = QtWidgets.QGroupBox("2. Bộ Soạn Thảo Luật & Mô Hình Đồ Họa Đa Đối Tượng (Interactive Canvas)")
+        group_rule = QtWidgets.QGroupBox("2. Bộ Soạn Thảo Luật && Mô Hình Đồ Họa Đa Đối Tượng (Interactive Canvas)")
         vlayout_rule = QtWidgets.QVBoxLayout(group_rule)
         vlayout_rule.setSpacing(10)
 
@@ -1328,18 +1374,21 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         self.btn_reset_canvas.setToolTip("Khôi phục vị trí mặc định theo khuôn mẫu mô hình đang chọn")
         self.btn_reset_canvas.setStyleSheet("""
             QPushButton#btnResetCanvas {
-                background-color: #334155;
-                color: #ffffff !important;
-                border: 1px solid #475569;
+                background-color: #ffffff;
+                color: #334155 !important;
+                border: 1px solid #cbd5e1;
                 border-radius: 6px;
                 padding: 7px 16px;
                 font-weight: bold;
                 font-size: 12px;
             }
             QPushButton#btnResetCanvas:hover {
-                background-color: #475569;
-                border: 1px solid #89b4fa;
-                color: #ffffff !important;
+                background-color: #eff6ff;
+                border: 1px solid #3b82f6;
+                color: #1d4ed8 !important;
+            }
+            QPushButton#btnResetCanvas:pressed {
+                background-color: #dbeafe;
             }
         """)
         self.btn_reset_canvas.clicked.connect(lambda: self.visual_canvas.reset_positions())
@@ -1357,7 +1406,7 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         vlayout_rule.addLayout(layout_scope)
 
         self.lbl_scope_hint = QtWidgets.QLabel()
-        self.lbl_scope_hint.setStyleSheet("color: #89b4fa; font-size: 12px; font-style: italic; margin-bottom: 2px;")
+        self.lbl_scope_hint.setStyleSheet("color: #2563eb; font-size: 12px; font-style: italic; margin-bottom: 2px;")
         self.lbl_scope_hint.setWordWrap(True)
         vlayout_rule.addWidget(self.lbl_scope_hint)
 
@@ -1370,9 +1419,9 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         expr_frame.setObjectName("exprFrame")
         expr_frame.setStyleSheet("""
             QFrame#exprFrame {
-                background-color: #181825;
-                border: 1px solid #313244;
-                border-radius: 6px;
+                background-color: #f8fafc;
+                border: 1px solid #cbd5e1;
+                border-radius: 8px;
                 padding: 8px;
             }
         """)
@@ -1434,7 +1483,7 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
             QPushButton#btnAddRule {
                 background-color: #16a34a;
                 color: #ffffff !important;
-                border: 1px solid #22c55e;
+                border: 1px solid #15803d;
                 border-radius: 6px;
                 padding: 8px 18px;
                 font-weight: bold;
@@ -1442,11 +1491,11 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
             }
             QPushButton#btnAddRule:hover {
                 background-color: #15803d;
-                border: 1px solid #4ade80;
+                border: 1px solid #166534;
                 color: #ffffff !important;
             }
             QPushButton#btnAddRule:pressed {
-                background-color: #14532d;
+                background-color: #166534;
                 color: #ffffff !important;
             }
         """)
@@ -1458,21 +1507,21 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         self.btn_update_rule.setCursor(QtGui.QCursor(Qt.PointingHandCursor))
         self.btn_update_rule.setStyleSheet("""
             QPushButton#btnUpdateRule {
-                background-color: #d97706;
+                background-color: #ea580c;
                 color: #ffffff !important;
-                border: 1px solid #f59e0b;
+                border: 1px solid #c2410c;
                 border-radius: 6px;
                 padding: 8px 18px;
                 font-weight: bold;
                 font-size: 13px;
             }
             QPushButton#btnUpdateRule:hover {
-                background-color: #b45309;
-                border: 1px solid #fbbf24;
+                background-color: #c2410c;
+                border: 1px solid #9a3412;
                 color: #ffffff !important;
             }
             QPushButton#btnUpdateRule:pressed {
-                background-color: #92400e;
+                background-color: #9a3412;
                 color: #ffffff !important;
             }
         """)
@@ -1484,7 +1533,7 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         content_layout.addWidget(group_rule)
 
         # 3. BẢNG DANH SÁCH RULES CỦA TASK
-        group_table = QtWidgets.QGroupBox("3. Danh sách các Quy Tắc (Rules) trong Task này (Nhấp vào dòng để chỉnh sửa & xem mô hình)")
+        group_table = QtWidgets.QGroupBox("3. Danh sách các Quy Tắc (Rules) trong Task này (Nhấp vào dòng để chỉnh sửa && xem mô hình)")
         vlayout_table = QtWidgets.QVBoxLayout(group_table)
 
         self.table_rules = QtWidgets.QTableWidget(0, 6)
@@ -1507,8 +1556,8 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         bottom_frame.setObjectName("bottomFrame")
         bottom_frame.setStyleSheet("""
             QFrame#bottomFrame {
-                background-color: #181825;
-                border-top: 1px solid #313244;
+                background-color: #e2e8f0;
+                border-top: 1px solid #cbd5e1;
                 border-radius: 6px;
                 padding: 6px;
             }
@@ -1523,7 +1572,7 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
             QPushButton#btnDeleteRule {
                 background-color: #dc2626;
                 color: #ffffff !important;
-                border: 1px solid #ef4444;
+                border: 1px solid #b91c1c;
                 border-radius: 6px;
                 padding: 9px 20px;
                 font-weight: bold;
@@ -1531,7 +1580,7 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
             }
             QPushButton#btnDeleteRule:hover {
                 background-color: #b91c1c;
-                border: 1px solid #f87171;
+                border: 1px solid #991b1b;
                 color: #ffffff !important;
             }
             QPushButton#btnDeleteRule:pressed {
@@ -1548,30 +1597,34 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         self.btn_cancel.setCursor(QtGui.QCursor(Qt.PointingHandCursor))
         self.btn_cancel.setStyleSheet("""
             QPushButton#btnCancel {
-                background-color: #475569;
-                color: #ffffff !important;
-                border: 1px solid #64748b;
+                background-color: #ffffff;
+                color: #475569 !important;
+                border: 1px solid #cbd5e1;
                 border-radius: 6px;
                 padding: 9px 22px;
                 font-weight: bold;
                 font-size: 13px;
             }
             QPushButton#btnCancel:hover {
-                background-color: #64748b;
-                color: #ffffff !important;
+                background-color: #f1f5f9;
+                color: #1e293b !important;
+                border-color: #94a3b8;
+            }
+            QPushButton#btnCancel:pressed {
+                background-color: #e2e8f0;
             }
         """)
         self.btn_cancel.clicked.connect(self.reject)
         layout_bottom.addWidget(self.btn_cancel)
 
-        self.btn_save = QtWidgets.QPushButton("💾 Lưu Task & Áp Dụng")
+        self.btn_save = QtWidgets.QPushButton("💾 Lưu Task && Áp Dụng")
         self.btn_save.setObjectName("btnSave")
         self.btn_save.setCursor(QtGui.QCursor(Qt.PointingHandCursor))
         self.btn_save.setStyleSheet("""
             QPushButton#btnSave {
                 background-color: #2563eb;
                 color: #ffffff !important;
-                border: 1px solid #3b82f6;
+                border: 1px solid #1d4ed8;
                 border-radius: 6px;
                 padding: 9px 26px;
                 font-weight: bold;
@@ -1579,7 +1632,7 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
             }
             QPushButton#btnSave:hover {
                 background-color: #1d4ed8;
-                border: 1px solid #60a5fa;
+                border: 1px solid #1e40af;
                 color: #ffffff !important;
             }
             QPushButton#btnSave:pressed {
@@ -1604,7 +1657,7 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         for ed_cb in (self.combo_label_1, self.combo_label_2):
             le = ed_cb.lineEdit()
             if le:
-                le.setStyleSheet("background-color: transparent; color: #ffffff; padding: 0px 4px; border: none;")
+                le.setStyleSheet("background-color: transparent; color: #0f172a; padding: 0px 4px; border: none;")
 
         # KẾT NỐI SIGNALS
         self.visual_canvas.hotspot_clicked.connect(self.on_canvas_hotspot_clicked)
@@ -1995,21 +2048,21 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         for row_idx, r in enumerate(self.rules_list):
             item_stt = QtWidgets.QTableWidgetItem(str(row_idx + 1))
             item_stt.setTextAlignment(Qt.AlignCenter)
-            item_stt.setForeground(QColor("#ffffff"))
+            item_stt.setForeground(QColor("#475569"))
             self.table_rules.setItem(row_idx, 0, item_stt)
 
             scope = r.get('instance_scope', '1_VS_1')
             scope_name = "1 vs 1"
-            scope_color = "#ffffff"
+            scope_color = "#334155"
             if scope == 'ALL_A_IN_ONE_B':
                 scope_name = "N vs 1 (Tập hợp A vs B)"
-                scope_color = "#89b4fa"
+                scope_color = "#0284c7"
             elif scope == 'ONE_A_IN_ANY_B':
                 scope_name = "1 vs N (1 A vs Các vùng B)"
-                scope_color = "#fab387"
+                scope_color = "#d97706"
             elif scope == 'ALL_A_VS_ALL_B':
                 scope_name = "N vs N (Tập hợp A vs B)"
-                scope_color = "#cba6f7"
+                scope_color = "#7c3aed"
             item_scope = QtWidgets.QTableWidgetItem(scope_name)
             item_scope.setTextAlignment(Qt.AlignCenter)
             item_scope.setForeground(QColor(scope_color))
@@ -2017,11 +2070,11 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
 
             desc = r.get('description') or f"{r.get('param_1', '')}({r.get('label_1', '')}) {r.get('operator', '')} {r.get('param_2', '')}({r.get('label_2', '')})"
             item_desc = QtWidgets.QTableWidgetItem(desc)
-            item_desc.setForeground(QColor("#ffffff"))
+            item_desc.setForeground(QColor("#0f172a"))
             self.table_rules.setItem(row_idx, 2, item_desc)
 
             item_lhs = QtWidgets.QTableWidgetItem(f"{r.get('label_1', '')} [{r.get('param_1', '')}]")
-            item_lhs.setForeground(QColor("#ffffff"))
+            item_lhs.setForeground(QColor("#1e293b"))
             self.table_rules.setItem(row_idx, 3, item_lhs)
 
             rhs_target = r.get('label_2', '') if r.get('target_type') == 'LABEL' else 'HẰNG SỐ'
@@ -2030,15 +2083,15 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
             if r.get('math_op') and r.get('math_op') != 'NONE':
                 rhs_info += f" {r.get('math_op')} {r.get('math_operand_val', '0')}"
             item_rhs = QtWidgets.QTableWidgetItem(rhs_info)
-            item_rhs.setForeground(QColor("#ffffff"))
+            item_rhs.setForeground(QColor("#1e293b"))
             self.table_rules.setItem(row_idx, 4, item_rhs)
 
             item_res = QtWidgets.QTableWidgetItem(f"Vi phạm ➔ {r.get('condition_true_result', 'NG')}")
             item_res.setTextAlignment(Qt.AlignCenter)
             if r.get('condition_true_result') == 'NG':
-                item_res.setForeground(QColor("#f38ba8"))
+                item_res.setForeground(QColor("#dc2626"))
             else:
-                item_res.setForeground(QColor("#a6e3a1"))
+                item_res.setForeground(QColor("#16a34a"))
             self.table_rules.setItem(row_idx, 5, item_res)
 
     def delete_selected_rule(self):

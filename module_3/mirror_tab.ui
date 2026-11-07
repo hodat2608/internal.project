@@ -160,15 +160,34 @@ QGroupBox::title {
                  <bold>true</bold>
                 </font>
                </property>
+               <property name="toolTip">
+                <string>Start camera </string>
+               </property>
                <property name="styleSheet">
-                <string notr="true">QPushButton { background-color:#0067c0; color:white; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#005ba1; }</string>
+                <string notr="true">QPushButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+}
+QPushButton:hover {
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
+}
+QPushButton:pressed {
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
+}</string>
                </property>
                <property name="text">
                 <string/>
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>assert/icon/play.png</normaloff>assert/icon/play.png</iconset>
+                 <normaloff>assert/icon/play-button.png</normaloff>assert/icon/play-button.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>25</width>
+                 <height>25</height>
+                </size>
                </property>
               </widget>
              </item>
@@ -186,15 +205,34 @@ QGroupBox::title {
                  <pointsize>10</pointsize>
                 </font>
                </property>
+               <property name="toolTip">
+                <string>Stop camera</string>
+               </property>
                <property name="styleSheet">
-                <string notr="true">QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }</string>
+                <string notr="true">QPushButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+}
+QPushButton:hover {
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
+}
+QPushButton:pressed {
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
+}</string>
                </property>
                <property name="text">
                 <string/>
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>assert/icon/stop.png</normaloff>assert/icon/stop.png</iconset>
+                 <normaloff>assert/icon/stop-button_mirror.png</normaloff>assert/icon/stop-button_mirror.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>25</width>
+                 <height>25</height>
+                </size>
                </property>
               </widget>
              </item>
@@ -212,15 +250,34 @@ QGroupBox::title {
                  <pointsize>10</pointsize>
                 </font>
                </property>
+               <property name="toolTip">
+                <string>Streaming</string>
+               </property>
                <property name="styleSheet">
-                <string notr="true">QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }</string>
+                <string notr="true">QPushButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+}
+QPushButton:hover {
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
+}
+QPushButton:pressed {
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
+}</string>
                </property>
                <property name="text">
                 <string/>
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>assert/icon/stream.png</normaloff>assert/icon/stream.png</iconset>
+                 <normaloff>assert/icon/live-streaming.png</normaloff>assert/icon/live-streaming.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>25</width>
+                 <height>25</height>
+                </size>
                </property>
               </widget>
              </item>
@@ -238,15 +295,34 @@ QGroupBox::title {
                  <pointsize>10</pointsize>
                 </font>
                </property>
+               <property name="toolTip">
+                <string>Capture image</string>
+               </property>
                <property name="styleSheet">
-                <string notr="true">QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }</string>
+                <string notr="true">QPushButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+}
+QPushButton:hover {
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
+}
+QPushButton:pressed {
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
+}</string>
                </property>
                <property name="text">
                 <string/>
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>assert/icon/capture.png</normaloff>assert/icon/capture.png</iconset>
+                 <normaloff>assert/icon/capture_mirror.png</normaloff>assert/icon/capture_mirror.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>25</width>
+                 <height>25</height>
+                </size>
                </property>
               </widget>
              </item>
@@ -318,6 +394,9 @@ QGroupBox::title {
                 </font>
                </property>
                <property name="text">
+                <string/>
+               </property>
+               <property name="placeholderText">
                 <string> /*.jpg, png, bmp, jpeg,...</string>
                </property>
               </widget>
@@ -326,8 +405,8 @@ QGroupBox::title {
               <widget class="QPushButton" name="pushButton_broswer_file_img">
                <property name="minimumSize">
                 <size>
-                 <width>100</width>
-                 <height>35</height>
+                 <width>20</width>
+                 <height>20</height>
                 </size>
                </property>
                <property name="font">
@@ -337,14 +416,30 @@ QGroupBox::title {
                 </font>
                </property>
                <property name="styleSheet">
-                <string notr="true">QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }</string>
+                <string notr="true">QPushButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+}
+QPushButton:hover {
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
+}
+QPushButton:pressed {
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
+}</string>
                </property>
                <property name="text">
-                <string>Browser File</string>
+                <string/>
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>assert/icon/folder.png</normaloff>assert/icon/folder.png</iconset>
+                 <normaloff>assert/icon/folder1.png</normaloff>assert/icon/folder1.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>25</width>
+                 <height>25</height>
+                </size>
                </property>
               </widget>
              </item>
@@ -424,11 +519,34 @@ QGroupBox::title {
                  <bold>true</bold>
                 </font>
                </property>
+               <property name="toolTip">
+                <string>Run Check Mirror</string>
+               </property>
                <property name="styleSheet">
-                <string notr="true">QPushButton { background-color:#0067c0; color:white; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#005ba1; }</string>
+                <string notr="true">QPushButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+}
+QPushButton:hover {
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
+}
+QPushButton:pressed {
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
+}</string>
                </property>
                <property name="text">
-                <string>Run</string>
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset>
+                 <normaloff>assert/icon/code11.png</normaloff>assert/icon/code11.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>25</width>
+                 <height>25</height>
+                </size>
                </property>
               </widget>
              </item>
@@ -446,15 +564,34 @@ QGroupBox::title {
                  <pointsize>10</pointsize>
                 </font>
                </property>
+               <property name="toolTip">
+                <string>Save config</string>
+               </property>
                <property name="styleSheet">
-                <string notr="true">QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }</string>
+                <string notr="true">QPushButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+}
+QPushButton:hover {
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
+}
+QPushButton:pressed {
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
+}</string>
                </property>
                <property name="text">
                 <string/>
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>assert/icon/save-data1.png</normaloff>assert/icon/save-data1.png</iconset>
+                 <normaloff>assert/icon/save_mirror.png</normaloff>assert/icon/save_mirror.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>25</width>
+                 <height>25</height>
+                </size>
                </property>
               </widget>
              </item>
@@ -472,15 +609,34 @@ QGroupBox::title {
                  <pointsize>10</pointsize>
                 </font>
                </property>
+               <property name="toolTip">
+                <string>Export config</string>
+               </property>
                <property name="styleSheet">
-                <string notr="true">QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }</string>
+                <string notr="true">QPushButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+}
+QPushButton:hover {
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
+}
+QPushButton:pressed {
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
+}</string>
                </property>
                <property name="text">
                 <string/>
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>assert/icon/import-export.png</normaloff>assert/icon/import-export.png</iconset>
+                 <normaloff>assert/icon/file-export.png</normaloff>assert/icon/file-export.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>25</width>
+                 <height>25</height>
+                </size>
                </property>
               </widget>
              </item>
@@ -498,15 +654,34 @@ QGroupBox::title {
                  <pointsize>10</pointsize>
                 </font>
                </property>
+               <property name="toolTip">
+                <string>Import config</string>
+               </property>
                <property name="styleSheet">
-                <string notr="true">QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }</string>
+                <string notr="true">QPushButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+}
+QPushButton:hover {
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
+}
+QPushButton:pressed {
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
+}</string>
                </property>
                <property name="text">
                 <string/>
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>assert/icon/file-import.png</normaloff>assert/icon/file-import.png</iconset>
+                 <normaloff>assert/icon/file-importqq.png</normaloff>assert/icon/file-importqq.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>25</width>
+                 <height>25</height>
+                </size>
                </property>
               </widget>
              </item>
@@ -577,15 +752,34 @@ QGroupBox::title {
                  <pointsize>10</pointsize>
                 </font>
                </property>
+               <property name="toolTip">
+                <string>Show Cross Line</string>
+               </property>
                <property name="styleSheet">
-                <string notr="true">QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }</string>
+                <string notr="true">QPushButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+}
+QPushButton:hover {
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
+}
+QPushButton:pressed {
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
+}</string>
                </property>
                <property name="text">
                 <string/>
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>assert/icon/aim.png</normaloff>assert/icon/aim.png</iconset>
+                 <normaloff>assert/icon/focus.png</normaloff>assert/icon/focus.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>25</width>
+                 <height>25</height>
+                </size>
                </property>
               </widget>
              </item>
@@ -603,15 +797,34 @@ QGroupBox::title {
                  <pointsize>10</pointsize>
                 </font>
                </property>
+               <property name="toolTip">
+                <string>Reset Cross Line</string>
+               </property>
                <property name="styleSheet">
-                <string notr="true">QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }</string>
+                <string notr="true">QPushButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+}
+QPushButton:hover {
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
+}
+QPushButton:pressed {
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
+}</string>
                </property>
                <property name="text">
                 <string/>
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>assert/icon/circular.png</normaloff>assert/icon/circular.png</iconset>
+                 <normaloff>assert/icon/undo.png</normaloff>assert/icon/undo.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>25</width>
+                 <height>25</height>
+                </size>
                </property>
               </widget>
              </item>
@@ -629,15 +842,34 @@ QGroupBox::title {
                  <pointsize>10</pointsize>
                 </font>
                </property>
+               <property name="toolTip">
+                <string>Drag Cross Line</string>
+               </property>
                <property name="styleSheet">
-                <string notr="true">QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }</string>
+                <string notr="true">QPushButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+}
+QPushButton:hover {
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
+}
+QPushButton:pressed {
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
+}</string>
                </property>
                <property name="text">
                 <string/>
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>assert/icon/move.png</normaloff>assert/icon/move.png</iconset>
+                 <normaloff>assert/icon/move-selection.png</normaloff>assert/icon/move-selection.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>25</width>
+                 <height>25</height>
+                </size>
                </property>
               </widget>
              </item>
@@ -655,15 +887,34 @@ QGroupBox::title {
                  <pointsize>10</pointsize>
                 </font>
                </property>
+               <property name="toolTip">
+                <string>Show Grid Line</string>
+               </property>
                <property name="styleSheet">
-                <string notr="true">QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }</string>
+                <string notr="true">QPushButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+}
+QPushButton:hover {
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
+}
+QPushButton:pressed {
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
+}</string>
                </property>
                <property name="text">
                 <string/>
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>assert/icon/grid_line.png</normaloff>assert/icon/grid_line.png</iconset>
+                 <normaloff>assert/icon/grid.png</normaloff>assert/icon/grid.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>25</width>
+                 <height>25</height>
+                </size>
                </property>
               </widget>
              </item>
@@ -733,6 +984,34 @@ QGroupBox::title {
                <pointsize>10</pointsize>
               </font>
              </property>
+             <property name="styleSheet">
+              <string notr="true">QTableWidget::item:selected {
+    background-color: #DCE8FF;
+    color: #1F2937;
+}
+ 
+QHeaderView::section {
+    background-color: #F1F4F9;
+    color: #374151;
+    padding: 8px;
+    border: none;
+    border-right: 1px solid #E5E9F0;
+    border-bottom: 1px solid #D9DEE7;
+    font-weight: bold;
+}
+ 
+/* Ô nhập khi nhấp đúp: rộng, chữ lớn, viền xanh rõ ràng */
+QTableWidget QLineEdit {
+    background-color: #FFFFFF;
+    color: #111827;
+    border: 2px solid #2563EB;
+    padding: 0px 6px;
+    font-size: 16px;
+    font-weight: bold;
+    selection-background-color: #2563EB;
+    selection-color: #FFFFFF;
+}</string>
+             </property>
              <property name="alternatingRowColors">
               <bool>true</bool>
              </property>
@@ -776,6 +1055,14 @@ QGroupBox::title {
               <property name="text">
                <string>Center x</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -783,6 +1070,14 @@ QGroupBox::title {
              <row>
               <property name="text">
                <string>Center y</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -792,6 +1087,14 @@ QGroupBox::title {
               <property name="text">
                <string>Circle Radius</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -799,6 +1102,14 @@ QGroupBox::title {
              <row>
               <property name="text">
                <string>Radius Ref</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -808,6 +1119,14 @@ QGroupBox::title {
               <property name="text">
                <string>Delta</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -816,20 +1135,52 @@ QGroupBox::title {
               <property name="text">
                <string>Result Values</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
              </column>
              <column>
               <property name="text">
                <string>Min</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
              </column>
              <column>
               <property name="text">
                <string>Max</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
              </column>
              <column>
               <property name="text">
                <string>Status</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
              </column>
              <item row="0" column="0">
@@ -858,7 +1209,7 @@ QGroupBox::title {
              </item>
              <item row="0" column="3">
               <property name="text">
-               <string>N/A</string>
+               <string>#N/A</string>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -890,7 +1241,7 @@ QGroupBox::title {
              </item>
              <item row="1" column="3">
               <property name="text">
-               <string>N/A</string>
+               <string>#N/A</string>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -922,7 +1273,7 @@ QGroupBox::title {
              </item>
              <item row="2" column="3">
               <property name="text">
-               <string>N/A</string>
+               <string>#N/A</string>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1052,6 +1403,34 @@ QGroupBox::title {
                <pointsize>10</pointsize>
               </font>
              </property>
+             <property name="styleSheet">
+              <string notr="true">QTableWidget::item:selected {
+    background-color: #DCE8FF;
+    color: #1F2937;
+}
+ 
+QHeaderView::section {
+    background-color: #F1F4F9;
+    color: #374151;
+    padding: 8px;
+    border: none;
+    border-right: 1px solid #E5E9F0;
+    border-bottom: 1px solid #D9DEE7;
+    font-weight: bold;
+}
+ 
+/* Ô nhập khi nhấp đúp: rộng, chữ lớn, viền xanh rõ ràng */
+QTableWidget QLineEdit {
+    background-color: #FFFFFF;
+    color: #111827;
+    border: 2px solid #2563EB;
+    padding: 0px 6px;
+    font-size: 16px;
+    font-weight: bold;
+    selection-background-color: #2563EB;
+    selection-color: #FFFFFF;
+}</string>
+             </property>
              <property name="alternatingRowColors">
               <bool>true</bool>
              </property>
@@ -1083,7 +1462,7 @@ QGroupBox::title {
               <number>30</number>
              </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
-              <number>30</number>
+              <number>33</number>
              </attribute>
              <attribute name="verticalHeaderShowSortIndicator" stdset="0">
               <bool>true</bool>
@@ -1095,6 +1474,14 @@ QGroupBox::title {
               <property name="text">
                <string>Iris 1</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -1102,6 +1489,14 @@ QGroupBox::title {
              <row>
               <property name="text">
                <string>Iris 2</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1111,6 +1506,14 @@ QGroupBox::title {
               <property name="text">
                <string>Iris 3</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -1118,6 +1521,14 @@ QGroupBox::title {
              <row>
               <property name="text">
                <string>Iris 4</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1127,20 +1538,52 @@ QGroupBox::title {
               <property name="text">
                <string>Result Values</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
              </column>
              <column>
               <property name="text">
                <string>Min</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
              </column>
              <column>
               <property name="text">
                <string>Max</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
              </column>
              <column>
               <property name="text">
                <string>Status</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
              </column>
              <item row="0" column="0">
@@ -1169,7 +1612,7 @@ QGroupBox::title {
              </item>
              <item row="0" column="3">
               <property name="text">
-               <string>N/A</string>
+               <string>#N/A</string>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1201,7 +1644,7 @@ QGroupBox::title {
              </item>
              <item row="1" column="3">
               <property name="text">
-               <string>N/A</string>
+               <string>#N/A</string>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1233,7 +1676,7 @@ QGroupBox::title {
              </item>
              <item row="2" column="3">
               <property name="text">
-               <string>N/A</string>
+               <string>#N/A</string>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1265,7 +1708,7 @@ QGroupBox::title {
              </item>
              <item row="3" column="3">
               <property name="text">
-               <string>N/A</string>
+               <string>#N/A</string>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1331,6 +1774,34 @@ QGroupBox::title {
                <pointsize>10</pointsize>
               </font>
              </property>
+             <property name="styleSheet">
+              <string notr="true">QTableWidget::item:selected {
+    background-color: #DCE8FF;
+    color: #1F2937;
+}
+ 
+QHeaderView::section {
+    background-color: #F1F4F9;
+    color: #374151;
+    padding: 8px;
+    border: none;
+    border-right: 1px solid #E5E9F0;
+    border-bottom: 1px solid #D9DEE7;
+    font-weight: bold;
+}
+ 
+/* Ô nhập khi nhấp đúp: rộng, chữ lớn, viền xanh rõ ràng */
+QTableWidget QLineEdit {
+    background-color: #FFFFFF;
+    color: #111827;
+    border: 2px solid #2563EB;
+    padding: 0px 6px;
+    font-size: 16px;
+    font-weight: bold;
+    selection-background-color: #2563EB;
+    selection-color: #FFFFFF;
+}</string>
+             </property>
              <property name="alternatingRowColors">
               <bool>true</bool>
              </property>
@@ -1362,7 +1833,7 @@ QGroupBox::title {
               <number>30</number>
              </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
-              <number>30</number>
+              <number>33</number>
              </attribute>
              <attribute name="verticalHeaderShowSortIndicator" stdset="0">
               <bool>true</bool>
@@ -1374,40 +1845,104 @@ QGroupBox::title {
               <property name="text">
                <string>Focus 1</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
              </row>
              <row>
               <property name="text">
                <string>Focus 2</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
              </row>
              <row>
               <property name="text">
                <string>Focus 3</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
              </row>
              <row>
               <property name="text">
                <string>Focus 4</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
              </row>
              <column>
               <property name="text">
                <string>Result Values</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
              </column>
              <column>
               <property name="text">
                <string>Min</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
              </column>
              <column>
               <property name="text">
                <string>Max</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
              </column>
              <column>
               <property name="text">
                <string>Status</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
              </column>
              <item row="0" column="0">
@@ -1436,7 +1971,7 @@ QGroupBox::title {
              </item>
              <item row="0" column="3">
               <property name="text">
-               <string>N/A</string>
+               <string>#N/A</string>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1468,7 +2003,7 @@ QGroupBox::title {
              </item>
              <item row="1" column="3">
               <property name="text">
-               <string>N/A</string>
+               <string>#N/A</string>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1500,7 +2035,7 @@ QGroupBox::title {
              </item>
              <item row="2" column="3">
               <property name="text">
-               <string>N/A</string>
+               <string>#N/A</string>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1532,7 +2067,7 @@ QGroupBox::title {
              </item>
              <item row="3" column="3">
               <property name="text">
-               <string>N/A</string>
+               <string>#N/A</string>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1570,7 +2105,7 @@ QGroupBox::title {
            <widget class="QPushButton" name="pushButton_load_setting">
             <property name="minimumSize">
              <size>
-              <width>120</width>
+              <width>60</width>
               <height>35</height>
              </size>
             </property>
@@ -1582,15 +2117,34 @@ QGroupBox::title {
               <bold>true</bold>
              </font>
             </property>
+            <property name="toolTip">
+             <string>Load Settings</string>
+            </property>
             <property name="styleSheet">
-             <string notr="true">QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }</string>
+             <string notr="true">QPushButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+}
+QPushButton:hover {
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
+}
+QPushButton:pressed {
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
+}</string>
             </property>
             <property name="text">
-             <string>Load Setting</string>
+             <string/>
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>assert/icon/system-update (1).png</normaloff>assert/icon/system-update (1).png</iconset>
+              <normaloff>assert/icon/upload.png</normaloff>assert/icon/upload.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>25</width>
+              <height>25</height>
+             </size>
             </property>
            </widget>
           </item>
@@ -1598,7 +2152,7 @@ QGroupBox::title {
            <widget class="QPushButton" name="pushButton_appl_setting">
             <property name="minimumSize">
              <size>
-              <width>120</width>
+              <width>60</width>
               <height>35</height>
              </size>
             </property>
@@ -1610,15 +2164,34 @@ QGroupBox::title {
               <bold>true</bold>
              </font>
             </property>
+            <property name="toolTip">
+             <string>Save Settings</string>
+            </property>
             <property name="styleSheet">
-             <string notr="true">QPushButton { background-color:#0067c0; color:white; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#005ba1; }</string>
+             <string notr="true">QPushButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+}
+QPushButton:hover {
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
+}
+QPushButton:pressed {
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
+}</string>
             </property>
             <property name="text">
-             <string>Apply Settings</string>
+             <string/>
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>assert/icon/save-data.png</normaloff>assert/icon/save-data.png</iconset>
+              <normaloff>assert/icon/save_mirror.png</normaloff>assert/icon/save_mirror.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>25</width>
+              <height>25</height>
+             </size>
             </property>
            </widget>
           </item>

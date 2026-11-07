@@ -184,6 +184,7 @@ class Ui_MainWindow(object):
         if result_image_rgb is None:
             _log.error("Lỗi đọc ảnh: %s", file_path)
             return
+        result_image_rgb = cv2.cvtColor(result_image_rgb, cv2.COLOR_BGR2RGB)
         
         self.target_width = self.label_display_image.width()
         self.target_height = self.label_display_image.height()

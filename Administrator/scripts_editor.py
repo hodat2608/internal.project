@@ -65,7 +65,7 @@ except Exception:
 # =========================================================================
 PY_KEYWORDS = list(keyword.kwlist)
 PY_BUILTINS = sorted(n for n in dir(builtins) if not n.startswith("_"))
-JUNK_DIRS = {"_internal", "__pycache__", "build", "dist", ".git", ".vscode", ".idea", "venv",
+JUNK_DIRS = {"__pycache__", "build", "dist", ".git", ".vscode", ".idea", "venv",
              ".venv", "node_modules", ".mypy_cache", ".pytest_cache", ".ide_backups"}
 TEXT_EXTS = (".py", ".pyw", ".json", ".txt", ".ini", ".cfg", ".toml", ".yaml", ".yml", ".md",
              ".csv", ".html", ".css", ".js", ".sql", ".bat", ".sh", ".qss", ".ui")
@@ -414,10 +414,25 @@ class CustomFileFilterProxyModel(QSortFilterProxyModel):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.show_all = False
+        self.current_root_path = ""
+
+    def set_root_path(self, path):
+        self.current_root_path = os.path.abspath(path).lower() if path else ""
+        self.invalidateFilter()
 
     def filterAcceptsRow(self, source_row, source_parent):
         model = self.sourceModel()
         index = model.index(source_row, 0, source_parent)
+        if not index.isValid():
+            return False
+
+        # QUAN TRỌNG: Bảo vệ thư mục root và các thư mục cha (ancestor)
+        # Tuyệt đối không bao giờ lọc bỏ để tránh mapFromSource trả về Invalid Index -> Qt hiển thị cả ổ C:\
+        if self.current_root_path:
+            file_path = os.path.abspath(model.filePath(index)).lower()
+            if file_path == self.current_root_path or self.current_root_path.startswith(file_path + os.sep):
+                return True
+
         file_name = model.fileName(index)
 
         if model.isDir(index):
@@ -1491,6 +1506,88 @@ class ConsolePanel(QWidget):
 
 
 # =========================================================================
+# PHÁT HIỆN THƯ MỤC CODE DỰ ÁN (PROJECT ROOT DISCOVERY)
+# =========================================================================
+def is_valid_project_root(path):
+    """Kiểm tra một thư mục có phải là project code gốc hợp lệ của phần mềm hay không."""
+    if not path or not os.path.isdir(path):
+        return False
+    signatures = ["module_3", "module_2", "module_1", "Administrator", "_source"]
+    return any(os.path.isdir(os.path.join(path, sig)) for sig in signatures)
+
+
+def find_project_root(preferred_path=None):
+    """
+    Tự động dò tìm thư mục code dự án gốc một cách thông minh và chính xác trên mọi môi trường:
+    - Khi chạy dev từ mã nguồn Python.
+    - Khi cài đặt trong C:\\Program Files\\MBC Vision Inspector\\internal\\...
+    - Khi đóng gói PyInstaller (_internal\\ hoặc internal\\).
+    """
+    candidates = []
+
+    if preferred_path and is_valid_project_root(preferred_path):
+        return os.path.abspath(preferred_path)
+
+    # 1. Thư mục cha của Administrator (nơi chứa scripts_editor.py)
+    try:
+        cand_self = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+        candidates.append(cand_self)
+    except Exception:
+        pass
+
+    # 2. Khi chạy ứng dụng đóng gói (.exe) hoặc từ sys.executable
+    try:
+        exe_dir = os.path.dirname(os.path.abspath(sys.executable))
+        candidates.append(os.path.join(exe_dir, "internal"))
+        candidates.append(os.path.join(exe_dir, "intenal"))
+        candidates.append(os.path.join(exe_dir, "_internal"))
+        candidates.append(exe_dir)
+        parent_exe = os.path.dirname(exe_dir)
+        candidates.append(os.path.join(parent_exe, "internal"))
+        candidates.append(os.path.join(parent_exe, "intenal"))
+        candidates.append(os.path.join(parent_exe, "_internal"))
+    except Exception:
+        pass
+
+    # 3. sys._MEIPASS (PyInstaller onefile runtime)
+    if hasattr(sys, "_MEIPASS"):
+        try:
+            candidates.append(os.path.abspath(sys._MEIPASS))
+        except Exception:
+            pass
+
+    # 4. Các đường dẫn cài đặt mặc định phổ biến của MBC Vision Inspector
+    for prog in [os.environ.get("ProgramFiles", r"C:\Program Files"),
+                 os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)")]:
+        if prog:
+            for folder_name in ["MBC Vision Inspector", "MBC Vision Inspectior", "MBC_Vision_Inspector"]:
+                for sub in ["internal", "intenal", "_internal", ""]:
+                    cand_p = os.path.join(prog, folder_name, sub) if sub else os.path.join(prog, folder_name)
+                    candidates.append(cand_p)
+
+    seen = set()
+    unique_candidates = []
+    for c in candidates:
+        if c:
+            norm = os.path.normpath(os.path.abspath(c))
+            if norm not in seen:
+                seen.add(norm)
+                unique_candidates.append(norm)
+
+    # Ưu tiên số 1: Thư mục tồn tại VÀ chứa signature của project code
+    for cand in unique_candidates:
+        if is_valid_project_root(cand):
+            return cand
+
+    # Ưu tiên số 2: Thư mục tồn tại trên ổ đĩa (tránh ổ gốc C:\, D:\)
+    for cand in unique_candidates:
+        if os.path.isdir(cand) and cand.lower() not in ["c:\\", "c:", "d:\\", "d:"]:
+            return cand
+
+    return os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+
+
+# =========================================================================
 # MAIN IDE WINDOW
 # =========================================================================
 class IDEWindow(QMainWindow):
@@ -1510,24 +1607,15 @@ class IDEWindow(QMainWindow):
         self.interpreter = self.settings.value("interpreter", "") or default_python()
 
         # Base directory (thư mục code gốc của dự án phần mềm)
-        if getattr(sys, "frozen", False):
-            exe_dir = os.path.dirname(os.path.abspath(sys.executable))
-            internal_dir = os.path.join(exe_dir, "_internal")
-            if not os.path.isdir(internal_dir):
-                internal_dir = os.path.join(exe_dir, "internal")
-            
-            if os.path.isdir(internal_dir):
-                self.root_path = internal_dir
-            elif hasattr(sys, "_MEIPASS") and os.path.isdir(sys._MEIPASS):
-                self.root_path = os.path.abspath(sys._MEIPASS)
-            else:
-                self.root_path = exe_dir
-        else:
-            self.root_path = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+        self.root_path = find_project_root()
         self.default_project_root = self.root_path
 
         saved_root = self.settings.value("root", "")
-        self.tree_root = saved_root if saved_root and os.path.isdir(saved_root) else self.root_path
+        # Chỉ dùng saved_root nếu nó tồn tại VÀ không phải ổ đĩa gốc (C:\, D:\)
+        if saved_root and os.path.isdir(saved_root) and saved_root.strip().rstrip("\\/").lower() not in ["c:", "d:", "e:"]:
+            self.tree_root = os.path.abspath(saved_root)
+        else:
+            self.tree_root = self.root_path
 
         self._palette_actions = []
         self.watcher = QFileSystemWatcher(self)
@@ -1908,11 +1996,26 @@ class IDEWindow(QMainWindow):
     # EXPLORER
     # =====================================================================
     def set_tree_root(self, path):
+        path = os.path.abspath(path)
         self.tree_root = path
+        if hasattr(self.proxy_model, "set_root_path"):
+            self.proxy_model.set_root_path(path)
         self.file_model.setRootPath(path)
         root_index = self.file_model.index(path)
-        self.tree_view.setRootIndex(self.proxy_model.mapFromSource(root_index))
-        folder_name = os.path.basename(os.path.abspath(path)) or path
+        mapped_index = self.proxy_model.mapFromSource(root_index)
+        if mapped_index.isValid():
+            self.tree_view.setRootIndex(mapped_index)
+        else:
+            # Nếu QFileSystemModel chưa nạp xong index trên luồng nền, tự động thử lại sau 50ms & 200ms
+            def _apply_mapped_root(p=path):
+                idx = self.file_model.index(p)
+                m_idx = self.proxy_model.mapFromSource(idx)
+                if m_idx.isValid():
+                    self.tree_view.setRootIndex(m_idx)
+            QTimer.singleShot(50, _apply_mapped_root)
+            QTimer.singleShot(200, _apply_mapped_root)
+
+        folder_name = os.path.basename(path) or path
         self.side_tabs.setTabText(0, f"📁 {folder_name}")
         self.side_tabs.setTabToolTip(0, f"Folder: {path}")
         self.check_and_update_permission_status()
@@ -2149,7 +2252,11 @@ class IDEWindow(QMainWindow):
         self.build_outline()
 
     def reset_to_project_root(self):
-        root = getattr(self, "default_project_root", self.root_path)
+        root = getattr(self, "default_project_root", None)
+        if not root or not is_valid_project_root(root):
+            root = find_project_root()
+            self.default_project_root = root
+
         if not os.path.isdir(root):
             QMessageBox.warning(self, "Cảnh báo", f"Thư mục code dự án không tồn tại:\n{root}")
             return

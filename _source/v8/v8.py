@@ -21,9 +21,9 @@ class v8s(v5s):
         self.params           = ['xmax', 'xmin', 'ymax', 'ymin']
 
     def run_model(self, image: np.ndarray, model_loader, pyuic, camera, key_model):
-        if camera:
-            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) 
-        
+        if len(image.shape) == 2:
+            image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
+
         imgsz = int(pyuic.comboBox_imgsz.currentText())
         conf_thr_global = int(pyuic.spinBox_confidenc_score.value()) / 100
 
