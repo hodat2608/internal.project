@@ -122,8 +122,10 @@ def parse_math_offset(offset_expr: str, ref_box: Optional[Dict[str, Any]]) -> fl
 
 
 def compare_values(lhs: float, op: str, rhs: float, min_val: float = 0.0, max_val: float = 0.0) -> bool:
-    """Thực hiện phép so sánh hai giá trị số học."""
+    """Thực hiện phép so sánh hai giá trị số học (hỗ trợ cả tiền tố DIST_)."""
     op = (op or '<').strip()
+    if op.startswith('DIST_'):
+        op = op.replace('DIST_', '')
     if op == '<':
         return lhs < rhs
     elif op == '<=':
@@ -235,6 +237,67 @@ def evaluate_single_pair(
             'operator': operator
         }
 
+    # 1b. Toán tử đo khoảng cách giữa 2 cạnh bất kỳ (Edge Distance Comparison)
+    elif operator.startswith('DIST_'):
+        if box_2 is None:
+            return {
+                'cond_matched': False,
+                'pass': False,
+                'lhs_val': 0.0,
+                'rhs_val': 0.0,
+                'delta': 0.0,
+                'is_spatial': False,
+                'is_distance': True,
+                'operator': operator,
+                'reason': 'Thiếu box mục tiêu để đo khoảng cách'
+            }
+
+        pt1 = get_param_point(box_1, param_1)
+        pt2 = get_param_point(box_2, param_2)
+
+        p1_u = (param_1 or '').upper()
+        p2_u = (param_2 or '').upper()
+        is_y1 = p1_u in ('Y_MIN', 'YMIN', 'TOP', 'Y_MAX', 'YMAX', 'BOTTOM')
+        is_y2 = p2_u in ('Y_MIN', 'YMIN', 'TOP', 'Y_MAX', 'YMAX', 'BOTTOM')
+        is_x1 = p1_u in ('X_MIN', 'XMIN', 'LEFT', 'X_MAX', 'XMAX', 'RIGHT')
+        is_x2 = p2_u in ('X_MIN', 'XMIN', 'LEFT', 'X_MAX', 'XMAX', 'RIGHT')
+
+        if is_y1 and is_y2:
+            dist_val = abs(float(pt1[1]) - float(pt2[1]))
+        elif is_x1 and is_x2:
+            dist_val = abs(float(pt1[0]) - float(pt2[0]))
+        else:
+            dist_val = float(np.hypot(float(pt1[0]) - float(pt2[0]), float(pt1[1]) - float(pt2[1])))
+
+        try:
+            threshold = float(math_operand_val)
+        except Exception:
+            try:
+                threshold = float(min_val)
+            except Exception:
+                threshold = 0.0
+
+        comp_op = operator.replace('DIST_', '')
+        cond_matched = compare_values(dist_val, comp_op, threshold, min_val, max_val)
+        if condition_true_result == 'NG':
+            pair_pass = not cond_matched
+        else:
+            pair_pass = cond_matched
+
+        delta = dist_val - threshold
+        return {
+            'cond_matched': cond_matched,
+            'pass': pair_pass,
+            'lhs_val': dist_val,
+            'rhs_val': threshold,
+            'delta': delta,
+            'is_spatial': False,
+            'is_distance': True,
+            'operator': operator,
+            'pt1': pt1,
+            'pt2': pt2
+        }
+
     # 2. Các toán tử số học tọa độ / kích thước (<, <=, >, >=, ==, !=, BETWEEN)
     lhs_val = get_box_param(box_1, param_1)
     if target_type == 'LABEL' and box_2 is not None:
@@ -320,12 +383,15 @@ def evaluate_task_calculator(
     for task in tasks_config:
         if not task.get('enabled', True):
             continue
-
+        print('task',task)
         task_id = task.get('id')
         task_name = task.get('task_name', f'Task-{task_id}')
         logic_mode = task.get('logic_mode', 'ALL_PASS')
         rules = task.get('rules') or []
         assign_reg = (task.get('assign_register') or '').strip()
+        val_state = task.get('value_state', task.get('Value_State', 1))
+        val_ok = task.get('value_ok', task.get('Value_OK', task.get('value_bit_on', 1)))
+        val_ng = task.get('value_ng', task.get('Value_NG', task.get('value_bit_off', 0)))
         val_on = task.get('value_bit_on', 1)
 
         evaluated_rules = []
@@ -553,7 +619,9 @@ def evaluate_task_calculator(
                 'param_2': param_2,
                 'label_1': lbl_1,
                 'label_2': lbl_2,
-                'operator': operator
+                'operator': operator,
+                'is_distance': res.get('is_distance', False),
+                'is_spatial': res.get('is_spatial', False)
             })
 
             # Vẽ Overlay 1 vs 1 Lên Ảnh
@@ -571,15 +639,21 @@ def evaluate_task_calculator(
                     cv2.putText(result_img, f"{lbl_2}", (rx1, max(ry1 - 4, 12)), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 165, 0), 1, cv2.LINE_AA)
                 elif box_2 is not None:
                     # Đo khoảng cách / tọa độ giữa 2 điểm
-                    pt1 = get_param_point(box_1, param_1)
-                    pt2 = get_param_point(box_2, param_2)
+                    pt1 = res.get('pt1') or get_param_point(box_1, param_1)
+                    pt2 = res.get('pt2') or get_param_point(box_2, param_2)
                     cv2.line(result_img, pt1, pt2, draw_color, 2, cv2.LINE_AA)
                     cv2.circle(result_img, pt1, 5, draw_color, -1, cv2.LINE_AA)
                     cv2.circle(result_img, pt2, 5, draw_color, -1, cv2.LINE_AA)
 
                     mid_x = (pt1[0] + pt2[0]) // 2
                     mid_y = (pt1[1] + pt2[1]) // 2
-                    delta_str = f"Task[{task_name}] {delta:+.1f}px ({'OK' if rule_pass else 'NG'})"
+                    if res.get('is_distance'):
+                        comp_op = operator.replace('DIST_', '')
+                        thresh = res.get('rhs_val', 0.0)
+                        dist_v = res.get('lhs_val', 0.0)
+                        delta_str = f"Dist[{lbl_1}.{param_1}-{lbl_2}.{param_2}]: {dist_v:.1f}px {comp_op} {thresh:.1f}px ({'OK' if rule_pass else 'NG'})"
+                    else:
+                        delta_str = f"Task[{task_name}] {delta:+.1f}px ({'OK' if rule_pass else 'NG'})"
                     (tw, th), _ = cv2.getTextSize(delta_str, cv2.FONT_HERSHEY_SIMPLEX, 0.45, 1)
                     cv2.rectangle(result_img, (mid_x - 2, mid_y - th - 4), (mid_x + tw + 2, mid_y + 2), (20, 20, 30), -1)
                     cv2.putText(result_img, delta_str, (mid_x, mid_y - 2), cv2.FONT_HERSHEY_SIMPLEX, 0.45, draw_color, 1, cv2.LINE_AA)
@@ -595,8 +669,12 @@ def evaluate_task_calculator(
         if not task_pass:
             all_tasks_pass = False
             if assign_reg:
-                plc_registers_to_send.append((assign_reg, val_on))
-                _log.warning("Task '%s' (ID: %s) [NG] -> Trigger PLC Register %s = %s", task_name, task_id, assign_reg, val_on)
+                plc_val = val_ng if ('value_ng' in task or 'Value_NG' in task or 'value_bit_off' in task) else val_on
+                plc_registers_to_send.append((assign_reg, plc_val))
+                _log.warning("Task '%s' (ID: %s) [NG] -> Trigger PLC Register %s = %s", task_name, task_id, assign_reg, plc_val)
+        else:
+            if assign_reg and ('value_ok' in task or 'Value_OK' in task or 'value_bit_on' in task):
+                plc_registers_to_send.append((assign_reg, val_ok))
 
         task_results.append({
             'task_id': task_id,
@@ -604,6 +682,12 @@ def evaluate_task_calculator(
             'pass': task_pass,
             'rules': evaluated_rules,
             'assign_register': assign_reg,
+            'value_state': val_state,
+            'Value_State': val_state,
+            'value_ok': val_ok,
+            'Value_OK': val_ok,
+            'value_ng': val_ng,
+            'Value_NG': val_ng,
             'value_bit_on': val_on
         })
 

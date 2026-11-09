@@ -20,7 +20,7 @@ class v8s(v5s):
         self.keys_mapping = list(COLUMN_MAPPING.keys())
         self.params           = ['xmax', 'xmin', 'ymax', 'ymin']
 
-    def run_model(self, image: np.ndarray, model_loader, pyuic, camera, key_model):
+    def run_model(self, image: np.ndarray, model_loader, pyuic, camera, key_model, *args, **kwargs):
         if len(image.shape) == 2:
             image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
 
@@ -46,8 +46,9 @@ class v8s(v5s):
  
         label_cfg: dict[str, dict] = {}
         for cfg in cfg_rows:
-            if cfg['label'] and cfg['label'] not in label_cfg:
-                label_cfg[cfg['label']] = cfg
+            lbl = cfg.get('label')
+            if lbl and 'quantity' in cfg and lbl not in label_cfg:
+                label_cfg[lbl] = cfg
  
         valid_names: list[str] = []
         draw_candidates: list[dict] = []   
@@ -92,18 +93,20 @@ class v8s(v5s):
         name_counts = Counter(valid_names)
 
         for cfg in cfg_rows:
-            if not cfg['join']:
+            if not cfg.get('join'):
+                continue
+            if 'quantity' not in cfg:
                 continue
 
-            label    = cfg['label']
+            label    = cfg.get('label', '')
             ok_count = name_counts.get(label, 0)
             reg      = str(cfg.get('register') or '').strip()
 
             is_label_ng = False
-            if cfg['ok'] and ok_count != cfg['quantity']:
+            if cfg.get('ok') and ok_count != cfg.get('quantity', 0):
                 is_label_ng = True
 
-            if cfg['ng'] and ok_count > 0:
+            if cfg.get('ng') and ok_count > 0:
                 is_label_ng = True
 
             if is_label_ng:
@@ -115,12 +118,10 @@ class v8s(v5s):
                 if reg and any(c.isdigit() for c in reg):
                     list_register[reg] = cfg.get('value_ok', 1)
 
-        # ── Colour failing boxes red ──────────────────────────────────────────
+        # ── Đổi màu đỏ cho các box thuộc nhãn bị NG ──────────────────────────
         for d in draw_candidates:
-            if d['label'] in fail_labels:
+            if any(d['label'] in x for x in fail_labels if '*' in x):
                 d['color'] = COLOR_NG
-
-        result_image_rgb = draw_detections(image, draw_candidates, fail_labels)
 
         # ── Kiểm tra điều kiện Task Calculator đa nhãn theo key_model ─────────
         processor = getattr(pyuic, 'processor', None)
@@ -144,15 +145,35 @@ class v8s(v5s):
         elif isinstance(active_tasks_dict, list):
             tasks_for_model = active_tasks_dict
 
-        # Chỉ khi trùng key_model và có task cấu hình thì mới thực thi evaluate_task_calculator
+        # QUAN TRỌNG: Thực thi Task Calculator TRƯỚC KHI vẽ HUD và tổng hợp toàn bộ lỗi vào fail_labels
         if tasks_for_model:
-            result_image_rgb, flag, list_register = self.evaluate_task_calculator(
-                result_image_rgb, draw_candidates, pyuic, flag, list_register,
+            image, flag, list_register = self.evaluate_task_calculator(
+                image, draw_candidates, pyuic, flag, list_register,
                 tasks_config=tasks_for_model,
-                key_model=key_model
+                key_model=key_model,
+                fail_labels=fail_labels
             )
 
-        return result_image_rgb, flag, list_register, LOGO_WATERMARK, cfg_rows
+        # ── Chốt toàn bộ kết quả (nhãn + toán tử) rồi mới vẽ Bounding Boxes và HUD ──
+        result_image_rgb = draw_detections(image, draw_candidates, fail_labels)
+
+        # Chuẩn bị danh sách cfg_rows độc lập trả về cho main_core (không làm bẩn cache pyuic)
+        final_cfg_rows = [dict(c) for c in cfg_rows if 'quantity' in c]
+        if tasks_for_model:
+            for t in tasks_for_model:
+                t_reg = str(t.get('assign_register') or '').strip()
+                if t_reg and any(c.isdigit() for c in t_reg):
+                    final_cfg_rows.append({
+                        'label': f"Task:{t.get('task_name', '')}",
+                        'register': t_reg,
+                        'value_state': t.get('value_state', t.get('Value_State', 1)),
+                        'value_ok': t.get('value_ok', t.get('Value_OK', t.get('value_bit_on', 1))),
+                        'value_ng': t.get('value_ng', t.get('Value_NG', t.get('value_bit_off', 0))),
+                        'join': True,
+                    })
+        print('final_cfg_rows',final_cfg_rows)
+        print('list_register',list_register)
+        return result_image_rgb, flag, list_register, LOGO_WATERMARK, final_cfg_rows
 
     def evaluate_task_calculator(
         self,
@@ -160,9 +181,12 @@ class v8s(v5s):
         draw_candidates: list,
         pyuic,
         flag: bool,
-        list_register: list,
+        list_register: dict,
         tasks_config: list = None,
         key_model: tuple = None,
+        fail_labels: set = None,
+        *args,
+        **kwargs
     ):
         """
         Hàm riêng biệt thực hiện kiểm tra các Task quan hệ tọa độ & kích thước hình học đa nhãn.
@@ -221,8 +245,57 @@ class v8s(v5s):
                 flag = False
                 for reg, val in plc_to_send:
                     reg_str = str(reg or '').strip()
+                    if reg_str:
+                        list_register[reg_str] = val
+            else:
+                for reg, val in plc_to_send:
+                    reg_str = str(reg or '').strip()
                     if reg_str and reg_str not in list_register:
                         list_register[reg_str] = val
+
+            # Trích xuất toàn bộ hạng mục Task vi phạm đưa vào fail_labels để hiển thị lên HUD
+            if fail_labels is not None and task_results:
+                for t in task_results:
+                    t_name = t.get('task_name') or f"Task-{t.get('task_id', '')}"
+                    if not t.get('pass'):
+                        failing_rules = [r for r in t.get('rules', []) if not r.get('pass')]
+                        if failing_rules:
+                            for r in failing_rules:
+                                lbl1 = r.get('label_1', '')
+                                lbl2 = r.get('label_2', '')
+                                op = r.get('operator', '')
+                                p1 = r.get('param_1', '')
+                                p2 = r.get('param_2', '')
+                                reason = r.get('reason')
+
+                                # Tô màu đỏ cho box tham gia vào rule vi phạm
+                                for d in draw_candidates:
+                                    if d.get('label') in (lbl1, lbl2):
+                                        d['color'] = COLOR_NG
+
+                                if reason:
+                                    desc = f"{reason}"
+                                elif op.startswith('DIST_') or r.get('is_distance'):
+                                    comp_op = op.replace('DIST_', '')
+                                    d_val = r.get('lhs_val', 0.0) or 0.0
+                                    thresh = r.get('rhs_val', 0.0) or 0.0
+                                    desc = f"{lbl1}.{p1}-{lbl2}.{p2}: {d_val:.1f}px {comp_op} {thresh:.1f}px"
+                                elif op in ('INSIDE', 'OUTSIDE', 'OVERLAP') or r.get('is_spatial'):
+                                    desc = f"{lbl1} {op} {lbl2}"
+                                else:
+                                    v1 = r.get('lhs_val')
+                                    v2 = r.get('rhs_val')
+                                    if v1 is not None and v2 is not None:
+                                        desc = f"{lbl1}.{p1} {op} {lbl2}.{p2} ({v1:.1f}px vs {v2:.1f}px)"
+                                    else:
+                                        desc = f"{lbl1}.{p1} {op} {lbl2}.{p2}"
+
+                                fail_labels.add(f"* Task: {t_name} [{desc}]")
+                        else:
+                            fail_labels.add(f"* Task: {t_name} (Vi phạm)")
+                    else:
+                        fail_labels.add(f"Task: {t_name} (OK)")
+
         except Exception as e:
             print("Error in evaluate_task_calculator (v8):", e)
 

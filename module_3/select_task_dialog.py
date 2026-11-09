@@ -179,8 +179,14 @@ class SelectTaskForLabelsDialog(QtWidgets.QDialog):
                 'action_on_fail': 'NG',
                 'enabled': True,
                 'assign_register': '',
+                'value_state': 1,
+                'Value_State': 1,
                 'value_bit_on': 1,
+                'value_ok': 1,
+                'Value_OK': 1,
                 'value_bit_off': 0,
+                'value_ng': 0,
+                'Value_NG': 0,
             }
             rules_data = []
         else:

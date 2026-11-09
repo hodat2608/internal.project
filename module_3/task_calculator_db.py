@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS task_calculator (
     action_on_fail  VARCHAR(20) NOT NULL DEFAULT 'NG',
     enabled         TINYINT(1) NOT NULL DEFAULT 1,
     assign_register VARCHAR(255) DEFAULT '',
+    value_state     INT DEFAULT 1,
     value_bit_on    INT DEFAULT 1,
     value_bit_off   INT DEFAULT 0,
     datetime        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -114,6 +115,14 @@ def ensure_task_calculator_tables(cursor, connection) -> bool:
             cursor.execute("ALTER TABLE task_calculator ADD COLUMN action_on_fail VARCHAR(20) DEFAULT 'NG'")
             cursor.execute("ALTER TABLE task_calculator ADD COLUMN enabled TINYINT(1) DEFAULT 1")
 
+        # Kiểm tra và migrate tự động cột value_state nếu bảng cũ chưa có
+        cursor.execute("SHOW COLUMNS FROM task_calculator LIKE 'value_state'")
+        if not cursor.fetchone():
+            cursor.execute("SHOW COLUMNS FROM task_calculator LIKE 'Value_State'")
+            if not cursor.fetchone():
+                _log.info("Migrating task_calculator: thêm cột value_state (Value_State)")
+                cursor.execute("ALTER TABLE task_calculator ADD COLUMN value_state INT DEFAULT 1 AFTER assign_register")
+
         # Kiểm tra và migrate tự động cột model_id nếu bảng cũ chưa có
         cursor.execute("SHOW COLUMNS FROM task_calculator LIKE 'model_id'")
         if not cursor.fetchone():
@@ -139,12 +148,19 @@ def get_tasks_by_camera(cursor, camera_id: int, model_id: Optional[int] = None) 
     if not cursor:
         return []
     try:
+        cursor.execute("SHOW COLUMNS FROM task_calculator LIKE 'value_state'")
+        has_val_state = bool(cursor.fetchone())
+        if not has_val_state:
+            cursor.execute("SHOW COLUMNS FROM task_calculator LIKE 'Value_State'")
+            has_val_state = bool(cursor.fetchone())
+        col_val_state = ", t.value_state" if has_val_state else ""
+
         if model_id is not None:
-            query = """
+            query = f"""
                 SELECT t.id, t.camera_id, t.model_id, t.task_name, t.task_type, t.logic_mode, 
                        t.action_on_fail, t.enabled, t.assign_register, t.value_bit_on, 
                        t.value_bit_off, t.datetime,
-                       COUNT(r.id) AS rule_count
+                       COUNT(r.id) AS rule_count{col_val_state}
                 FROM task_calculator t
                 LEFT JOIN task_calculator_rules r ON t.id = r.task_id
                 WHERE t.camera_id = %s AND t.model_id = %s
@@ -153,11 +169,11 @@ def get_tasks_by_camera(cursor, camera_id: int, model_id: Optional[int] = None) 
             """
             cursor.execute(query, (camera_id, model_id))
         else:
-            query = """
+            query = f"""
                 SELECT t.id, t.camera_id, t.model_id, t.task_name, t.task_type, t.logic_mode, 
                        t.action_on_fail, t.enabled, t.assign_register, t.value_bit_on, 
                        t.value_bit_off, t.datetime,
-                       COUNT(r.id) AS rule_count
+                       COUNT(r.id) AS rule_count{col_val_state}
                 FROM task_calculator t
                 LEFT JOIN task_calculator_rules r ON t.id = r.task_id
                 WHERE t.camera_id = %s
@@ -168,6 +184,9 @@ def get_tasks_by_camera(cursor, camera_id: int, model_id: Optional[int] = None) 
         rows = cursor.fetchall()
         tasks = []
         for r in rows:
+            v_state = r[13] if (has_val_state and len(r) > 13 and r[13] is not None) else 1
+            v_on = r[9] if r[9] is not None else 1
+            v_off = r[10] if r[10] is not None else 0
             tasks.append({
                 'id': r[0],
                 'camera_id': r[1],
@@ -178,8 +197,14 @@ def get_tasks_by_camera(cursor, camera_id: int, model_id: Optional[int] = None) 
                 'action_on_fail': r[6],
                 'enabled': bool(r[7]),
                 'assign_register': r[8] or '',
-                'value_bit_on': r[9] if r[9] is not None else 1,
-                'value_bit_off': r[10] if r[10] is not None else 0,
+                'value_state': v_state,
+                'Value_State': v_state,
+                'value_bit_on': v_on,
+                'value_ok': v_on,
+                'Value_OK': v_on,
+                'value_bit_off': v_off,
+                'value_ng': v_off,
+                'Value_NG': v_off,
                 'datetime': r[11],
                 'rule_count': r[12]
             })
@@ -194,10 +219,17 @@ def get_task_by_id(cursor, task_id: int) -> Optional[Dict[str, Any]]:
     if not cursor:
         return None
     try:
-        query = """
+        cursor.execute("SHOW COLUMNS FROM task_calculator LIKE 'value_state'")
+        has_val_state = bool(cursor.fetchone())
+        if not has_val_state:
+            cursor.execute("SHOW COLUMNS FROM task_calculator LIKE 'Value_State'")
+            has_val_state = bool(cursor.fetchone())
+        col_val_state = ", value_state" if has_val_state else ""
+
+        query = f"""
             SELECT id, camera_id, model_id, task_name, task_type, logic_mode, 
                    action_on_fail, enabled, assign_register, value_bit_on, 
-                   value_bit_off, datetime
+                   value_bit_off, datetime{col_val_state}
             FROM task_calculator
             WHERE id = %s
         """
@@ -205,6 +237,9 @@ def get_task_by_id(cursor, task_id: int) -> Optional[Dict[str, Any]]:
         r = cursor.fetchone()
         if not r:
             return None
+        v_state = r[12] if (has_val_state and len(r) > 12 and r[12] is not None) else 1
+        v_on = r[9] if r[9] is not None else 1
+        v_off = r[10] if r[10] is not None else 0
         return {
             'id': r[0],
             'camera_id': r[1],
@@ -215,8 +250,14 @@ def get_task_by_id(cursor, task_id: int) -> Optional[Dict[str, Any]]:
             'action_on_fail': r[6],
             'enabled': bool(r[7]),
             'assign_register': r[8] or '',
-            'value_bit_on': r[9] if r[9] is not None else 1,
-            'value_bit_off': r[10] if r[10] is not None else 0,
+            'value_state': v_state,
+            'Value_State': v_state,
+            'value_bit_on': v_on,
+            'value_ok': v_on,
+            'Value_OK': v_on,
+            'value_bit_off': v_off,
+            'value_ng': v_off,
+            'Value_NG': v_off,
             'datetime': r[11]
         }
     except Exception as e:
@@ -290,19 +331,27 @@ def save_task_and_rules(cursor, connection, task_data: Dict[str, Any], rules: Li
         action_on_fail = task_data.get('action_on_fail', 'NG')
         enabled = 1 if task_data.get('enabled', True) else 0
         assign_register = task_data.get('assign_register', '').strip()
-        value_bit_on = int(task_data.get('value_bit_on', 1))
-        value_bit_off = int(task_data.get('value_bit_off', 0))
+        val_state = int(task_data.get('value_state', task_data.get('Value_State', 1)))
+        value_bit_on = int(task_data.get('value_bit_on', task_data.get('value_ok', task_data.get('Value_OK', 1))))
+        value_bit_off = int(task_data.get('value_bit_off', task_data.get('value_ng', task_data.get('Value_NG', 0))))
+
+        # Đảm bảo cột value_state tồn tại
+        cursor.execute("SHOW COLUMNS FROM task_calculator LIKE 'value_state'")
+        if not cursor.fetchone():
+            cursor.execute("SHOW COLUMNS FROM task_calculator LIKE 'Value_State'")
+            if not cursor.fetchone():
+                cursor.execute("ALTER TABLE task_calculator ADD COLUMN value_state INT DEFAULT 1 AFTER assign_register")
 
         if task_id:
             # Update Task
             cursor.execute("""
                 UPDATE task_calculator
                 SET task_name = %s, task_type = %s, logic_mode = %s, action_on_fail = %s,
-                    enabled = %s, assign_register = %s, value_bit_on = %s, value_bit_off = %s,
+                    enabled = %s, assign_register = %s, value_state = %s, value_bit_on = %s, value_bit_off = %s,
                     model_id = %s
                 WHERE id = %s AND camera_id = %s
             """, (task_name, task_type, logic_mode, action_on_fail, enabled,
-                  assign_register, value_bit_on, value_bit_off, model_id, task_id, camera_id))
+                  assign_register, val_state, value_bit_on, value_bit_off, model_id, task_id, camera_id))
             
             # Xóa các rules cũ để ghi lại danh sách mới
             cursor.execute("DELETE FROM task_calculator_rules WHERE task_id = %s", (task_id,))
@@ -311,10 +360,10 @@ def save_task_and_rules(cursor, connection, task_data: Dict[str, Any], rules: Li
             cursor.execute("""
                 INSERT INTO task_calculator
                 (camera_id, model_id, task_name, task_type, logic_mode, action_on_fail, enabled,
-                 assign_register, value_bit_on, value_bit_off)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                 assign_register, value_state, value_bit_on, value_bit_off)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """, (camera_id, model_id, task_name, task_type, logic_mode, action_on_fail, enabled,
-                  assign_register, value_bit_on, value_bit_off))
+                  assign_register, val_state, value_bit_on, value_bit_off))
             task_id = cursor.lastrowid
 
         # Đảm bảo cột instance_scope tồn tại

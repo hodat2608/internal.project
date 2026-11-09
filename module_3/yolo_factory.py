@@ -132,8 +132,6 @@ if _ultra_path not in sys.path:
     sys.path.insert(0, _ultra_path)
 
 from ultralytics import YOLO
-from _source.v5.v5 import v5s
-from _source.v8.v8 import v8s
 from module_1.root_path import resource_path
 from app_logger.app_logger import get_logger
 
@@ -198,6 +196,7 @@ class YoloFactory:
 
     @staticmethod
     def _load_v8(task: str, model_runtime: str, weight_path: str, device: str, result: dict):
+        from _source.v8.v8 import v8s
         if task == 'Normal Box':
             if model_runtime == 'PyTorch':
                 try:
@@ -233,6 +232,7 @@ class YoloFactory:
 
     @staticmethod
     def _load_v5(task: str, model_runtime: str, weight_path: str, device: str, result: dict):
+        from _source.v5.v5 import v5s
         if task == 'Normal Box':
             if model_runtime == 'PyTorch':
                 try:

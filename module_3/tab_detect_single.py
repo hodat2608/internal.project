@@ -193,10 +193,17 @@ class Ui_MainWindow(object):
             self.list_size.append(self.target_width)
             self.list_size.append(self.target_height)
 
-        result_image_rgb, flag, list_register = self.processer.process_image_func(
-                result_image_rgb, self.model_loader, self.pyuic, True, self.valid_key, 12,
-                mode_load_jumper=False,
-            )
+        camera_id = self.valid_key[0] if isinstance(self.valid_key, (tuple, list)) and len(self.valid_key) > 0 else 'camera-1'
+        res_process = self.processer.process_image_func(
+            result_image_rgb, self.model_loader, self.pyuic, camera_id, self.valid_key
+        )
+        if isinstance(res_process, (tuple, list)):
+            result_image_rgb = res_process[0]
+            flag = res_process[1]
+            list_register = res_process[2]
+        else:
+            flag = False
+            list_register = {}
         self.dict_view_results[file_path] = list_register
 
         result_text = f'RESULT: {"OK" if flag else "NG"}'

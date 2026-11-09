@@ -251,8 +251,10 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
             item_rules.setTextAlignment(Qt.AlignCenter)
             self.table_tasks.setItem(row_idx, 3, item_rules)
 
-            # Cột 4: PLC Register NG
-            reg_text = f"{t['assign_register']} (val={t['value_bit_on']})" if t['assign_register'] else "--"
+            # Cột 4: PLC Register
+            v_st = t.get('value_state', 1)
+            v_on = t.get('value_bit_on', 1)
+            reg_text = f"{t['assign_register']} (st={v_st}, on={v_on})" if t['assign_register'] else "--"
             item_reg = QtWidgets.QTableWidgetItem(reg_text)
             item_reg.setTextAlignment(Qt.AlignCenter)
             if t['assign_register']:
@@ -325,8 +327,14 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
             'action_on_fail': 'NG',
             'enabled': True,
             'assign_register': '',
+            'value_state': 1,
+            'Value_State': 1,
             'value_bit_on': 1,
+            'value_ok': 1,
+            'Value_OK': 1,
             'value_bit_off': 0,
+            'value_ng': 0,
+            'Value_NG': 0,
         }
         dlg = TaskRuleEditorDialog(
             camera_id=self.camera_id,

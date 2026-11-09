@@ -22,7 +22,8 @@ Tính năng nâng cấp:
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt, QRectF, QPointF, pyqtSignal
 from PyQt5.QtGui import QPainter, QColor, QPen, QBrush, QFont, QPainterPath
-from typing import List, Dict, Any, Optional
+import math
+from typing import List, Dict, Any, Optional, Tuple
 
 PARAM_DISPLAY_NAMES = {
     'FULL_BOX': 'Toàn bộ Box (Bounding Box)',
@@ -46,7 +47,13 @@ OPERATOR_DISPLAY_NAMES = {
     'BETWEEN': 'Trong khoảng (Min <= X <= Max)',
     'INSIDE': 'Nằm trong (INSIDE: Toàn bộ A nằm trong B)',
     'OUTSIDE': 'Nằm ngoài (OUTSIDE: A hoàn toàn ngoài B)',
-    'OVERLAP': 'Giao nhau / Chạm (OVERLAP: A chạm mép hoặc cắt B)'
+    'OVERLAP': 'Giao nhau / Chạm (OVERLAP: A chạm mép hoặc cắt B)',
+    'DIST_<': 'Khoảng cách < (Khoảng cách giữa 2 cạnh < Ngưỡng)',
+    'DIST_<=': 'Khoảng cách <= (Khoảng cách giữa 2 cạnh <= Ngưỡng)',
+    'DIST_>': 'Khoảng cách > (Khoảng cách giữa 2 cạnh > Ngưỡng)',
+    'DIST_>=': 'Khoảng cách >= (Khoảng cách giữa 2 cạnh >= Ngưỡng)',
+    'DIST_==': 'Khoảng cách == (Khoảng cách giữa 2 cạnh == Ngưỡng)',
+    'DIST_!=': 'Khoảng cách != (Khoảng cách giữa 2 cạnh != Ngưỡng)'
 }
 
 INSTANCE_SCOPE_DISPLAY_NAMES = {
@@ -54,6 +61,13 @@ INSTANCE_SCOPE_DISPLAY_NAMES = {
     'ALL_A_IN_ONE_B': 'N vs 1 (Tất cả đối tượng A vs 1 vùng chứa B - VD: Khay linh kiện / Vùng bao)',
     'ONE_A_IN_ANY_B': '1 vs N (1 đối tượng A vs Bất kỳ vùng B - VD: Đối tượng vào vùng cấm / vùng giới hạn)',
     'ALL_A_VS_ALL_B': 'N vs N (Tất cả đối tượng A vs Tất cả đối tượng B)'
+}
+
+TASK_PLC_MAPPING = {
+    "Register": "`assign_register`",
+    "Value State": "`Value_State`",
+    "Value OK": "`Value_OK`",
+    "Value NG": "`Value_NG`",
 }
 
 
@@ -70,7 +84,7 @@ class VisualBoxCanvas(QtWidgets.QWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setMinimumHeight(400)
+        self.setMinimumHeight(540)
         self.setMouseTracking(True)
         
         self.label_1_name = "Đối Tượng 1 (Label A)"
@@ -112,7 +126,7 @@ class VisualBoxCanvas(QtWidgets.QWidget):
             bw = max(70.0, min(r.width(), w - 20.0))
             bh = max(50.0, min(r.height(), h - 20.0))
             bx = max(5.0, min(r.x(), w - bw - 5.0))
-            by = max(5.0, min(r.y(), h - bh - 5.0))
+            by = max(80.0, min(r.y(), h - bh - 5.0))
             if b_idx == 1:
                 self.box1_rect = QRectF(bx, by, bw, bh)
             else:
@@ -124,39 +138,39 @@ class VisualBoxCanvas(QtWidgets.QWidget):
         self.reset_positions()
 
     def reset_positions(self):
-        """Khôi phục vị trí mặc định nằm cân đối hoặc theo khuôn mẫu Scope."""
-        w = max(400, self.width())
-        h = max(350, self.height())
+        """Khôi phục vị trí mặc định nằm cân đối hoặc theo khuôn mẫu Scope (bề cao rộng rãi)."""
+        w = max(500, self.width())
+        h = max(520, self.height())
 
         if self.instance_scope == 'ALL_A_IN_ONE_B':
             # Master Container B (Vùng chứa quy chiếu) lớn ở trung tâm
-            b2_w = min(580.0, max(380.0, w * 0.72))
-            b2_h = min(360.0, max(250.0, h * 0.68))
-            b2_x = max(15.0, (w - b2_w) / 2)
-            b2_y = max(48.0, (h - b2_h) / 2)
+            b2_w = min(680.0, max(420.0, w * 0.76))
+            b2_h = min(400.0, max(280.0, h * 0.65))
+            b2_x = max(20.0, (w - b2_w) / 2)
+            b2_y = max(85.0, (h - b2_h) / 2 + 30.0)
             self.box2_rect = QRectF(b2_x, b2_y, b2_w, b2_h)
             
             # Box 1 (Đối tượng A1 - đối tượng tương tác chính) đặt nằm trong vùng chứa
-            b1_w = 125.0
-            b1_h = 85.0
-            self.box1_rect = QRectF(b2_x + 35.0, b2_y + 50.0, b1_w, b1_h)
+            b1_w = 135.0
+            b1_h = 95.0
+            self.box1_rect = QRectF(b2_x + 45.0, b2_y + 55.0, b1_w, b1_h)
             self.front_box = 1
 
         elif self.instance_scope == 'ONE_A_IN_ANY_B':
             # Đối tượng A ở bên trái, Vùng giới hạn B1 ở giữa
-            b1_w = 125.0
-            b1_h = 85.0
-            self.box1_rect = QRectF(w * 0.16 - b1_w / 2, max(50.0, (h - b1_h) / 2), b1_w, b1_h)
-            b2_w = 175.0
-            b2_h = 135.0
-            self.box2_rect = QRectF(w * 0.48 - b2_w / 2, max(50.0, (h - b2_h) / 2), b2_w, b2_h)
+            b1_w = 135.0
+            b1_h = 95.0
+            self.box1_rect = QRectF(w * 0.18 - b1_w / 2, max(95.0, (h - b1_h) / 2 + 20.0), b1_w, b1_h)
+            b2_w = 190.0
+            b2_h = 145.0
+            self.box2_rect = QRectF(w * 0.50 - b2_w / 2, max(95.0, (h - b2_h) / 2 + 20.0), b2_w, b2_h)
             self.front_box = 1
 
         else:
-            # 1 vs 1 tiêu chuẩn
-            box_w = 180.0
-            box_h = 130.0
-            y = max(50.0, (h - box_h) / 2 - 20)
+            # 1 vs 1 tiêu chuẩn & N vs N
+            box_w = 190.0
+            box_h = 140.0
+            y = max(95.0, (h - box_h) / 2 + 15.0)
             self.box1_rect = QRectF(w * 0.25 - box_w / 2, y, box_w, box_h)
             self.box2_rect = QRectF(w * 0.75 - box_w / 2, y, box_w, box_h)
 
@@ -248,7 +262,7 @@ class VisualBoxCanvas(QtWidgets.QWidget):
         elif param in ('X_MAX', 'RIGHT'):
             return QPointF(rect.right(), cy)
         elif param in ('Y_MIN', 'TOP'):
-            return QPointF(cx, rect.top())
+            return QPointF(cx, rect.top() + 24.0)
         elif param in ('Y_MAX', 'BOTTOM'):
             return QPointF(cx, rect.bottom())
         elif param == 'WIDTH':
@@ -257,6 +271,64 @@ class VisualBoxCanvas(QtWidgets.QWidget):
             return QPointF(rect.left() + 20, rect.bottom() - 15)
         else:  # Center / FULL_BOX
             return QPointF(cx, cy)
+
+    def _get_param_value(self, rect: QRectF, param: str) -> float:
+        """Trích xuất giá trị số học của tham số từ QRectF thời gian thực."""
+        p = (param or '').upper().strip()
+        if p in ('X_MIN', 'LEFT'):
+            return float(rect.left())
+        elif p in ('X_MAX', 'RIGHT'):
+            return float(rect.right())
+        elif p in ('Y_MIN', 'TOP'):
+            return float(rect.top() + 24.0)
+        elif p in ('Y_MAX', 'BOTTOM'):
+            return float(rect.bottom())
+        elif p in ('CENTER_X', 'CX'):
+            return float(rect.center().x())
+        elif p in ('CENTER_Y', 'CY'):
+            return float(rect.center().y())
+        elif p in ('WIDTH', 'W'):
+            return float(rect.width())
+        elif p in ('HEIGHT', 'H'):
+            return float(rect.height())
+        return 0.0
+
+    def _calculate_edge_distance(self, p1: QPointF, p2: QPointF, param1: str, param2: str) -> Tuple[float, str]:
+        """
+        Tính khoảng cách giữa 2 điểm neo của 2 cạnh:
+        - Nếu cùng trục dọc (Y_MIN, Y_MAX): abs(p1.y - p2.y) (khoảng cách dọc ΔY)
+        - Nếu cùng trục ngang (X_MIN, X_MAX): abs(p1.x - p2.x) (khoảng cách ngang ΔX)
+        - Trường hợp chéo trục hoặc Center: Euclidean distance
+        """
+        p1_u = (param1 or '').upper()
+        p2_u = (param2 or '').upper()
+        is_y1 = p1_u in ('Y_MIN', 'TOP', 'Y_MAX', 'BOTTOM')
+        is_y2 = p2_u in ('Y_MIN', 'TOP', 'Y_MAX', 'BOTTOM')
+        is_x1 = p1_u in ('X_MIN', 'LEFT', 'X_MAX', 'RIGHT')
+        is_x2 = p2_u in ('X_MIN', 'LEFT', 'X_MAX', 'RIGHT')
+
+        if is_y1 and is_y2:
+            return abs(p1.y() - p2.y()), "ΔY"
+        elif is_x1 and is_x2:
+            return abs(p1.x() - p2.x()), "ΔX"
+        else:
+            return math.hypot(p1.x() - p2.x(), p1.y() - p2.y()), "Dist"
+
+    def _paint_top_status_badge(self, painter: QPainter, width: int, status_text: str, is_pass: bool):
+        """Hiển thị ô vuông Status phán định ở phía trên Canvas, tách biệt xa khỏi 2 box để không bị che khuất."""
+        status_color = QColor("#a6e3a1") if is_pass else QColor("#f38ba8")
+        painter.setFont(QFont("Segoe UI", 10, QFont.Bold))
+        tw = max(440.0, float(len(status_text) * 7.5 + 40.0))
+        tw = min(tw, float(width - 30.0))
+        th = 28.0
+        badge_rect = QRectF((width - tw) / 2, 42.0, tw, th)
+
+        painter.setBrush(QBrush(QColor("#181825")))
+        painter.setPen(QPen(status_color, 1.8))
+        painter.drawRoundedRect(badge_rect, 6, 6)
+
+        painter.setPen(status_color)
+        painter.drawText(badge_rect, Qt.AlignCenter, status_text)
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -277,6 +349,7 @@ class VisualBoxCanvas(QtWidgets.QWidget):
             painter.drawLine(0, y, w, y)
 
         is_spatial = self.operator_str in ('INSIDE', 'OUTSIDE', 'OVERLAP')
+        is_distance = self.operator_str.startswith('DIST_')
         is_inside = self._is_rect_inside(self.box1_rect, self.box2_rect)
         is_outside = self._is_rect_outside(self.box1_rect, self.box2_rect)
         is_overlap = self._is_rect_overlapping(self.box1_rect, self.box2_rect)
@@ -291,8 +364,32 @@ class VisualBoxCanvas(QtWidgets.QWidget):
                 cond_matched = is_outside
             elif self.operator_str == 'OVERLAP':
                 cond_matched = is_overlap
+            elif is_distance:
+                p1 = self._get_hotspot_point(self.box1_rect, self.selected_param_1)
+                p2 = self._get_hotspot_point(self.box2_rect, self.selected_param_2)
+                dist_val, _ = self._calculate_edge_distance(p1, p2, self.selected_param_1, self.selected_param_2)
+                try:
+                    thresh = float(self.math_val)
+                except Exception:
+                    thresh = 0.0
+                comp_op = self.operator_str.replace('DIST_', '')
+                if comp_op == '<': cond_matched = (dist_val < thresh)
+                elif comp_op == '<=': cond_matched = (dist_val <= thresh)
+                elif comp_op == '>': cond_matched = (dist_val > thresh)
+                elif comp_op == '>=': cond_matched = (dist_val >= thresh)
+                elif comp_op in ('==', '='): cond_matched = (abs(dist_val - thresh) < 1.0)
+                elif comp_op == '!=': cond_matched = (abs(dist_val - thresh) >= 1.0)
+                else: cond_matched = False
             else:
-                cond_matched = True
+                v1 = self._get_param_value(self.box1_rect, self.selected_param_1)
+                v2 = self._get_param_value(self.box2_rect, self.selected_param_2)
+                if self.operator_str == '<': cond_matched = (v1 < v2)
+                elif self.operator_str == '<=': cond_matched = (v1 <= v2)
+                elif self.operator_str == '>': cond_matched = (v1 > v2)
+                elif self.operator_str == '>=': cond_matched = (v1 >= v2)
+                elif self.operator_str in ('==', '='): cond_matched = (abs(v1 - v2) < 1.0)
+                elif self.operator_str == '!=': cond_matched = (abs(v1 - v2) >= 1.0)
+                else: cond_matched = True
 
             box1_pass = (not cond_matched) if (self.condition_true_result == 'NG') else cond_matched
 
@@ -300,8 +397,8 @@ class VisualBoxCanvas(QtWidgets.QWidget):
             self._paint_master_container(painter, self.box2_rect, self.label_2_name)
 
             # 2. Vẽ 2 Ghost Instances của A đang nằm an toàn trong vùng
-            ghost_a2 = QRectF(self.box2_rect.right() - 145, self.box2_rect.top() + 65, 115, 70)
-            ghost_a3 = QRectF(self.box2_rect.left() + 45, self.box2_rect.bottom() - 100, 115, 70)
+            ghost_a2 = QRectF(self.box2_rect.right() - 150, self.box2_rect.top() + 70, 125, 75)
+            ghost_a3 = QRectF(self.box2_rect.left() + 45, self.box2_rect.bottom() - 105, 125, 75)
             self._paint_ghost_box(painter, ghost_a2, f"🔹 {self.label_1_name} #2", "✓ Trong vùng (OK)", "#a6e3a1")
             self._paint_ghost_box(painter, ghost_a3, f"🔹 {self.label_1_name} #3", "✓ Trong vùng (OK)", "#a6e3a1")
 
@@ -318,29 +415,10 @@ class VisualBoxCanvas(QtWidgets.QWidget):
                 pen_warn = QPen(QColor("#f38ba8"), 2, Qt.DashLine)
                 painter.setPen(pen_warn)
                 painter.drawLine(p_c1, p_c2)
-                
-                mid_p = QPointF((p_c1.x() + p_c2.x()) / 2, (p_c1.y() + p_c2.y()) / 2)
-                warn_text = "🚨 VƯỢT RA NGOÀI VÙNG GIỚI HẠN (NG)!"
-                painter.setFont(QFont("Segoe UI", 10, QFont.Bold))
-                tw = 260.0
-                th = 24.0
-                b_rect = QRectF(mid_p.x() - tw / 2, mid_p.y() - th / 2, tw, th)
-                painter.setBrush(QBrush(QColor("#181825")))
-                painter.setPen(QPen(QColor("#f38ba8"), 1.8))
-                painter.drawRoundedRect(b_rect, 5, 5)
-                painter.setPen(QColor("#f38ba8"))
-                painter.drawText(b_rect, Qt.AlignCenter, warn_text)
 
-            # Status Badge tổng quan N vs 1
+            # Status Badge tổng quan N vs 1 đặt ở phía trên tách xa 2 box
             status_text = f"MÔ HÌNH N vs 1: TẬP HỢP ĐỐI TƯỢNG TRONG VÙNG CHỨA  ➔  {'HỢP LỆ (OK)' if box1_pass else 'VI PHẠM (NG)'}"
-            status_color = QColor("#a6e3a1") if box1_pass else QColor("#f38ba8")
-            badge_rect = QRectF((w - 480) / 2, self.box2_rect.top() - 36, 480, 26)
-            painter.setBrush(QBrush(QColor("#181825")))
-            painter.setPen(QPen(status_color, 1.8))
-            painter.drawRoundedRect(badge_rect, 6, 6)
-            painter.setFont(QFont("Segoe UI", 10, QFont.Bold))
-            painter.setPen(status_color)
-            painter.drawText(badge_rect, Qt.AlignCenter, status_text)
+            self._paint_top_status_badge(painter, w, status_text, box1_pass)
 
         # ─────────────────────────────────────────────────────────────────────
         # B. VẼ THEO SCOPE: 1 vs N (1 ĐỐI TƯỢNG VS NHIỀU VÙNG GIỚI HẠN - ONE_A_IN_ANY_B)
@@ -372,16 +450,9 @@ class VisualBoxCanvas(QtWidgets.QWidget):
             custom_center = "✓ Ngoài vùng giới hạn (OK)" if not in_any else "⚠️ VI PHẠM VÀO VÙNG B (NG)!"
             self._paint_box(painter, self.box1_rect, 1, lbl_a, color_a, self.selected_param_1, custom_status=custom_center)
 
-            # Status Badge tổng quan 1 vs N
+            # Status Badge tổng quan 1 vs N đặt ở phía trên tách xa 2 box
             status_text = f"MÔ HÌNH 1 vs N: 1 ĐỐI TƯỢNG VS CÁC VÙNG GIỚI HẠN  ➔  {'HỢP LỆ (OK)' if box1_pass else 'VI PHẠM (NG)'}"
-            status_color = QColor("#a6e3a1") if box1_pass else QColor("#f38ba8")
-            badge_rect = QRectF((w - 480) / 2, max(42.0, self.box2_rect.top() - 36), 480, 26)
-            painter.setBrush(QBrush(QColor("#181825")))
-            painter.setPen(QPen(status_color, 1.8))
-            painter.drawRoundedRect(badge_rect, 6, 6)
-            painter.setFont(QFont("Segoe UI", 10, QFont.Bold))
-            painter.setPen(status_color)
-            painter.drawText(badge_rect, Qt.AlignCenter, status_text)
+            self._paint_top_status_badge(painter, w, status_text, box1_pass)
 
         # ─────────────────────────────────────────────────────────────────────
         # C. VẼ THEO SCOPE: 1 vs 1 HOẶC N vs N
@@ -417,30 +488,35 @@ class VisualBoxCanvas(QtWidgets.QWidget):
                         color2 = QColor("#cba6f7") if is_const else QColor("#f97316")
                         self._paint_box(painter, self.box2_rect, 2, lbl2_txt, color2, self.selected_param_2, is_constant=is_const)
 
-                # Badge trạng thái không gian ở giữa 2 box
-                mid_x = (self.box1_rect.center().x() + self.box2_rect.center().x()) / 2
-                mid_y = (self.box1_rect.center().y() + self.box2_rect.center().y()) / 2
-                op_desc = f"{self.label_1_name} {self.operator_str} {self.label_2_name} ➔ {'ĐẠT (OK)' if pair_pass else 'VI PHẠM (NG)'}"
-                painter.setFont(QFont("Segoe UI", 10, QFont.Bold))
-                tw = max(240.0, float(len(op_desc) * 7.5))
-                th = 26.0
-                badge_rect = QRectF(mid_x - tw / 2, mid_y - th / 2, tw, th)
-                painter.setBrush(QBrush(QColor("#181825")))
-                painter.setPen(QPen(line_color, 1.8))
-                painter.drawRoundedRect(badge_rect, 6, 6)
-                painter.setPen(line_color)
-                painter.drawText(badge_rect, Qt.AlignCenter, op_desc)
+                # Badge đặt phía trên, không che 2 box
+                res_txt = 'HỢP LỆ (OK)' if pair_pass else 'VI PHẠM (NG)'
+                status_text = f"MÔ HÌNH KHÔNG GIAN: {self.label_1_name} [{self.operator_str}] {self.label_2_name}  ➔  {res_txt}"
+                self._paint_top_status_badge(painter, w, status_text, pair_pass)
 
-            else:
-                # Phép đo số học tọa độ tiêu chuẩn (Left, Right, Center, Width, Height)
+            elif is_distance:
+                # ── BÀI TOÁN KHOẢNG CÁCH GIỮA 2 CẠNH TÙY CHỌN ──
                 p1 = self._get_hotspot_point(self.box1_rect, self.selected_param_1)
-                if self.target_type == 'CONSTANT':
-                    p2 = QPointF(self.box2_rect.left(), self.box2_rect.center().y())
-                else:
-                    p2 = self._get_hotspot_point(self.box2_rect, self.selected_param_2)
+                p2 = self._get_hotspot_point(self.box2_rect, self.selected_param_2)
 
-                is_ng = (self.condition_true_result == 'NG')
-                line_color = QColor("#f38ba8") if is_ng else QColor("#a6e3a1")
+                dist_val, dist_label = self._calculate_edge_distance(p1, p2, self.selected_param_1, self.selected_param_2)
+                try:
+                    thresh = float(self.math_val)
+                except Exception:
+                    thresh = 0.0
+
+                comp_op = self.operator_str.replace('DIST_', '')
+                if comp_op == '<': cond_matched = (dist_val < thresh)
+                elif comp_op == '<=': cond_matched = (dist_val <= thresh)
+                elif comp_op == '>': cond_matched = (dist_val > thresh)
+                elif comp_op == '>=': cond_matched = (dist_val >= thresh)
+                elif comp_op in ('==', '='): cond_matched = (abs(dist_val - thresh) < 1.0)
+                elif comp_op == '!=': cond_matched = (abs(dist_val - thresh) >= 1.0)
+                else: cond_matched = False
+
+                pair_pass = (not cond_matched) if (self.condition_true_result == 'NG') else cond_matched
+                line_color = QColor("#a6e3a1") if pair_pass else QColor("#f38ba8")
+
+                # Vẽ đường nét đứt nối giữa tâm của 2 cạnh được chọn
                 pen_line = QPen(line_color, 2, Qt.DashLine)
                 painter.setPen(pen_line)
                 painter.drawLine(p1, p2)
@@ -449,24 +525,109 @@ class VisualBoxCanvas(QtWidgets.QWidget):
                 painter.drawEllipse(p1, 5, 5)
                 painter.drawEllipse(p2, 5, 5)
 
-                mid_x = (p1.x() + p2.x()) / 2
-                mid_y = (p1.y() + p2.y()) / 2
-                
-                rhs_display = self.selected_param_2 if self.target_type == 'LABEL' else "HẰNG SỐ"
-                math_display = f" {self.math_op} {self.math_val}" if self.math_op != 'NONE' else ""
-                res_display = "➔ VI PHẠM (NG)" if is_ng else "➔ HỢP LỆ (OK)"
-                op_text = f" {self.selected_param_1} {self.operator_str} {rhs_display}{math_display} {res_display} "
+                # Mini tag d = ... px nhỏ gọn hiển thị ngay cạnh nét đứt (không che lấp cạnh)
+                line_len = math.hypot(p1.x() - p2.x(), p1.y() - p2.y())
+                if line_len > 35:
+                    mid_p = QPointF((p1.x() + p2.x()) / 2, (p1.y() + p2.y()) / 2)
+                    d_txt = f"{dist_label}: {dist_val:.1f}px"
+                    painter.setFont(QFont("Segoe UI", 8, QFont.Bold))
+                    tw_m = max(56.0, float(len(d_txt) * 6.8 + 10))
+                    th_m = 18.0
+                    m_rect = QRectF(mid_p.x() - tw_m / 2, mid_p.y() - th_m / 2, tw_m, th_m)
+                    painter.setBrush(QBrush(QColor("#181825")))
+                    painter.setPen(QPen(line_color, 1.2))
+                    painter.drawRoundedRect(m_rect, 4, 4)
+                    painter.setPen(line_color)
+                    painter.drawText(m_rect, Qt.AlignCenter, d_txt)
 
-                painter.setFont(QFont("Segoe UI", 10, QFont.Bold))
-                tw = max(160.0, float(len(op_text) * 7.2))
-                th = 24.0
-                badge_rect = QRectF(mid_x - tw / 2, mid_y - th / 2, tw, th)
-                painter.setBrush(QBrush(QColor("#181825")))
-                painter.setPen(QPen(line_color, 1.8))
-                painter.drawRoundedRect(badge_rect, 6, 6)
-                painter.setPen(line_color)
-                painter.drawText(badge_rect, Qt.AlignCenter, op_text)
+                # Vẽ 2 box
+                boxes_to_draw = [2, 1] if self.front_box == 1 else [1, 2]
+                for b_idx in boxes_to_draw:
+                    if b_idx == 1:
+                        self._paint_box(painter, self.box1_rect, 1, self.label_1_name, QColor("#3b82f6"), self.selected_param_1)
+                    else:
+                        self._paint_box(painter, self.box2_rect, 2, self.label_2_name, QColor("#f97316"), self.selected_param_2)
 
+                # Badge trạng thái đầy đủ đưa lên phía trên, xa 2 box
+                res_txt = 'HỢP LỆ (OK)' if pair_pass else 'VI PHẠM (NG)'
+                status_text = f"KHOẢNG CÁCH [{self.selected_param_1} ➔ {self.selected_param_2}]: {dist_val:.1f}px {comp_op} {thresh:.1f}px  ➔  {res_txt}"
+                self._paint_top_status_badge(painter, w, status_text, pair_pass)
+
+            else:
+                # ── PHÉP ĐO SỐ HỌC TỌA ĐỘ TIÊU CHUẨN (<, <=, >, >=, ==, !=, BETWEEN) ──
+                p1 = self._get_hotspot_point(self.box1_rect, self.selected_param_1)
+                if self.target_type == 'CONSTANT':
+                    p2 = QPointF(self.box2_rect.left(), self.box2_rect.center().y())
+                else:
+                    p2 = self._get_hotspot_point(self.box2_rect, self.selected_param_2)
+
+                # TÍNH TOÁN GIÁ TRỊ THỰC TẾ THỜI GIAN THỰC (LIVE UPDATE) KHI KÉO THẢ BOX
+                lhs_val = self._get_param_value(self.box1_rect, self.selected_param_1)
+                if self.target_type == 'LABEL':
+                    rhs_base = self._get_param_value(self.box2_rect, self.selected_param_2)
+                    rhs_display = f"{self.selected_param_2}({rhs_base:.1f}px)"
+                else:
+                    try:
+                        rhs_base = float(self.math_val)
+                    except Exception:
+                        rhs_base = 0.0
+                    rhs_display = f"HẰNG SỐ({rhs_base:.1f}px)"
+
+                try:
+                    offset_num = float(self.math_val) if self.target_type == 'LABEL' else 0.0
+                except Exception:
+                    offset_num = 0.0
+
+                if self.target_type == 'LABEL' and self.math_op != 'NONE':
+                    if self.math_op == '+': rhs_val = rhs_base + offset_num
+                    elif self.math_op == '-': rhs_val = rhs_base - offset_num
+                    elif self.math_op == '*': rhs_val = rhs_base * offset_num
+                    elif self.math_op == '/': rhs_val = rhs_base / offset_num if abs(offset_num) > 1e-6 else rhs_base
+                    else: rhs_val = rhs_base
+                    math_display = f" {self.math_op} {offset_num:.1f}px"
+                else:
+                    rhs_val = rhs_base
+                    math_display = ""
+
+                # Phán định điều kiện thời gian thực
+                if self.operator_str == '<': cond_matched = (lhs_val < rhs_val)
+                elif self.operator_str == '<=': cond_matched = (lhs_val <= rhs_val)
+                elif self.operator_str == '>': cond_matched = (lhs_val > rhs_val)
+                elif self.operator_str == '>=': cond_matched = (lhs_val >= rhs_val)
+                elif self.operator_str in ('==', '='): cond_matched = (abs(lhs_val - rhs_val) < 1.0)
+                elif self.operator_str == '!=': cond_matched = (abs(lhs_val - rhs_val) >= 1.0)
+                elif self.operator_str == 'BETWEEN': cond_matched = (rhs_val <= lhs_val <= rhs_val)
+                else: cond_matched = False
+
+                pair_pass = (not cond_matched) if (self.condition_true_result == 'NG') else cond_matched
+                line_color = QColor("#a6e3a1") if pair_pass else QColor("#f38ba8")
+
+                # Vẽ nét đứt đo tọa độ nối 2 điểm neo
+                pen_line = QPen(line_color, 2, Qt.DashLine)
+                painter.setPen(pen_line)
+                painter.drawLine(p1, p2)
+
+                painter.setBrush(QBrush(line_color))
+                painter.drawEllipse(p1, 5, 5)
+                painter.drawEllipse(p2, 5, 5)
+
+                # Mini tag Δ = ... px nhỏ gọn cạnh nét đứt (không che lấp 2 box)
+                line_len = math.hypot(p1.x() - p2.x(), p1.y() - p2.y())
+                if line_len > 40:
+                    mid_p = QPointF((p1.x() + p2.x()) / 2, (p1.y() + p2.y()) / 2)
+                    delta_v = lhs_val - rhs_val
+                    delta_txt = f"Δ = {delta_v:+.1f}px"
+                    painter.setFont(QFont("Segoe UI", 8, QFont.Bold))
+                    tw_m = max(56.0, float(len(delta_txt) * 6.8 + 10))
+                    th_m = 18.0
+                    m_rect = QRectF(mid_p.x() - tw_m / 2, mid_p.y() - th_m / 2, tw_m, th_m)
+                    painter.setBrush(QBrush(QColor("#181825")))
+                    painter.setPen(QPen(line_color, 1.2))
+                    painter.drawRoundedRect(m_rect, 4, 4)
+                    painter.setPen(line_color)
+                    painter.drawText(m_rect, Qt.AlignCenter, delta_txt)
+
+                # Vẽ 2 box
                 boxes_to_draw = [2, 1] if self.front_box == 1 else [1, 2]
                 for b_idx in boxes_to_draw:
                     if b_idx == 1:
@@ -476,6 +637,11 @@ class VisualBoxCanvas(QtWidgets.QWidget):
                         lbl2_txt = f"HẰNG SỐ: {self.math_val}" if is_const else self.label_2_name
                         color2 = QColor("#cba6f7") if is_const else QColor("#f97316")
                         self._paint_box(painter, self.box2_rect, 2, lbl2_txt, color2, self.selected_param_2, is_constant=is_const)
+
+                # Badge đặt phía trên, xa 2 box
+                res_txt = 'HỢP LỆ (OK)' if pair_pass else 'VI PHẠM (NG)'
+                status_text = f"TỌA ĐỘ: {self.selected_param_1}({lhs_val:.1f}px) {self.operator_str} {rhs_display}{math_display}  ➔  {res_txt}"
+                self._paint_top_status_badge(painter, w, status_text, pair_pass)
 
         # 4. HUD Banner hiển thị Pixel thời gian thực khi kéo to thu nhỏ hoặc di chuyển
         self._paint_hud_banner(painter, w)
@@ -914,8 +1080,8 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         self._is_populating = False
 
         title_suffix = f" [Model ID: {self.model_id}]" if self.model_id else ""
-        self.setWindowTitle(f"Chỉnh Sửa Task & Quy Tắc Tính Toán Tọa Độ (Geometric Task Editor){title_suffix}")
-        self.resize(1150, 850)
+        self.setWindowTitle(f"Geometric Task Editor-{title_suffix}")
+        self.resize(1200, 920)
 
         self.setWindowFlags(
             self.windowFlags()
@@ -1305,7 +1471,7 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         grid_task.addWidget(QtWidgets.QLabel("Tên Task:"), 0, 0)
         task_name_box = QtWidgets.QHBoxLayout()
         self.line_task_name = QtWidgets.QLineEdit()
-        self.line_task_name.setPlaceholderText("VD: Kiểm tra phôi trong khay chứa / Lệch mép linh kiện A-B")
+        self.line_task_name.setPlaceholderText("...")
         task_name_box.addWidget(self.line_task_name, 3)
 
         self.chk_task_enabled = QtWidgets.QCheckBox("Kích hoạt [✓]")
@@ -1321,22 +1487,31 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         self.combo_task_type.addItem("Biểu thức Tùy chỉnh (CUSTOM_EXPRESSION)", "CUSTOM_EXPRESSION")
         grid_task.addWidget(self.combo_task_type, 0, 3)
 
-        grid_task.addWidget(QtWidgets.QLabel("PLC Register (khi NG):"), 1, 0)
+        grid_task.addWidget(QtWidgets.QLabel("PLC Register:"), 1, 0)
         self.line_plc_register = QtWidgets.QLineEdit()
-        self.line_plc_register.setPlaceholderText("VD: D105 hoặc M20 (Để trống nếu không gửi)")
+        self.line_plc_register.setPlaceholderText("Để trống nếu không gửi")
         grid_task.addWidget(self.line_plc_register, 1, 1)
 
         layout_plc_vals = QtWidgets.QHBoxLayout()
-        layout_plc_vals.addWidget(QtWidgets.QLabel("Gửi Value:"))
+        layout_plc_vals.addWidget(QtWidgets.QLabel("Value State:"))
+        self.spin_plc_state = QtWidgets.QSpinBox()
+        self.spin_plc_state.setRange(-32768, 32767)
+        self.spin_plc_state.setValue(1)
+        self.spin_plc_state.setToolTip("🎯 Giá trị trạng thái ban đầu của thanh ghi (Value State)")
+        layout_plc_vals.addWidget(self.spin_plc_state)
+
+        layout_plc_vals.addWidget(QtWidgets.QLabel("Value OK:"))
         self.spin_plc_on = QtWidgets.QSpinBox()
         self.spin_plc_on.setRange(-32768, 32767)
         self.spin_plc_on.setValue(1)
+        self.spin_plc_on.setToolTip("✔ Giá trị gửi đến PLC khi Task đạt chuẩn (Value OK)")
         layout_plc_vals.addWidget(self.spin_plc_on)
 
-        layout_plc_vals.addWidget(QtWidgets.QLabel("Reset Value:"))
+        layout_plc_vals.addWidget(QtWidgets.QLabel("Value NG:"))
         self.spin_plc_off = QtWidgets.QSpinBox()
         self.spin_plc_off.setRange(-32768, 32767)
         self.spin_plc_off.setValue(0)
+        self.spin_plc_off.setToolTip("✘ Giá trị gửi đến PLC khi Task vi phạm (Value NG)")
         layout_plc_vals.addWidget(self.spin_plc_off)
         grid_task.addLayout(layout_plc_vals, 1, 2)
 
@@ -1351,7 +1526,7 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         content_layout.addWidget(group_task)
 
         # 2. GROUPBOX MÔ HÌNH ĐỒ HỌA TRỰC QUAN & SOẠN THẢO LUẬT
-        group_rule = QtWidgets.QGroupBox("2. Bộ Soạn Thảo Luật && Mô Hình Đồ Họa Đa Đối Tượng (Interactive Canvas)")
+        group_rule = QtWidgets.QGroupBox("2.Mô Hình Đồ Họa Đa Đối Tượng (Interactive Canvas)")
         vlayout_rule = QtWidgets.QVBoxLayout(group_rule)
         vlayout_rule.setSpacing(10)
 
@@ -1453,7 +1628,8 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         grid_expr.addWidget(self.combo_param_2, 0, 6)
 
         # Dòng 2: Math Offset & Kết quả
-        grid_expr.addWidget(QtWidgets.QLabel("Phép bù trừ / Dung sai:"), 1, 0)
+        self.lbl_math_op = QtWidgets.QLabel("Phép bù trừ / Dung sai:")
+        grid_expr.addWidget(self.lbl_math_op, 1, 0)
         self.combo_math_op = QtWidgets.QComboBox()
         self.combo_math_op.addItem("Không bù trừ (NONE)", "NONE")
         self.combo_math_op.addItem("+ (Cộng)", "+")
@@ -1462,7 +1638,8 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         self.combo_math_op.addItem("/ (Chia)", "/")
         grid_expr.addWidget(self.combo_math_op, 1, 1)
 
-        grid_expr.addWidget(QtWidgets.QLabel("Giá trị bù trừ (px):"), 1, 2)
+        self.lbl_math_val = QtWidgets.QLabel("Giá trị bù trừ (px):")
+        grid_expr.addWidget(self.lbl_math_val, 1, 2)
         self.line_math_val = QtWidgets.QLineEdit("0")
         self.line_math_val.setPlaceholderText("VD: 15.5 hoặc dung sai viền")
         grid_expr.addWidget(self.line_math_val, 1, 3)
@@ -1724,6 +1901,8 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
             return
         op = self.combo_operator.currentData() or '<'
         is_spatial = op in ('INSIDE', 'OUTSIDE', 'OVERLAP')
+        is_distance = op.startswith('DIST_')
+
         if is_spatial:
             idx_p1 = self.combo_param_1.findData('FULL_BOX')
             if idx_p1 >= 0:
@@ -1740,12 +1919,56 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
                 self.combo_param_2.setCurrentIndex(idx_p2)
             self.combo_param_2.setEnabled(False)
             self.combo_label_2.setEnabled(True)
+
+            self.lbl_math_op.setText("Phép bù trừ Margin:")
+            self.lbl_math_val.setText("Dung sai Margin (px):")
+            self.line_math_val.setPlaceholderText("VD: 5 hoặc -5")
+            self.combo_math_op.setEnabled(True)
+            self.line_math_val.setEnabled(True)
+
+        elif is_distance:
+            self.combo_param_1.setEnabled(True)
+            # Khóa so sánh với Nhãn B (chọn cạnh của B)
+            idx_lbl = self.combo_target_type.findData('LABEL')
+            if idx_lbl >= 0:
+                self.combo_target_type.setCurrentIndex(idx_lbl)
+            self.combo_target_type.setEnabled(False)
+            self.combo_label_2.setEnabled(True)
+            self.combo_param_2.setEnabled(True)
+
+            # Nếu đang chọn FULL_BOX thì tự đổi sang Y_MAX và Y_MIN mặc định
+            if self.combo_param_1.currentData() == 'FULL_BOX':
+                idx_ymax = self.combo_param_1.findData('Y_MAX')
+                if idx_ymax >= 0:
+                    self.combo_param_1.setCurrentIndex(idx_ymax)
+            if self.combo_param_2.currentData() == 'FULL_BOX':
+                idx_ymin = self.combo_param_2.findData('Y_MIN')
+                if idx_ymin >= 0:
+                    self.combo_param_2.setCurrentIndex(idx_ymin)
+
+            self.lbl_math_op.setText("Phép tính:")
+            idx_none = self.combo_math_op.findData('NONE')
+            if idx_none >= 0:
+                self.combo_math_op.setCurrentIndex(idx_none)
+            self.combo_math_op.setEnabled(False)
+
+            self.lbl_math_val.setText("Ngưỡng khoảng cách (px):")
+            self.line_math_val.setPlaceholderText("VD: 40 hoặc 25.5")
+            self.line_math_val.setEnabled(True)
+
         else:
             self.combo_param_1.setEnabled(True)
             self.combo_target_type.setEnabled(True)
             is_label = (self.combo_target_type.currentData() == 'LABEL')
             self.combo_label_2.setEnabled(is_label)
             self.combo_param_2.setEnabled(is_label)
+
+            self.lbl_math_op.setText("Phép bù trừ / Dung sai:")
+            self.combo_math_op.setEnabled(True)
+            self.lbl_math_val.setText("Giá trị bù trừ (px):")
+            self.line_math_val.setPlaceholderText("VD: 15.5 hoặc dung sai viền")
+            self.line_math_val.setEnabled(True)
+
         self.on_form_param_changed()
 
     def populate_data(self):
@@ -1784,8 +2007,10 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
 
                 self.chk_task_enabled.setChecked(bool(self.task_data.get('enabled', True)))
                 self.line_plc_register.setText(self.task_data.get('assign_register', ''))
-                self.spin_plc_on.setValue(int(self.task_data.get('value_bit_on', 1)))
-                self.spin_plc_off.setValue(int(self.task_data.get('value_bit_off', 0)))
+                val_state = self.task_data.get('value_state', self.task_data.get('Value_State', 1))
+                self.spin_plc_state.setValue(int(val_state if val_state is not None else 1))
+                self.spin_plc_on.setValue(int(self.task_data.get('value_bit_on', self.task_data.get('value_ok', self.task_data.get('Value_OK', 1)))))
+                self.spin_plc_off.setValue(int(self.task_data.get('value_bit_off', self.task_data.get('value_ng', self.task_data.get('Value_NG', 0)))))
 
             self.refresh_rules_table()
 
@@ -1865,14 +2090,28 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
                 self.combo_param_2.setCurrentIndex(idx_p2)
 
             is_spatial = op in ('INSIDE', 'OUTSIDE', 'OVERLAP')
+            is_distance = op.startswith('DIST_')
             if is_spatial:
                 self.combo_param_1.setEnabled(False)
                 self.combo_param_2.setEnabled(False)
                 self.combo_target_type.setEnabled(False)
+                self.lbl_math_op.setText("Phép bù trừ Margin:")
+                self.lbl_math_val.setText("Dung sai Margin (px):")
+                self.combo_math_op.setEnabled(True)
+            elif is_distance:
+                self.combo_param_1.setEnabled(True)
+                self.combo_param_2.setEnabled(True)
+                self.combo_target_type.setEnabled(False)
+                self.lbl_math_op.setText("Phép tính:")
+                self.combo_math_op.setEnabled(False)
+                self.lbl_math_val.setText("Ngưỡng khoảng cách (px):")
             else:
                 self.combo_param_1.setEnabled(True)
                 self.combo_target_type.setEnabled(True)
                 self.combo_param_2.setEnabled(tt == 'LABEL')
+                self.lbl_math_op.setText("Phép bù trừ / Dung sai:")
+                self.combo_math_op.setEnabled(True)
+                self.lbl_math_val.setText("Giá trị bù trừ (px):")
 
             # 5. Math Op & Value
             m_op = rule.get('math_op', 'NONE')
@@ -1977,8 +2216,16 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
             param1 = 'FULL_BOX'
             param2 = 'FULL_BOX'
 
+        try:
+            val_f = float(math_val)
+        except Exception:
+            val_f = 0.0
+
         # Xây dựng mô tả rule chuyên nghiệp
-        if scope == 'ALL_A_IN_ONE_B':
+        if op.startswith('DIST_'):
+            comp_op = op.replace('DIST_', '')
+            rule_desc = f"Khoảng cách [{param1}({lbl1}) ➔ {param2}({lbl2})] {comp_op} {math_val}px ➔ {true_res}"
+        elif scope == 'ALL_A_IN_ONE_B':
             rule_desc = f"[N vs 1] Mọi {lbl1} {op} {lbl2} ➔ {true_res}"
         elif scope == 'ONE_A_IN_ANY_B':
             rule_desc = f"[1 vs N] {lbl1} {op} Bất kỳ {lbl2} ➔ {true_res}"
@@ -2004,7 +2251,7 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
             'math_op': math_op,
             'math_operand_type': 'CONSTANT',
             'math_operand_val': math_val,
-            'min_value': 0.0,
+            'min_value': val_f if op.startswith('DIST_') else 0.0,
             'max_value': 0.0,
             'condition_true_result': true_res,
             'enabled': True,
@@ -2077,11 +2324,17 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
             item_lhs.setForeground(QColor("#1e293b"))
             self.table_rules.setItem(row_idx, 3, item_lhs)
 
-            rhs_target = r.get('label_2', '') if r.get('target_type') == 'LABEL' else 'HẰNG SỐ'
-            rhs_param_str = f"[{r.get('param_2', '')}]" if (r.get('target_type') == 'LABEL' and r.get('param_2') != 'FULL_BOX') else ''
-            rhs_info = f"{r.get('operator', '')} {rhs_target} {rhs_param_str}".strip()
-            if r.get('math_op') and r.get('math_op') != 'NONE':
-                rhs_info += f" {r.get('math_op')} {r.get('math_operand_val', '0')}"
+            rule_op = str(r.get('operator', ''))
+            if rule_op.startswith('DIST_'):
+                comp_op = rule_op.replace('DIST_', '')
+                thresh_str = str(r.get('math_operand_val') or r.get('min_value', 0))
+                rhs_info = f"Khoảng cách {comp_op} {thresh_str} px [{r.get('param_2', '')}]"
+            else:
+                rhs_target = r.get('label_2', '') if r.get('target_type') == 'LABEL' else 'HẰNG SỐ'
+                rhs_param_str = f"[{r.get('param_2', '')}]" if (r.get('target_type') == 'LABEL' and r.get('param_2') != 'FULL_BOX') else ''
+                rhs_info = f"{rule_op} {rhs_target} {rhs_param_str}".strip()
+                if r.get('math_op') and r.get('math_op') != 'NONE':
+                    rhs_info += f" {r.get('math_op')} {r.get('math_operand_val', '0')}"
             item_rhs = QtWidgets.QTableWidgetItem(rhs_info)
             item_rhs.setForeground(QColor("#1e293b"))
             self.table_rules.setItem(row_idx, 4, item_rhs)
@@ -2129,8 +2382,14 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
             'action_on_fail': self.task_data.get('action_on_fail', 'NG'),
             'enabled': self.chk_task_enabled.isChecked(),
             'assign_register': self.line_plc_register.text().strip(),
+            'value_state': self.spin_plc_state.value(),
+            'Value_State': self.spin_plc_state.value(),
             'value_bit_on': self.spin_plc_on.value(),
+            'value_ok': self.spin_plc_on.value(),
+            'Value_OK': self.spin_plc_on.value(),
             'value_bit_off': self.spin_plc_off.value(),
+            'value_ng': self.spin_plc_off.value(),
+            'Value_NG': self.spin_plc_off.value(),
         }
 
         from module_3.task_calculator_db import save_task_and_rules

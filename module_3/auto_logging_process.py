@@ -34,7 +34,15 @@ class AutoLoggingProcess:
 
     def generate_table(self,total_key):
         path = self.ui_logging.lineEdit_folder_path.text().strip()
-        list_obj = glob.glob(os.path.join(path, '*.jpg'))
+        valid_exts = ('.jpg', '.jpeg', '.png', '.bmp', '.webp')
+        list_obj = []
+        if path and os.path.isdir(path):
+            list_obj = [
+                os.path.join(path, f)
+                for f in os.listdir(path)
+                if os.path.isfile(os.path.join(path, f)) and os.path.splitext(f)[1].lower() in valid_exts
+            ]
+            list_obj.sort()
 
         total_cam = set()
         total_model = set()
@@ -402,10 +410,17 @@ class AutoLoggingProcess:
         if not hasattr(self, 'dict_view_results'):
             self.dict_view_results = {}
 
-        result_image_rgb, flag, list_register,_ = self.process.process_image_func(
-                result_image_rgb, self.model_loader, self.pyuic, True, self.valid_key, 12,
-                mode_load_jumper=False,
-            )
+        camera_id = self.valid_key[0] if isinstance(self.valid_key, (tuple, list)) and len(self.valid_key) > 0 else 'camera-1'
+        res_process = self.process.process_image_func(
+            result_image_rgb, self.model_loader, self.pyuic, camera_id, self.valid_key
+        )
+        if isinstance(res_process, (tuple, list)):
+            result_image_rgb = res_process[0]
+            flag = res_process[1]
+            list_register = res_process[2]
+        else:
+            flag = False
+            list_register = {}
         self.dict_view_results[file_path] = list_register
 
         result_text = f'RESULT: {"OK" if flag else "NG"}'

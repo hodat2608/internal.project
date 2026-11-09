@@ -12,8 +12,8 @@ from module_3.handle_option_models import COLUMN_MAPPING
 LOGO_WATERMARK = "Detected by YOLO V5 Architecture"
 
 
-COLOR_OK = (0, 255, 0)   
-COLOR_NG = (255, 0, 0)   
+COLOR_OK = (20, 122, 0)   
+COLOR_NG = (171, 33, 56)   
 
 def _normalize_key_model(k):
     """Chuẩn hoá key_model về tuple dạng ('camera-X', 'model-Y')."""
@@ -30,18 +30,57 @@ def draw_detections(image_rgb: np.ndarray, draw_list: list, fail_labels) -> np.n
         return image_rgb
 
     out = image_rgb.copy()
+    img_h, img_w = out.shape[:2]
+
+    # Dynamic scaling co giãn hài hòa theo kích thước ảnh (chuẩn mốc 1280px)
+    base_dim = max(img_w, img_h)
+    scale = max(0.5, min(2.5, base_dim / 1280.0))
+    box_thickness = max(1, int(round(scale * 1.5)))
+    font_scale = max(0.38, min(1.0, 0.45 * scale))
+    font_thickness = max(1, int(round(scale * 0.9)))
 
     # ── Bounding boxes ───────────────────────────────────────────────────
     for d in draw_list:
         x1, y1, x2, y2, color = d['x1'], d['y1'], d['x2'], d['y2'], d['color']
-        text = f"{d['label']} {d['conf']:.2f} {x2-x1} {y2-y1}"
 
-        cv2.rectangle(out, (x1, y1), (x2, y2), color, 5)
+        # Viền box thanh thoát, sắc nét (khử răng cưa LINE_AA)
+        cv2.rectangle(out, (x1, y1), (x2, y2), color, box_thickness, cv2.LINE_AA)
 
-        (tw, th), _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 2, 5)
-        ty = max(y1 - 5, th + 2)
-        cv2.rectangle(out, (x1, ty - th - 2), (x1 + tw + 2, ty + 2), color, -1)
-        cv2.putText(out, text, (x1 + 1, ty), cv2.FONT_HERSHEY_SIMPLEX, 2, (0,0,0), 5, cv2.LINE_AA)
+        w_box = max(0, x2 - x1)
+        h_box = max(0, y2 - y1)
+        conf_val = d.get('conf', 1.0)
+        text = f"{d['label']} {conf_val:.2f} {w_box}x{h_box}"
+
+        (tw, th), baseline = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, font_scale, font_thickness)
+        pad_x = max(3, int(4 * scale))
+        pad_y = max(2, int(3 * scale))
+        tag_w = tw + pad_x * 2
+        tag_h = th + baseline + pad_y * 2
+
+        # Đặt nhãn tag nằm ở NGOÀI hộp (phía trên cạnh top y1) để không che lấp chi tiết object bên trong
+        # Nếu y1 quá sát mép trên ảnh thì mới đưa tag vào phía trong hộp
+        if y1 - tag_h >= 0:
+            tag_y1 = y1 - tag_h
+            tag_y2 = y1
+        else:
+            tag_y1 = y1
+            tag_y2 = y1 + tag_h
+
+        tag_x1 = max(0, x1)
+        if tag_x1 + tag_w > img_w:
+            tag_x1 = max(0, img_w - tag_w)
+        tag_x2 = min(img_w - 1, tag_x1 + tag_w)
+
+        # Nền tag màu tương ứng với trạng thái (Xanh lá = OK, Đỏ = NG)
+        cv2.rectangle(out, (tag_x1, tag_y1), (tag_x2, tag_y2), color, -1)
+
+        # Màu chữ: Tự động chọn Đen hoặc Trắng theo độ sáng màu nền (Perceived Luminance) để dễ đọc
+        lum = 0.299 * color[0] + 0.587 * color[1] + 0.114 * color[2]
+        text_color = (0, 0, 0) if lum > 140 else (255, 255, 255)
+
+        text_x = tag_x1 + pad_x
+        text_y = tag_y2 - baseline - pad_y
+        cv2.putText(out, text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, font_scale, text_color, font_thickness, cv2.LINE_AA)
 
     # ── Fail labels HUD (Heads-Up Display) ────────────────────────────────
     if not fail_labels and not draw_list:
@@ -72,6 +111,11 @@ def draw_detections(image_rgb: np.ndarray, draw_list: list, fail_labels) -> np.n
             is_ng = '*' in lbl_str.upper()
 
             clean_text = lbl_str
+            if clean_text.startswith('* '):
+                clean_text = clean_text[2:]
+            elif clean_text.startswith('*'):
+                clean_text = clean_text[1:]
+
             if clean_text.startswith('NG: '):
                 clean_text = clean_text[4:]
             elif clean_text.startswith('OK: '):
@@ -241,7 +285,8 @@ def get_model_config(pyuic, keys_mapping: list) -> list:
     """
     cached = getattr(pyuic, '_cached_model_config', None)
     if cached is not None:
-        return cached
+        # Lọc sạch các mục không phải label config và trả về bản copy để tránh bị mutate
+        return [dict(r) for r in cached if isinstance(r, dict) and 'quantity' in r]
 
     model = getattr(pyuic, 'model', None)
     model_column = getattr(pyuic, 'model_column', None)
@@ -250,10 +295,10 @@ def get_model_config(pyuic, keys_mapping: list) -> list:
 
     rows = _read_model_config(model, model_column, keys_mapping)
     try:
-        pyuic._cached_model_config = rows
+        pyuic._cached_model_config = [dict(r) for r in rows]
     except Exception:
         pass
-    return rows
+    return [dict(r) for r in rows]
  
 
 class v5s:
@@ -276,7 +321,7 @@ class v5s:
 
 
 
-    def run_model(self, image: np.ndarray, model_loader, pyuic, camera, key_model):
+    def run_model(self, image: np.ndarray, model_loader, pyuic, camera, key_model, *args, **kwargs):
         """
         Chạy inference, lọc detection, vẽ kết quả và đánh giá pass/fail.
         Tối ưu hoá:
@@ -304,8 +349,9 @@ class v5s:
 
         label_cfg: dict[str, dict] = {}
         for cfg in cfg_rows:
-            if cfg['label'] and cfg['label'] not in label_cfg:
-                label_cfg[cfg['label']] = cfg
+            lbl = cfg.get('label')
+            if lbl and 'quantity' in cfg and lbl not in label_cfg:
+                label_cfg[lbl] = cfg
 
         valid_names: list[str] = []
         draw_candidates: list[dict] = []
@@ -381,18 +427,20 @@ class v5s:
         name_counts = Counter(valid_names)
 
         for cfg in cfg_rows:
-            if not cfg['join']:
+            if not cfg.get('join'):
+                continue
+            if 'quantity' not in cfg:
                 continue
 
-            label    = cfg['label']
+            label    = cfg.get('label', '')
             ok_count = name_counts.get(label, 0)
             reg      = str(cfg.get('register') or '').strip()
 
             is_label_ng = False
-            if cfg['ok'] and ok_count != cfg['quantity']:
+            if cfg.get('ok') and ok_count != cfg.get('quantity', 0):
                 is_label_ng = True
 
-            if cfg['ng'] and ok_count > 0:
+            if cfg.get('ng') and ok_count > 0:
                 is_label_ng = True
 
             if is_label_ng:
@@ -405,12 +453,10 @@ class v5s:
                 if reg and any(c.isdigit() for c in reg):
                     list_register[reg] = cfg.get('value_ok', 1)
 
-        # ── Colour failing boxes red ──────────────────────────────────────────
+        # ── Đổi màu đỏ cho các box thuộc nhãn bị NG ──────────────────────────
         for d in draw_candidates:
-            if d['label'] in fail_labels:
+            if any(d['label'] in x for x in fail_labels if '*' in x):
                 d['color'] = COLOR_NG
-
-        result_image_rgb = draw_detections(image, draw_candidates, fail_labels)
 
         # ── Kiểm tra điều kiện Task Calculator đa nhãn theo key_model ─────────
         processor = getattr(pyuic, 'processor', None)
@@ -434,15 +480,34 @@ class v5s:
         elif isinstance(active_tasks_dict, list):
             tasks_for_model = active_tasks_dict
 
-        # Chỉ khi trùng key_model và có task cấu hình thì mới thực thi evaluate_task_calculator
+        # QUAN TRỌNG: Thực thi Task Calculator TRƯỚC KHI vẽ HUD và tổng hợp toàn bộ lỗi vào fail_labels
         if tasks_for_model:
-            result_image_rgb, flag, list_register = self.evaluate_task_calculator(
-                result_image_rgb, draw_candidates, pyuic, flag, list_register,
+            image, flag, list_register = self.evaluate_task_calculator(
+                image, draw_candidates, pyuic, flag, list_register,
                 tasks_config=tasks_for_model,
-                key_model=key_model
+                key_model=key_model,
+                fail_labels=fail_labels
             )
 
-        return result_image_rgb, flag, list_register,LOGO_WATERMARK, cfg_rows
+        # ── Chốt toàn bộ kết quả (nhãn + toán tử) rồi mới vẽ Bounding Boxes và HUD ──
+        result_image_rgb = draw_detections(image, draw_candidates, fail_labels)
+
+        # Chuẩn bị danh sách cfg_rows độc lập trả về cho main_core (không làm bẩn cache pyuic)
+        final_cfg_rows = [dict(c) for c in cfg_rows if 'quantity' in c]
+        if tasks_for_model:
+            for t in tasks_for_model:
+                t_reg = str(t.get('assign_register') or '').strip()
+                if t_reg and any(c.isdigit() for c in t_reg):
+                    final_cfg_rows.append({
+                        'label': f"Task:{t.get('task_name', '')}",
+                        'register': t_reg,
+                        'value_state': t.get('value_state', t.get('Value_State', 1)),
+                        'value_ok': t.get('value_ok', t.get('Value_OK', t.get('value_bit_on', 1))),
+                        'value_ng': t.get('value_ng', t.get('Value_NG', t.get('value_bit_off', 0))),
+                        'join': True,
+                    })
+
+        return result_image_rgb, flag, list_register, LOGO_WATERMARK, final_cfg_rows
 
     def evaluate_task_calculator(
         self,
@@ -450,9 +515,12 @@ class v5s:
         draw_candidates: list,
         pyuic,
         flag: bool,
-        list_register: list,
+        list_register: dict,
         tasks_config: list = None,
         key_model: tuple = None,
+        fail_labels: set = None,
+        *args,
+        **kwargs
     ):
         """
         Hàm riêng biệt thực hiện kiểm tra các Task quan hệ tọa độ & kích thước hình học đa nhãn.
@@ -512,8 +580,57 @@ class v5s:
                 flag = False
                 for reg, val in plc_to_send:
                     reg_str = str(reg or '').strip()
+                    if reg_str:
+                        list_register[reg_str] = val
+            else:
+                for reg, val in plc_to_send:
+                    reg_str = str(reg or '').strip()
                     if reg_str and reg_str not in list_register:
                         list_register[reg_str] = val
+
+            # Trích xuất toàn bộ hạng mục Task vi phạm đưa vào fail_labels để hiển thị lên HUD
+            if fail_labels is not None and task_results:
+                for t in task_results:
+                    t_name = t.get('task_name') or f"Task-{t.get('task_id', '')}"
+                    if not t.get('pass'):
+                        failing_rules = [r for r in t.get('rules', []) if not r.get('pass')]
+                        if failing_rules:
+                            for r in failing_rules:
+                                lbl1 = r.get('label_1', '')
+                                lbl2 = r.get('label_2', '')
+                                op = r.get('operator', '')
+                                p1 = r.get('param_1', '')
+                                p2 = r.get('param_2', '')
+                                reason = r.get('reason')
+
+                                # Tô màu đỏ cho box tham gia vào rule vi phạm
+                                for d in draw_candidates:
+                                    if d.get('label') in (lbl1, lbl2):
+                                        d['color'] = COLOR_NG
+
+                                if reason:
+                                    desc = f"{reason}"
+                                elif op.startswith('DIST_') or r.get('is_distance'):
+                                    comp_op = op.replace('DIST_', '')
+                                    d_val = r.get('lhs_val', 0.0) or 0.0
+                                    thresh = r.get('rhs_val', 0.0) or 0.0
+                                    desc = f"{lbl1}.{p1}-{lbl2}.{p2}: {d_val:.1f}px {comp_op} {thresh:.1f}px"
+                                elif op in ('INSIDE', 'OUTSIDE', 'OVERLAP') or r.get('is_spatial'):
+                                    desc = f"{lbl1} {op} {lbl2}"
+                                else:
+                                    v1 = r.get('lhs_val')
+                                    v2 = r.get('rhs_val')
+                                    if v1 is not None and v2 is not None:
+                                        desc = f"{lbl1}.{p1} {op} {lbl2}.{p2} ({v1:.1f}px vs {v2:.1f}px)"
+                                    else:
+                                        desc = f"{lbl1}.{p1} {op} {lbl2}.{p2}"
+
+                                fail_labels.add(f"* Task: {t_name} [{desc}]")
+                        else:
+                            fail_labels.add(f"* Task: {t_name} (Vi phạm)")
+                    else:
+                        fail_labels.add(f"Task: {t_name} (OK)")
+
         except Exception as e:
             print("Error in evaluate_task_calculator (v5):", e)
 

@@ -1532,7 +1532,6 @@ class PLCHandler:
                 return
 
             plc_tasks = []
-            # Ghi tất cả các thanh ghi trong list_register (bao gồm cả thanh ghi OK và NG)
             if list_register:
                 _log.info('[%s] Single frame registers to write (OK/NG): %s', key, list_register)
                 if isinstance(list_register, dict):
@@ -1542,7 +1541,6 @@ class PLCHandler:
                     for reg in list_register:
                         plc_tasks.append((reg, 1))
 
-            # Chỉ khi tất cả các label đều OK thì mới gửi thêm tín hiệu reset_sig
             if flag and reset_sig:
                 _log.info(f'Send Reset Signal OK {reset_sig}')
                 plc_tasks.append((reset_sig.get('reg'), int(reset_sig.get('on', 1))))
@@ -1728,8 +1726,7 @@ class PLCHandler:
             _log.exception('[handle_result_mode_geji][%s] Retrieve_Image_Buffer failed', key)
             self._reset_counter(key)
             return
-        # CẢNH BÁO LỖI LUỒNG: KHÔNG ĐƯỢC CHẠY get_value_from_table() Ở ĐÂY VÌ ĐANG Ở BACKGROUND THREAD.
-        # Chúng ta chỉ lấy biến dict đã được lưu trữ sẵn từ Main Thread.
+
         MIRROR_DATA_CAMERA1 = mirror_dev.MIRROR_DATA_CAMERA1
         CONFIG_CAMERA1 = mirror_dev.CONFIG_CAMERA1
         
@@ -1743,8 +1740,6 @@ class PLCHandler:
 
         result_img = img
         flag       = check
-
-        # NOTE: PLC write PHẢI ngoài read-lock để tránh deadlock
         try:
             with self._signal_rwlock.read():
                 reset_ok_sig = self._resolve_signal(key, 'component')
@@ -1755,19 +1750,15 @@ class PLCHandler:
             complete_sig = None
 
         plc_tasks = []
-
-        # 1. Tín hiệu Component / Result (OK hoặc NG)
         if reset_ok_sig and reset_ok_sig.get('reg'):
             reg_target = str(reset_ok_sig['reg']).strip()
             if flag:
-                # Trường hợp ĐẠT (OK): Gửi giá trị ON (mặc định 1)
                 val_on = reset_ok_sig.get('on', 1)
                 try:
                     plc_tasks.append((reg_target, int(val_on)))
                 except (ValueError, TypeError):
                     plc_tasks.append((reg_target, 1))
             else:
-                # Trường hợp LỖI (NG): Kiểm tra xem có cấu hình giá trị OFF hợp lệ không
                 val_off = reset_ok_sig.get('off')
                 if val_off is not None and str(val_off).strip() != "" and str(val_off).strip().lower() not in ('none', 'no value'):
                     try:
@@ -1775,7 +1766,6 @@ class PLCHandler:
                     except (ValueError, TypeError):
                         pass
 
-        # 2. Tín hiệu Hoàn thành Chu kỳ (Complete Signal) - Luôn gửi sau cùng
         if complete_sig and complete_sig.get('reg'):
             val_comp = complete_sig.get('on', 1)
             try:
@@ -1783,7 +1773,6 @@ class PLCHandler:
             except (ValueError, TypeError):
                 plc_tasks.append((str(complete_sig['reg']).strip(), 1))
 
-        # 3. Gửi danh sách task PLC tuần tự an toàn (Component -> Complete)
         if plc_tasks:
             self._dispatch_plc_writes(plc_tasks)
 
