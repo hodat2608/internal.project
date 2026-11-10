@@ -36,6 +36,14 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
         super().__init__(parent)
         self.camera_id = camera_id
         self.model_id = model_id if model_id is not None else kwargs.get('model_id', None)
+        if self.camera_id is not None:
+            c_str = str(self.camera_id).lower().replace('camera-', '').replace('built-in-', '').strip()
+            if c_str.isdigit():
+                self.camera_id = int(c_str)
+        if self.model_id is not None:
+            m_str = str(self.model_id).lower().replace('model-', '').replace('model', '').strip()
+            if m_str.isdigit():
+                self.model_id = int(m_str)
         self.camera_name = camera_name or f"Camera-{camera_id}"
         self.item_code = item_code or "N/A"
         self.cursor = cursor
@@ -46,43 +54,47 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
         self.resize(1000, 600)
         self.setStyleSheet("""
             QDialog {
-                background-color: #1e1e2e;
-                color: #cdd6f4;
+                background-color: #F0F9FF;
+                color: #0f172a;
                 font-family: 'Segoe UI', Arial, sans-serif;
             }
             QGroupBox {
-                border: 1px solid #45475a;
+                background-color: #F0F9FF;
+                border: 1px solid #cbd5e1;
                 border-radius: 8px;
                 margin-top: 12px;
                 padding-top: 14px;
                 font-weight: bold;
-                color: #89b4fa;
+                color: #0f172a;
             }
             QGroupBox::title {
                 subcontrol-origin: margin;
                 left: 12px;
                 padding: 0 6px;
+                background-color: #ffffff;
+                color: #0f172a;
             }
             QLabel {
-                color: #cdd6f4;
+                color: #334155;
             }
             QPushButton {
-                background-color: #313244;
-                border: 1px solid #45475a;
+                background-color: #ffffff;
+                border: 1px solid #cbd5e1;
                 border-radius: 6px;
                 padding: 7px 15px;
-                color: #ffffff;
+                color: #334155;
                 font-weight: bold;
                 font-size: 13px;
             }
             QPushButton:hover {
-                background-color: #45475a;
-                color: #ffffff;
+                background-color: #f8fafc;
+                border-color: #94a3b8;
+                color: #0f172a;
             }
             QPushButton#btnAddTask {
                 background-color: #2563eb;
                 color: #ffffff;
-                border: 1px solid #3b82f6;
+                border: 1px solid #1d4ed8;
             }
             QPushButton#btnAddTask:hover {
                 background-color: #1d4ed8;
@@ -90,7 +102,7 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
             QPushButton#btnEditTask {
                 background-color: #d97706;
                 color: #ffffff;
-                border: 1px solid #f59e0b;
+                border: 1px solid #b45309;
             }
             QPushButton#btnEditTask:hover {
                 background-color: #b45309;
@@ -98,7 +110,7 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
             QPushButton#btnDeleteTask {
                 background-color: #dc2626;
                 color: #ffffff;
-                border: 1px solid #ef4444;
+                border: 1px solid #b91c1c;
             }
             QPushButton#btnDeleteTask:hover {
                 background-color: #b91c1c;
@@ -106,37 +118,38 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
             QPushButton#btnCloneTask {
                 background-color: #7c3aed;
                 color: #ffffff;
-                border: 1px solid #8b5cf6;
+                border: 1px solid #6d28d9;
             }
             QPushButton#btnCloneTask:hover {
                 background-color: #6d28d9;
             }
             QTableWidget {
-                background-color: #181825;
-                alternate-background-color: #212234;
-                border: 1px solid #313244;
-                gridline-color: #313244;
-                color: #ffffff;
-                border-radius: 6px;
+                background-color: #ffffff;
+                alternate-background-color: #f8fafc;
+                border: 1px solid #cbd5e1;
+                gridline-color: #e2e8f0;
+                color: #0f172a;
+                border-radius: 8px;
                 font-size: 13px;
-                selection-background-color: #2563eb;
-                selection-color: #ffffff;
+                selection-background-color: #dbeafe;
+                selection-color: #1e40af;
             }
             QTableWidget::item:hover {
-                background-color: #383a52;
-                color: #ffffff;
+                background-color: #f1f5f9;
+                color: #0f172a;
             }
             QTableWidget::item:selected {
-                background-color: #2563eb;
-                color: #ffffff;
+                background-color: #dbeafe;
+                color: #1e40af;
                 font-weight: bold;
             }
             QHeaderView::section {
-                background-color: #313244;
-                color: #cdd6f4;
-                padding: 6px;
-                border: 1px solid #45475a;
+                background-color: #f8fafc;
+                color: #334155;
+                padding: 8px 6px;
+                border: 1px solid #e2e8f0;
                 font-weight: bold;
+                font-size: 13px;
             }
         """)
 
@@ -150,16 +163,16 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
 
         # Header Info Banner
         header_frame = QtWidgets.QFrame()
-        header_frame.setStyleSheet("background-color: #252538; border-radius: 8px; padding: 10px;")
+        header_frame.setStyleSheet("background-color: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px;")
         header_layout = QtWidgets.QHBoxLayout(header_frame)
         
-        lbl_title = QtWidgets.QLabel(f"📷 <b>Camera:</b> <font color='#89b4fa'>{self.camera_name}</font> (ID: {self.camera_id}) &nbsp;|&nbsp; 🧩 <b>Model:</b> <font color='#fab387'>{self.model_id}</font> &nbsp;|&nbsp; 🏷️ <b>Mã Hàng:</b> <font color='#a6e3a1'>{self.item_code}</font>")
+        lbl_title = QtWidgets.QLabel(f"📷 <b>Camera:</b> <font color='#1d4ed8'><b>{self.camera_name}</b></font> (ID: {self.camera_id}) &nbsp;|&nbsp; 🧩 <b>Model:</b> <font color='#c2410c'><b>{self.model_id}</b></font> &nbsp;|&nbsp; 🏷️ <b>Mã Hàng:</b> <font color='#15803d'><b>{self.item_code}</b></font>")
         lbl_title.setFont(QFont("Segoe UI", 12))
         header_layout.addWidget(lbl_title)
         header_layout.addStretch()
 
         self.lbl_task_stats = QtWidgets.QLabel("Tổng số: 0 tasks")
-        self.lbl_task_stats.setStyleSheet("color: #a6adc8; font-size: 12px;")
+        self.lbl_task_stats.setStyleSheet("color: #475569; font-size: 13px; font-weight: 500;")
         header_layout.addWidget(self.lbl_task_stats)
 
         main_layout.addWidget(header_frame)
@@ -211,7 +224,7 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
         # Bottom Bar
         bottom_layout = QtWidgets.QHBoxLayout()
         lbl_hint = QtWidgets.QLabel("💡 Nhấp đúp vào dòng để sửa nhanh. Bật/tắt checkbox để áp dụng tức thì.")
-        lbl_hint.setStyleSheet("color: #6c7086; font-size: 11px;")
+        lbl_hint.setStyleSheet("color: #64748b; font-size: 12px;")
         bottom_layout.addWidget(lbl_hint)
 
         bottom_layout.addStretch()
@@ -258,13 +271,13 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
             item_reg = QtWidgets.QTableWidgetItem(reg_text)
             item_reg.setTextAlignment(Qt.AlignCenter)
             if t['assign_register']:
-                item_reg.setForeground(QColor("#89b4fa"))
+                item_reg.setForeground(QColor("#2563eb"))
             self.table_tasks.setItem(row_idx, 4, item_reg)
 
             # Cột 5: Khi vi phạm (NG)
             item_fail = QtWidgets.QTableWidgetItem("Đánh giá NG")
             item_fail.setTextAlignment(Qt.AlignCenter)
-            item_fail.setForeground(QColor("#f38ba8"))
+            item_fail.setForeground(QColor("#dc2626"))
             self.table_tasks.setItem(row_idx, 5, item_fail)
 
             # Cột 6: Kích Hoạt (Checkbox)
@@ -293,16 +306,42 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
             btn_row_edit.clicked.connect(lambda _, tid=t['id']: self.edit_task_by_id(tid))
             action_layout.addWidget(btn_row_edit)
 
+            btn_row_edit.setStyleSheet("""
+                QPushButton {
+                    background-color: #eff6ff;
+                    color: #2563eb;
+                    border: 1px solid #bfdbfe;
+                    border-radius: 4px;
+                    font-size: 12px;
+                }
+                QPushButton:hover {
+                    background-color: #dbeafe;
+                    border-color: #3b82f6;
+                }
+            """)
+
             btn_row_del = QtWidgets.QPushButton("🗑️")
             btn_row_del.setToolTip("Xóa Task")
             btn_row_del.setFixedSize(30, 26)
-            btn_row_del.setStyleSheet("background-color: #45222d; color: #f38ba8;")
+            btn_row_del.setStyleSheet("""
+                QPushButton {
+                    background-color: #fef2f2;
+                    color: #dc2626;
+                    border: 1px solid #fecaca;
+                    border-radius: 4px;
+                    font-size: 12px;
+                }
+                QPushButton:hover {
+                    background-color: #fee2e2;
+                    border-color: #ef4444;
+                }
+            """)
             btn_row_del.clicked.connect(lambda _, tid=t['id'], tname=t['task_name']: self.delete_task_by_id(tid, tname))
             action_layout.addWidget(btn_row_del)
 
             self.table_tasks.setCellWidget(row_idx, 7, action_widget)
 
-        self.lbl_task_stats.setText(f"Tổng số: <b>{len(self.tasks)}</b> tasks | Đang kích hoạt: <font color='#a6e3a1'><b>{active_count}</b></font>")
+        self.lbl_task_stats.setText(f"Tổng số: <b>{len(self.tasks)}</b> tasks | Đang kích hoạt: <font color='#16a34a'><b>{active_count}</b></font>")
 
     def on_toggle_task(self, task_id: int, enabled: bool):
         toggle_task_enabled(self.cursor, self.connection, task_id, enabled)
@@ -312,7 +351,7 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
                 t['enabled'] = enabled
                 break
         active_count = sum(1 for t in self.tasks if t['enabled'])
-        self.lbl_task_stats.setText(f"Tổng số: <b>{len(self.tasks)}</b> tasks | Đang kích hoạt: <font color='#a6e3a1'><b>{active_count}</b></font>")
+        self.lbl_task_stats.setText(f"Tổng số: <b>{len(self.tasks)}</b> tasks | Đang kích hoạt: <font color='#16a34a'><b>{active_count}</b></font>")
 
     def add_task(self, preselected_labels: Optional[List[str]] = None):
         """Mở dialog tạo task mới."""
@@ -362,11 +401,12 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
         if not task_info:
             return
         rules = get_task_rules(self.cursor, task_id)
-        avail_labels = get_available_labels_for_camera(self.cursor, self.camera_id, self.model_id)
+        target_model_id = task_info.get('model_id') or self.model_id
+        avail_labels = get_available_labels_for_camera(self.cursor, self.camera_id, target_model_id)
 
         dlg = TaskRuleEditorDialog(
             camera_id=self.camera_id,
-            model_id=self.model_id,
+            model_id=target_model_id,
             task_data=task_info,
             rules_data=rules,
             available_labels=avail_labels,

@@ -383,7 +383,7 @@ def evaluate_task_calculator(
     for task in tasks_config:
         if not task.get('enabled', True):
             continue
-        print('task',task)
+        
         task_id = task.get('id')
         task_name = task.get('task_name', f'Task-{task_id}')
         logic_mode = task.get('logic_mode', 'ALL_PASS')

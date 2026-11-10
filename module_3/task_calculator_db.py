@@ -148,6 +148,17 @@ def get_tasks_by_camera(cursor, camera_id: int, model_id: Optional[int] = None) 
     if not cursor:
         return []
     try:
+        # Chuẩn hóa camera_id và model_id
+        c_id = None
+        if camera_id is not None:
+            c_str = str(camera_id).lower().replace('camera-', '').replace('built-in-', '').strip()
+            c_id = int(c_str) if c_str.isdigit() else camera_id
+
+        m_id = None
+        if model_id is not None:
+            m_str = str(model_id).lower().replace('model-', '').replace('model', '').strip()
+            m_id = int(m_str) if m_str.isdigit() else model_id
+
         cursor.execute("SHOW COLUMNS FROM task_calculator LIKE 'value_state'")
         has_val_state = bool(cursor.fetchone())
         if not has_val_state:
@@ -155,7 +166,7 @@ def get_tasks_by_camera(cursor, camera_id: int, model_id: Optional[int] = None) 
             has_val_state = bool(cursor.fetchone())
         col_val_state = ", t.value_state" if has_val_state else ""
 
-        if model_id is not None:
+        if m_id is not None:
             query = f"""
                 SELECT t.id, t.camera_id, t.model_id, t.task_name, t.task_type, t.logic_mode, 
                        t.action_on_fail, t.enabled, t.assign_register, t.value_bit_on, 
@@ -167,7 +178,7 @@ def get_tasks_by_camera(cursor, camera_id: int, model_id: Optional[int] = None) 
                 GROUP BY t.id
                 ORDER BY t.id ASC
             """
-            cursor.execute(query, (camera_id, model_id))
+            cursor.execute(query, (c_id, m_id))
         else:
             query = f"""
                 SELECT t.id, t.camera_id, t.model_id, t.task_name, t.task_type, t.logic_mode, 
@@ -180,7 +191,7 @@ def get_tasks_by_camera(cursor, camera_id: int, model_id: Optional[int] = None) 
                 GROUP BY t.id
                 ORDER BY t.id ASC
             """
-            cursor.execute(query, (camera_id,))
+            cursor.execute(query, (c_id,))
         rows = cursor.fetchall()
         tasks = []
         for r in rows:
@@ -323,8 +334,13 @@ def save_task_and_rules(cursor, connection, task_data: Dict[str, Any], rules: Li
         return None
     try:
         task_id = task_data.get('id')
-        camera_id = int(task_data['camera_id'])
-        model_id = int(task_data.get('model_id') or 1)
+        c_raw = task_data.get('camera_id', 1)
+        c_str = str(c_raw).lower().replace('camera-', '').replace('built-in-', '').strip()
+        camera_id = int(c_str) if c_str.isdigit() else 1
+        
+        m_raw = task_data.get('model_id', 1)
+        m_str = str(m_raw).lower().replace('model-', '').replace('model', '').strip()
+        model_id = int(m_str) if m_str.isdigit() else 1
         task_name = task_data.get('task_name', 'Task Mới')
         task_type = task_data.get('task_type', 'RELATION_COORDINATE')
         logic_mode = task_data.get('logic_mode', 'ALL_PASS')
@@ -449,25 +465,39 @@ def get_available_labels_for_camera(cursor, camera_id: int, model_id: Optional[i
     if not cursor:
         return []
     try:
+        # Chuẩn hóa camera_id sang int nếu có thể
+        c_id = None
+        if camera_id is not None:
+            c_str = str(camera_id).lower().replace('camera-', '').replace('built-in-', '').strip()
+            c_id = int(c_str) if c_str.isdigit() else camera_id
+
+        # Chuẩn hóa model_id sang int nếu có thể
+        m_id = None
         if model_id is not None:
-            # model_id có thể là NUMS_MODEL.id hoặc nums_model
+            m_str = str(model_id).lower().replace('model-', '').replace('model', '').strip()
+            m_id = int(m_str) if m_str.isdigit() else model_id
+
+        if c_id is not None and m_id is not None:
             query = """
                 SELECT DISTINCT p.Label_Name
                 FROM PARAMETERSET p
                 JOIN NUMS_MODEL m ON p.model_id = m.id
-                WHERE (p.model_id = %s OR (m.camera_id = %s AND m.nums_model = %s))
+                WHERE (m.camera_id = %s OR m.camera_id = (SELECT id FROM NUMS_CAMERA WHERE nums_camera = %s LIMIT 1))
+                  AND (m.nums_model = %s OR m.id = %s)
                 ORDER BY p.Label_Name ASC
             """
-            cursor.execute(query, (model_id, camera_id, model_id))
+            cursor.execute(query, (c_id, c_id, m_id, m_id))
+        elif c_id is not None:
+            query = """
+                SELECT DISTINCT p.Label_Name
+                FROM PARAMETERSET p
+                JOIN NUMS_MODEL m ON p.model_id = m.id
+                WHERE (m.camera_id = %s OR m.camera_id = (SELECT id FROM NUMS_CAMERA WHERE nums_camera = %s LIMIT 1))
+                ORDER BY p.Label_Name ASC
+            """
+            cursor.execute(query, (c_id, c_id))
         else:
-            query = """
-                SELECT DISTINCT p.Label_Name
-                FROM PARAMETERSET p
-                JOIN NUMS_MODEL m ON p.model_id = m.id
-                WHERE m.camera_id = %s
-                ORDER BY p.Label_Name ASC
-            """
-            cursor.execute(query, (camera_id,))
+            return []
             
         rows = cursor.fetchall()
         labels = [r[0] for r in rows if r[0] and str(r[0]).strip()]

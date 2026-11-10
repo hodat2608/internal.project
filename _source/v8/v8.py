@@ -171,8 +171,6 @@ class v8s(v5s):
                         'value_ng': t.get('value_ng', t.get('Value_NG', t.get('value_bit_off', 0))),
                         'join': True,
                     })
-        print('final_cfg_rows',final_cfg_rows)
-        print('list_register',list_register)
         return result_image_rgb, flag, list_register, LOGO_WATERMARK, final_cfg_rows
 
     def evaluate_task_calculator(
