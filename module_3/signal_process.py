@@ -274,6 +274,44 @@ class DataProcessSignal:
         self.table_signal_up_to_selected_trigger_signals()
         self.program_signal_ready_mgr = ProgramSignalReadyManager(self.uic, self.signal_table, self)
         self.is_unlocked = False
+
+        # Tích hợp nút Lịch Sử Cấu Hình vào cùng hàng với pushButton_admin
+        # Đặt chung trong 1 QHBoxLayout tại hàng 2 cột 0 để KHÔNG tạo thêm cột 1 làm vỡ bố cục gridLayout_32
+        if hasattr(self.uic, 'gridLayout_32') and hasattr(self.uic, 'pushButton_admin'):
+            if not hasattr(self.uic, 'pushButton_config_history'):
+                self.uic.pushButton_config_history = QtWidgets.QPushButton(self.uic.scrollAreaWidgetContents)
+                self.uic.pushButton_config_history.setMinimumSize(QtCore.QSize(0, 40))
+                self.uic.pushButton_config_history.setMaximumSize(QtCore.QSize(180, 16777215))
+                font = QtGui.QFont()
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                font.setBold(True)
+                self.uic.pushButton_config_history.setFont(font)
+                self.uic.pushButton_config_history.setStyleSheet("""
+                    QPushButton {
+                        background-color: #0284c7;
+                        color: white;
+                        border: none;
+                        border-radius: 4px;
+                        font-weight: 600;
+                        padding: 4px 10px;
+                    }
+                    QPushButton:hover {
+                        background-color: #0369a1;
+                    }
+                """)
+                self.uic.pushButton_config_history.setText("  🕒 Lịch Sử Cấu Hình")
+                self.uic.pushButton_config_history.setToolTip("🕒 Xem Lịch Sử Cấu Hình, So Sánh Diff & Rollback PLC/Mode")
+
+                admin_row_layout = QtWidgets.QHBoxLayout()
+                admin_row_layout.setContentsMargins(0, 0, 0, 0)
+                admin_row_layout.setSpacing(10)
+                self.uic.gridLayout_32.removeWidget(self.uic.pushButton_admin)
+                admin_row_layout.addWidget(self.uic.pushButton_admin)
+                admin_row_layout.addWidget(self.uic.pushButton_config_history)
+                admin_row_layout.addStretch()
+                self.uic.gridLayout_32.addLayout(admin_row_layout, 2, 0, 1, 2)
+
         self.set_ui_enabled(False)
         self._setup_config_status_log_ui()
 
@@ -577,6 +615,24 @@ class DataProcessSignal:
         if not assign_register or assign_register == '':
             QMessageBox.warning(None, "Cảnh báo", f"Vui lòng nhập thanh ghi cho Mã hàng {Itemcode}")
             return
+
+        from module_3.change_reason_dialog import ChangeReasonDialog
+        from module_3.config_version_manager import save_snapshot
+
+        curr_user = getattr(self, 'current_user', None) or 'Admin'
+        curr_role = getattr(self, 'current_role', None) or 'full_control'
+
+        reason_dlg = ChangeReasonDialog(
+            current_user=curr_user,
+            current_role=curr_role,
+            context_info=f"Gán thanh ghi PLC cho Mã Hàng: {Itemcode}",
+            parent=getattr(self.uic, 'centralwidget', None)
+        )
+        if reason_dlg.exec_() != QtWidgets.QDialog.Accepted:
+            return
+
+        change_reason, is_golden = reason_dlg.get_reason_and_golden()
+
         _ensure_value_bit_off_columns(cursor, connect_db)
         try:
             cursor.execute("""
@@ -590,9 +646,24 @@ class DataProcessSignal:
                             WHERE name_line_code = %s 
                 """, (assign_register, value_bit_on, value_bit_off, Itemcode))
                 connect_db.connection.commit()
+
+                try:
+                    conn_raw = getattr(connect_db, 'connection', connect_db)
+                    save_snapshot(
+                        cursor=cursor,
+                        connection=conn_raw,
+                        scope_category='PLC_SETTINGS',
+                        change_reason=f"Mã hàng '{Itemcode}': {change_reason}",
+                        changed_by=curr_user,
+                        user_role=curr_role,
+                        is_golden=is_golden
+                    )
+                except Exception as e_snap:
+                    pass
+
                 if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
                     self.uic.config_logger.set_status('item_code', 'success', f"Đã lưu thành công mã hàng '{Itemcode}' (Reg: {assign_register})")
-                QMessageBox.information(None, "Thành công", f"Lưu thành công Ma hang {Itemcode}!")
+                QMessageBox.information(None, "Thành công", f"Lưu thành công Ma hang {Itemcode} và ghi nhận lịch sử!")
             else:
                 if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
                     self.uic.config_logger.set_status('item_code', 'error', f"Không tìm thấy mã hàng '{Itemcode}'")
@@ -629,17 +700,35 @@ class DataProcessSignal:
     def save_mode_auto(self, cursor, connect_db, item_code_id):
         if not self.check_permission_full_control():
             return
+        camera_name = self.uic.comboBox_camera.currentText()
+        register_mode = self.uic.lineEdit_register_mode.text()
+        value_bit_on = self.uic.comboBox_value_mode_selector_bit_on.currentText()
+        value_bit_off = self.uic.comboBox_value_mode_selector_bit_off.currentText()
+        mode_name = self.uic.comboBox_mode_auto.currentText()
+
+        if not register_mode or register_mode == '':
+            QMessageBox.warning(None, "Cảnh báo", f"Vui lòng nhập thanh ghi cho chế độ {mode_name}")
+            return
+
+        from module_3.change_reason_dialog import ChangeReasonDialog
+        from module_3.config_version_manager import save_snapshot
+
+        curr_user = getattr(self, 'current_user', None) or 'Admin'
+        curr_role = getattr(self, 'current_role', None) or 'full_control'
+        context_str = f"Camera: {camera_name} | Mode: {mode_name} (Thiết định Mode Auto)"
+
+        reason_dlg = ChangeReasonDialog(
+            current_user=curr_user,
+            current_role=curr_role,
+            context_info=context_str,
+            parent=getattr(self.uic, 'centralwidget', None)
+        )
+        if reason_dlg.exec_() != QtWidgets.QDialog.Accepted:
+            return
+
+        change_reason, is_golden = reason_dlg.get_reason_and_golden()
+
         try:
-            camera_name = self.uic.comboBox_camera.currentText()
-            register_mode = self.uic.lineEdit_register_mode.text()
-            value_bit_on = self.uic.comboBox_value_mode_selector_bit_on.currentText()
-            value_bit_off = self.uic.comboBox_value_mode_selector_bit_off.currentText()
-            mode_name = self.uic.comboBox_mode_auto.currentText()
-
-            if not register_mode or register_mode == '':
-                QMessageBox.warning(None, "Cảnh báo", f"Vui lòng nhập thanh ghi cho chế độ {mode_name}")
-                return
-
             _ensure_value_bit_off_columns(cursor, connect_db)
             cursor.execute("""
                         SELECT id FROM NUMS_CAMERA 
@@ -673,9 +762,26 @@ class DataProcessSignal:
 
             self.mode_auto_id = result[0] if result else None
             connect_db.connection.commit()
+
+            try:
+                conn_raw = getattr(connect_db, 'connection', connect_db)
+                save_snapshot(
+                    cursor=cursor,
+                    connection=conn_raw,
+                    scope_category='MODE_AUTO',
+                    change_reason=change_reason,
+                    changed_by=curr_user,
+                    camera_id=str(camera_name),
+                    mode_id=self.mode_auto_id,
+                    user_role=curr_role,
+                    is_golden=is_golden
+                )
+            except Exception as e_snap:
+                _log.error("Lỗi khi ghi snapshot MODE_AUTO: %s", e_snap)
+
             if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
                 self.uic.config_logger.set_status('mode_auto', 'success', f"Đã lưu thành công Mode '{mode_name}'")
-            QMessageBox.information(None, "Thành công", "Lưu thành công mode auto!")
+            QMessageBox.information(None, "Thành công", "Lưu thành công mode auto và ghi nhận lịch sử!")
 
         except mysql.connector.Error as error:
                 connect_db.connection.rollback()
@@ -710,6 +816,26 @@ class DataProcessSignal:
             return
         mode_auto_id = self.produce_mode_auto_id(cursor,connect_db,item_code_id)
         if mode_auto_id:
+            from module_3.change_reason_dialog import ChangeReasonDialog
+            from module_3.config_version_manager import save_snapshot
+
+            curr_user = getattr(self, 'current_user', None) or 'Admin'
+            curr_role = getattr(self, 'current_role', None) or 'full_control'
+            camera_name = self.uic.comboBox_camera.currentText()
+            mode_name = self.uic.comboBox_mode_auto.currentText()
+            context_str = f"Camera: {camera_name} | Mode: {mode_name} (Bảng Tín Hiệu PLC)"
+
+            reason_dlg = ChangeReasonDialog(
+                current_user=curr_user,
+                current_role=curr_role,
+                context_info=context_str,
+                parent=getattr(self.uic, 'centralwidget', None)
+            )
+            if reason_dlg.exec_() != QtWidgets.QDialog.Accepted:
+                return
+
+            change_reason, is_golden = reason_dlg.get_reason_and_golden()
+
             try:
                 cursor.execute("""
                     DELETE FROM MODE_AUTO_SIGNAL WHERE mode_id = %s
@@ -740,9 +866,26 @@ class DataProcessSignal:
                         mode_auto_id
                     ))
                 connect_db.connection.commit()
+
+                try:
+                    conn_raw = getattr(connect_db, 'connection', connect_db)
+                    save_snapshot(
+                        cursor=cursor,
+                        connection=conn_raw,
+                        scope_category='MODE_AUTO',
+                        change_reason=change_reason,
+                        changed_by=curr_user,
+                        camera_id=str(camera_name),
+                        mode_id=mode_auto_id,
+                        user_role=curr_role,
+                        is_golden=is_golden
+                    )
+                except Exception as e_snap:
+                    _log.error("Lỗi khi ghi snapshot MODE_AUTO_SIGNAL: %s", e_snap)
+
                 if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
-                    self.uic.config_logger.set_status('signal_table', 'success', "Đã lưu thành công bảng tín hiệu PLC")
-                QMessageBox.information(None, "Thành công", "Lưu thành công mode auto!")
+                    self.uic.config_logger.set_status('signal_table', 'success', "Đã lưu thành công bảng tín hiệu PLC và ghi nhận lịch sử")
+                QMessageBox.information(None, "Thành công", "Lưu thành công bảng tín hiệu PLC và ghi nhận lịch sử!")
 
             except Error as e:
                 connect_db.connection.rollback()
@@ -984,6 +1127,26 @@ class DataProcessSignal:
             return
         mode_auto_id = self.produce_mode_auto_id(cursor,connect_db,item_code_id)
         if mode_auto_id:
+            from module_3.change_reason_dialog import ChangeReasonDialog
+            from module_3.config_version_manager import save_snapshot
+
+            curr_user = getattr(self, 'current_user', None) or 'Admin'
+            curr_role = getattr(self, 'current_role', None) or 'full_control'
+            camera_name = self.uic.comboBox_camera.currentText()
+            mode_name = self.uic.comboBox_mode_auto.currentText()
+            context_str = f"Camera: {camera_name} | Mode: {mode_name} (Bảng Shot x Model)"
+
+            reason_dlg = ChangeReasonDialog(
+                current_user=curr_user,
+                current_role=curr_role,
+                context_info=context_str,
+                parent=getattr(self.uic, 'centralwidget', None)
+            )
+            if reason_dlg.exec_() != QtWidgets.QDialog.Accepted:
+                return
+
+            change_reason, is_golden = reason_dlg.get_reason_and_golden()
+
             try: 
                 _ensure_shotxmodel_column(cursor, connect_db)
                 cursor.execute("""
@@ -1018,9 +1181,26 @@ class DataProcessSignal:
                         discription = str(row.get(2, "") or "")
                         cursor.execute(insert_query, (shot, no_of_model, discription, mode_auto_id))
                     connect_db.connection.commit()
+
+                    try:
+                        conn_raw = getattr(connect_db, 'connection', connect_db)
+                        save_snapshot(
+                            cursor=cursor,
+                            connection=conn_raw,
+                            scope_category='MODE_AUTO',
+                            change_reason=change_reason,
+                            changed_by=curr_user,
+                            camera_id=str(camera_name),
+                            mode_id=mode_auto_id,
+                            user_role=curr_role,
+                            is_golden=is_golden
+                        )
+                    except Exception as e_snap:
+                        _log.error("Lỗi khi ghi snapshot SHOTXMODEL: %s", e_snap)
+
                     if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
                         self.uic.config_logger.set_status('shot_model', 'success', f"Đã lưu thành công bảng Shot x Model ({len(list_insert)} dòng)")
-                    QMessageBox.information(None, "Thành công", "Lưu thành công shot link model!")
+                    QMessageBox.information(None, "Thành công", "Lưu thành công shot link model và ghi nhận lịch sử!")
 
             except Error as e:
                 connect_db.connection.rollback()
@@ -1202,15 +1382,78 @@ class DataProcessSignal:
     def save_all_data(self,cursor,connect_db,camera_id):
         if not self.check_permission_full_control():
             return
+
+        from module_3.change_reason_dialog import ChangeReasonDialog
+        from module_3.config_version_manager import save_snapshot
+
+        user = getattr(self, 'current_user', None) or 'Admin'
+        role = getattr(self, 'current_role', None) or 'full_control'
+        reason_dlg = ChangeReasonDialog(
+            current_user=user,
+            current_role=role,
+            context_info=f"PLC Transmission & Timing (Camera: {camera_id})",
+            parent=getattr(self.uic, 'centralwidget', None)
+        )
+        if reason_dlg.exec_() != QtWidgets.QDialog.Accepted:
+            return
+        change_reason, is_golden = reason_dlg.get_reason_and_golden()
+
         try:
             self.save_signal_transmission_and_reception(cursor,connect_db,camera_id)
             self.save_signal_timing_config(cursor,connect_db,camera_id)
             self.save_program_signal_ready(cursor,connect_db,camera_id)
+
+            try:
+                conn_raw = getattr(connect_db, 'connection', connect_db)
+                save_snapshot(
+                    cursor=cursor,
+                    connection=conn_raw,
+                    scope_category='PLC_SETTINGS',
+                    change_reason=change_reason,
+                    changed_by=user,
+                    camera_id=str(camera_id),
+                    user_role=role,
+                    is_golden=is_golden
+                )
+            except Exception as e_snap:
+                pass
+
             if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
-                self.uic.config_logger.set_status('transmission_timing', 'success', "Đã lưu thành công dữ liệu truyền nhận & timing")
+                self.uic.config_logger.set_status('transmission_timing', 'success', "Đã lưu thành công dữ liệu truyền nhận & timing và ghi nhận lịch sử")
         except Exception as e:
             if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
                 self.uic.config_logger.set_status('transmission_timing', 'error', f"Lỗi lưu truyền nhận & timing: {str(e)}")
+
+    def open_config_history(self, cursor=None, connect_db=None):
+        """Mở cửa sổ Lịch Sử Cấu Hình, So Sánh Diff & Rollback cho PLC Settings & Mode Auto."""
+        cur = cursor or getattr(self, 'cursor', None)
+        conn = connect_db or getattr(self, 'connect_db', None)
+        raw_conn = getattr(conn, 'connection', conn)
+        
+        if not cur or not raw_conn:
+            QMessageBox.warning(None, "Cảnh báo", "Chưa kết nối cơ sở dữ liệu để xem lịch sử cấu hình!")
+            return
+
+        from module_3.config_history_dialog import ConfigHistoryDialog
+
+        curr_user = getattr(self, 'current_user', None) or 'Admin'
+        curr_role = getattr(self, 'current_role', None) or 'full_control'
+        cam_text = self.uic.comboBox_camera.currentText() if hasattr(self.uic, 'comboBox_camera') else ""
+
+        dlg = ConfigHistoryDialog(
+            cursor=cur,
+            connection=raw_conn,
+            current_user=curr_user,
+            current_role=curr_role,
+            initial_category='ALL',
+            initial_camera_id=cam_text,
+            initial_mode_id=getattr(self, 'mode_auto_id', None),
+            parent=getattr(self.uic, 'centralwidget', None)
+        )
+        if dlg.exec_() == QtWidgets.QDialog.Accepted:
+            # Nếu vừa rollback thành công, reload lại dữ liệu PLC
+            if cam_text:
+                self.load_all_data(cur, cam_text)
 
     def load_all_data(self,cursor,camera_id):
         self.load_data_signal_transmission_and_reception(cursor,camera_id)
@@ -1402,6 +1645,24 @@ class DataProcessSignal:
             if widget != self.uic.pushButton_admin:
                 widget.setEnabled(enabled)
         self.uic.pushButton_admin.setEnabled(True)
+        if hasattr(self.uic, 'pushButton_config_history') and self.uic.pushButton_config_history:
+            self.uic.pushButton_config_history.setEnabled(enabled)
+
+        # Khóa/mở khóa scrollArea_ProgramSignalReady và toàn bộ phần tử con bên trong
+        if hasattr(self.uic, 'scrollArea_ProgramSignalReady') and self.uic.scrollArea_ProgramSignalReady:
+            self.uic.scrollArea_ProgramSignalReady.setEnabled(enabled)
+            for child in self.uic.scrollArea_ProgramSignalReady.findChildren(QtWidgets.QWidget):
+                child.setEnabled(enabled)
+
+        if hasattr(self.uic, 'scrollAreaWidgetContents_2') and self.uic.scrollAreaWidgetContents_2:
+            self.uic.scrollAreaWidgetContents_2.setEnabled(enabled)
+            for child in self.uic.scrollAreaWidgetContents_2.findChildren(QtWidgets.QWidget):
+                child.setEnabled(enabled)
+
+        if hasattr(self.uic, 'pushButton_apply_setting_ProgramSignalReady') and self.uic.pushButton_apply_setting_ProgramSignalReady:
+            self.uic.pushButton_apply_setting_ProgramSignalReady.setEnabled(enabled)
+        if hasattr(self.uic, 'pushButton_load_setting_ProgramSignalReady') and self.uic.pushButton_load_setting_ProgramSignalReady:
+            self.uic.pushButton_load_setting_ProgramSignalReady.setEnabled(enabled)
 
     def lock_gui(self, cursor, connect_db, method=False, boolen=False):
         try:
@@ -1411,6 +1672,8 @@ class DataProcessSignal:
                 self.current_role = None
                 self.current_user = None
                 self.uic.pushButton_admin.setText("ADMIN")
+                if hasattr(self, 'tab_manager') and self.tab_manager:
+                    self.tab_manager.set_all_tabs_enabled(False, role='read_only')
                 return True
 
             from module_3.auth_dialog import EnterpriseAuthDialog
@@ -1435,11 +1698,14 @@ class DataProcessSignal:
                     self.current_user = username
                     self.current_role = "full_control"
                     self.uic.pushButton_admin.setText("LOCK")
+                    if hasattr(self, 'tab_manager') and self.tab_manager:
+                        self.tab_manager.set_all_tabs_enabled(True, role='full_control', username=username)
+
                     QtWidgets.QMessageBox.information(
                         self.uic.centralwidget,
                         "Mở khóa thành công (Full Control)",
                         f"Xác thực thành công cho tài khoản '{username}' [Toàn quyền].\n\n"
-                        "Toàn bộ giao diện Cài đặt Tín hiệu PLC (Signal Transmission) đã được MỞ KHÓA."
+                        "Toàn bộ hệ thống (PLC Settings, Model, Camera Device, Mirror, Auto Logging) đã được MỞ KHÓA."
                     )
                     return True
                 else:
@@ -1449,6 +1715,8 @@ class DataProcessSignal:
                     self.current_user = username
                     self.current_role = role
                     self.uic.pushButton_admin.setText("ADMIN")
+                    if hasattr(self, 'tab_manager') and self.tab_manager:
+                        self.tab_manager.set_all_tabs_enabled(False, role='read_only')
                     QtWidgets.QMessageBox.warning(
                         self.uic.centralwidget,
                         "Không đủ thẩm quyền chỉnh sửa",
@@ -1517,6 +1785,23 @@ class DataProcessSignal:
         reset_counter_signal_selected = self.uic.comboBox_reset_counter_signal_selected.currentText()
         method_use_signal_selected = self.uic.comboBox_method_use_signal_selected.currentText()
 
+        from module_3.change_reason_dialog import ChangeReasonDialog
+        from module_3.config_version_manager import save_snapshot
+
+        curr_user = getattr(self, 'current_user', None) or 'Admin'
+        curr_role = getattr(self, 'current_role', None) or 'full_control'
+
+        reason_dlg = ChangeReasonDialog(
+            current_user=curr_user,
+            current_role=curr_role,
+            context_info=f"Cấu hình Counter Shot (Camera: {camera_id})",
+            parent=getattr(self.uic, 'centralwidget', None)
+        )
+        if reason_dlg.exec_() != QtWidgets.QDialog.Accepted:
+            return
+
+        change_reason, is_golden = reason_dlg.get_reason_and_golden()
+
         try:
             cursor.execute("DELETE FROM counter_shot_setup WHERE camera_id = %s", (camera_id,))
 
@@ -1528,9 +1813,25 @@ class DataProcessSignal:
 
             cursor.execute(sql_command, (camera_id, is_check, is_reset, method_use, increment_counter_signal_selected, reset_counter_signal_selected, method_use_signal_selected))
             connect_db.connection.commit()
+
+            try:
+                conn_raw = getattr(connect_db, 'connection', connect_db)
+                save_snapshot(
+                    cursor=cursor,
+                    connection=conn_raw,
+                    scope_category='PLC_SETTINGS',
+                    change_reason=f"Counter Shot: {change_reason}",
+                    changed_by=curr_user,
+                    camera_id=str(camera_id),
+                    user_role=curr_role,
+                    is_golden=is_golden
+                )
+            except Exception as e_snap:
+                pass
+
             if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
                 self.uic.config_logger.set_status('counter_shot', 'success', f"Đã lưu thành công thiết lập Counter Shot ({method_use})")
-            QtWidgets.QMessageBox.information(None, "Thành công", "Thiết lập counter shot thành công!")
+            QtWidgets.QMessageBox.information(None, "Thành công", "Thiết lập counter shot thành công và ghi nhận lịch sử!")
         except Exception as e:
             if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
                 self.uic.config_logger.set_status('counter_shot', 'error', f"Lỗi thiết lập counter shot: {str(e)}")
@@ -1603,6 +1904,24 @@ class DataProcessSignal:
     def save_mapping_mode(self, cursor, connect_db, camera_id):
         if not self.check_permission_full_control():
             return
+
+        from module_3.change_reason_dialog import ChangeReasonDialog
+        from module_3.config_version_manager import save_snapshot
+
+        curr_user = getattr(self, 'current_user', None) or 'Admin'
+        curr_role = getattr(self, 'current_role', None) or 'full_control'
+
+        reason_dlg = ChangeReasonDialog(
+            current_user=curr_user,
+            current_role=curr_role,
+            context_info=f"Cấu hình Mapping Mode (Camera: {camera_id})",
+            parent=getattr(self.uic, 'centralwidget', None)
+        )
+        if reason_dlg.exec_() != QtWidgets.QDialog.Accepted:
+            return
+
+        change_reason, is_golden = reason_dlg.get_reason_and_golden()
+
         try:
             cursor.execute("DELETE FROM setup_mapping_mode WHERE camera_id = %s", (camera_id,))
             sql_command = """
@@ -1621,9 +1940,25 @@ class DataProcessSignal:
                     w['completed'].currentText(),
                 ))
             connect_db.connection.commit()
+
+            try:
+                conn_raw = getattr(connect_db, 'connection', connect_db)
+                save_snapshot(
+                    cursor=cursor,
+                    connection=conn_raw,
+                    scope_category='PLC_SETTINGS',
+                    change_reason=f"Mapping Mode: {change_reason}",
+                    changed_by=curr_user,
+                    camera_id=str(camera_id),
+                    user_role=curr_role,
+                    is_golden=is_golden
+                )
+            except Exception as e_snap:
+                pass
+
             if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
                 self.uic.config_logger.set_status('mapping_mode', 'success', "Đã lưu thành công thiết lập Mapping Mode")
-            QtWidgets.QMessageBox.information(None, "Thành công", "Thiết lập Mapping Mode thành công!")
+            QtWidgets.QMessageBox.information(None, "Thành công", "Thiết lập Mapping Mode thành công và ghi nhận lịch sử!")
         except Exception as e:
             if hasattr(self.uic, 'config_logger') and self.uic.config_logger:
                 self.uic.config_logger.set_status('mapping_mode', 'error', f"Lỗi Mapping Mode: {str(e)}")

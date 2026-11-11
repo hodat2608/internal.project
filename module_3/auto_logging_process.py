@@ -21,6 +21,32 @@ class AutoLoggingProcess:
         self.list_size = []
         self.process = process
         self.built_in_objects = built_in_objects
+
+        # Tích hợp nút Lịch Sử Cấu Hình cho Auto Logging
+        if hasattr(self.ui_logging, 'hlayout_item_code'):
+            if not hasattr(self.ui_logging, 'pushButton_config_history'):
+                self.ui_logging.pushButton_config_history = QtWidgets.QPushButton(getattr(self.ui_logging, 'groupBox_item', None))
+                self.ui_logging.pushButton_config_history.setMinimumSize(QtCore.QSize(50, 40))
+                self.ui_logging.pushButton_config_history.setMaximumSize(QtCore.QSize(60, 16777215))
+                self.ui_logging.pushButton_config_history.setStyleSheet("""
+                    QPushButton {
+                        background-color: transparent;
+                        border: none;
+                        border-radius: 6px;
+                    }
+                    QPushButton:hover {
+                        background-color: rgba(0, 0, 0, 25);
+                    }
+                    QPushButton:pressed {
+                        background-color: rgba(0, 0, 0, 50);
+                    }
+                """)
+                self.ui_logging.pushButton_config_history.setToolTip("🕒 Xem Lịch Sử Cấu Hình, So Sánh Diff & Rollback (Auto Logging)")
+                icon_h = QtGui.QIcon()
+                icon_h.addPixmap(QtGui.QPixmap("module_3/assert/icon/history.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+                self.ui_logging.pushButton_config_history.setIcon(icon_h)
+                self.ui_logging.pushButton_config_history.setIconSize(QtCore.QSize(25, 25))
+                self.ui_logging.hlayout_item_code.addWidget(self.ui_logging.pushButton_config_history)
     
     def broswer_folder(self):
         folder_path = QtWidgets.QFileDialog.getExistingDirectory(
@@ -148,6 +174,26 @@ class AutoLoggingProcess:
 
 
     def save_values_auto_log_to_db(self,camera_id,connection):
+        self.camera_id = camera_id
+        self.connection = connection
+
+        from module_3.change_reason_dialog import ChangeReasonDialog
+        from module_3.config_version_manager import save_snapshot
+
+        curr_user = getattr(self, 'current_user', None) or 'Admin'
+        curr_role = getattr(self, 'current_role', None) or 'full_control'
+
+        reason_dlg = ChangeReasonDialog(
+            current_user=curr_user,
+            current_role=curr_role,
+            context_info=f"Camera: {camera_id} (Cấu hình Auto Logging)",
+            parent=getattr(self.ui_logging, 'centralwidget', None)
+        )
+        if reason_dlg.exec_() != QtWidgets.QDialog.Accepted:
+            return
+
+        change_reason, is_golden = reason_dlg.get_reason_and_golden()
+
         from PyQt5.QtCore import Qt
         from PyQt5.QtWidgets import QComboBox, QCheckBox, QPushButton
         cursor = connection.cursor()
@@ -233,10 +279,26 @@ class AutoLoggingProcess:
                     ))
                     
                 connection.commit()
+
+                try:
+                    conn_raw = getattr(connection, 'connection', connection)
+                    save_snapshot(
+                        cursor=cursor,
+                        connection=conn_raw,
+                        scope_category='AUTO_LOGGING',
+                        change_reason=change_reason,
+                        changed_by=curr_user,
+                        camera_id=str(camera_id),
+                        user_role=curr_role,
+                        is_golden=is_golden
+                    )
+                except Exception as e_snap:
+                    pass
+
                 print(f"Lưu thành công {len(list_insert)} dòng vào database auto_logging!")
                 
                 from PyQt5.QtWidgets import QMessageBox
-                QMessageBox.information(None, "Thành công", "Đã lưu thiết lập Auto Logging vào database!")
+                QMessageBox.information(None, "Thành công", "Đã lưu thiết lập Auto Logging và ghi nhận lịch sử!")
                 
             except Exception as e:
                 print("Lỗi khi lưu dữ liệu Auto Logging vào Database:", e)
@@ -247,8 +309,39 @@ class AutoLoggingProcess:
         else:
             print("Không có dữ liệu để lưu.")
 
+    def open_config_history(self, connection=None, camera_id=None):
+        """Mở cửa sổ Lịch Sử Cấu Hình, So Sánh Diff & Rollback cho Auto Logging."""
+        conn = connection or getattr(self, 'connection', None)
+        cur = self.cursor
+        cam_id = camera_id or getattr(self, 'camera_id', None)
+        if not conn:
+            from PyQt5.QtWidgets import QMessageBox
+            QMessageBox.warning(None, "Cảnh báo", "Chưa kết nối cơ sở dữ liệu để xem lịch sử cấu hình!")
+            return
+
+        from module_3.config_history_dialog import ConfigHistoryDialog
+
+        curr_user = getattr(self, 'current_user', None) or 'Admin'
+        curr_role = getattr(self, 'current_role', None) or 'full_control'
+        raw_conn = getattr(conn, 'connection', conn)
+
+        dlg = ConfigHistoryDialog(
+            cursor=cur,
+            connection=raw_conn,
+            current_user=curr_user,
+            current_role=curr_role,
+            initial_category='AUTO_LOGGING',
+            initial_camera_id=str(cam_id) if cam_id else '',
+            parent=getattr(self.ui_logging, 'centralwidget', None)
+        )
+        if dlg.exec_() == QtWidgets.QDialog.Accepted:
+            if cam_id:
+                self.load_data_from_db(cam_id, conn)
+
 
     def load_data_from_db(self,camera_id,connection):
+        self.camera_id = camera_id
+        self.connection = connection
         from PyQt5.QtCore import Qt
         from PyQt5.QtWidgets import QTableWidgetItem, QCheckBox, QComboBox, QPushButton
         

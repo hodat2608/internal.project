@@ -207,6 +207,25 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
         self.btn_refresh.clicked.connect(self.load_tasks)
         toolbar_layout.addWidget(self.btn_refresh)
 
+        self.btn_history = QtWidgets.QPushButton("🕒 Lịch Sử Cấu Hình")
+        self.btn_history.setStyleSheet("""
+            QPushButton {
+                background-color: #f1f5f9;
+                color: #0f172a;
+                border: 1px solid #cbd5e1;
+                border-radius: 6px;
+                font-weight: 600;
+                padding: 6px 14px;
+                font-size: 13px;
+            }
+            QPushButton:hover {
+                background-color: #e2e8f0;
+                border-color: #94a3b8;
+            }
+        """)
+        self.btn_history.clicked.connect(self.open_config_history)
+        toolbar_layout.addWidget(self.btn_history)
+
         main_layout.addLayout(toolbar_layout)
 
         # Table Danh sách Tasks
@@ -440,6 +459,22 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
             t = self.tasks[row]
             self.delete_task_by_id(t['id'], t['task_name'])
 
+    def open_config_history(self):
+        """Mở giao diện Audit Trail & Diff Viewer cho Task Calculator."""
+        from module_3.config_history_dialog import ConfigHistoryDialog
+        dlg = ConfigHistoryDialog(
+            cursor=self.cursor,
+            connection=self.connection,
+            current_user="Admin",
+            current_role="full_control",
+            initial_category='TASK_RULES',
+            initial_camera_id=str(self.camera_id),
+            initial_model_id=self.model_id,
+            parent=self
+        )
+        if dlg.exec_() == QtWidgets.QDialog.Accepted:
+            self.load_tasks()
+
     def delete_task_by_id(self, task_id: int, task_name: str):
         reply = QtWidgets.QMessageBox.question(
             self,
@@ -449,7 +484,36 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
             QtWidgets.QMessageBox.No
         )
         if reply == QtWidgets.QMessageBox.Yes:
+            from module_3.change_reason_dialog import ChangeReasonDialog
+            from module_3.config_version_manager import save_snapshot
+
+            reason_dlg = ChangeReasonDialog(
+                current_user="Admin",
+                current_role="full_control",
+                context_info=f"Xóa Task '{task_name}' (ID: {task_id})",
+                parent=self
+            )
+            if reason_dlg.exec_() != QtWidgets.QDialog.Accepted:
+                return
+
+            change_reason, is_golden = reason_dlg.get_reason_and_golden()
+
             if delete_task(self.cursor, self.connection, task_id):
+                try:
+                    save_snapshot(
+                        cursor=self.cursor,
+                        connection=self.connection,
+                        scope_category='TASK_RULES',
+                        change_reason=f"Xóa Task '{task_name}': {change_reason}",
+                        changed_by="Admin",
+                        camera_id=str(self.camera_id),
+                        model_id=self.model_id or 1,
+                        user_role="full_control",
+                        is_golden=is_golden
+                    )
+                except Exception as e_snap:
+                    pass
+                QtWidgets.QMessageBox.information(self, "Thành công", f"Đã xóa thành công Task '{task_name}'!")
                 self.load_tasks()
             else:
                 QtWidgets.QMessageBox.critical(self, "Lỗi", "Không thể xóa Task. Vui lòng kiểm tra lại kết nối Database!")

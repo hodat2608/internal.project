@@ -151,8 +151,8 @@ class SignalReadyRowWidget(QtWidgets.QFrame):
         self.spin_on.setToolTip("Giá trị gửi tới PLC khi Camera và PLC kết nối THÀNH CÔNG (ON)")
         self.spin_on.setStyleSheet("""
             QSpinBox {
-                background-color: #F0FDF4;
-                border: 1px solid #86EFAC;
+                background-color: #FFFFFF;
+                border: 1px solid #94A3B8;
                 border-radius: 4px;
                 padding: 2px 4px;
                 color: #166534;
@@ -180,8 +180,8 @@ class SignalReadyRowWidget(QtWidgets.QFrame):
         self.spin_off.setToolTip("Giá trị gửi tới PLC khi Camera hoặc PLC THẤT BẠI / MẤT KẾT NỐI (OFF)")
         self.spin_off.setStyleSheet("""
             QSpinBox {
-                background-color: #FEF2F2;
-                border: 1px solid #FECACA;
+                background-color: #FFFFFF;
+                border: 1px solid #94A3B8;
                 border-radius: 4px;
                 padding: 2px 4px;
                 color: #991B1B;
@@ -542,12 +542,12 @@ class ProgramSignalReadyManager:
         header_frame.setMaximumHeight(34)
         header_frame.setStyleSheet("""
             QFrame#header_program_signal_ready {
-                background-color: #E0F2FE;
-                border: 1px solid #BAE6FD;
+                background-color: #F7FFFD;
+                border: 1px solid #F7FFFD;
                 border-radius: 5px;
             }
             QLabel {
-                color: #0369A1;
+                color: #000000;
                 font-family: 'Segoe UI';
                 font-size: 10pt;
                 font-weight: bold;

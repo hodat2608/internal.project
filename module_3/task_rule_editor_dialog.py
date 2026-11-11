@@ -2732,10 +2732,45 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
             'Value_NG': self.spin_plc_off.value(),
         }
 
+        # ─────────────────────────────────────────────────────────────
+        # BẮT BUỘC NHẬP LÝ DO THAY ĐỔI THEO QUY CHUẨN AUDIT TRAIL
+        # ─────────────────────────────────────────────────────────────
+        from module_3.change_reason_dialog import ChangeReasonDialog
+        from module_3.config_version_manager import save_snapshot
+
+        curr_user = getattr(self, 'current_user', None) or 'Admin'
+        curr_role = getattr(self, 'current_role', None) or 'full_control'
+        context_str = f"Camera: {self.camera_id} | Model ID: {self.model_id} | Task: {task_name}"
+
+        reason_dlg = ChangeReasonDialog(
+            current_user=curr_user,
+            current_role=curr_role,
+            context_info=context_str,
+            parent=self
+        )
+        if reason_dlg.exec_() != QtWidgets.QDialog.Accepted:
+            return
+
+        change_reason, is_golden = reason_dlg.get_reason_and_golden()
+
         from module_3.task_calculator_db import save_task_and_rules
         saved_id = save_task_and_rules(self.cursor, self.connection, task_data, self.rules_list)
         if saved_id:
-            QtWidgets.QMessageBox.information(self, "Thành công", f"Đã lưu thành công Task '{task_name}' (ID: {saved_id}) cùng {len(self.rules_list)} rules!")
+            try:
+                save_snapshot(
+                    cursor=self.cursor,
+                    connection=self.connection,
+                    scope_category='TASK_RULES',
+                    change_reason=change_reason,
+                    changed_by=curr_user,
+                    camera_id=str(self.camera_id),
+                    model_id=self.model_id or 1,
+                    user_role=curr_role,
+                    is_golden=is_golden
+                )
+            except Exception as e_snap:
+                pass
+            QtWidgets.QMessageBox.information(self, "Thành công", f"Đã lưu thành công Task '{task_name}' (ID: {saved_id}) cùng {len(self.rules_list)} rules và ghi nhận lịch sử!")
             self.accept()
         else:
             QtWidgets.QMessageBox.critical(self, "Lỗi Lưu Database", "Không thể lưu Task vào cơ sở dữ liệu. Vui lòng kiểm tra lại kết nối MySQL!")

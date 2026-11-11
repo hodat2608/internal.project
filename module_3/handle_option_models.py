@@ -816,6 +816,34 @@ class Process_Model:
         self.uic.model.itemChanged.connect(self._on_table_item_changed)
         self.uic.is_unlocked = False
 
+        # Tích hợp nút Xem Lịch Sử Cấu Hình & Rollback vào toolbar groupBox_4
+        if hasattr(self.uic, 'horizontalLayout') and hasattr(self.uic, 'groupBox_4'):
+            if not hasattr(self.uic, 'pushButton_config_history'):
+                self.uic.pushButton_config_history = QtWidgets.QPushButton(self.uic.groupBox_4)
+                self.uic.pushButton_config_history.setMinimumSize(QtCore.QSize(0, 40))
+                self.uic.pushButton_config_history.setMaximumSize(QtCore.QSize(40, 16777215))
+                self.uic.pushButton_config_history.setStyleSheet("""
+                    QPushButton {
+                        background-color: transparent;
+                        border: none;
+                        border-radius: 6px;
+                    }
+                    QPushButton:hover {
+                        background-color: rgba(0, 0, 0, 25);
+                    }
+                    QPushButton:pressed {
+                        background-color: rgba(0, 0, 0, 50);
+                    }
+                """)
+                self.uic.pushButton_config_history.setText("")
+                icon_hist = QtGui.QIcon()
+                icon_hist.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/undo.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+                self.uic.pushButton_config_history.setIcon(icon_hist)
+                self.uic.pushButton_config_history.setIconSize(QtCore.QSize(25, 25))
+                self.uic.pushButton_config_history.setObjectName("pushButton_config_history")
+                self.uic.pushButton_config_history.setToolTip("🕒 Xem Lịch Sử Cấu Hình, So Sánh Diff & Rollback")
+                self.uic.horizontalLayout.addWidget(self.uic.pushButton_config_history)
+
         self.set_ui_enabled(False)
 
     def _setup_table_view_style(self):
@@ -1250,8 +1278,12 @@ class Process_Model:
                     if widget != self.uic.pushButton_edit_params:
                         widget.setEnabled(False)
             self.uic.pushButton_edit_params.setEnabled(True)
+            if hasattr(self.uic, 'pushButton_config_history') and self.uic.pushButton_config_history:
+                self.uic.pushButton_config_history.setEnabled(False)
             if hasattr(self, 'slider_controller') and self.slider_controller:
                 self.slider_controller.popup.hide()
+            if hasattr(self, '_update_runtime_ui'):
+                self._update_runtime_ui()
             return
 
         # 2. Nếu quyền modify: Chỉ thao tác điều chỉnh các thông số trong tableView và lưu dữ liệu
@@ -1269,7 +1301,11 @@ class Process_Model:
                 self.uic.pushButton_save_data.setEnabled(True)
             if hasattr(self.uic, 'pushButton_load_parameters'):
                 self.uic.pushButton_load_parameters.setEnabled(True)
+            if hasattr(self.uic, 'pushButton_config_history') and self.uic.pushButton_config_history:
+                self.uic.pushButton_config_history.setEnabled(True)
             self.uic.pushButton_edit_params.setEnabled(True)
+            if hasattr(self, '_update_runtime_ui'):
+                self._update_runtime_ui()
             return
 
         # 3. Nếu quyền full_control hoặc Administrator: Mở toàn bộ các đối tượng
@@ -1279,6 +1315,10 @@ class Process_Model:
                     if widget != self.uic.pushButton_edit_params:
                         widget.setEnabled(True)
             self.uic.pushButton_edit_params.setEnabled(True)
+            if hasattr(self.uic, 'pushButton_config_history') and self.uic.pushButton_config_history:
+                self.uic.pushButton_config_history.setEnabled(True)
+            if hasattr(self, '_update_runtime_ui'):
+                self._update_runtime_ui()
             return
 
     def lock_gui(self, cursor, connect_db, method=False, boolen=False):
@@ -1668,6 +1708,30 @@ class Process_Model:
             _log.info("Find model_id successfully")
 
             model_id = result[0]
+
+            # ─────────────────────────────────────────────────────────────
+            # HỎI LÝ DO THAY ĐỔI (BẮT BUỘC >= 3 KÝ TỰ THEO QUY CHUẨN AUDIT TRAIL)
+            # ─────────────────────────────────────────────────────────────
+            from module_3.change_reason_dialog import ChangeReasonDialog
+            from module_3.config_version_manager import save_snapshot
+
+            curr_user = getattr(self, 'current_user', None) or 'Admin'
+            curr_role = getattr(self, 'current_role', None) or 'full_control'
+            cam_text = self.uic.comboBox_camera_id.currentText()
+            model_text = self.uic.comboBox_model_id.currentText()
+            context_str = f"Camera: {cam_text} | Model: {model_text} (Tham số nhãn & Model Weights)"
+
+            reason_dlg = ChangeReasonDialog(
+                current_user=curr_user,
+                current_role=curr_role,
+                context_info=context_str,
+                parent=getattr(self.uic, 'centralwidget', None)
+            )
+            if reason_dlg.exec_() != QtWidgets.QDialog.Accepted:
+                _log.info("Người dùng đã hủy lưu thông số (Không nhập lý do thay đổi)")
+                return
+
+            change_reason, is_golden = reason_dlg.get_reason_and_golden()
             weight_path_input = self.uic.lineEdit_weight_pytorch.text().strip()
             if weight_path_input and not os.path.isabs(weight_path_input):
                 full_weight_path = os.path.join(WEIGHTS_DIR, weight_path_input)
@@ -1776,9 +1840,28 @@ class Process_Model:
                     values.append(model_id)
                     cursor.execute(sql, values)
 
-                connector.connection.commit()
+            connector.connection.commit()
+
+            # ─────────────────────────────────────────────────────────────
+            # GHI NHẬN SNAPSHOT AUDIT TRAIL VÀ TÍNH TOÁN DIFF
+            # ─────────────────────────────────────────────────────────────
+            try:
+                save_snapshot(
+                    cursor=cursor,
+                    connection=connector.connection,
+                    scope_category='MODEL_PARAMS',
+                    change_reason=change_reason,
+                    changed_by=curr_user,
+                    camera_id=cam_text,
+                    model_id=model_id,
+                    user_role=curr_role,
+                    is_golden=is_golden
+                )
+            except Exception as e_snap:
+                _log.error("Không thể ghi snapshot MODEL_PARAMS: %s", e_snap)
+
             _log.info("Save parameter successfully")
-            QMessageBox.information(None, "Thành công", "Lưu thông số thành công")
+            QMessageBox.information(None, "Thành công", "Lưu thông số và ghi nhận lịch sử thay đổi thành công!")
 
         except Error as e:
             connector.connection.rollback()
@@ -1789,6 +1872,39 @@ class Process_Model:
             connector.connection.rollback()
             QMessageBox.critical(None, "Lỗi không xác định", str(e))
             _log.error("Save parameter failed: %s", e)
+
+    def open_config_history(self, cursor=None, connector=None):
+        """Mở cửa sổ Lịch Sử Cấu Hình, So Sánh Diff & Rollback cho Model & Bảng Nhãn."""
+        cur = cursor or getattr(self, 'cursor', None)
+        conn = connector or getattr(self, 'connect_db', None)
+        raw_conn = getattr(conn, 'connection', conn)
+        
+        if not cur or not raw_conn:
+            QMessageBox.warning(None, "Cảnh báo", "Chưa kết nối cơ sở dữ liệu để xem lịch sử cấu hình!")
+            return
+
+        from module_3.config_history_dialog import ConfigHistoryDialog
+
+        cam_text = self.uic.comboBox_camera_id.currentText()
+        model_text = self.uic.comboBox_model_id.currentText()
+        model_id = self.model_id or self.get_current_model_id()
+
+        curr_user = getattr(self, 'current_user', None) or 'Admin'
+        curr_role = getattr(self, 'current_role', None) or 'full_control'
+
+        dlg = ConfigHistoryDialog(
+            cursor=cur,
+            connection=raw_conn,
+            current_user=curr_user,
+            current_role=curr_role,
+            initial_category='MODEL_PARAMS',
+            initial_camera_id=cam_text,
+            initial_model_id=model_id,
+            parent=getattr(self.uic, 'centralwidget', None)
+        )
+        if dlg.exec_() == QtWidgets.QDialog.Accepted:
+            # Nếu vừa thực hiện Rollback, tự động tải lại bảng dữ liệu giao diện
+            self.load_data_injection_safe()
 
     def load_data_injection_safe(self):
         model = self.uic.model

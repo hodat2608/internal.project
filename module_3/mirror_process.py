@@ -415,6 +415,32 @@ class Process_Mirror_Device:
             self.on_position_changed
         )
 
+        # Tích hợp nút Lịch Sử Cấu Hình cho tab Mirror
+        if hasattr(self.ui_mirror_tab, 'hlayout_settings_btns'):
+            if not hasattr(self.ui_mirror_tab, 'pushButton_config_history'):
+                self.ui_mirror_tab.pushButton_config_history = QtWidgets.QPushButton(getattr(self.ui_mirror_tab, 'frame_2', None))
+                self.ui_mirror_tab.pushButton_config_history.setMinimumSize(QtCore.QSize(35, 35))
+                self.ui_mirror_tab.pushButton_config_history.setMaximumSize(QtCore.QSize(35, 35))
+                self.ui_mirror_tab.pushButton_config_history.setStyleSheet("""
+                    QPushButton {
+                        background-color: transparent;
+                        border: none;
+                        border-radius: 6px;
+                    }
+                    QPushButton:hover {
+                        background-color: rgba(0, 0, 0, 25);
+                    }
+                    QPushButton:pressed {
+                        background-color: rgba(0, 0, 0, 50);
+                    }
+                """)
+                self.ui_mirror_tab.pushButton_config_history.setToolTip("🕒 Xem Lịch Sử Cấu Hình, So Sánh Diff & Rollback (Mirror)")
+                icon_h = QtGui.QIcon()
+                icon_h.addPixmap(QtGui.QPixmap("module_3/assert/icon/history.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+                self.ui_mirror_tab.pushButton_config_history.setIcon(icon_h)
+                self.ui_mirror_tab.pushButton_config_history.setIconSize(QtCore.QSize(25, 25))
+                self.ui_mirror_tab.hlayout_settings_btns.addWidget(self.ui_mirror_tab.pushButton_config_history)
+
     # ------------------------------------------------------------------
     def _replace_label_with_crosshair(self):
         old_label = self.ui_mirror_tab.label_display_image
@@ -656,7 +682,26 @@ class Process_Mirror_Device:
         return  result_camera_id
     
     def save_params(self,item_code_id,camera_name):
+        self.item_code_id = item_code_id
+        self.camera_name = camera_name
         camera_id = self.produce_mode_auto_id(item_code_id,camera_name)
+
+        from module_3.change_reason_dialog import ChangeReasonDialog
+        from module_3.config_version_manager import save_snapshot
+
+        curr_user = getattr(self, 'current_user', None) or 'Admin'
+        curr_role = getattr(self, 'current_role', None) or 'full_control'
+
+        reason_dlg = ChangeReasonDialog(
+            current_user=curr_user,
+            current_role=curr_role,
+            context_info=f"Camera: {camera_name} (Cấu hình Gương Quang Học MIRROR_CONFIG)",
+            parent=getattr(self.ui_mirror_tab, 'centralwidget', None)
+        )
+        if reason_dlg.exec_() != QtWidgets.QDialog.Accepted:
+            return
+
+        change_reason, is_golden = reason_dlg.get_reason_and_golden()
         
         self.cursor.execute("""
             DELETE FROM MIRROR_CONFIG WHERE camera_id = %s
@@ -680,7 +725,52 @@ class Process_Mirror_Device:
             ))
         self.connect_db.connection.commit()
         self.get_value_from_table()
-        QMessageBox.information(None, "Thành công", "Lưu thành công mode auto!")
+
+        try:
+            conn_raw = getattr(self.connect_db, 'connection', self.connect_db)
+            save_snapshot(
+                cursor=self.cursor,
+                connection=conn_raw,
+                scope_category='MIRROR_CONFIG',
+                change_reason=change_reason,
+                changed_by=curr_user,
+                camera_id=str(camera_name),
+                user_role=curr_role,
+                is_golden=is_golden
+            )
+        except Exception as e_snap:
+            pass
+
+        QMessageBox.information(None, "Thành công", "Lưu thành công cấu hình gương quang học và ghi nhận lịch sử!")
+
+    def open_config_history(self, camera_name=None):
+        """Mở cửa sổ Lịch Sử Cấu Hình, So Sánh Diff & Rollback cho Mirror Config."""
+        cur = self.cursor
+        conn = self.connect_db
+        raw_conn = getattr(conn, 'connection', conn)
+        if not cur or not raw_conn:
+            QMessageBox.warning(None, "Cảnh báo", "Chưa kết nối cơ sở dữ liệu để xem lịch sử cấu hình!")
+            return
+
+        from module_3.config_history_dialog import ConfigHistoryDialog
+
+        curr_user = getattr(self, 'current_user', None) or 'Admin'
+        curr_role = getattr(self, 'current_role', None) or 'full_control'
+        cam_str = str(camera_name or getattr(self, 'camera_name', ''))
+
+        dlg = ConfigHistoryDialog(
+            cursor=cur,
+            connection=raw_conn,
+            current_user=curr_user,
+            current_role=curr_role,
+            initial_category='MIRROR_CONFIG',
+            initial_camera_id=cam_str,
+            parent=getattr(self.ui_mirror_tab, 'centralwidget', None)
+        )
+        if dlg.exec_() == QtWidgets.QDialog.Accepted:
+            item_code_id = getattr(self, 'item_code_id', None)
+            if item_code_id and cam_str:
+                self.load_params(item_code_id, cam_str)
 
     def load_params(self,item_code_id,camera_name):
         camera_id = self.produce_mode_auto_id(item_code_id,camera_name)

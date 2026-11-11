@@ -32,7 +32,10 @@ Speed optimisation list:
 """
 
 from Administrator import hardware_key
-from absl.flags import _flagvalues
+try:
+    from absl.flags import _flagvalues
+except ImportError:
+    _flagvalues = None
 from Administrator import scripts_editor
 from app_logger.app_logger import get_logger as _get_logger, open_log_window
 _log = _get_logger('module_3.main_core')
@@ -2328,6 +2331,62 @@ class CameraTabManager:
         self._continuous_signals_dict = {}
         self._continuous_signals_running = False
         self.status_signal_interval = 0.1
+        self.all_device_tabs = []
+        self.all_mirror_tabs = []
+        self.all_auto_log_tabs = []
+        self.all_signal_processors = []
+
+    def _set_container_widgets_enabled(self, container, enabled=False):
+        """Khóa hoặc mở khóa tất cả các widget tương tác trong tab container mà không làm vô hiệu hóa scroll hoặc tab widget."""
+        if not container:
+            return
+        widget_types = (
+            QtWidgets.QPushButton, QtWidgets.QLineEdit, QtWidgets.QComboBox,
+            QtWidgets.QSpinBox, QtWidgets.QDoubleSpinBox, QtWidgets.QCheckBox,
+            QtWidgets.QRadioButton, QtWidgets.QSlider, QtWidgets.QTableView,
+            QtWidgets.QTableWidget, QtWidgets.QTextEdit, QtWidgets.QPlainTextEdit
+        )
+        for w in container.findChildren(widget_types):
+            w.setEnabled(enabled)
+
+    def set_all_tabs_enabled(self, enabled=False, role='full_control', username='__ADMIN__'):
+        """
+        Khóa hoặc Mở khóa toàn bộ các tab trong hệ thống khi đăng nhập Administrator tại PLC Settings:
+        - Các Tab Model: Mở toàn bộ quyền full_control, cập nhật runtime
+        - Tab Camera Device: findChildren widgets enabled=True/False
+        - Tab Mirror: findChildren widgets enabled=True/False
+        - Tab Auto Logging: findChildren widgets enabled=True/False
+        """
+        # 1. Các tab Model
+        if hasattr(self, 'dict_processors'):
+            for key, proc in self.dict_processors.items():
+                if proc:
+                    proc.is_unlocked = enabled
+                    proc.current_role = role if enabled else None
+                    proc.current_user = username if enabled else None
+                    proc.set_ui_enabled(enabled, role=role if enabled else 'read_only')
+                    if hasattr(proc, 'uic') and hasattr(proc.uic, 'pushButton_edit_params'):
+                        proc.uic.pushButton_edit_params.setText("LOCK" if enabled else "Edit Parameters")
+                    if hasattr(proc, '_update_runtime_ui'):
+                        proc._update_runtime_ui()
+
+        # 2. Các tab Camera Device
+        if hasattr(self, 'all_device_tabs'):
+            for d_tab in self.all_device_tabs:
+                if d_tab:
+                    self._set_container_widgets_enabled(d_tab, enabled)
+
+        # 3. Các tab Mirror
+        if hasattr(self, 'all_mirror_tabs'):
+            for m_tab in self.all_mirror_tabs:
+                if m_tab:
+                    self._set_container_widgets_enabled(m_tab, enabled)
+
+        # 4. Các tab Auto Logging
+        if hasattr(self, 'all_auto_log_tabs'):
+            for a_tab in self.all_auto_log_tabs:
+                if a_tab:
+                    self._set_container_widgets_enabled(a_tab, enabled)
 
     def _apply_tab_bar_font(self, tab_widget_2):
         """Cài đặt font Segoe UI, size 10 cho QTabBar của tab_widget_2."""
@@ -2770,6 +2829,7 @@ class CameraTabManager:
             self.dict_processors[key] = self.processor
             
             self._connect_model_signals(ui_child, self.processor)
+            self.processor.set_ui_enabled(False, role='read_only')
             
             tab_widget_2.addTab(new_tab, f"📌 Model {model_number}")
             self._apply_tab_bar_font(tab_widget_2)
@@ -2796,9 +2856,29 @@ class CameraTabManager:
             ui_child.pushButton_add_tasks.clicked.connect(lambda _: processor.open_task_workspace())
         if hasattr(ui_child, 'pushButton_data_calculator'):
             ui_child.pushButton_data_calculator.clicked.connect(lambda _: processor.open_task_workspace())
+        if hasattr(ui_child, 'pushButton_config_history'):
+            try:
+                ui_child.pushButton_config_history.clicked.disconnect()
+            except Exception:
+                pass
+            ui_child.pushButton_config_history.clicked.connect(lambda _: processor.open_config_history(self.db_manager.cursor, self.db_manager.connect_db))
         
-        def _update_runtime_ui(text):
-            if text == 'PyTorch':
+        def _update_runtime_ui(text=None):
+            runtime = text or ui_child.comboBox_model_runtime.currentText()
+            is_unlocked = getattr(processor, 'is_unlocked', False)
+            if not is_unlocked:
+                ui_child.lineEdit_weight_tensorrt.setEnabled(False)
+                ui_child.pushButton_broswer_tensort.setEnabled(False)
+                ui_child.pushButton_model_tensorrt.setEnabled(False)
+                ui_child.lineEdit_classes_txt.setEnabled(False)
+                ui_child.pushButton_classes_txt.setEnabled(False)
+                ui_child.pushButton_class_file.setEnabled(False)
+                ui_child.lineEdit_weight_pytorch.setEnabled(False)
+                ui_child.pushButton_weight_pytorch.setEnabled(False)
+                ui_child.pushButton_weight_pytorch_2.setEnabled(False)
+                return
+
+            if runtime == 'PyTorch':
                 ui_child.lineEdit_weight_tensorrt.setEnabled(False)
                 ui_child.pushButton_broswer_tensort.setEnabled(False)
                 ui_child.pushButton_model_tensorrt.setEnabled(False)
@@ -2808,7 +2888,7 @@ class CameraTabManager:
                 ui_child.lineEdit_weight_pytorch.setEnabled(True)
                 ui_child.pushButton_weight_pytorch.setEnabled(True)
                 ui_child.pushButton_weight_pytorch_2.setEnabled(True)
-            elif text == 'TensorRT':
+            elif runtime == 'TensorRT':
                 ui_child.lineEdit_weight_tensorrt.setEnabled(True)
                 ui_child.pushButton_broswer_tensort.setEnabled(True)
                 ui_child.pushButton_model_tensorrt.setEnabled(True)
@@ -2820,7 +2900,8 @@ class CameraTabManager:
                 ui_child.pushButton_weight_pytorch_2.setEnabled(False)
                 
         ui_child.comboBox_model_runtime.currentTextChanged.connect(_update_runtime_ui)
-        _update_runtime_ui(ui_child.comboBox_model_runtime.currentText())
+        processor._update_runtime_ui = _update_runtime_ui
+        _update_runtime_ui()
         
     def create_automation_interface(self, camera_id, camera_name, item_code_id, models, tab_widget_2, product_code_forms):
         _translate = QtCore.QCoreApplication.translate
@@ -2831,6 +2912,12 @@ class CameraTabManager:
         self._apply_tab_bar_font(tab_widget_2)
         
         _signals_processor = signals(self.automation_ui)
+        _signals_processor.cursor = self.db_manager.cursor
+        _signals_processor.connect_db = self.db_manager.connect_db
+        _signals_processor.tab_manager = self
+        if not hasattr(self, 'all_signal_processors'):
+            self.all_signal_processors = []
+        self.all_signal_processors.append(_signals_processor)
         self.automation_ui.signals_processor = _signals_processor
         self.automation_ui.camera_id = camera_id
         self.automation_ui.camera_name = camera_name
@@ -2898,6 +2985,14 @@ class CameraTabManager:
         self.automation_ui.pushButton_apply_tranmission_reception.clicked.connect(lambda _: (_clear_capture_cache(), _signals_processor.save_all_data(self.db_manager.cursor, self.db_manager.connect_db, camera_id)))
         self.automation_ui.pushButton_load_tranmission_reception.clicked.connect(lambda _: (_clear_capture_cache(), _signals_processor.load_all_data(self.db_manager.cursor, camera_id)))
         _signals_processor.load_all_data(self.db_manager.cursor,camera_id)
+        if hasattr(self.automation_ui, 'pushButton_config_history'):
+            try:
+                self.automation_ui.pushButton_config_history.clicked.disconnect()
+            except Exception:
+                pass
+            self.automation_ui.pushButton_config_history.clicked.connect(
+                lambda _: _signals_processor.open_config_history(self.db_manager.cursor, self.db_manager.connect_db)
+            )
 
         # setup Program Signal Ready
         def _apply_program_signal_ready():
@@ -2914,6 +3009,7 @@ class CameraTabManager:
                 lambda _: _signals_processor.load_program_signal_ready(self.db_manager.cursor, camera_id)
             )
         _signals_processor.load_program_signal_ready(self.db_manager.cursor, camera_id)
+        _signals_processor.set_ui_enabled(getattr(_signals_processor, 'is_unlocked', False))
 
         # Quét trạng thái CSDL ban đầu và hiển thị lên log realtime
         self.automation_ui.config_logger.check_initial_db(
@@ -2949,6 +3045,10 @@ class CameraTabManager:
         driver = Process_Camera_Device(self.db_manager.connect_db, self.db_manager.cursor,self.automation_ui)
         device_launch = DICT_DEVICE_MANUAL[driver.query_camera_type(item_code_id, camera_name)[0]]
         device_camera = device_launch(device_tab, _device_tab_ui,_mirror_tab_widget)
+        if not hasattr(self, 'all_device_tabs'):
+            self.all_device_tabs = []
+        self.all_device_tabs.append(device_tab)
+        self._set_container_widgets_enabled(device_tab, False)
         
         #auto action
         _device_tab_ui.comboBox_camera_id.setItemText(0, _translate("MainWindow", str({camera_name})))
@@ -2997,6 +3097,12 @@ class CameraTabManager:
         _mirror_tab_widget.pushButton_stop_grab.clicked.connect(lambda _: dev.stop_stream_detect())
         _mirror_tab_widget.pushButton_load_setting.clicked.connect(lambda _: dev.load_params(item_code_id,camera_name))
         _mirror_tab_widget.pushButton_appl_setting.clicked.connect(lambda _: dev.save_params(item_code_id,camera_name))
+        if hasattr(_mirror_tab_widget, 'pushButton_config_history'):
+            try:
+                _mirror_tab_widget.pushButton_config_history.clicked.disconnect()
+            except Exception:
+                pass
+            _mirror_tab_widget.pushButton_config_history.clicked.connect(lambda _: dev.open_config_history(camera_name))
         dev.load_params(item_code_id,camera_name)
         product_code_forms.append(device_tab)
         return device_camera,dev,_device_tab_ui
@@ -3011,6 +3117,10 @@ class CameraTabManager:
         dev = Process_Mirror_Device(self._mirror_tab_widget,self.db_manager.connect_db,self.db_manager.cursor)
         tab_widget_2.mirror_device = dev
         self._mirror_tab_widget.mirror_device = dev
+        if not hasattr(self, 'all_mirror_tabs'):
+            self.all_mirror_tabs = []
+        self.all_mirror_tabs.append(mirror_tab_widget)
+        self._set_container_widgets_enabled(mirror_tab_widget, False)
 
         return self._mirror_tab_widget,dev
     
@@ -3296,11 +3406,23 @@ class CameraTabManager:
         self.logging_process = logging_process
 
         logging_process.load_data_from_db(camera_id,self.connect_plc.connection)
+        if not hasattr(self, 'all_auto_log_tabs'):
+            self.all_auto_log_tabs = []
+        self.all_auto_log_tabs.append(auto_log_tab)
+        self._set_container_widgets_enabled(auto_log_tab, False)
         auto_log_tab_ui.pushButton_broswer_folder.clicked.connect(logging_process.broswer_folder)
         auto_log_tab_ui.pushButton_import.clicked.connect(lambda _=False, lp=logging_process, cn=camera_name: lp.generate_table([k for k in self.total_key if k[0] == f'camera-{cn}']))
         auto_log_tab_ui.tableWidget.itemSelectionChanged.connect(logging_process.show_image_preview)
         auto_log_tab_ui.pushButton_set_save.clicked.connect(lambda _=False, lp=logging_process: lp.save_values_auto_log_to_db(camera_id,self.connect_plc.connection))
         auto_log_tab_ui.pushButton_set_load.clicked.connect(lambda _=False, lp=logging_process: lp.load_data_from_db(camera_id,self.connect_plc.connection))
+        if hasattr(auto_log_tab_ui, 'pushButton_config_history'):
+            try:
+                auto_log_tab_ui.pushButton_config_history.clicked.disconnect()
+            except Exception:
+                pass
+            auto_log_tab_ui.pushButton_config_history.clicked.connect(
+                lambda _=False, lp=logging_process: lp.open_config_history(self.connect_plc.connection, camera_id)
+            )
 
         return auto_log_tab_ui
 

@@ -22,7 +22,7 @@ class EnterpriseAuthDialog(QtWidgets.QDialog):
 
     ROLE_DETAILS = {
         "__ADMIN__": {
-            "title": "QUẢN TRỊ VIÊN TỐI CAO (MASTER ADMIN)",
+            "title": "QUẢN TRỊ VIÊN (ADMINISTRATOR)",
             "desc": "Toàn quyền quản trị, cấu hình và can thiệp toàn bộ hệ thống.",
             "color": "#1D4ED8",
             "bg": "#EFF6FF",
@@ -30,7 +30,7 @@ class EnterpriseAuthDialog(QtWidgets.QDialog):
             "icon": "👑"
         },
         "full_control": {
-            "title": "FULL CONTROL (TOÀN QUYỀN ĐIỀU KHIỂN)",
+            "title": "FULL CONTROL (TOÀN QUYỀN THAO TÁC CHỈNH SỬA)",
             "desc": "Toàn quyền hiệu chỉnh thông số mô hình, camera và tín hiệu PLC.",
             "color": "#15803D",
             "bg": "#F0FDF4",
@@ -116,7 +116,7 @@ class EnterpriseAuthDialog(QtWidgets.QDialog):
         """)
         h_layout.addWidget(lbl_icon)
 
-        # Header Titles
+              # Header Titles
         title_vbox = QtWidgets.QVBoxLayout()
         title_vbox.setSpacing(3)
         title_vbox.setAlignment(QtCore.Qt.AlignVCenter)
@@ -129,6 +129,8 @@ class EnterpriseAuthDialog(QtWidgets.QDialog):
                 font-weight: bold;
                 letter-spacing: 0.5px;
                 background: transparent;
+                text-decoration: none;
+                border: none;
             }
         """)
         lbl_subtitle = QtWidgets.QLabel(f"{self.system_context} • Phân quyền thao tác")
@@ -137,6 +139,8 @@ class EnterpriseAuthDialog(QtWidgets.QDialog):
                 color: #94A3B8;
                 font-size: 11px;
                 background: transparent;
+                text-decoration: none;
+                border: none;
             }
         """)
         title_vbox.addWidget(lbl_title)
@@ -145,6 +149,7 @@ class EnterpriseAuthDialog(QtWidgets.QDialog):
         h_layout.addStretch()
 
         main_layout.addWidget(header_widget)
+
 
         # ─────────────────────────────────────────────
         # 2. BODY CONTAINER
@@ -401,12 +406,8 @@ class EnterpriseAuthDialog(QtWidgets.QDialog):
         details = self.ROLE_DETAILS.get(role_key, self.ROLE_DETAILS.get("read_only"))
 
         self.card_role.setStyleSheet(f"""
-            QFrame {{
-                background-color: {details['bg']};
-                border: 1px solid {details['border']};
-                border-radius: 8px;
-            }}
-        """)
+        QFrame {{ background-color: {details['bg']}; border: none; border-radius: 8px; }} """)
+
         self.lbl_role_icon.setText(details["icon"])
         self.lbl_role_title.setText(details["title"])
         self.lbl_role_title.setStyleSheet(f"font-size: 11px; font-weight: bold; color: {details['color']}; background: transparent;")
