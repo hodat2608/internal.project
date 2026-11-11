@@ -1574,8 +1574,10 @@ class PLCHandler:
                     image_format
                 )
         elapsed = (time.perf_counter() - start_time) * 1000
+        display_mode = self.get_display_mode()
+        display_img = raw_image if display_mode == "Hide Bounding Boxes" else result_img
         self.signals.update_display.emit(
-            [(key_model, pyuic, result_img, flag, list_register, logo_text)],
+            [(key_model, pyuic, display_img, flag, list_register, logo_text, raw_image, result_img)],
             f"⏱️: {elapsed:.2f} ms",
         )
 
@@ -1688,8 +1690,10 @@ class PLCHandler:
                     image_format
                 )
         
+        display_mode = self.get_display_mode()
+        display_img = raw_image if display_mode == "Hide Bounding Boxes" else result_img
         self.signals.update_display.emit(
-            [(key_model, pyuic, result_img, flag, list_register,logo_text)],
+            [(key_model, pyuic, display_img, flag, list_register, logo_text, raw_image, result_img)],
             f"⏱️: {elapsed:.2f} ms",
         )
         time_end = time.perf_counter()
@@ -1779,8 +1783,10 @@ class PLCHandler:
         list_register = []
         elapsed       = (time.perf_counter() - start_time) * 1000
         self._reset_counter(key)
+        display_mode = self.get_display_mode()
+        display_img = raw_image_rgb if display_mode == "Hide Bounding Boxes" else result_img
         self.signals.update_display.emit(
-            [(key_model, pyuic, result_img, flag, list_register, "Mirror (Use Mirror Model)")],
+            [(key_model, pyuic, display_img, flag, list_register, "Mirror (Use Mirror Model)", raw_image_rgb, result_img)],
             f"⏱️: {elapsed:.2f} ms",
         )
 
@@ -1966,8 +1972,10 @@ class PLCHandler:
                         else:
                             _log.debug('[%s] Không cấu hình value_off cho %s, bỏ qua tắt bit trigger', key, register)
 
+                        display_mode = self.get_display_mode()
+                        display_img = raw_image if display_mode == "Hide Bounding Boxes" else result_img
                         self.signals.update_display.emit(
-                            [(key_model, pyuic, result_img, flag, list_register, logo_text or "Logging (Model Representation Mapping)")],
+                            [(key_model, pyuic, display_img, flag, list_register, logo_text or "Logging (Model Representation Mapping)", raw_image, result_img)],
                             f"⏱️: {elapsed:.2f} ms",
                         )
 
@@ -1981,6 +1989,20 @@ class PLCHandler:
     # UI update slot (main thread)
     # -----------------------------------------------------------------------
 
+    def get_display_mode(self) -> str:
+        """Lấy chế độ hiển thị từ giao diện chính (Show Bounding Boxes / Hide Bounding Boxes)."""
+        try:
+            if hasattr(self, 'processor') and self.processor:
+                if hasattr(self.processor, 'display_mode') and self.processor.display_mode:
+                    return str(self.processor.display_mode).strip()
+                if hasattr(self.processor, 'ui_mother') and self.processor.ui_mother:
+                    cb = getattr(self.processor.ui_mother, 'comboBox_display_mode', None)
+                    if cb is not None:
+                        return cb.currentText().strip()
+        except Exception as e:
+            _log.warning("[get_display_mode] Error reading display mode: %s", e)
+        return "Show Bounding Boxes"
+
     def clear_ui_caches(self):
         """Xóa cache kích thước label và pixmap khi thay đổi layout mode."""
         self._label_sizes.clear()
@@ -1988,28 +2010,53 @@ class PLCHandler:
             self._pixmap_cache.clear()
 
     def re_render_latest_ui(self):
-        """Hiển thị lại ảnh kết quả gần nhất khớp với kích thước layout mới."""
+        """Hiển thị lại ảnh kết quả gần nhất khớp với kích thước layout mới hoặc khi đổi display mode."""
         if not getattr(self, '_last_results_map', None):
             return
-        for key_model, (item, time_str) in list(self._last_results_map.items()):
-            self.update_ui_slot([item], time_str)
+        for key_model, val in list(self._last_results_map.items()):
+            if isinstance(val, dict):
+                display_mode = self.get_display_mode()
+                raw_img = val.get('raw_image')
+                res_img = val.get('result_img')
+                if display_mode == "Hide Bounding Boxes" and raw_img is not None:
+                    cur_img = raw_img
+                else:
+                    cur_img = res_img if res_img is not None else raw_img
+                if cur_img is None:
+                    continue
+                item = (val['key_model'], val['pyuic'], cur_img, val['flag'], val['list_register'], val.get('logo_text', ''), raw_img, res_img)
+                self.update_ui_slot([item], val['time_str'])
+            elif isinstance(val, (tuple, list)) and len(val) == 2:
+                item, time_str = val
+                self.update_ui_slot([item], time_str)
 
     def update_ui_slot(self, results, time_str):
         if not hasattr(self, '_last_results_map'):
             self._last_results_map = {}
-        for key_model, _pyuic5, result_img, flag, list_register, logo_text in results:
+        for item in results:
             try:
+                if len(item) >= 8:
+                    key_model, _pyuic5, display_img, flag, list_register, logo_text, raw_image, base_result_img = item[:8]
+                elif len(item) == 7:
+                    key_model, _pyuic5, display_img, flag, list_register, logo_text, raw_image = item[:7]
+                    base_result_img = display_img
+                else:
+                    key_model, _pyuic5, display_img, flag, list_register, logo_text = item[:6]
+                    raw_image = None
+                    base_result_img = display_img
+
                 set_style = 'background-color:#2e7d32; color:white' if flag else 'background-color:#c62828; color:white'
                 result_text = "OK" if flag else "NG"
-                
-                # --- Watermark Logic ---
-                if logo_text:
+
+                # --- Watermark Logic (chỉ copy khi cần vẽ đè watermark lên ảnh) ---
+                if logo_text and display_img is not None:
+                    render_img = display_img.copy()
                     font = cv2.FONT_HERSHEY_DUPLEX
                     font_scale = 1.5
                     thickness = 2
                     (tw, th), _ = cv2.getTextSize(logo_text, font, font_scale, thickness)
                     margin = 30
-                    img_h, img_w = result_img.shape[:2]
+                    img_h, img_w = render_img.shape[:2]
                     
                     x_text = img_w - tw - margin
                     y_text = img_h - margin
@@ -2020,7 +2067,7 @@ class PLCHandler:
                     y2 = min(img_h, y_text + 15)
                     
                     if x2 > x1 and y2 > y1:
-                        roi = result_img[y1:y2, x1:x2]
+                        roi = render_img[y1:y2, x1:x2]
                         overlay_roi = roi.copy()
                         
                         # Nền đen bán trong suốt cho watermark
@@ -2030,17 +2077,25 @@ class PLCHandler:
                         
                         # Blend overlay với ROI gốc (60% độ đậm cho chữ, 40% giữ lại nền ảnh)
                         cv2.addWeighted(overlay_roi, 0.6, roi, 0.4, 0, roi)
-                        result_img[y1:y2, x1:x2] = roi
+                        render_img[y1:y2, x1:x2] = roi
+                else:
+                    render_img = display_img
                 # -----------------------
                 
-                # Lưu lại kết quả gần nhất (đã có watermark, để rỗng logo_text tránh vẽ lặp khi re-render)
-                self._last_results_map[key_model] = (
-                    (key_model, _pyuic5, result_img, flag, list_register, ""),
-                    time_str
-                )
+                # Lưu lại tham chiếu kết quả gần nhất (zero copy)
+                self._last_results_map[key_model] = {
+                    'key_model': key_model,
+                    'pyuic': _pyuic5,
+                    'raw_image': raw_image,
+                    'result_img': base_result_img if base_result_img is not None else display_img,
+                    'flag': flag,
+                    'list_register': list_register,
+                    'logo_text': logo_text,
+                    'time_str': time_str,
+                }
                 
                 child = self.processor.dict_child.get(key_model) if self.processor and hasattr(self.processor, 'dict_child') else None
-                if not child:
+                if not child or render_img is None:
                     continue
                 label_image = child['ldi']
                 label_okng  = child['ldr']
@@ -2053,7 +2108,7 @@ class PLCHandler:
 
                 target_w, target_h = self._label_sizes.get(key_model, (w, h))
 
-                h_img, w_img = result_img.shape[:2]
+                h_img, w_img = render_img.shape[:2]
                 if target_w > 0 and target_h > 0:
                     aspect = w_img / h_img
                     if target_w / target_h > aspect:
@@ -2062,9 +2117,9 @@ class PLCHandler:
                     else:
                         new_w = target_w
                         new_h = int(new_w / aspect)
-                    resized = cv2.resize(result_img, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
+                    resized = cv2.resize(render_img, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
                 else:
-                    resized = result_img
+                    resized = render_img
 
                 h_r, w_r  = resized.shape[:2]
                 cache_key = (key_model, w_r, h_r)
@@ -2268,6 +2323,7 @@ class CameraTabManager:
         self.total_key = []
         self.device = None
         self.camera_colors = {}
+        self.display_mode = "Show Bounding Boxes"
         self._continuous_signals_lock = threading.RLock()
         self._continuous_signals_dict = {}
         self._continuous_signals_running = False
@@ -2578,7 +2634,8 @@ class CameraTabManager:
         """Xử lý khi người dùng chọn Show/Hide Bounding Boxes."""
         if not hasattr(self, 'ui_mother'):
             return
-        display_mode = self.ui_mother.comboBox_display_mode.currentText()
+        display_mode = self.ui_mother.comboBox_display_mode.currentText().strip()
+        self.display_mode = display_mode
         layout_mode = self.ui_mother.comboBox_layout_mode_by.currentText()
         show_layout = self.ui_mother.comboBox_show_ui.currentText()
         try:
@@ -2593,6 +2650,9 @@ class CameraTabManager:
                 )
         except Exception as e:
             _log.warning("Could not save display_mode to database: %s", e)
+
+        if hasattr(self, 'plc_handler') and self.plc_handler:
+            self.plc_handler.re_render_latest_ui()
 
     def create_model_tabs(self, models, camera_name, camera_id, tab_widget_2, product_code_forms,total_models,total_cameras,item_code_id,progress_callback=None, base_progress=0, step_progress=0):
 
@@ -2625,7 +2685,8 @@ class CameraTabManager:
                 result_cursor = self.db_manager.cursor.fetchone()
                 if result_cursor:
                     if result_cursor[0]:
-                        self.ui_mother.comboBox_display_mode.setCurrentText(str(result_cursor[0]))
+                        self.display_mode = str(result_cursor[0]).strip()
+                        self.ui_mother.comboBox_display_mode.setCurrentText(self.display_mode)
                     if result_cursor[1]:
                         self.ui_mother.comboBox_layout_mode_by.setCurrentText(str(result_cursor[1]))
                     if result_cursor[2]:
@@ -2653,10 +2714,10 @@ class CameraTabManager:
             self.ui_mother.comboBox_show_ui.activated.connect(self.on_show_ui_activated)
 
             try:
-                self.ui_mother.comboBox_display_mode.activated.disconnect(self.on_display_mode_activated)
+                self.ui_mother.comboBox_display_mode.currentIndexChanged.disconnect(self.on_display_mode_activated)
             except (TypeError, RuntimeError):
                 pass
-            self.ui_mother.comboBox_display_mode.activated.connect(self.on_display_mode_activated)
+            self.ui_mother.comboBox_display_mode.currentIndexChanged.connect(self.on_display_mode_activated)
 
         self.item_code_id = item_code_id
         layout_mode = self.ui_mother.comboBox_layout_mode_by.currentText()
