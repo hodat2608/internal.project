@@ -26,15 +26,15 @@ import math
 from typing import List, Dict, Any, Optional, Tuple
 
 PARAM_DISPLAY_NAMES = {
-    'FULL_BOX': 'Toàn bộ Box',
+    'FULL_BOX': 'Full Box',
     'X_MIN': 'Left (X min)',
     'X_MAX': 'Right (X max)',
     'Y_MIN': 'Top (Y min)',
     'Y_MAX': 'Bottom (Y max)',
     'CENTER_X': 'Center X',
     'CENTER_Y': 'Center Y',
-    'WIDTH': 'Width (Rộng)',
-    'HEIGHT': 'Height (Cao)'
+    'WIDTH': 'Width',
+    'HEIGHT': 'Height'
 }
 
 OPERATOR_DISPLAY_NAMES = {
@@ -132,10 +132,28 @@ class VisualBoxCanvas(QtWidgets.QWidget):
             else:
                 self.box2_rect = QRectF(bx, by, bw, bh)
 
-    def set_instance_scope(self, scope: str):
+    def get_box_geometry(self, box_idx: int):
+        """Lấy tọa độ và kích thước hiện tại (x, y, w, h) của box 1 hoặc box 2."""
+        r = self.box1_rect if box_idx == 1 else self.box2_rect
+        return (float(r.x()), float(r.y()), float(r.width()), float(r.height()))
+
+    def set_box_geometry(self, box_idx: int, x: float, y: float, w: float, h: float):
+        """Thiết lập chính xác tọa độ và kích thước cho box 1 hoặc box 2."""
+        new_rect = QRectF(float(x), float(y), float(w), float(h))
+        if box_idx == 1:
+            self.box1_rect = new_rect
+        else:
+            self.box2_rect = new_rect
+        self._clamp_boxes_to_bounds()
+        self.update()
+
+    def set_instance_scope(self, scope: str, reset: bool = True):
         """Thiết lập chế độ đối tượng và cấu hình lại đồ họa trực quan theo đúng mô hình."""
         self.instance_scope = scope or '1_VS_1'
-        self.reset_positions()
+        if reset:
+            self.reset_positions()
+        else:
+            self.update()
 
     def reset_positions(self):
         """Khôi phục vị trí mặc định nằm cân đối hoặc theo khuôn mẫu Scope (bề cao rộng rãi)."""
@@ -243,9 +261,9 @@ class VisualBoxCanvas(QtWidgets.QWidget):
             (box_idx, 'X_MAX', right_rect, 'Right (X max)'),
             (box_idx, 'Y_MIN', top_rect, 'Top (Y min)'),
             (box_idx, 'Y_MAX', bottom_rect, 'Bottom (Y max)'),
-            (box_idx, 'CENTER_X', center_rect, 'Center (Tâm)'),
-            (box_idx, 'WIDTH', width_hotspot_rect, 'Width (Chiều rộng)'),
-            (box_idx, 'HEIGHT', height_hotspot_rect, 'Height (Chiều cao)'),
+            (box_idx, 'CENTER_X', center_rect, 'Center'),
+            (box_idx, 'WIDTH', width_hotspot_rect, 'Width'),
+            (box_idx, 'HEIGHT', height_hotspot_rect, 'Height'),
         ]
 
     def _get_resize_rect(self, rect: QRectF) -> QRectF:
@@ -417,26 +435,38 @@ class VisualBoxCanvas(QtWidgets.QWidget):
 
         painter.setFont(QFont("Segoe UI", 7, QFont.Bold))
         painter.setPen(QColor("#1e293b"))
-        painter.drawText(QRectF(14, 10, 138, 13), Qt.AlignLeft, "📐 Hệ Tọa Độ Ảnh (0,0)")
+        painter.drawText(QRectF(14, 10, 138, 13), Qt.AlignLeft, "📐 Image Coordinate (0,0)")
 
         painter.setFont(QFont("Segoe UI", 7, QFont.Normal))
         painter.setPen(QColor("#475569"))
         painter.drawText(QRectF(74, 23, 78, 12), Qt.AlignLeft, "X: 0 → Width")
         painter.drawText(QRectF(74, 35, 78, 12), Qt.AlignLeft, "Y: 0 ↓ Height")
-        painter.drawText(QRectF(74, 47, 78, 12), Qt.AlignLeft, "Đơn vị: Pixel (px)")
+        painter.drawText(QRectF(74, 47, 78, 12), Qt.AlignLeft, "Unit: Pixel (px)")
 
     def _paint_top_status_badge(self, painter: QPainter, width: int, status_text: str, is_pass: bool):
-        """Hiển thị ô vuông Status phán định ở phía trên Canvas, tách biệt xa khỏi 2 box để không bị che khuất."""
+        """Hiển thị ô vuông Status phán định ở phía trên Canvas, tự động tính bề rộng chính xác để không bao giờ bị khuyết chữ OK/NG."""
         status_bg = QColor("#f0fdf4") if is_pass else QColor("#fef2f2")
         status_border = QColor("#22c55e") if is_pass else QColor("#ef4444")
         status_color = QColor("#15803d") if is_pass else QColor("#b91c1c")
 
-        painter.setFont(QFont("Segoe UI", 10, QFont.Bold))
-        tw = max(440.0, float(len(status_text) * 7.5 + 40.0))
-        tw = min(tw, float(width - 30.0))
+        badge_font = QFont("Segoe UI", 9, QFont.Bold)
+        painter.setFont(badge_font)
+        fm = QtGui.QFontMetrics(badge_font)
+        text_w = fm.horizontalAdvance(status_text) if hasattr(fm, 'horizontalAdvance') else fm.width(status_text)
+        tw = float(text_w + 38.0)
         th = 28.0
-        badge_x = max(162.0, (width - tw) / 2)
-        badge_rect = QRectF(badge_x, 42.0, tw, th)
+
+        # Nếu chiều rộng canvas đủ chỗ cho góc tọa độ (160px) và badge
+        if width >= (tw + 180.0):
+            badge_x = (width + 160.0 - tw) / 2.0
+            badge_y = 12.0
+        else:
+            # Nếu bề ngang hẹp, hạ badge xuống dưới góc tọa độ để có toàn bộ không gian
+            tw = min(tw, float(width - 20.0))
+            badge_x = max(10.0, (width - tw) / 2.0)
+            badge_y = 62.0
+
+        badge_rect = QRectF(badge_x, badge_y, tw, th)
 
         painter.setBrush(QBrush(status_bg))
         painter.setPen(QPen(status_border, 1.6))
@@ -506,13 +536,13 @@ class VisualBoxCanvas(QtWidgets.QWidget):
             # 2. Vẽ 2 Ghost Instances của A đang nằm an toàn trong vùng
             ghost_a2 = QRectF(self.box2_rect.right() - 150, self.box2_rect.top() + 70, 125, 75)
             ghost_a3 = QRectF(self.box2_rect.left() + 45, self.box2_rect.bottom() - 105, 125, 75)
-            self._paint_ghost_box(painter, ghost_a2, f"🔹 {self.label_1_name} #2", "✓ Trong vùng (OK)", "#16a34a")
-            self._paint_ghost_box(painter, ghost_a3, f"🔹 {self.label_1_name} #3", "✓ Trong vùng (OK)", "#16a34a")
+            self._paint_ghost_box(painter, ghost_a2, f"🔹 {self.label_1_name} #2", "✓ Inside zone (OK)", "#16a34a")
+            self._paint_ghost_box(painter, ghost_a3, f"🔹 {self.label_1_name} #3", "✓ Inside zone (OK)", "#16a34a")
 
             # 3. Vẽ Box 1 (Đối tượng A1 - có thể kéo thả tự do)
             color_a1 = QColor("#16a34a") if box1_pass else QColor("#dc2626")
             lbl_a1 = f"🔷 {self.label_1_name} #1"
-            custom_center = f"✓ Nằm trong {self.label_2_name}" if is_inside else f"⚠️ VƯỢT NGOÀI {self.label_2_name}!"
+            custom_center = f"✓ Inside {self.label_2_name}" if is_inside else f"⚠️ OUTSIDE {self.label_2_name}!"
             self._paint_box(painter, self.box1_rect, 1, lbl_a1, color_a1, self.selected_param_1, custom_status=custom_center)
 
             # Nếu vi phạm vượt biên -> vẽ đường gióng cảnh báo màu đỏ
@@ -524,7 +554,8 @@ class VisualBoxCanvas(QtWidgets.QWidget):
                 painter.drawLine(p_c1, p_c2)
 
             # Status Badge tổng quan N vs 1 đặt ở phía trên tách xa 2 box
-            status_text = f"MÔ HÌNH N vs 1: TẬP HỢP ĐỐI TƯỢNG TRONG VÙNG CHỨA  ➔  {'HỢP LỆ (OK)' if box1_pass else 'VI PHẠM (NG)'}"
+            res_badge = 'VALID (OK)' if box1_pass else 'VIOLATION (NG)'
+            status_text = f"MODEL N vs 1: OBJECT GROUP IN CONTAINER  ➔  {res_badge}"
             self._paint_top_status_badge(painter, w, status_text, box1_pass)
 
         # ─────────────────────────────────────────────────────────────────────
@@ -546,7 +577,7 @@ class VisualBoxCanvas(QtWidgets.QWidget):
             box1_pass = (not cond_matched) if (self.condition_true_result == 'NG') else cond_matched
 
             # 1. Vẽ Ghost Zone B2
-            self._paint_ghost_box(painter, ghost_b2, f"🚫 {self.label_2_name} #2", "Vùng Giới Hạn #2", "#ea580c")
+            self._paint_ghost_box(painter, ghost_b2, f"🚫 {self.label_2_name} #2", "Boundary Zone #2", "#ea580c")
 
             # 2. Vẽ Zone B1 (Box 2)
             self._paint_box(painter, self.box2_rect, 2, f"🚫 {self.label_2_name} #1", QColor("#ea580c"), self.selected_param_2)
@@ -554,11 +585,12 @@ class VisualBoxCanvas(QtWidgets.QWidget):
             # 3. Vẽ Box 1 (Đối tượng A)
             color_a = QColor("#16a34a") if box1_pass else QColor("#dc2626")
             lbl_a = f"🔷 {self.label_1_name}"
-            custom_center = "✓ Ngoài vùng giới hạn (OK)" if not in_any else "⚠️ VI PHẠM VÀO VÙNG B (NG)!"
+            custom_center = "✓ Outside boundary zone (OK)" if not in_any else "⚠️ VIOLATION IN ZONE B (NG)!"
             self._paint_box(painter, self.box1_rect, 1, lbl_a, color_a, self.selected_param_1, custom_status=custom_center)
 
             # Status Badge tổng quan 1 vs N đặt ở phía trên tách xa 2 box
-            status_text = f"MÔ HÌNH 1 vs N: 1 ĐỐI TƯỢNG VS CÁC VÙNG GIỚI HẠN  ➔  {'HỢP LỆ (OK)' if box1_pass else 'VI PHẠM (NG)'}"
+            res_badge = 'VALID (OK)' if box1_pass else 'VIOLATION (NG)'
+            status_text = f"MODEL 1 vs N: 1 OBJECT VS BOUNDARY ZONES  ➔  {res_badge}"
             self._paint_top_status_badge(painter, w, status_text, box1_pass)
 
         # ─────────────────────────────────────────────────────────────────────
@@ -591,13 +623,13 @@ class VisualBoxCanvas(QtWidgets.QWidget):
                         self._paint_box(painter, self.box1_rect, 1, self.label_1_name, QColor("#2563eb"), self.selected_param_1)
                     else:
                         is_const = (self.target_type == 'CONSTANT')
-                        lbl2_txt = f"HẰNG SỐ: {self.math_val}" if is_const else self.label_2_name
+                        lbl2_txt = f"CONSTANT: {self.math_val}" if is_const else self.label_2_name
                         color2 = QColor("#7c3aed") if is_const else QColor("#ea580c")
                         self._paint_box(painter, self.box2_rect, 2, lbl2_txt, color2, self.selected_param_2, is_constant=is_const)
 
                 # Badge đặt phía trên, không che 2 box
-                res_txt = 'HỢP LỆ (OK)' if pair_pass else 'VI PHẠM (NG)'
-                status_text = f"MÔ HÌNH KHÔNG GIAN: {self.label_1_name} [{self.operator_str}] {self.label_2_name}  ➔  {res_txt}"
+                res_txt = 'VALID (OK)' if pair_pass else 'VIOLATION (NG)'
+                status_text = f"SPATIAL MODEL: {self.label_1_name} [{self.operator_str}] {self.label_2_name}  ➔  {res_txt}"
                 self._paint_top_status_badge(painter, w, status_text, pair_pass)
 
             elif is_distance:
@@ -656,8 +688,8 @@ class VisualBoxCanvas(QtWidgets.QWidget):
                         self._paint_box(painter, self.box2_rect, 2, self.label_2_name, QColor("#ea580c"), self.selected_param_2)
 
                 # Badge trạng thái đầy đủ đưa lên phía trên, xa 2 box
-                res_txt = 'HỢP LỆ (OK)' if pair_pass else 'VI PHẠM (NG)'
-                status_text = f"KHOẢNG CÁCH [{self.selected_param_1} ➔ {self.selected_param_2}]: {dist_val:.1f}px {comp_op} {thresh:.1f}px  ➔  {res_txt}"
+                res_txt = 'VALID (OK)' if pair_pass else 'VIOLATION (NG)'
+                status_text = f"DISTANCE [{self.selected_param_1} ➔ {self.selected_param_2}]: {dist_val:.1f}px {comp_op} {thresh:.1f}px  ➔  {res_txt}"
                 self._paint_top_status_badge(painter, w, status_text, pair_pass)
 
             else:
@@ -678,7 +710,7 @@ class VisualBoxCanvas(QtWidgets.QWidget):
                         rhs_base = float(self.math_val)
                     except Exception:
                         rhs_base = 0.0
-                    rhs_display = f"HẰNG SỐ({rhs_base:.1f}px)"
+                    rhs_display = f"CONSTANT({rhs_base:.1f}px)"
 
                 try:
                     offset_num = float(self.math_val) if self.target_type == 'LABEL' else 0.0
@@ -741,13 +773,13 @@ class VisualBoxCanvas(QtWidgets.QWidget):
                         self._paint_box(painter, self.box1_rect, 1, self.label_1_name, QColor("#2563eb"), self.selected_param_1)
                     else:
                         is_const = (self.target_type == 'CONSTANT')
-                        lbl2_txt = f"HẰNG SỐ: {self.math_val}" if is_const else self.label_2_name
+                        lbl2_txt = f"CONSTANT: {self.math_val}" if is_const else self.label_2_name
                         color2 = QColor("#7c3aed") if is_const else QColor("#ea580c")
                         self._paint_box(painter, self.box2_rect, 2, lbl2_txt, color2, self.selected_param_2, is_constant=is_const)
 
                 # Badge đặt phía trên, xa 2 box
-                res_txt = 'HỢP LỆ (OK)' if pair_pass else 'VI PHẠM (NG)'
-                status_text = f"TỌA ĐỘ: {self.selected_param_1}({lhs_val:.1f}px) {self.operator_str} {rhs_display}{math_display}  ➔  {res_txt}"
+                res_txt = 'VALID (OK)' if pair_pass else 'VIOLATION (NG)'
+                status_text = f"COORDINATE: {self.selected_param_1}({lhs_val:.1f}px) {self.operator_str} {rhs_display}{math_display}  ➔  {res_txt}"
                 self._paint_top_status_badge(painter, w, status_text, pair_pass)
 
         # 4. HUD Banner hiển thị Pixel thời gian thực khi kéo to thu nhỏ hoặc di chuyển
@@ -776,13 +808,13 @@ class VisualBoxCanvas(QtWidgets.QWidget):
 
         painter.setFont(QFont("Segoe UI", 10, QFont.Bold))
         painter.setPen(QColor("#ffffff"))
-        painter.drawText(header_rect, Qt.AlignCenter, f"📦 VÙNG CHỨA MASTER (Vùng Giới Hạn B): {label_name}")
+        painter.drawText(header_rect, Qt.AlignCenter, f"📦 MASTER CONTAINER (Boundary Zone B): {label_name}")
 
         # Badge góc đáy
         sub_badge_rect = QRectF(rect.left() + 10, rect.bottom() - 24, rect.width() - 20, 18)
         painter.setFont(QFont("Segoe UI", 8, QFont.Bold))
         painter.setPen(QColor("#c2410c"))
-        painter.drawText(sub_badge_rect, Qt.AlignLeft, "📐 MASTER BOUNDARY CONTAINER (1 Vùng chứa nhiều đối tượng A)")
+        painter.drawText(sub_badge_rect, Qt.AlignLeft, "📐 MASTER BOUNDARY CONTAINER (1 Zone contains multiple objects A)")
 
     def _paint_ghost_box(self, painter: QPainter, rect: QRectF, title: str, subtitle: str, color_hex: str = "#a6e3a1"):
         """Vẽ các box đại diện phụ (Ghost Instances) cho mô hình N vs 1 hoặc 1 vs N."""
@@ -811,14 +843,14 @@ class VisualBoxCanvas(QtWidgets.QWidget):
         if self.instance_scope == 'ALL_A_IN_ONE_B':
             box1_in_box2 = self._is_rect_inside(self.box1_rect, self.box2_rect)
             if self.operator_str == 'INSIDE' and self.condition_true_result == 'NG':
-                return "✅ TẤT CẢ ĐỐI TƯỢNG A NẰM TRONG VÙNG B ➔ HỢP LỆ (OK)" if box1_in_box2 else "🚨 CẢNH BÁO: PHÁT HIỆN ĐỐI TƯỢNG A1 VƯỢT RA NGOÀI VÙNG B ➔ VI PHẠM (NG)!"
+                return "✅ ALL OBJECTS A INSIDE ZONE B ➔ VALID (OK)" if box1_in_box2 else "🚨 WARNING: OBJECT A1 OUTSIDE ZONE B ➔ VIOLATION (NG)!"
             elif self.operator_str == 'OUTSIDE' and self.condition_true_result == 'NG':
-                return "🚨 CẢNH BÁO: ĐỐI TƯỢNG A1 VƯỢT RA NGOÀI VÙNG B ➔ VI PHẠM (NG)!" if not box1_in_box2 else "✅ TẤT CẢ ĐỐI TƯỢNG A NẰM TRONG VÙNG B ➔ HỢP LỆ (OK)"
-            return "🎯 N vs 1 (Tập hợp đối tượng & Vùng chứa): Thử kéo [Nhãn A1] ra ngoài vùng B để xem phán định đổi màu thời gian thực!"
+                return "🚨 WARNING: OBJECT A1 OUTSIDE ZONE B ➔ VIOLATION (NG)!" if not box1_in_box2 else "✅ ALL OBJECTS A INSIDE ZONE B ➔ VALID (OK)"
+            return "🎯 N vs 1 (Object Group & Container): Try dragging [Label A1] outside zone B to test live evaluation!"
         elif self.instance_scope == 'ONE_A_IN_ANY_B':
-            return "🎯 1 vs N (1 đối tượng & Nhiều vùng giới hạn): Thử kéo [Nhãn A] vào các vùng cấm B để kiểm tra cảnh báo!"
+            return "🎯 1 vs N (1 Object & Multiple Zones): Try dragging [Label A] into restricted zones B to test warning!"
         else:
-            return "🖱️ Kéo thân để DI CHUYỂN | Kéo góc dưới-phải (📐) để CO GIÃN | Click cạnh để CHỌN TỌA ĐỘ"
+            return "🖱️ Drag body to MOVE | Drag bottom-right (📐) to RESIZE | Click edge to SELECT PARAM"
 
     def _paint_hud_banner(self, painter: QPainter, width: int):
         """Hiển thị Banner thông số Pixel động cực kỳ rõ ràng trên đầu Canvas."""
@@ -832,7 +864,7 @@ class VisualBoxCanvas(QtWidgets.QWidget):
                 h_now = int(target_rect.height())
                 dw = int(w_now - self.initial_box_rect.width())
                 dh = int(h_now - self.initial_box_rect.height())
-                hud_text = f"📐 ĐANG CO GIÃN NHÃN {box_idx}: {w_now} × {h_now} px  (Độ biến thiên: ΔW {dw:+d} px, ΔH {dh:+d} px)"
+                hud_text = f"📐 RESIZING LABEL {box_idx}: {w_now} × {h_now} px  (Delta: ΔW {dw:+d} px, ΔH {dh:+d} px)"
                 hud_color = QColor("#b45309")
                 border_color = QColor("#f59e0b")
             elif action_type in ('DRAG', 'HOTSPOT_OR_DRAG') and self.is_dragging:
@@ -840,7 +872,7 @@ class VisualBoxCanvas(QtWidgets.QWidget):
                 y_now = int(target_rect.y())
                 dx = int(x_now - self.initial_box_rect.x())
                 dy = int(y_now - self.initial_box_rect.y())
-                hud_text = f"📍 ĐANG DI CHUYỂN NHÃN {box_idx}: X = {x_now} px, Y = {y_now} px  (Dịch chuyển: ΔX {dx:+d} px, ΔY {dy:+d} px)"
+                hud_text = f"📍 MOVING LABEL {box_idx}: X = {x_now} px, Y = {y_now} px  (Offset: ΔX {dx:+d} px, ΔY {dy:+d} px)"
                 hud_color = QColor("#1d4ed8")
                 border_color = QColor("#3b82f6")
             else:
@@ -886,7 +918,7 @@ class VisualBoxCanvas(QtWidgets.QWidget):
 
         painter.setFont(QFont("Segoe UI", 10, QFont.Bold))
         painter.setPen(QColor("#ffffff"))
-        tag = label_text if (label_text.startswith("🔷") or label_text.startswith("🚫") or is_constant) else f"Nhãn {box_idx}: {label_text}"
+        tag = label_text if (label_text.startswith("🔷") or label_text.startswith("🚫") or is_constant) else f"Label {box_idx}: {label_text}"
         painter.drawText(header_rect, Qt.AlignCenter, tag)
 
         # Vẽ các Hotspots cạnh (nếu không phải là constant và không phải FULL_BOX)
@@ -967,7 +999,7 @@ class VisualBoxCanvas(QtWidgets.QWidget):
         # Cạnh đang chọn text ở giữa hoặc custom status
         painter.setFont(QFont("Segoe UI", 10, QFont.Bold if custom_status else QFont.Normal))
         painter.setPen(theme_color if custom_status else QColor("#1e293b"))
-        status_text = custom_status or (f"Cạnh: {PARAM_DISPLAY_NAMES.get(selected_param, selected_param)}" if selected_param not in ('WIDTH', 'HEIGHT') else "")
+        status_text = custom_status or (f"Edge: {PARAM_DISPLAY_NAMES.get(selected_param, selected_param)}" if selected_param not in ('WIDTH', 'HEIGHT') else "")
         if status_text:
             painter.drawText(QRectF(rect.left() + 4, rect.top() + header_h + 6, rect.width() - 8, 20), Qt.AlignCenter, status_text)
 
@@ -2385,7 +2417,7 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
             if idx_scope >= 0:
                 self.combo_instance_scope.setCurrentIndex(idx_scope)
             self._update_scope_hint(scope)
-            self.visual_canvas.set_instance_scope(scope)
+            self.visual_canvas.set_instance_scope(scope, reset=False)
 
             # 1. Nhãn 1 & Nhãn 2
             lbl1 = rule.get('label_1', '')
@@ -2475,6 +2507,30 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
             self.visual_canvas.set_target_type(tt)
             self.visual_canvas.set_math_info(m_op, m_val)
             self.visual_canvas.set_operator_and_result(op, c_res)
+
+            # 8. Phục hồi chính xác tọa độ và kích thước 2 Box theo Rule
+            b1_val = rule.get('box1_rect')
+            b2_val = rule.get('box2_rect')
+            if b1_val and b2_val:
+                try:
+                    def _parse_rect(val):
+                        if isinstance(val, (list, tuple)) and len(val) == 4:
+                            return [float(v) for v in val]
+                        s = str(val).replace('[', '').replace(']', '').replace('(', '').replace(')', '').strip()
+                        parts = [float(v.strip()) for v in s.split(',') if v.strip()]
+                        return parts if len(parts) == 4 else None
+
+                    r1 = _parse_rect(b1_val)
+                    r2 = _parse_rect(b2_val)
+                    if r1 and r2:
+                        self.visual_canvas.set_box_geometry(1, r1[0], r1[1], r1[2], r1[3])
+                        self.visual_canvas.set_box_geometry(2, r2[0], r2[1], r2[2], r2[3])
+                    else:
+                        self.visual_canvas.reset_positions()
+                except Exception:
+                    self.visual_canvas.reset_positions()
+            else:
+                self.visual_canvas.reset_positions()
 
             self.btn_update_rule.setText(f"💾 Cập Nhật Rule #{rule_idx + 1}")
         finally:
@@ -2578,6 +2634,11 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
                 rhs_str += f" {math_op} {math_val}"
             rule_desc = f"{lhs_str} {op} {rhs_str} ➔ {true_res}"
 
+        b1_geo = self.visual_canvas.get_box_geometry(1)
+        b2_geo = self.visual_canvas.get_box_geometry(2)
+        b1_str = f"{b1_geo[0]:.1f},{b1_geo[1]:.1f},{b1_geo[2]:.1f},{b1_geo[3]:.1f}"
+        b2_str = f"{b2_geo[0]:.1f},{b2_geo[1]:.1f},{b2_geo[2]:.1f},{b2_geo[3]:.1f}"
+
         return {
             'label_1': lbl1,
             'param_1': param1,
@@ -2595,7 +2656,9 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
             'max_value': 0.0,
             'condition_true_result': true_res,
             'enabled': True,
-            'description': rule_desc
+            'description': rule_desc,
+            'box1_rect': b1_str,
+            'box2_rect': b2_str
         }
 
     def add_rule_to_table(self):

@@ -55,8 +55,17 @@ class ConfigHistoryDialog(QtWidgets.QDialog):
         parent=None
     ):
         super().__init__(parent)
-        self.cursor = cursor
         self.connection = connection
+        self._own_cursor = False
+        if self.connection and hasattr(self.connection, 'cursor'):
+            try:
+                self.cursor = self.connection.cursor(buffered=True)
+                self._own_cursor = True
+            except Exception:
+                self.cursor = cursor
+        else:
+            self.cursor = cursor
+
         self.current_user = str(current_user or 'Unknown').strip()
         self.current_role = str(current_role or 'modify').strip().lower()
         self.default_category = initial_category or default_category or "ALL"
@@ -395,6 +404,14 @@ class ConfigHistoryDialog(QtWidgets.QDialog):
     # DỮ LIỆU & LOGIC
     # ─────────────────────────────────────────────────────────────────────────
 
+    def closeEvent(self, event):
+        if getattr(self, '_own_cursor', False) and self.cursor:
+            try:
+                self.cursor.close()
+            except Exception:
+                pass
+        super().closeEvent(event)
+
     def _load_filters_data(self):
         """Nạp danh sách Camera và Model vào combobox bộ lọc."""
         # Nạp Camera
@@ -423,6 +440,13 @@ class ConfigHistoryDialog(QtWidgets.QDialog):
 
         if self.default_camera:
             idx = self.combo_camera.findData(self.default_camera)
+            if idx < 0:
+                c_digits = ''.join(ch for ch in str(self.default_camera) if ch.isdigit())
+                for i in range(self.combo_camera.count()):
+                    item_d = str(self.combo_camera.itemData(i))
+                    if item_d == c_digits or ''.join(ch for ch in item_d if ch.isdigit()) == c_digits:
+                        idx = i
+                        break
             if idx >= 0:
                 self.combo_camera.setCurrentIndex(idx)
 

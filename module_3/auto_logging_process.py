@@ -12,15 +12,21 @@ from PyQt5 import QtCore,QtGui
 from PyQt5.QtGui import QPixmap
 import cv2
 from app_logger.app_logger import get_logger as _get_logger, open_log_window
+from module_1.root_path import resource_path
 _log = _get_logger('auto_logging_process')
 
 class AutoLoggingProcess:
-    def __init__(self,ui_logging,cursor,process=None,built_in_objects={}):
+    def __init__(self, ui_logging, cursor, process=None, built_in_objects={}, camera_id=None, connection=None):
         self.ui_logging = ui_logging
         self.cursor = cursor
         self.list_size = []
         self.process = process
         self.built_in_objects = built_in_objects
+        self.camera_id = camera_id
+        self.connection = connection
+        self.is_unlocked = False
+        self.current_user = None
+        self.current_role = None
 
         # Tích hợp nút Lịch Sử Cấu Hình cho Auto Logging
         if hasattr(self.ui_logging, 'hlayout_item_code'):
@@ -43,7 +49,7 @@ class AutoLoggingProcess:
                 """)
                 self.ui_logging.pushButton_config_history.setToolTip("🕒 Xem Lịch Sử Cấu Hình, So Sánh Diff & Rollback (Auto Logging)")
                 icon_h = QtGui.QIcon()
-                icon_h.addPixmap(QtGui.QPixmap("module_3/assert/icon/history.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+                icon_h.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/history.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
                 self.ui_logging.pushButton_config_history.setIcon(icon_h)
                 self.ui_logging.pushButton_config_history.setIconSize(QtCore.QSize(25, 25))
                 self.ui_logging.hlayout_item_code.addWidget(self.ui_logging.pushButton_config_history)
@@ -57,6 +63,396 @@ class AutoLoggingProcess:
             QtWidgets.QFileDialog.DontResolveSymlinks
         )
         self.ui_logging.lineEdit_folder_path.setText(folder_path)
+
+    def _get_button_row(self, btn, col=9) -> int:
+        """Tìm chỉ số dòng hiện tại của một button nằm trong bảng tableWidget."""
+        table = getattr(self.ui_logging, 'tableWidget', None)
+        if not table:
+            return -1
+        for r in range(table.rowCount()):
+            if table.cellWidget(r, col) is btn:
+                return r
+        return -1
+
+    def _create_save_button(self, row: int, file_path: str = None) -> QtWidgets.QPushButton:
+        """Tạo nút Save cho từng dòng ảnh với giao diện chuyên nghiệp."""
+        btn = QtWidgets.QPushButton("💾 Data Save")
+        btn.setToolTip("Lưu cấu hình riêng cho dòng ảnh này vào cơ sở dữ liệu")
+        btn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        btn.setStyleSheet("""
+            QPushButton {
+                background-color: #C3DBFF;
+                color: #000000;
+                font-weight: 600;
+                font-size: 11px;
+                border: 1px solid #0b5ed7;
+                border-radius: 4px;
+                padding: 4px 8px;
+                min-height: 22px;
+            }
+            QPushButton:hover {
+                background-color: #72ABFF;
+                border-color: #0a58ca;
+            }
+            QPushButton:pressed {
+                background-color: #325A97;
+            }
+            QPushButton:disabled {
+                background-color: #e9ecef;
+                color: #6c757d;
+                border: 1px solid #ced4da;
+            }
+        """)
+        if hasattr(self, 'is_unlocked'):
+            btn.setEnabled(self.is_unlocked)
+        btn.clicked.connect(lambda _=False, r=row, fp=file_path, b=btn: self.on_save_row_clicked(r, fp, b))
+        return btn
+
+    def _create_detect_button(self, file_path: str, combo_cam, combo_key) -> QtWidgets.QPushButton:
+        """Tạo nút Detect cho cột View Detection."""
+        btn = QtWidgets.QPushButton("Detect")
+        btn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        btn.setStyleSheet("""
+            QPushButton {
+                background-color: #C3E5D5;
+                color: #000000;
+                font-weight: 600;
+                font-size: 11px;
+                border: 1px solid #157347;
+                border-radius: 4px;
+                padding: 4px 8px;
+                min-height: 22px;
+            }
+            QPushButton:hover {
+                background-color: #A4DBC1;
+                border-color: #146c43;
+            }
+            QPushButton:pressed {
+                background-color: #7BCAA5;
+            }
+            QPushButton:disabled {
+                background-color: #e9ecef;
+                color: #6c757d;
+                border: 1px solid #ced4da;
+            }
+        """)
+        if hasattr(self, 'is_unlocked'):
+            btn.setEnabled(self.is_unlocked)
+        from functools import partial
+        btn.clicked.connect(partial(self.on_detect_clicked, file_path, combo_cam, combo_key))
+        return btn
+
+    def _show_save_success_effect(self, btn: QtWidgets.QPushButton):
+        """Hiệu ứng xanh lá '✔ Đã lưu' tạm thời trên nút Save khi lưu thành công."""
+        orig_text = btn.text()
+        orig_style = btn.styleSheet()
+        btn.setText("✔ Đã lưu")
+        btn.setStyleSheet("""
+            QPushButton {
+                background-color: #198754;
+                color: #ffffff;
+                font-weight: 700;
+                font-size: 11px;
+                border: 1px solid #146c43;
+                border-radius: 4px;
+                padding: 4px 8px;
+                min-height: 22px;
+            }
+        """)
+        QtCore.QTimer.singleShot(2500, lambda: self._reset_save_button_state(btn, orig_text, orig_style))
+
+    def _reset_save_button_state(self, btn: QtWidgets.QPushButton, orig_text: str, orig_style: str):
+        try:
+            if btn and not btn.isHidden():
+                btn.setText(orig_text)
+                btn.setStyleSheet(orig_style)
+        except RuntimeError:
+            pass
+
+    def _adjust_table_columns(self):
+        """Cấu hình lại độ rộng và chế độ hiển thị chuẩn cho 10 cột trong tableWidget."""
+        table = self.ui_logging.tableWidget
+        if table.columnCount() < 10:
+            table.setColumnCount(10)
+            
+        header = table.horizontalHeader()
+        header.setCascadingSectionResizes(False)
+        for i in range(table.columnCount()):
+            header.setSectionResizeMode(i, QtWidgets.QHeaderView.Interactive)
+            
+        table.setColumnWidth(0, 75)   # Join State
+        table.setColumnWidth(1, 320)  # Image Preview / Path
+        table.setColumnWidth(2, 130)  # Description
+        table.setColumnWidth(3, 110)  # Select Camera
+        table.setColumnWidth(4, 110)  # Select Model
+        table.setColumnWidth(5, 85)   # View Detection
+        table.setColumnWidth(6, 95)   # Register
+        table.setColumnWidth(7, 85)   # Value ON
+        table.setColumnWidth(8, 85)   # Value OFF
+        table.setColumnWidth(9, 90)   # Action (Save)
+
+    def get_row_data(self, row: int) -> dict:
+        """Trích xuất dữ liệu của 1 dòng từ tableWidget."""
+        data = {
+            'row': row,
+            'db_id': None,
+            'folder_path': '',
+            'join_state': 1,
+            'image_path': '',
+            'description_image': '',
+            'select_camera': '',
+            'select_model': '',
+            'register': '',
+            'value_on': '',
+            'value_off': '',
+        }
+        
+        # 1. Folder path
+        if hasattr(self.ui_logging, 'lineEdit_folder_path'):
+            data['folder_path'] = self.ui_logging.lineEdit_folder_path.text().strip()
+            
+        # 2. Col 0: Join State
+        cell0 = self.ui_logging.tableWidget.cellWidget(row, 0)
+        if cell0 is not None:
+            chk = cell0.findChild(QtWidgets.QCheckBox)
+            if chk is not None:
+                data['join_state'] = 1 if chk.isChecked() else 0
+            elif isinstance(cell0, QtWidgets.QCheckBox):
+                data['join_state'] = 1 if cell0.isChecked() else 0
+        else:
+            item0 = self.ui_logging.tableWidget.item(row, 0)
+            if item0:
+                data['join_state'] = 1 if item0.checkState() == QtCore.Qt.Checked else 0
+
+        # 3. Col 1: Image Path & DB ID
+        item1 = self.ui_logging.tableWidget.item(row, 1)
+        if item1 is not None:
+            data['image_path'] = item1.text().strip()
+            user_data = item1.data(QtCore.Qt.UserRole)
+            if user_data is not None:
+                try:
+                    data['db_id'] = int(user_data)
+                except (ValueError, TypeError):
+                    data['db_id'] = None
+
+        # 4. Col 2: Description
+        item2 = self.ui_logging.tableWidget.item(row, 2)
+        if item2 is not None:
+            data['description_image'] = item2.text().strip()
+
+        # 5. Col 3: Select Camera
+        cell3 = self.ui_logging.tableWidget.cellWidget(row, 3)
+        if isinstance(cell3, QtWidgets.QComboBox):
+            data['select_camera'] = cell3.currentText().strip()
+        elif self.ui_logging.tableWidget.item(row, 3):
+            data['select_camera'] = self.ui_logging.tableWidget.item(row, 3).text().strip()
+
+        # 6. Col 4: Select Model
+        cell4 = self.ui_logging.tableWidget.cellWidget(row, 4)
+        if isinstance(cell4, QtWidgets.QComboBox):
+            data['select_model'] = cell4.currentText().strip()
+        elif self.ui_logging.tableWidget.item(row, 4):
+            data['select_model'] = self.ui_logging.tableWidget.item(row, 4).text().strip()
+
+        # 7. Col 6: Register
+        item6 = self.ui_logging.tableWidget.item(row, 6)
+        if item6 is not None:
+            data['register'] = item6.text().strip()
+
+        # 8. Col 7: Value ON
+        item7 = self.ui_logging.tableWidget.item(row, 7)
+        if item7 is not None:
+            data['value_on'] = item7.text().strip()
+
+        # 9. Col 8: Value OFF
+        item8 = self.ui_logging.tableWidget.item(row, 8)
+        if item8 is not None:
+            data['value_off'] = item8.text().strip()
+
+        return data
+
+    def on_save_row_clicked(self, row: int, file_path: str = None, btn: QtWidgets.QPushButton = None):
+        """Lưu cấu hình riêng cho từng dòng ảnh vào database auto_logging và ghi lịch sử thay đổi."""
+        if hasattr(self, 'is_unlocked') and not self.is_unlocked:
+            QtWidgets.QMessageBox.warning(
+                getattr(self.ui_logging, 'centralwidget', None),
+                "Từ chối thao tác",
+                "Chức năng Auto Logging đang ở chế độ khóa!\n"
+                "Vui lòng nhấn nút ADMIN tại tab PLC Settings để đăng nhập với quyền Quản trị viên (Administrator)."
+            )
+            return
+
+        actual_row = row
+        if btn is not None:
+            found = self._get_button_row(btn, col=9)
+            if found != -1:
+                actual_row = found
+                
+        row_count = self.ui_logging.tableWidget.rowCount()
+        if actual_row < 0 or actual_row >= row_count:
+            QtWidgets.QMessageBox.warning(None, "Lỗi", f"Không tìm thấy dòng tương ứng ({actual_row})!")
+            return
+
+        row_data = self.get_row_data(actual_row)
+        image_path = row_data['image_path']
+        if not image_path and file_path:
+            image_path = file_path
+            row_data['image_path'] = file_path
+            
+        if not image_path:
+            QtWidgets.QMessageBox.warning(None, "Cảnh báo", "Dòng này chưa có đường dẫn hình ảnh!")
+            return
+
+        conn = getattr(self, 'connection', None)
+        if conn is None and hasattr(self, 'cursor') and self.cursor:
+            conn = getattr(self.cursor, 'connection', None)
+        if conn is None:
+            QtWidgets.QMessageBox.warning(None, "Lỗi kết nối", "Chưa có kết nối cơ sở dữ liệu để lưu dữ liệu!")
+            return
+
+        # Xác định camera_id
+        camera_id = getattr(self, 'camera_id', None)
+        if camera_id is None:
+            cam_str = row_data.get('select_camera', '')
+            import re
+            digits = re.findall(r'\d+', cam_str)
+            camera_id = int(digits[0]) if digits else 1
+        else:
+            try:
+                import re
+                digits = re.findall(r'\d+', str(camera_id))
+                camera_id = int(digits[0]) if digits else int(camera_id)
+            except Exception:
+                camera_id = 1
+
+        from module_3.change_reason_dialog import ChangeReasonDialog
+        from module_3.config_version_manager import save_snapshot
+
+        curr_user = getattr(self, 'current_user', None) or 'Admin'
+        curr_role = getattr(self, 'current_role', None) or 'full_control'
+        img_name = os.path.basename(image_path)
+
+        reason_dlg = ChangeReasonDialog(
+            current_user=curr_user,
+            current_role=curr_role,
+            context_info=f"Camera {camera_id} - Dòng ảnh: {img_name}",
+            parent=getattr(self.ui_logging, 'centralwidget', None)
+        )
+        if reason_dlg.exec_() != QtWidgets.QDialog.Accepted:
+            return
+
+        change_reason, is_golden = reason_dlg.get_reason_and_golden()
+
+        cursor = conn.cursor()
+        db_id = row_data.get('db_id')
+        
+        # Kiểm tra xem bản ghi đã tồn tại trong DB chưa (theo id hoặc theo image_path + camera_id)
+        existing_id = None
+        if db_id:
+            cursor.execute("SELECT id FROM auto_logging WHERE id = %s", (db_id,))
+            res = cursor.fetchone()
+            if res:
+                existing_id = res[0]
+        
+        if existing_id is None:
+            cursor.execute(
+                "SELECT id FROM auto_logging WHERE image_path = %s AND camera_id = %s LIMIT 1",
+                (image_path, camera_id)
+            )
+            res = cursor.fetchone()
+            if res:
+                existing_id = res[0]
+
+        try:
+            if existing_id is not None:
+                update_sql = """
+                    UPDATE auto_logging SET
+                        folder_path = %s,
+                        join_state = %s,
+                        image_path = %s,
+                        description_image = %s,
+                        select_camera = %s,
+                        select_model = %s,
+                        register = %s,
+                        value_on = %s,
+                        value_off = %s,
+                        camera_id = %s
+                    WHERE id = %s
+                """
+                cursor.execute(update_sql, (
+                    row_data['folder_path'],
+                    row_data['join_state'],
+                    row_data['image_path'],
+                    row_data['description_image'],
+                    row_data['select_camera'],
+                    row_data['select_model'],
+                    row_data['register'],
+                    row_data['value_on'],
+                    row_data['value_off'],
+                    camera_id,
+                    existing_id
+                ))
+                final_id = existing_id
+            else:
+                insert_sql = """
+                    INSERT INTO auto_logging (
+                        folder_path, join_state, image_path, description_image,
+                        select_camera, select_model, register, value_on, value_off, camera_id
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """
+                cursor.execute(insert_sql, (
+                    row_data['folder_path'],
+                    row_data['join_state'],
+                    row_data['image_path'],
+                    row_data['description_image'],
+                    row_data['select_camera'],
+                    row_data['select_model'],
+                    row_data['register'],
+                    row_data['value_on'],
+                    row_data['value_off'],
+                    camera_id
+                ))
+                final_id = cursor.lastrowid
+                
+            conn.commit()
+            
+            # Cập nhật ID vào UserRole của ô image_path trong bảng
+            shot_item = self.ui_logging.tableWidget.item(actual_row, 1)
+            if shot_item:
+                shot_item.setData(QtCore.Qt.UserRole, final_id)
+
+            # Ghi snapshot audit trail
+            try:
+                conn_raw = getattr(conn, 'connection', conn)
+                save_snapshot(
+                    cursor=cursor,
+                    connection=conn_raw,
+                    scope_category='AUTO_LOGGING',
+                    change_reason=f"Lưu riêng dòng [{img_name}]: {change_reason}",
+                    changed_by=curr_user,
+                    camera_id=str(camera_id),
+                    user_role=curr_role,
+                    is_golden=is_golden
+                )
+            except Exception as e_snap:
+                _log.warning("Lỗi ghi snapshot cho dòng auto logging: %s", e_snap)
+
+            # Cập nhật visual feedback trên nút Save
+            if btn is not None:
+                self._show_save_success_effect(btn)
+
+            QtWidgets.QMessageBox.information(
+                None,
+                "Thành công",
+                f"Đã lưu thành công cấu hình cho dòng ảnh:\n{img_name}\n(ID: {final_id})"
+            )
+        except Exception as e:
+            _log.error("Lỗi khi lưu dòng auto logging: %s", e)
+            try:
+                conn.rollback()
+            except Exception:
+                pass
+            QtWidgets.QMessageBox.critical(None, "Lỗi lưu dữ liệu", f"Không thể lưu dữ liệu dòng này:\n{str(e)}")
 
     def generate_table(self,total_key):
         path = self.ui_logging.lineEdit_folder_path.text().strip()
@@ -103,10 +499,7 @@ class AutoLoggingProcess:
             combo_key.addItems(list(total_model))
             self.ui_logging.tableWidget.setCellWidget(row, 4, combo_key)
             
-            detect_button = QtWidgets.QPushButton("Detect")
-            
-            from functools import partial
-            detect_button.clicked.connect(partial(self.on_detect_clicked, file_path, combo_cam, combo_key))
+            detect_button = self._create_detect_button(file_path, combo_cam, combo_key)
             self.ui_logging.tableWidget.setCellWidget(row, 5, detect_button)
             
             from PyQt5.QtCore import Qt
@@ -121,33 +514,11 @@ class AutoLoggingProcess:
             item_col8 = QTableWidgetItem("")
             item_col8.setTextAlignment(Qt.AlignCenter)
             self.ui_logging.tableWidget.setItem(row, 8, item_col8)
-            
-        header = self.ui_logging.tableWidget.horizontalHeader()
-        header.setCascadingSectionResizes(False) 
-        
-        for i in range(self.ui_logging.tableWidget.columnCount()):
-            header.setSectionResizeMode(i, QtWidgets.QHeaderView.Interactive)
-            
-        self.ui_logging.tableWidget.resizeColumnToContents(0)
-        self.ui_logging.tableWidget.resizeColumnToContents(1)
-        
-        col0_width = self.ui_logging.tableWidget.columnWidth(0)
-        col1_width = self.ui_logging.tableWidget.columnWidth(1)
-        
-        if col1_width < 300:
-            col1_width = 300
-            self.ui_logging.tableWidget.setColumnWidth(1, col1_width)
-        
-        table_width = self.ui_logging.tableWidget.viewport().width()
-        if table_width < 100: table_width = 1000
-        
-        remaining_space = table_width - col0_width - col1_width
-        remaining_cols = self.ui_logging.tableWidget.columnCount() - 2
-        
-        if remaining_cols > 0:
-            width_per_col = max(100, remaining_space // remaining_cols)
-            for i in range(2, self.ui_logging.tableWidget.columnCount()):
-                self.ui_logging.tableWidget.setColumnWidth(i, width_per_col)
+
+            save_button = self._create_save_button(row, file_path)
+            self.ui_logging.tableWidget.setCellWidget(row, 9, save_button)
+
+        self._adjust_table_columns()
 
         
 
@@ -255,7 +626,7 @@ class AutoLoggingProcess:
                     ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
                 
-                for item in list_insert:
+                for idx, item in enumerate(list_insert):
                     join_state = 1 if item.get(0) else 0
                     image_path = str(item.get(1, ""))
                     description_image = str(item.get(2, ""))
@@ -277,6 +648,11 @@ class AutoLoggingProcess:
                         value_off_val, 
                         camera_id
                     ))
+                    new_id = cursor.lastrowid
+                    if idx < self.ui_logging.tableWidget.rowCount():
+                        t_item = self.ui_logging.tableWidget.item(idx, 1)
+                        if t_item:
+                            t_item.setData(Qt.UserRole, new_id)
                     
                 connection.commit()
 
@@ -405,6 +781,7 @@ class AutoLoggingProcess:
             
             # Cột 1: Image Path
             shot_item = QTableWidgetItem(image_path_val)
+            shot_item.setData(Qt.UserRole, row_data[0])
             self.ui_logging.tableWidget.setItem(row, 1, shot_item)
             
             # Cột 2: Description
@@ -436,9 +813,7 @@ class AutoLoggingProcess:
             self.ui_logging.tableWidget.setCellWidget(row, 4, combo_key)
             
             # Cột 5: View Detection (QPushButton)
-            detect_button = QPushButton("Detect")
-            from functools import partial
-            detect_button.clicked.connect(partial(self.on_detect_clicked, image_path_val, combo_cam, combo_key))
+            detect_button = self._create_detect_button(image_path_val, combo_cam, combo_key)
             self.ui_logging.tableWidget.setCellWidget(row, 5, detect_button)
             
             # Cột 6: Register (Căn giữa)
@@ -455,33 +830,12 @@ class AutoLoggingProcess:
             item_col8 = QTableWidgetItem(value_off_val)
             item_col8.setTextAlignment(Qt.AlignCenter)
             self.ui_logging.tableWidget.setItem(row, 8, item_col8)
+
+            # Cột 9: Action (Save)
+            save_button = self._create_save_button(row, image_path_val)
+            self.ui_logging.tableWidget.setCellWidget(row, 9, save_button)
             
-        # -- CẤU HÌNH LẠI ĐỘ RỘNG CÁC CỘT GIỐNG HÀM GENERATE --
-        header = self.ui_logging.tableWidget.horizontalHeader()
-        header.setCascadingSectionResizes(False)
-        for i in range(self.ui_logging.tableWidget.columnCount()):
-            header.setSectionResizeMode(i, QtWidgets.QHeaderView.Interactive)
-            
-        self.ui_logging.tableWidget.resizeColumnToContents(0)
-        self.ui_logging.tableWidget.resizeColumnToContents(1)
-        
-        col0_width = self.ui_logging.tableWidget.columnWidth(0)
-        col1_width = self.ui_logging.tableWidget.columnWidth(1)
-        if col1_width < 300:
-            col1_width = 300
-            self.ui_logging.tableWidget.setColumnWidth(1, col1_width)
-            
-        table_width = self.ui_logging.tableWidget.viewport().width()
-        if table_width < 100: table_width = 1000
-        
-        remaining_space = table_width - col0_width - col1_width
-        remaining_cols = self.ui_logging.tableWidget.columnCount() - 2
-        
-        if remaining_cols > 0:
-            width_per_col = max(100, remaining_space // remaining_cols)
-            for i in range(2, self.ui_logging.tableWidget.columnCount()):
-                self.ui_logging.tableWidget.setColumnWidth(i, width_per_col)
-                
+        self._adjust_table_columns()
         print(f"Đã load thành công {len(result)} dòng dữ liệu Logging!")
 
 

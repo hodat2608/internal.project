@@ -212,7 +212,7 @@ def evaluate_single_pair(
                 'delta': 0.0,
                 'is_spatial': True,
                 'operator': operator,
-                'reason': 'Thiếu box mục tiêu để so sánh không gian'
+                'reason': 'Missing target box for spatial comparison'
             }
 
         if operator == 'INSIDE':
@@ -249,7 +249,7 @@ def evaluate_single_pair(
                 'is_spatial': False,
                 'is_distance': True,
                 'operator': operator,
-                'reason': 'Thiếu box mục tiêu để đo khoảng cách'
+                'reason': 'Missing target box for distance measurement'
             }
 
         pt1 = get_param_point(box_1, param_1)
@@ -423,7 +423,7 @@ def evaluate_task_calculator(
                         'rule_id': rule.get('id'),
                         'pass': False,
                         'scope': inst_scope,
-                        'reason': f"Thiếu nhãn vùng chứa '{lbl_2}'",
+                        'reason': f"Missing container label '{lbl_2}'",
                         'lhs_val': None, 'rhs_val': None
                     })
                     continue
@@ -433,7 +433,7 @@ def evaluate_task_calculator(
                         'rule_id': rule.get('id'),
                         'pass': False,
                         'scope': inst_scope,
-                        'reason': f"Không tìm thấy đối tượng '{lbl_1}' nào",
+                        'reason': f"No object found for label '{lbl_1}'",
                         'lhs_val': None, 'rhs_val': None
                     })
                     continue
@@ -487,7 +487,7 @@ def evaluate_task_calculator(
                         cv2.line(result_img, (cx_1, cy_1), (cx_2, cy_2), (0, 0, 255), 1, cv2.LINE_AA)
 
                     # Banner tóm tắt rule
-                    summary_text = f"Rule[{rule.get('rule_name') or task_name}]: {len(violating_boxes)}/{len(cand_1)} vi pham ({'OK' if rule_pass else 'NG'})"
+                    summary_text = f"Rule[{rule.get('rule_name') or task_name}]: {len(violating_boxes)}/{len(cand_1)} violations ({'OK' if rule_pass else 'NG'})"
                     cv2.putText(result_img, summary_text, (bx1, min(by2 + 20, result_img.shape[0] - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255) if not rule_pass else (0, 255, 0), 2, cv2.LINE_AA)
                 continue
 
@@ -501,7 +501,7 @@ def evaluate_task_calculator(
                         'rule_id': rule.get('id'),
                         'pass': False,
                         'scope': inst_scope,
-                        'reason': f"Thiếu đối tượng '{lbl_1}'",
+                        'reason': f"Missing object '{lbl_1}'",
                         'lhs_val': None, 'rhs_val': None
                     })
                     continue
@@ -511,7 +511,7 @@ def evaluate_task_calculator(
                         'rule_id': rule.get('id'),
                         'pass': True,
                         'scope': inst_scope,
-                        'reason': f"Không có vùng '{lbl_2}' nào",
+                        'reason': f"No zone found for '{lbl_2}'",
                         'lhs_val': None, 'rhs_val': None
                     })
                     continue
@@ -558,7 +558,7 @@ def evaluate_task_calculator(
                         'rule_id': rule.get('id'),
                         'pass': False,
                         'scope': inst_scope,
-                        'reason': f"Thiếu nhãn '{lbl_1}' hoặc '{lbl_2}'",
+                        'reason': f"Missing label '{lbl_1}' or '{lbl_2}'",
                         'lhs_val': None, 'rhs_val': None
                     })
                     continue
@@ -590,7 +590,7 @@ def evaluate_task_calculator(
 
             if box_1 is None or (target_type == 'LABEL' and box_2 is None):
                 rule_pass = False
-                reason = f"Thiếu nhãn '{lbl_1}' hoặc '{lbl_2}'"
+                reason = f"Missing label '{lbl_1}' or '{lbl_2}'"
                 evaluated_rules.append({
                     'rule_id': rule.get('id'),
                     'pass': rule_pass,

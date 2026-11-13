@@ -68,8 +68,14 @@ def ensure_config_history_table(cursor, connection) -> bool:
     try:
         try:
             cursor.execute(SQL_CREATE_CONFIG_HISTORY)
+            if hasattr(cursor, 'fetchall'):
+                try: cursor.fetchall()
+                except Exception: pass
         except Exception:
             cursor.execute(SQL_CREATE_CONFIG_HISTORY_FALLBACK)
+            if hasattr(cursor, 'fetchall'):
+                try: cursor.fetchall()
+                except Exception: pass
         if connection:
             connection.commit()
         return True
@@ -80,12 +86,20 @@ def ensure_config_history_table(cursor, connection) -> bool:
 
 def _get_history_table_name(cursor) -> str:
     """Xác định tên bảng lịch sử có prefix ADMINISTRATOR hay không."""
-    try:
-        cursor.execute("SHOW TABLES FROM ADMINISTRATOR LIKE 'CONFIG_HISTORY'")
-        if cursor.fetchone():
-            return "ADMINISTRATOR.CONFIG_HISTORY"
-    except Exception:
-        pass
+    candidates = [
+        "`ADMINISTRATOR`.`CONFIG_HISTORY`",
+        "`administrator`.`config_history`",
+        "`ADMINISTRATOR`.`config_history`",
+        "`CONFIG_HISTORY`",
+        "`config_history`"
+    ]
+    for cand in candidates:
+        try:
+            cursor.execute(f"SELECT 1 FROM {cand} LIMIT 1")
+            cursor.fetchall()
+            return cand
+        except Exception:
+            continue
     return "CONFIG_HISTORY"
 
 
@@ -763,8 +777,14 @@ def get_history_records(
             clauses.append("scope_category = %s")
             params.append(scope_category)
         if camera_id and str(camera_id).strip() not in ('', 'ALL'):
-            clauses.append("camera_id = %s")
-            params.append(str(camera_id).strip())
+            c_str = str(camera_id).strip()
+            c_digits = ''.join(ch for ch in c_str if ch.isdigit())
+            if c_digits and c_digits != c_str:
+                clauses.append("(camera_id = %s OR camera_id = %s OR camera_id = '')")
+                params.extend([c_str, c_digits])
+            else:
+                clauses.append("(camera_id = %s OR camera_id = '')")
+                params.append(c_str)
         if model_id is not None:
             clauses.append("model_id = %s")
             params.append(int(model_id))
@@ -801,7 +821,9 @@ def get_history_records(
             results.append(rec)
         return results
     except Exception as e:
-        _log.error("Lỗi get_history_records: %s", e)
+        _log.error("Lỗi get_history_records: %s", e, exc_info=True)
+        import traceback
+        traceback.print_exc()
         return []
 
 

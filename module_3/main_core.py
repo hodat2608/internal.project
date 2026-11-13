@@ -285,8 +285,7 @@ class PLCHandler:
 
         self._flag_logging: defaultdict[str, bool] = defaultdict(bool)
         self.register_table_logging: dict = {}
-
-        self.register_table_logging = {}
+        self._last_logging_plc_val: dict[str, Any] = {}
 
     # -----------------------------------------------------------------------
     # FIX CHÍNH: _submit — wrapper cho ThreadPoolExecutor.submit()
@@ -499,6 +498,8 @@ class PLCHandler:
             self.worker_auto_logging.running = False
             self.worker_auto_logging.quit()
             self.worker_auto_logging.wait()
+        if hasattr(self, '_last_logging_plc_val') and isinstance(self._last_logging_plc_val, dict):
+            self._last_logging_plc_val.clear()
 
     # -----------------------------------------------------------------------
     # Warning
@@ -1488,6 +1489,7 @@ class PLCHandler:
 
             if current_count >= shot_complete:
                 self._init_cfg_registers(key, value=1)
+                time.sleep(0.05)
                 all_registers = self._pop_registers(key)
                 is_all_ok = self._pop_cycle_flag(key)
 
@@ -1807,6 +1809,9 @@ class PLCHandler:
         if not hasattr(self, 'register_table_logging') or not isinstance(self.register_table_logging, dict):
             self.register_table_logging = {}
 
+        if not hasattr(self, '_last_logging_plc_val') or not isinstance(self._last_logging_plc_val, dict):
+            self._last_logging_plc_val = {}
+
         for reg in list(self.register_table_logging.keys()):
             self.register_table_logging[reg] = [
                 item for item in self.register_table_logging[reg] if item.get('key') != key
@@ -1849,9 +1854,17 @@ class PLCHandler:
                             'key': key
                         })
 
+        if hasattr(self, '_last_logging_plc_val') and isinstance(self._last_logging_plc_val, dict):
+            for reg in list(self._last_logging_plc_val.keys()):
+                if reg not in self.register_table_logging:
+                    del self._last_logging_plc_val[reg]
+
     def handle_auto_logging_process_image(self):
         if not getattr(self, 'register_table_logging', None):
             return
+
+        if not hasattr(self, '_last_logging_plc_val') or not isinstance(self._last_logging_plc_val, dict):
+            self._last_logging_plc_val = {}
 
         for register, list_configs in list(self.register_table_logging.items()):
             try:
@@ -1861,131 +1874,128 @@ class PLCHandler:
                 plc_val = int(plc_raw)
             except (ValueError, TypeError):
                 continue
-            
+
+            last_val = self._last_logging_plc_val.get(register)
+            if last_val is not None and last_val == plc_val:
+                continue
+
+            # Cập nhật latch giá trị vừa đọc từ PLC
+            self._last_logging_plc_val[register] = plc_val
+
+            # Lọc các cấu hình khớp chính xác với value_on
+            matching_configs = []
             for data_info in list_configs:
                 raw_target = data_info.get('value_on', data_info.get('value', 1))
                 try:
                     target_val = int(raw_target)
                 except (ValueError, TypeError):
                     continue
+                if target_val == plc_val:
+                    matching_configs.append(data_info)
 
-                raw_off = data_info.get('value_off')
-                value_off = None
-                if raw_off is not None and str(raw_off).strip() != "" and str(raw_off).strip().lower() not in ('none', 'no value'):
-                    try:
-                        value_off = int(raw_off)
-                    except (ValueError, TypeError):
-                        value_off = None
+            if not matching_configs:
+                continue
 
-                if plc_val == target_val:
-                    key = data_info['key']
-                    if self._flag_logging.get(key, False):
+            for data_info in matching_configs:
+                key = data_info['key']
+                if self._flag_logging.get(key, False):
+                    continue
+                self._flag_logging[key] = True
+
+                try:
+                    start_time = time.perf_counter()
+                    values = data_info['values']
+                    camera = key.removeprefix('built-in-')
+                    key_model = (data_info['selected_camera'], data_info['selected_model'])
+                    path = data_info['path_image']
+                    model_loader = values.get('model_loader', {}).get(key_model)
+                    pyuic = values.get('pyuic', {}).get(key_model)
+                    current_count = 1
+
+                    if not os.path.exists(path):
+                        _log.error('[%s] Đường dẫn không tồn tại: %s', key, path)
                         continue
-                    self._flag_logging[key] = True
+
+                    if not pyuic:
+                        _log.error('[%s] pyuic is None for key_model=%s', key, key_model)
+                        continue
+                    
+                    if not model_loader:
+                        _log.error('[%s] model_loader is None for key_model=%s', key, key_model)
+                        continue
+
+                    _log.info('[%s] handle_auto_logging_process_image — processing image: %s (register=%s, value_on=%s)', key, path, register, plc_val)
+                    raw_image = cv2.imread(path)
+                    if raw_image is None:
+                        _log.error('[%s] cv2.imread returned None for: %s', key, path)
+                        continue
+
+                    raw_image = cv2.cvtColor(raw_image, cv2.COLOR_BGR2RGB)
+
+                    model_processor = self.processor.dict_processors.get(key_model) if (self.processor and hasattr(self.processor, 'dict_processors')) else None
+                    if not model_processor or not getattr(model_processor, 'process_image_func', None):
+                        proc = getattr(self.processor, 'processor', self.processor)
+                        if hasattr(proc, 'process_image_func'):
+                            model_processor = proc
+                        else:
+                            _log.error('[%s] process_image_func is missing for key_model=%s', key, key_model)
+                            continue
 
                     try:
-                        start_time = time.perf_counter()
-                        values = data_info['values']
-                        camera = key.removeprefix('built-in-')
-                        key_model = (data_info['selected_camera'], data_info['selected_model'])
-                        path = data_info['path_image']
-                        model_loader = values.get('model_loader', {}).get(key_model)
-                        pyuic = values.get('pyuic', {}).get(key_model)
-                        current_count = 1
-
-                        if not os.path.exists(path):
-                            _log.error('[%s] Đường dẫn không tồn tại: %s', key, path)
-                            continue
-
-                        if not pyuic:
-                            _log.error('[%s] pyuic is None for key_model=%s', key, key_model)
-                            continue
-                        
-                        if not model_loader:
-                            _log.error('[%s] model_loader is None for key_model=%s', key, key_model)
-                            continue
-
-                        _log.info('[%s] handle_auto_logging_process_image — processing image: %s', key, path)
-                        raw_image = cv2.imread(path)
-                        if raw_image is None:
-                            _log.error('[%s] cv2.imread returned None for: %s', key, path)
-                            continue
-
-                        raw_image = cv2.cvtColor(raw_image, cv2.COLOR_BGR2RGB)
-
-                        model_processor = self.processor.dict_processors.get(key_model) if (self.processor and hasattr(self.processor, 'dict_processors')) else None
-                        if not model_processor or not getattr(model_processor, 'process_image_func', None):
-                            proc = getattr(self.processor, 'processor', self.processor)
-                            if hasattr(proc, 'process_image_func'):
-                                model_processor = proc
-                            else:
-                                _log.error('[%s] process_image_func is missing for key_model=%s', key, key_model)
-                                continue
-
-                        try:
-                            res_process = model_processor.process_image_func(raw_image, model_loader, pyuic, camera, key_model)
-                            if len(res_process) >= 5:
-                                result_img, flag, list_register, logo_text, cfg_rows = res_process[:5]
-                            else:
-                                result_img, flag, list_register, logo_text = res_process[:4]
-                                cfg_rows = getattr(pyuic, '_cached_model_config', [])
-                        except Exception:
-                            _log.exception('[%s] process_image_func failed for logging image %s', key, path)
-                            continue
-
-                        elapsed = (time.perf_counter() - start_time) * 1000
-                        self._init_cfg_registers(key, cfg_rows, 1)
-                        try:
-                            with self._signal_rwlock.read():
-                                comp_sig  = self._resolve_signal(key, 'completed')
-                                reset_sig = self._resolve_signal(key, 'component')
-                        except KeyError:
-                            _log.exception('[handle_auto_logging][%s] Missing signal config in dict_signal_complete', key)
-                            comp_sig = None
-                            reset_sig = None
-
-                        plc_tasks = []
-        
-                        if list_register:
-                            _log.info('[%s] Logging registers to write (OK/NG): %s', key, list_register)
-                            if isinstance(list_register, dict):
-                                for reg_addr, reg_val in list_register.items():
-                                    plc_tasks.append((reg_addr, reg_val))
-                            else:
-                                for reg_addr in list_register:
-                                    plc_tasks.append((reg_addr, 1))
-
-                        if flag and reset_sig:
-                            _log.info('[%s] Send Reset Signal OK %s', key, reset_sig)
-                            plc_tasks.append((reset_sig.get('reg'), int(reset_sig.get('on', 1))))
-
-                        if comp_sig:
-                            _log.info('[%s] Send Complete Signal %s', key, comp_sig)
-                            plc_tasks.append((comp_sig.get('reg'), int(comp_sig.get('on', 1))))
-
-                        if plc_tasks:
-                            self._dispatch_plc_writes(plc_tasks)
-
-                        if value_off is not None:
-                            try:
-                                self._safe_write_plc(str(register), int(value_off))
-                                _log.info('[%s] Đã tắt bit kích hoạt trigger logging %s -> %s (Handshake PLC OK)', key, register, value_off)
-                            except Exception as e:
-                                _log.error('[%s] Lỗi khi tắt trigger logging %s -> %s: %s', key, register, value_off, e)
+                        res_process = model_processor.process_image_func(raw_image, model_loader, pyuic, camera, key_model)
+                        if len(res_process) >= 5:
+                            result_img, flag, list_register, logo_text, cfg_rows = res_process[:5]
                         else:
-                            _log.debug('[%s] Không cấu hình value_off cho %s, bỏ qua tắt bit trigger', key, register)
+                            result_img, flag, list_register, logo_text = res_process[:4]
+                            cfg_rows = getattr(pyuic, '_cached_model_config', [])
+                    except Exception:
+                        _log.exception('[%s] process_image_func failed for logging image %s', key, path)
+                        continue
 
-                        display_mode = self.get_display_mode()
-                        display_img = raw_image if display_mode == "Hide Bounding Boxes" else result_img
-                        self.signals.update_display.emit(
-                            [(key_model, pyuic, display_img, flag, list_register, logo_text or "Logging (Model Representation Mapping)", raw_image, result_img)],
-                            f"⏱️: {elapsed:.2f} ms",
-                        )
+                    elapsed = (time.perf_counter() - start_time) * 1000
+                    self._init_cfg_registers(key, cfg_rows, 1)
+                    try:
+                        with self._signal_rwlock.read():
+                            comp_sig  = self._resolve_signal(key, 'completed')
+                            reset_sig = self._resolve_signal(key, 'component')
+                    except KeyError:
+                        _log.exception('[handle_auto_logging][%s] Missing signal config in dict_signal_complete', key)
+                        comp_sig = None
+                        reset_sig = None
 
-                        if not flag:
-                            _log.info('[%s] NG detected for image: %s', key, path)
-                    finally:
-                        self._flag_logging[key] = False
+                    plc_tasks = []
+    
+                    if list_register:
+                        _log.info('[%s] Logging registers to write (OK/NG): %s', key, list_register)
+                        if isinstance(list_register, dict):
+                            for reg_addr, reg_val in list_register.items():
+                                plc_tasks.append((reg_addr, reg_val))
+                        else:
+                            for reg_addr in list_register:
+                                plc_tasks.append((reg_addr, 1))
+
+                    if flag and reset_sig:
+                        _log.info('[%s] Send Reset Signal OK %s', key, reset_sig)
+                        plc_tasks.append((reset_sig.get('reg'), int(reset_sig.get('on', 1))))
+
+                    if comp_sig:
+                        _log.info('[%s] Send Complete Signal %s', key, comp_sig)
+                        plc_tasks.append((comp_sig.get('reg'), int(comp_sig.get('on', 1))))
+
+                    if plc_tasks:
+                        self._dispatch_plc_writes(plc_tasks)
+
+                    display_mode = self.get_display_mode()
+                    display_img = raw_image if display_mode == "Hide Bounding Boxes" else result_img
+                    self.signals.update_display.emit(
+                        [(key_model, pyuic, display_img, flag, list_register, logo_text or "Logging (Model Representation Mapping)", raw_image, result_img)],
+                        f"⏱️: {elapsed:.2f} ms",
+                    )
+
+                    if not flag:
+                        _log.info('[%s] NG detected for image: %s', key, path)
+                finally:
+                    self._flag_logging[key] = False
 
 
     # -----------------------------------------------------------------------
@@ -2387,6 +2397,16 @@ class CameraTabManager:
             for a_tab in self.all_auto_log_tabs:
                 if a_tab:
                     self._set_container_widgets_enabled(a_tab, enabled)
+        if hasattr(self, 'logging_processes'):
+            for lp in self.logging_processes.values():
+                if lp:
+                    lp.is_unlocked = enabled
+                    lp.current_role = role if enabled else None
+                    lp.current_user = username if enabled else None
+        if hasattr(self, 'logging_process') and self.logging_process:
+            self.logging_process.is_unlocked = enabled
+            self.logging_process.current_role = role if enabled else None
+            self.logging_process.current_user = username if enabled else None
 
     def _apply_tab_bar_font(self, tab_widget_2):
         """Cài đặt font Segoe UI, size 10 cho QTabBar của tab_widget_2."""
@@ -2864,7 +2884,7 @@ class CameraTabManager:
             ui_child.pushButton_config_history.clicked.connect(lambda _: processor.open_config_history(self.db_manager.cursor, self.db_manager.connect_db))
         
         def _update_runtime_ui(text=None):
-            runtime = text or ui_child.comboBox_model_runtime.currentText()
+            runtime = str(text or ui_child.comboBox_model_runtime.currentText() or 'PyTorch').strip()
             is_unlocked = getattr(processor, 'is_unlocked', False)
             if not is_unlocked:
                 ui_child.lineEdit_weight_tensorrt.setEnabled(False)
@@ -2878,17 +2898,7 @@ class CameraTabManager:
                 ui_child.pushButton_weight_pytorch_2.setEnabled(False)
                 return
 
-            if runtime == 'PyTorch':
-                ui_child.lineEdit_weight_tensorrt.setEnabled(False)
-                ui_child.pushButton_broswer_tensort.setEnabled(False)
-                ui_child.pushButton_model_tensorrt.setEnabled(False)
-                ui_child.lineEdit_classes_txt.setEnabled(False)
-                ui_child.pushButton_classes_txt.setEnabled(False)
-                ui_child.pushButton_class_file.setEnabled(False)
-                ui_child.lineEdit_weight_pytorch.setEnabled(True)
-                ui_child.pushButton_weight_pytorch.setEnabled(True)
-                ui_child.pushButton_weight_pytorch_2.setEnabled(True)
-            elif runtime == 'TensorRT':
+            if runtime.lower() == 'tensorrt':
                 ui_child.lineEdit_weight_tensorrt.setEnabled(True)
                 ui_child.pushButton_broswer_tensort.setEnabled(True)
                 ui_child.pushButton_model_tensorrt.setEnabled(True)
@@ -2898,6 +2908,16 @@ class CameraTabManager:
                 ui_child.lineEdit_weight_pytorch.setEnabled(False)
                 ui_child.pushButton_weight_pytorch.setEnabled(False)
                 ui_child.pushButton_weight_pytorch_2.setEnabled(False)
+            else:
+                ui_child.lineEdit_weight_tensorrt.setEnabled(False)
+                ui_child.pushButton_broswer_tensort.setEnabled(False)
+                ui_child.pushButton_model_tensorrt.setEnabled(False)
+                ui_child.lineEdit_classes_txt.setEnabled(False)
+                ui_child.pushButton_classes_txt.setEnabled(False)
+                ui_child.pushButton_class_file.setEnabled(False)
+                ui_child.lineEdit_weight_pytorch.setEnabled(True)
+                ui_child.pushButton_weight_pytorch.setEnabled(True)
+                ui_child.pushButton_weight_pytorch_2.setEnabled(True)
                 
         ui_child.comboBox_model_runtime.currentTextChanged.connect(_update_runtime_ui)
         processor._update_runtime_ui = _update_runtime_ui
@@ -3398,7 +3418,8 @@ class CameraTabManager:
         auto_log_tab_ui.comboBox_item_code.clear()
         auto_log_tab_ui.comboBox_item_code.addItem(str(self.i_code))
 
-        logging_process = AutoLoggingProcess(auto_log_tab_ui,self.connect_plc.connection.cursor(),process,built_in_objects)
+        logging_process = AutoLoggingProcess(auto_log_tab_ui,self.connect_plc.connection.cursor(),process,built_in_objects,camera_id=camera_id,connection=self.connect_plc.connection)
+        logging_process.is_unlocked = False
         # Giữ tham chiếu mạnh cho từng camera, không bị GC khi camera sau tạo tab
         if not hasattr(self, 'logging_processes'):
             self.logging_processes = {}

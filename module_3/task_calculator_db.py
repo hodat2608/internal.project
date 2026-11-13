@@ -53,6 +53,8 @@ CREATE TABLE IF NOT EXISTS task_calculator_rules (
     condition_true_result   VARCHAR(10) NOT NULL DEFAULT 'NG',
     enabled                 TINYINT(1) NOT NULL DEFAULT 1,
     description             TEXT,
+    box1_rect               VARCHAR(100) DEFAULT '',
+    box2_rect               VARCHAR(100) DEFAULT '',
     FOREIGN KEY (task_id) REFERENCES task_calculator(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 """
@@ -134,6 +136,17 @@ def ensure_task_calculator_tables(cursor, connection) -> bool:
         if not cursor.fetchone():
             _log.info("Migrating task_calculator_rules: thêm cột instance_scope")
             cursor.execute("ALTER TABLE task_calculator_rules ADD COLUMN instance_scope VARCHAR(50) NOT NULL DEFAULT '1_VS_1' AFTER instance_select_1")
+
+        # Kiểm tra và migrate tự động cột box1_rect, box2_rect lưu tọa độ trực quan
+        cursor.execute("SHOW COLUMNS FROM task_calculator_rules LIKE 'box1_rect'")
+        if not cursor.fetchone():
+            _log.info("Migrating task_calculator_rules: thêm cột box1_rect")
+            cursor.execute("ALTER TABLE task_calculator_rules ADD COLUMN box1_rect VARCHAR(100) DEFAULT ''")
+
+        cursor.execute("SHOW COLUMNS FROM task_calculator_rules LIKE 'box2_rect'")
+        if not cursor.fetchone():
+            _log.info("Migrating task_calculator_rules: thêm cột box2_rect")
+            cursor.execute("ALTER TABLE task_calculator_rules ADD COLUMN box2_rect VARCHAR(100) DEFAULT ''")
 
         safe_commit(connection)
         return True
@@ -284,40 +297,49 @@ def get_task_rules(cursor, task_id: int) -> List[Dict[str, Any]]:
         cursor.execute("SHOW COLUMNS FROM task_calculator_rules LIKE 'instance_scope'")
         has_scope = bool(cursor.fetchone())
         scope_select = ", instance_scope" if has_scope else ""
+
+        cursor.execute("SHOW COLUMNS FROM task_calculator_rules LIKE 'box1_rect'")
+        has_box_rect = bool(cursor.fetchone())
+        box_select = ", box1_rect, box2_rect" if has_box_rect else ""
+
         query = f"""
             SELECT id, task_id, rule_name, label_1, param_1, instance_select_1,
                    operator, target_type, label_2, param_2, instance_select_2,
                    math_op, math_operand_type, math_operand_val, min_value, max_value,
-                   condition_true_result, enabled, description{scope_select}
+                   condition_true_result, enabled, description{scope_select}{box_select}
             FROM task_calculator_rules
             WHERE task_id = %s
             ORDER BY id ASC
         """
         cursor.execute(query, (task_id,))
         rows = cursor.fetchall()
+        desc = [d[0] for d in cursor.description] if cursor.description else []
         rules = []
         for r in rows:
+            row_dict = dict(zip(desc, r))
             rules.append({
-                'id': r[0],
-                'task_id': r[1],
-                'rule_name': r[2] or '',
-                'label_1': r[3],
-                'param_1': r[4],
-                'instance_select_1': r[5] or 'BEST_CONF',
-                'operator': r[6],
-                'target_type': r[7] or 'LABEL',
-                'label_2': r[8] or '',
-                'param_2': r[9] or '',
-                'instance_select_2': r[10] or 'BEST_CONF',
-                'math_op': r[11] or 'NONE',
-                'math_operand_type': r[12] or 'CONSTANT',
-                'math_operand_val': str(r[13] if r[13] is not None else '0'),
-                'min_value': float(r[14] or 0.0),
-                'max_value': float(r[15] or 0.0),
-                'condition_true_result': r[16] or 'NG',
-                'enabled': bool(r[17]),
-                'description': r[18] or '',
-                'instance_scope': r[19] if (has_scope and len(r) > 19 and r[19]) else '1_VS_1'
+                'id': row_dict.get('id'),
+                'task_id': row_dict.get('task_id'),
+                'rule_name': row_dict.get('rule_name') or '',
+                'label_1': row_dict.get('label_1'),
+                'param_1': row_dict.get('param_1'),
+                'instance_select_1': row_dict.get('instance_select_1') or 'BEST_CONF',
+                'operator': row_dict.get('operator'),
+                'target_type': row_dict.get('target_type') or 'LABEL',
+                'label_2': row_dict.get('label_2') or '',
+                'param_2': row_dict.get('param_2') or '',
+                'instance_select_2': row_dict.get('instance_select_2') or 'BEST_CONF',
+                'math_op': row_dict.get('math_op') or 'NONE',
+                'math_operand_type': row_dict.get('math_operand_type') or 'CONSTANT',
+                'math_operand_val': str(row_dict.get('math_operand_val') if row_dict.get('math_operand_val') is not None else '0'),
+                'min_value': float(row_dict.get('min_value') or 0.0),
+                'max_value': float(row_dict.get('max_value') or 0.0),
+                'condition_true_result': row_dict.get('condition_true_result') or 'NG',
+                'enabled': bool(row_dict.get('enabled', 1)),
+                'description': row_dict.get('description') or '',
+                'instance_scope': row_dict.get('instance_scope') or '1_VS_1',
+                'box1_rect': row_dict.get('box1_rect') or '',
+                'box2_rect': row_dict.get('box2_rect') or '',
             })
         return rules
     except Exception as e:
@@ -387,6 +409,15 @@ def save_task_and_rules(cursor, connection, task_data: Dict[str, Any], rules: Li
         if not cursor.fetchone():
             cursor.execute("ALTER TABLE task_calculator_rules ADD COLUMN instance_scope VARCHAR(50) NOT NULL DEFAULT '1_VS_1' AFTER instance_select_1")
 
+        # Đảm bảo cột box1_rect, box2_rect tồn tại
+        cursor.execute("SHOW COLUMNS FROM task_calculator_rules LIKE 'box1_rect'")
+        if not cursor.fetchone():
+            cursor.execute("ALTER TABLE task_calculator_rules ADD COLUMN box1_rect VARCHAR(100) DEFAULT ''")
+
+        cursor.execute("SHOW COLUMNS FROM task_calculator_rules LIKE 'box2_rect'")
+        if not cursor.fetchone():
+            cursor.execute("ALTER TABLE task_calculator_rules ADD COLUMN box2_rect VARCHAR(100) DEFAULT ''")
+
         # Insert các Rules
         for r in rules:
             cursor.execute("""
@@ -394,8 +425,8 @@ def save_task_and_rules(cursor, connection, task_data: Dict[str, Any], rules: Li
                 (task_id, rule_name, label_1, param_1, instance_select_1, instance_scope,
                  operator, target_type, label_2, param_2, instance_select_2,
                  math_op, math_operand_type, math_operand_val, min_value, max_value,
-                 condition_true_result, enabled, description)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                 condition_true_result, enabled, description, box1_rect, box2_rect)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """, (
                 task_id,
                 r.get('rule_name', ''),
@@ -415,7 +446,9 @@ def save_task_and_rules(cursor, connection, task_data: Dict[str, Any], rules: Li
                 float(r.get('max_value', 0.0)),
                 r.get('condition_true_result', 'NG'),
                 1 if r.get('enabled', True) else 0,
-                r.get('description', '')
+                r.get('description', ''),
+                str(r.get('box1_rect', '') or ''),
+                str(r.get('box2_rect', '') or '')
             ))
 
         safe_commit(connection)

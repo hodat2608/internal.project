@@ -837,7 +837,7 @@ class Process_Model:
                 """)
                 self.uic.pushButton_config_history.setText("")
                 icon_hist = QtGui.QIcon()
-                icon_hist.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/undo.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+                icon_hist.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/history.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
                 self.uic.pushButton_config_history.setIcon(icon_hist)
                 self.uic.pushButton_config_history.setIconSize(QtCore.QSize(25, 25))
                 self.uic.pushButton_config_history.setObjectName("pushButton_config_history")
@@ -1260,6 +1260,9 @@ class Process_Model:
         - modify: Chỉ cho phép điều chỉnh bảng thông số (self.uic.tableView) và lưu bảng (pushButton_save_data)
         - full_control / __ADMIN__: Mở toàn bộ đối tượng điều khiển
         """
+        # Phân định trạng thái mở khóa
+        self.is_unlocked = bool(enabled and role in ('modify', 'full_control', '__ADMIN__'))
+
         widget_types = [
             QtWidgets.QPushButton, 
             QtWidgets.QLineEdit, 
@@ -1351,8 +1354,8 @@ class Process_Model:
                 # ─────────────────────────────────────────────────────────────
                 # 1. Trường hợp read_only: Mặc dù đúng pass nhưng đối tượng vẫn bị khóa
                 if role == "read_only":
-                    self.set_ui_enabled(enabled=False, role="read_only")
                     self.is_unlocked = False
+                    self.set_ui_enabled(enabled=False, role="read_only")
                     self.uic.pushButton_edit_params.setText("Edit Parameters")
                     QtWidgets.QMessageBox.warning(
                         self.uic.centralwidget,
@@ -1365,8 +1368,8 @@ class Process_Model:
 
                 # 2. Trường hợp modify: Chỉ cho phép điều chỉnh bảng tableView và lưu bảng
                 elif role == "modify":
-                    self.set_ui_enabled(enabled=True, role="modify")
                     self.is_unlocked = True
+                    self.set_ui_enabled(enabled=True, role="modify")
                     self.uic.pushButton_edit_params.setText("Lock Edit")
                     QtWidgets.QMessageBox.information(
                         self.uic.centralwidget,
@@ -1379,8 +1382,8 @@ class Process_Model:
 
                 # 3. Trường hợp full_control hoặc Master Administrator: Mở toàn bộ
                 elif role in ("full_control", "__ADMIN__"):
-                    self.set_ui_enabled(enabled=True, role="full_control")
                     self.is_unlocked = True
+                    self.set_ui_enabled(enabled=True, role="full_control")
                     self.uic.pushButton_edit_params.setText("Lock Edit")
                     QtWidgets.QMessageBox.information(
                         self.uic.centralwidget,
@@ -1390,8 +1393,8 @@ class Process_Model:
                     )
                     return True
                 else:
-                    self.set_ui_enabled(enabled=False, role="read_only")
                     self.is_unlocked = False
+                    self.set_ui_enabled(enabled=False, role="read_only")
                     return False
             else:
                 return False

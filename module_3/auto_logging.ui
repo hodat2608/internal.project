@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>1885</width>
-    <height>1000</height>
+    <height>1005</height>
    </rect>
   </property>
   <property name="font">
@@ -74,6 +74,7 @@
          <widget class="QGroupBox" name="groupBox_item">
           <property name="font">
            <font>
+            <family>Segoe UI</family>
             <pointsize>-1</pointsize>
             <weight>75</weight>
             <bold>true</bold>
@@ -127,7 +128,7 @@ QGroupBox::title {
               </font>
              </property>
              <property name="text">
-              <string>Item Code:</string>
+              <string/>
              </property>
             </widget>
            </item>
@@ -264,6 +265,7 @@ QPushButton:pressed {
          <widget class="QGroupBox" name="groupBox_path">
           <property name="font">
            <font>
+            <family>Segoe UI</family>
             <pointsize>-1</pointsize>
             <weight>75</weight>
             <bold>true</bold>
@@ -317,7 +319,7 @@ QGroupBox::title {
               </font>
              </property>
              <property name="text">
-              <string>Folder Path:</string>
+              <string/>
              </property>
             </widget>
            </item>
@@ -338,6 +340,9 @@ QGroupBox::title {
                 <font>
                  <pointsize>10</pointsize>
                 </font>
+               </property>
+               <property name="placeholderText">
+                <string>Path to Folder Image Logging</string>
                </property>
               </widget>
              </item>
@@ -440,6 +445,7 @@ QPushButton:pressed {
          <widget class="QGroupBox" name="groupBox_preview">
           <property name="font">
            <font>
+            <family>Segoe UI</family>
             <pointsize>-1</pointsize>
             <weight>75</weight>
             <bold>true</bold>
@@ -562,6 +568,7 @@ QGroupBox::title {
                   </property>
                   <property name="font">
                    <font>
+                    <family>Segoe UI</family>
                     <pointsize>10</pointsize>
                     <weight>75</weight>
                     <bold>true</bold>
@@ -625,6 +632,7 @@ QGroupBox::title {
          <widget class="QGroupBox" name="groupBox_table">
           <property name="font">
            <font>
+            <family>Segoe UI</family>
             <pointsize>10</pointsize>
             <weight>75</weight>
             <bold>true</bold>
@@ -867,6 +875,22 @@ QTableWidget QLineEdit {
              <column>
               <property name="text">
                <string>Value OFF</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Action</string>
               </property>
               <property name="font">
                <font>
