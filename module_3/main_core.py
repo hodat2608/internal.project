@@ -80,7 +80,7 @@ from module_3.auto_logging import Ui_MainWindow as Auto_Logging
 from module_3.auto_logging_process import AutoLoggingProcess
 from module_3.parent_interface import Ui_MainWindow as Ui_MainWindow_mother
 from module_3.child_interface import Ui_MainWindow as Ui_MainWindow_child
-
+from module_2.StyleSheet import *
 DICT_DEVICE_MANUAL = {
    'HIK - MVS' : hik_vision_manual,
    'Basler - Pypylon' : basler_vision_manual
@@ -286,6 +286,11 @@ class PLCHandler:
         self._flag_logging: defaultdict[str, bool] = defaultdict(bool)
         self.register_table_logging: dict = {}
         self._last_logging_plc_val: dict[str, Any] = {}
+        self._last_mode_plc_val: dict[tuple, Any] = {}
+
+        self._cfg_registers_ok_values: defaultdict[str, dict]        = defaultdict(dict)
+        self._cfg_registers_ng_values: defaultdict[str, dict]        = defaultdict(dict)
+        self._ng_registers_store: defaultdict[str, set]              = defaultdict(set)
 
     # -----------------------------------------------------------------------
     # FIX CHÍNH: _submit — wrapper cho ThreadPoolExecutor.submit()
@@ -533,6 +538,12 @@ class PLCHandler:
                 self._cfg_registers_store[key].clear()
             if hasattr(self, '_cfg_registers_values'):
                 self._cfg_registers_values[key].clear()
+            if hasattr(self, '_cfg_registers_ok_values'):
+                self._cfg_registers_ok_values[key].clear()
+            if hasattr(self, '_cfg_registers_ng_values'):
+                self._cfg_registers_ng_values[key].clear()
+            if hasattr(self, '_ng_registers_store'):
+                self._ng_registers_store[key].clear()
             if hasattr(self, '_cycle_flags'):
                 self._cycle_flags[key] = True
             if hasattr(self, '_pending_trigger_off'):
@@ -574,8 +585,52 @@ class PLCHandler:
 
             if not registers:
                 return
+
+            if not hasattr(self, '_ng_registers_store'):
+                self._ng_registers_store = defaultdict(set)
+
             if isinstance(registers, dict):
-                self._register_store[key].update(registers)
+                for reg, val in registers.items():
+                    reg_str = str(reg).strip()
+                    if not reg_str:
+                        continue
+
+                    try:
+                        val_num = int(val)
+                    except (ValueError, TypeError):
+                        val_num = val
+
+                    # Xác định xem giá trị này là NG hay OK theo cấu hình đã tích lũy
+                    cfg_ng = self._cfg_registers_ng_values[key].get(reg_str)
+                    cfg_ok = self._cfg_registers_ok_values[key].get(reg_str)
+
+                    is_this_ng = False
+                    if cfg_ng is not None and val_num == cfg_ng:
+                        is_this_ng = True
+                    elif cfg_ok is not None and val_num != cfg_ok:
+                        is_this_ng = True
+                    elif not is_shot_ok and (cfg_ok is None and cfg_ng is None):
+                        is_this_ng = True
+
+                    # NẾU THANH GHI NÀY ĐÃ TỪNG BỊ NG TRONG CHU KỲ NÀY:
+                    if reg_str in self._ng_registers_store[key]:
+                        if is_this_ng:
+                            # Cả 2 shot đều NG: cập nhật giá trị NG mới nhất
+                            self._register_store[key][reg_str] = val
+                        else:
+                            # ĐÃ BỊ NG Ở SHOT TRƯỚC, SHOT SAU TRẢ VỀ OK -> BẢO VỆ NG, TUYỆT ĐỐI KHÔNG GHI ĐÈ!
+                            _log.warning(
+                                "[%s] BẢO VỆ NG: Thanh ghi %s đã ghi nhận NG (giá trị hiện tại: %s), "
+                                "từ chối bị ghi đè bởi giá trị OK (%s) từ shot sau!",
+                                key, reg_str, self._register_store[key].get(reg_str), val
+                            )
+                    else:
+                        # Chưa từng bị NG
+                        if is_this_ng:
+                            self._ng_registers_store[key].add(reg_str)
+                            _log.info("[%s] Ghi nhận NG cho thanh ghi %s = %s", key, reg_str, val)
+                        self._register_store[key][reg_str] = val
+
             elif isinstance(registers, (list, tuple, set)):
                 for r in registers:
                     if r and str(r).strip():
@@ -596,13 +651,157 @@ class PLCHandler:
         with self._get_register_lock(key):
             registers = dict(self._register_store[key])
             self._register_store[key].clear()
+            if hasattr(self, '_ng_registers_store'):
+                self._ng_registers_store[key].clear()
+            if hasattr(self, '_cfg_registers_ok_values'):
+                self._cfg_registers_ok_values[key].clear()
+            if hasattr(self, '_cfg_registers_ng_values'):
+                self._cfg_registers_ng_values[key].clear()
         return registers
+
+    def _extract_shot_cfg_rows(self, pyuic, key_model=None) -> list:
+        """
+        Trích xuất danh sách cấu hình thanh ghi và Value State của model (bao gồm bảng nhãn Parameters và Task Calculator)
+        ngay trước khi chụp ảnh và chạy AI để sẵn sàng gửi Value State ở lần tổng hợp.
+        """
+        if not pyuic:
+            return []
+
+        cfg_rows = []
+        try:
+            cached = getattr(pyuic, '_cached_model_config', None)
+            if cached and isinstance(cached, list):
+                cfg_rows = [dict(r) for r in cached if isinstance(r, dict)]
+            else:
+                from _source.v5.v5 import get_model_config
+                from module_3.handle_option_models import COLUMN_MAPPING
+                cfg_rows = get_model_config(pyuic, list(COLUMN_MAPPING.keys()))
+        except Exception:
+            _log.debug("Lỗi đọc get_model_config cho pyuic", exc_info=True)
+
+        final_cfg = [dict(c) for c in cfg_rows if isinstance(c, dict) and 'quantity' in c]
+
+        # -------------------------------------------------------------------
+        # BỔ SUNG CÁC THANH GHI ĐĂNG KÝ TRONG TASK CALCULATOR CHO KEY_MODEL
+        # -------------------------------------------------------------------
+        try:
+            from _source.v5.v5 import _normalize_key_model
+            norm_target = _normalize_key_model(key_model) if key_model else None
+            tasks_for_model = []
+
+            # NGUỒN 1: Từ pyuic.processor (instance Process_Model được gán trực tiếp cho widget tab model này)
+            model_proc = getattr(pyuic, 'processor', None)
+
+            # NGUỒN 2: Nếu pyuic chưa gắn processor, lấy từ self.processor.dict_processors (CameraTabManager)
+            if not model_proc and hasattr(self, 'processor') and self.processor:
+                dict_procs = getattr(self.processor, 'dict_processors', {})
+                if isinstance(dict_procs, dict):
+                    if key_model in dict_procs:
+                        model_proc = dict_procs[key_model]
+                    elif norm_target:
+                        for km, proc in dict_procs.items():
+                            if _normalize_key_model(km) == norm_target:
+                                model_proc = proc
+                                break
+
+            # Nếu có model_proc: kiểm tra active_tasks trong RAM
+            if model_proc:
+                active_tasks = getattr(model_proc, 'active_tasks', {})
+                if isinstance(active_tasks, dict) and active_tasks:
+                    if key_model in active_tasks:
+                        tasks_for_model = active_tasks[key_model]
+                    elif norm_target:
+                        for km, tlist in active_tasks.items():
+                            if _normalize_key_model(km) == norm_target:
+                                tasks_for_model = tlist
+                                break
+
+                # Nếu active_tasks trong RAM đang rỗng, thử gọi load_task_calculator_config()
+                if not tasks_for_model and hasattr(model_proc, 'load_task_calculator_config'):
+                    try:
+                        model_proc.load_task_calculator_config()
+                        active_tasks = getattr(model_proc, 'active_tasks', {})
+                        if isinstance(active_tasks, dict) and active_tasks:
+                            if key_model in active_tasks:
+                                tasks_for_model = active_tasks[key_model]
+                            elif norm_target:
+                                for km, tlist in active_tasks.items():
+                                    if _normalize_key_model(km) == norm_target:
+                                        tasks_for_model = tlist
+                                        break
+                    except Exception:
+                        pass
+
+            # NGUỒN 3: Từ class Process_Model.dict_active_tasks (bộ nhớ dùng chung toàn bộ các model)
+            if not tasks_for_model:
+                try:
+                    from module_3.handle_option_models import Process_Model
+                    class_tasks = getattr(Process_Model, 'dict_active_tasks', {})
+                    if isinstance(class_tasks, dict) and class_tasks:
+                        if key_model in class_tasks:
+                            tasks_for_model = class_tasks[key_model]
+                        elif norm_target:
+                            for km, tlist in class_tasks.items():
+                                if _normalize_key_model(km) == norm_target:
+                                    tasks_for_model = tlist
+                                    break
+                except Exception:
+                    pass
+
+            # NGUỒN 4: Truy vấn trực tiếp từ cơ sở dữ liệu nếu cả RAM lẫn cache chưa có
+            if not tasks_for_model:
+                cursor = getattr(model_proc, 'cursor', None)
+                cam_id = None
+                mod_id = None
+                if model_proc:
+                    cam_id = model_proc.get_current_camera_id() if hasattr(model_proc, 'get_current_camera_id') else getattr(model_proc, 'camera_id', None)
+                    mod_id = model_proc.get_current_model_id() if hasattr(model_proc, 'get_current_model_id') else getattr(model_proc, 'model_id', None)
+                if not cursor and hasattr(self, 'processor') and self.processor:
+                    db_manager = getattr(self.processor, 'db_manager', None)
+                    if db_manager and hasattr(db_manager, 'cursor'):
+                        cursor = db_manager.cursor
+                if cursor and cam_id:
+                    try:
+                        from module_3.task_calculator_db import get_tasks_by_camera, get_task_rules
+                        all_db_tasks = get_tasks_by_camera(cursor, cam_id, mod_id)
+                        for t in all_db_tasks:
+                            if t.get('enabled'):
+                                t['rules'] = get_task_rules(cursor, t['id'])
+                                if t.get('rules'):
+                                    tasks_for_model.append(t)
+                    except Exception:
+                        pass
+
+            # Đưa tất cả các task có assign_register hợp lệ vào danh sách cấu hình
+            if tasks_for_model:
+                for t in tasks_for_model:
+                    t_reg = str(t.get('assign_register') or '').strip()
+                    if t_reg and t_reg.lower() not in ('none', 'no value') and any(c.isdigit() for c in t_reg):
+                        val_state = t.get('value_state', t.get('Value_State', 1))
+                        val_ok = t.get('value_ok', t.get('Value_OK', t.get('value_bit_on', 1)))
+                        val_ng = t.get('value_ng', t.get('Value_NG', t.get('value_bit_off', 0)))
+                        final_cfg.append({
+                            'label': f"Task:{t.get('task_name', '')}",
+                            'register': t_reg,
+                            'value_state': val_state,
+                            'value_ok': val_ok,
+                            'value_ng': val_ng,
+                            'value': val_state,
+                            'join': True,
+                        })
+
+                _log.info("[%s] _extract_shot_cfg_rows for key_model=%s: đã tập hợp %d nhãn + %d tasks (tổng %d thanh ghi)",
+                          getattr(self, 'key', 'PLCHandler'), key_model, len(cfg_rows), len(tasks_for_model), len(final_cfg))
+        except Exception:
+            _log.debug("Lỗi lấy tasks cho key_model=%s", key_model, exc_info=True)
+
+        return final_cfg
 
     def _accumulate_cfg_registers(self, key: str, cfg_rows: list):
         """
         Tích lũy các thanh ghi cấu hình cfg_rows theo key camera cho từng shot của chu kỳ.
         Có khử trùng lặp, lọc thanh ghi hợp lệ và an toàn luồng qua _get_register_lock(key).
-        Đồng thời ghi nhận giá trị value_state (mặc định 1) của từng thanh ghi.
+        Đồng thời ghi nhận giá trị value_state, value_ok, value_ng của từng thanh ghi.
         """
         if not cfg_rows:
             return
@@ -614,6 +813,19 @@ class PLCHandler:
                         self._cfg_registers_store[key].add(reg)
                         val_state = cfg.get('value_state', cfg.get('value', 1))
                         self._cfg_registers_values[key][reg] = val_state
+
+                        val_ok = cfg.get('value_ok', cfg.get('Value_OK'))
+                        val_ng = cfg.get('value_ng', cfg.get('Value_NG'))
+                        if val_ok is not None and str(val_ok).strip() != "":
+                            try:
+                                self._cfg_registers_ok_values[key][reg] = int(val_ok)
+                            except (ValueError, TypeError):
+                                self._cfg_registers_ok_values[key][reg] = val_ok
+                        if val_ng is not None and str(val_ng).strip() != "":
+                            try:
+                                self._cfg_registers_ng_values[key][reg] = int(val_ng)
+                            except (ValueError, TypeError):
+                                self._cfg_registers_ng_values[key][reg] = val_ng
         _log.debug('[%s] Accumulated cfg registers (total: %s)',
                    key, len(self._cfg_registers_store[key]))
 
@@ -861,6 +1073,18 @@ class PLCHandler:
     # Node / mode switching
     # -----------------------------------------------------------------------
 
+    def reset_mode_plc_latch(self, camera_key=None):
+        """Reset latch đọc thanh ghi mode PLC để cho phép đọc lại giá trị kích hoạt."""
+        if not hasattr(self, '_last_mode_plc_val') or not isinstance(self._last_mode_plc_val, dict):
+            self._last_mode_plc_val = {}
+            return
+        if camera_key:
+            for k in list(self._last_mode_plc_val.keys()):
+                if k[0] == camera_key:
+                    del self._last_mode_plc_val[k]
+        else:
+            self._last_mode_plc_val.clear()
+
     def _activate_mode(self):
         try:
             if not self.layer_core or not self.layer_core.driver_loader:
@@ -869,6 +1093,11 @@ class PLCHandler:
             if not self.processor.built_in_modes:
                 return
 
+            if not hasattr(self, '_last_mode_plc_val') or not isinstance(self._last_mode_plc_val, dict):
+                self._last_mode_plc_val = {}
+
+            plc_read_cache: dict[str, Any] = {}
+
             for cam_key, values in self.processor.built_in_modes.items():
                 modes_dict = values.get('modes', {})
                 if not modes_dict:
@@ -876,12 +1105,42 @@ class PLCHandler:
 
                 for mode_key, value in modes_dict.items():
                     register = value.get('register')
+                    if not register or str(register).strip() == "" or str(register).strip().lower() in ('none', 'no value'):
+                        continue
+
+                    reg_str = str(register).strip()
                     value_bit_off = value.get('value_bit_off')
+                    raw_target_on = value.get('value_bit_on')
+                    if raw_target_on is None:
+                        continue
+
                     try:
-                        current_value = self._safe_read_plc(register)
-                        if current_value is None:
+                        target_on = int(raw_target_on)
+                    except (ValueError, TypeError):
+                        continue
+
+                    try:
+                        if reg_str in plc_read_cache:
+                            current_value = plc_read_cache[reg_str]
+                        else:
+                            current_value = self._safe_read_plc(register)
+                            plc_read_cache[reg_str] = current_value
+
+                        if current_value is None or str(current_value).strip() == "":
                             continue
-                        if int(current_value) != value.get('value_bit_on'):
+                        plc_val = int(current_value)
+
+                        # Cơ chế single-read latch: chỉ xử lý khi giá trị thay đổi (rising edge / edge-triggered)
+                        latch_key = (cam_key, mode_key, reg_str)
+                        last_val = self._last_mode_plc_val.get(latch_key)
+                        if last_val is not None and last_val == plc_val:
+                            continue
+
+                        # Cập nhật latch giá trị vừa đọc từ PLC
+                        self._last_mode_plc_val[latch_key] = plc_val
+
+                        # Chỉ kích hoạt mode khi giá trị chuyển sang đúng value_bit_on
+                        if plc_val != target_on:
                             continue
 
                         # Cập nhật mode độc lập cho riêng camera cam_key
@@ -903,6 +1162,8 @@ class PLCHandler:
                         if value_bit_off is not None and str(value_bit_off).strip() != "" and str(value_bit_off).strip().lower() not in ('none', 'no value'):
                             try:
                                 self._safe_write_plc(str(register), int(value_bit_off))
+                                if reg_str in plc_read_cache:
+                                    del plc_read_cache[reg_str]
                             except (TypeError, ValueError):
                                 pass
                     except (TypeError, ValueError) as e:
@@ -1446,6 +1707,27 @@ class PLCHandler:
         if not automation_ui:
             _log.error('[%s] automation_ui missing', key)
             return
+
+        # -------------------------------------------------------------------
+        # TÍCH LŨY CẤU HÌNH THANH GHI VÀ GỬI VALUE STATE TRƯỚC KHI CHỤP ẢNH & CHẠY AI
+        # (Chỉ gửi Value State ở lần tổng hợp: shot cuối của Cycle Frame hoặc Single Frame)
+        # -------------------------------------------------------------------
+        shot_cfg_rows = self._extract_shot_cfg_rows(pyuic, key_model)
+        is_cycle_frame = automation_ui.radioButton_cycle_frame.isChecked()
+        is_single_frame = automation_ui.radioButton_single_frame.isChecked()
+
+        if is_cycle_frame:
+            # Tích lũy cấu hình thanh ghi của shot hiện tại vào kho trước khi chụp/chạy AI
+            self._accumulate_cfg_registers(key, shot_cfg_rows)
+
+            shot_complete = values.get('shot_complete', 0)
+            # Chỉ gửi Value State tại lần tổng hợp (shot cuối cùng của chu kỳ)
+            if current_count >= shot_complete:
+                self._init_cfg_registers(key, value=1)
+        elif is_single_frame:
+            # Single frame là chu kỳ 1 shot -> gửi Value State trước khi chụp/chạy AI
+            self._init_cfg_registers(key, shot_cfg_rows, value=1)
+
         capture_cfg = self.snapshot_capture_config(automation_ui)
 
         try:
@@ -1476,20 +1758,19 @@ class PLCHandler:
                 result_img, flag, list_register, logo_text, cfg_rows = res_process[:5]
             else:
                 result_img, flag, list_register, logo_text = res_process[:4]
-                cfg_rows = getattr(pyuic, '_cached_model_config', [])
+                cfg_rows = shot_cfg_rows
         except Exception:
             _log.exception('[%s] process_image_func failed at shot %s', key, current_count)
             return
 
-        if automation_ui.radioButton_cycle_frame.isChecked():
+        if is_cycle_frame:
+            if cfg_rows:
+                self._accumulate_cfg_registers(key, cfg_rows)
             self._accumulate_registers(key, list_register or {}, is_shot_ok=bool(flag))
-            self._accumulate_cfg_registers(key, cfg_rows)
 
             shot_complete = values.get('shot_complete', 0)
 
             if current_count >= shot_complete:
-                self._init_cfg_registers(key, value=1)
-                time.sleep(0.05)
                 all_registers = self._pop_registers(key)
                 is_all_ok = self._pop_cycle_flag(key)
 
@@ -1525,8 +1806,7 @@ class PLCHandler:
                 _log.info(f'_____________COMPLETE A CYCLE FRAME FROM {key.upper()}_____________')
                 _log.info(f'* Restart New Cycle')
 
-        elif automation_ui.radioButton_single_frame.isChecked():
-            self._init_cfg_registers(key, cfg_rows, 1)
+        elif is_single_frame:
             try:
                 with self._signal_rwlock.read():
                     comp_sig  = self._resolve_signal(key, 'completed')
@@ -2060,36 +2340,38 @@ class PLCHandler:
 
                 set_style = 'background-color:#2e7d32; color:white' if flag else 'background-color:#c62828; color:white'
                 result_text = "OK" if flag else "NG"
-
-                # --- Watermark Logic (chỉ copy khi cần vẽ đè watermark lên ảnh) ---
                 if logo_text and display_img is not None:
                     render_img = display_img.copy()
-                    font = cv2.FONT_HERSHEY_DUPLEX
-                    font_scale = 1.5
-                    thickness = 2
-                    (tw, th), _ = cv2.getTextSize(logo_text, font, font_scale, thickness)
-                    margin = 30
                     img_h, img_w = render_img.shape[:2]
+                    font = cv2.FONT_HERSHEY_SIMPLEX
+                    font_scale = max(0.4, min(0.55, img_w / 3000.0))
+                    thickness = 1
+                    (tw, th), baseline = cv2.getTextSize(logo_text, font, font_scale, thickness)
                     
-                    x_text = img_w - tw - margin
-                    y_text = img_h - margin
+                    pad_x = 8
+                    pad_y = 5
+                    margin_x = 10
+                    margin_y = 8
                     
-                    x1 = max(0, x_text - 15)
-                    y1 = max(0, y_text - th - 15)
-                    x2 = min(img_w, x_text + tw + 15)
-                    y2 = min(img_h, y_text + 15)
+                    box_w = tw + 2 * pad_x
+                    box_h = th + baseline + 2 * pad_y
+                    
+                    x2 = img_w - margin_x
+                    y2 = img_h - margin_y
+                    x1 = max(0, x2 - box_w)
+                    y1 = max(0, y2 - box_h)
                     
                     if x2 > x1 and y2 > y1:
                         roi = render_img[y1:y2, x1:x2]
                         overlay_roi = roi.copy()
                         
-                        # Nền đen bán trong suốt cho watermark
-                        cv2.rectangle(overlay_roi, (0, 0), (x2 - x1, y2 - y1), (30, 30, 30), -1)
-                        # Chữ watermark màu xám nhạt
-                        cv2.putText(overlay_roi, logo_text, (15, y2 - y1 - 15), font, font_scale, (220, 220, 220), thickness, cv2.LINE_AA)
+                        # Nền đen mờ tinh tế cho watermark
+                        cv2.rectangle(overlay_roi, (0, 0), (x2 - x1, y2 - y1), (25, 25, 25), -1)
+                        # Chữ watermark màu trắng xám sắc nét, thanh mảnh
+                        cv2.putText(overlay_roi, logo_text, (pad_x, pad_y + th), font, font_scale, (225, 225, 225), thickness, cv2.LINE_AA)
                         
-                        # Blend overlay với ROI gốc (60% độ đậm cho chữ, 40% giữ lại nền ảnh)
-                        cv2.addWeighted(overlay_roi, 0.6, roi, 0.4, 0, roi)
+                        # Blend overlay với ROI gốc (65% độ đậm cho chữ, 35% giữ lại nền ảnh)
+                        cv2.addWeighted(overlay_roi, 0.65, roi, 0.35, 0, roi)
                         render_img[y1:y2, x1:x2] = roi
                 else:
                     render_img = display_img
@@ -2360,13 +2642,6 @@ class CameraTabManager:
             w.setEnabled(enabled)
 
     def set_all_tabs_enabled(self, enabled=False, role='full_control', username='__ADMIN__'):
-        """
-        Khóa hoặc Mở khóa toàn bộ các tab trong hệ thống khi đăng nhập Administrator tại PLC Settings:
-        - Các Tab Model: Mở toàn bộ quyền full_control, cập nhật runtime
-        - Tab Camera Device: findChildren widgets enabled=True/False
-        - Tab Mirror: findChildren widgets enabled=True/False
-        - Tab Auto Logging: findChildren widgets enabled=True/False
-        """
         # 1. Các tab Model
         if hasattr(self, 'dict_processors'):
             for key, proc in self.dict_processors.items():
@@ -2424,18 +2699,6 @@ class CameraTabManager:
 
         cam_key = str(camera_id).strip()
         if cam_key not in self.camera_colors:
-            palette = [
-                {"bg": "#CAD2DA", "border": "#364554"},  # Xanh xám thép (Slate Blue)
-                {"bg": "#CAD4CB", "border": "#354A3A"},  # Xanh rêu xám (Sage Green)
-                {"bg": "#D3CCC5", "border": "#4D423B"},  # Nâu xám ấm (Warm Taupe)
-                {"bg": "#C6D2D4", "border": "#284449"},  # Xanh cổ vịt trầm (Petrol Teal)
-                {"bg": "#CBCDE0", "border": "#373C54"},  # Xanh chàm tro (Dusk Indigo)
-                {"bg": "#CCD0C2", "border": "#424A35"},  # Rêu đá trầm (Muted Olive)
-                {"bg": "#D0D4D8", "border": "#3D464F"},  # Xám than chì (Charcoal Slate)
-                {"bg": "#CFC7CF", "border": "#443743"},  # Xám tro ánh tím trầm (Dusk Plum)
-                {"bg": "#C4CDD3", "border": "#2D3E49"},  # Xanh xám bão trầm (Storm Slate)
-                {"bg": "#C8CDD0", "border": "#343E43"},  # Xám thép kim loại (Pewter Steel)
-            ]
             used_bgs = {v.get("bg") for v in self.camera_colors.values() if isinstance(v, dict)}
             available = [c for c in palette if c["bg"] not in used_bgs]
             if not available:
@@ -3482,6 +3745,8 @@ class CameraTabManager:
             'modes': mode_dict,
             'device': device
         }
+        if hasattr(self, 'plc_handler') and self.plc_handler:
+            self.plc_handler.reset_mode_plc_latch(key)
 
     def set_list_mapping_mode(self,camera_name,list_mode):
         key = f'built-in-camera-{camera_name}'

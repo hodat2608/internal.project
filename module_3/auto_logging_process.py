@@ -13,6 +13,7 @@ from PyQt5.QtGui import QPixmap
 import cv2
 from app_logger.app_logger import get_logger as _get_logger, open_log_window
 from module_1.root_path import resource_path
+from module_2.StyleSheet import *
 _log = _get_logger('auto_logging_process')
 
 class AutoLoggingProcess:
@@ -34,19 +35,7 @@ class AutoLoggingProcess:
                 self.ui_logging.pushButton_config_history = QtWidgets.QPushButton(getattr(self.ui_logging, 'groupBox_item', None))
                 self.ui_logging.pushButton_config_history.setMinimumSize(QtCore.QSize(50, 40))
                 self.ui_logging.pushButton_config_history.setMaximumSize(QtCore.QSize(60, 16777215))
-                self.ui_logging.pushButton_config_history.setStyleSheet("""
-                    QPushButton {
-                        background-color: transparent;
-                        border: none;
-                        border-radius: 6px;
-                    }
-                    QPushButton:hover {
-                        background-color: rgba(0, 0, 0, 25);
-                    }
-                    QPushButton:pressed {
-                        background-color: rgba(0, 0, 0, 50);
-                    }
-                """)
+                self.ui_logging.pushButton_config_history.setStyleSheet(pushButton_config_history_style)
                 self.ui_logging.pushButton_config_history.setToolTip("🕒 Xem Lịch Sử Cấu Hình, So Sánh Diff & Rollback (Auto Logging)")
                 icon_h = QtGui.QIcon()
                 icon_h.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/history.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -79,30 +68,7 @@ class AutoLoggingProcess:
         btn = QtWidgets.QPushButton("💾 Data Save")
         btn.setToolTip("Lưu cấu hình riêng cho dòng ảnh này vào cơ sở dữ liệu")
         btn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        btn.setStyleSheet("""
-            QPushButton {
-                background-color: #C3DBFF;
-                color: #000000;
-                font-weight: 600;
-                font-size: 11px;
-                border: 1px solid #0b5ed7;
-                border-radius: 4px;
-                padding: 4px 8px;
-                min-height: 22px;
-            }
-            QPushButton:hover {
-                background-color: #72ABFF;
-                border-color: #0a58ca;
-            }
-            QPushButton:pressed {
-                background-color: #325A97;
-            }
-            QPushButton:disabled {
-                background-color: #e9ecef;
-                color: #6c757d;
-                border: 1px solid #ced4da;
-            }
-        """)
+        btn.setStyleSheet(save_button_btn_setStyleSheet)
         if hasattr(self, 'is_unlocked'):
             btn.setEnabled(self.is_unlocked)
         btn.clicked.connect(lambda _=False, r=row, fp=file_path, b=btn: self.on_save_row_clicked(r, fp, b))
@@ -112,30 +78,7 @@ class AutoLoggingProcess:
         """Tạo nút Detect cho cột View Detection."""
         btn = QtWidgets.QPushButton("Detect")
         btn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        btn.setStyleSheet("""
-            QPushButton {
-                background-color: #C3E5D5;
-                color: #000000;
-                font-weight: 600;
-                font-size: 11px;
-                border: 1px solid #157347;
-                border-radius: 4px;
-                padding: 4px 8px;
-                min-height: 22px;
-            }
-            QPushButton:hover {
-                background-color: #A4DBC1;
-                border-color: #146c43;
-            }
-            QPushButton:pressed {
-                background-color: #7BCAA5;
-            }
-            QPushButton:disabled {
-                background-color: #e9ecef;
-                color: #6c757d;
-                border: 1px solid #ced4da;
-            }
-        """)
+        btn.setStyleSheet(detect_button_setStyleSheet)
         if hasattr(self, 'is_unlocked'):
             btn.setEnabled(self.is_unlocked)
         from functools import partial
@@ -147,18 +90,7 @@ class AutoLoggingProcess:
         orig_text = btn.text()
         orig_style = btn.styleSheet()
         btn.setText("✔ Đã lưu")
-        btn.setStyleSheet("""
-            QPushButton {
-                background-color: #198754;
-                color: #ffffff;
-                font-weight: 700;
-                font-size: 11px;
-                border: 1px solid #146c43;
-                border-radius: 4px;
-                padding: 4px 8px;
-                min-height: 22px;
-            }
-        """)
+        btn.setStyleSheet(show_save_success_effect)
         QtCore.QTimer.singleShot(2500, lambda: self._reset_save_button_state(btn, orig_text, orig_style))
 
     def _reset_save_button_state(self, btn: QtWidgets.QPushButton, orig_text: str, orig_style: str):

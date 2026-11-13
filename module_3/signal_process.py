@@ -20,7 +20,7 @@ from module_1.root_path import resource_path
 import re
 from module_3.config_status_logger import PLCConfigStatusLogger
 from module_3.program_signal_ready import ProgramSignalReadyManager, _ensure_program_signal_ready_table
-
+from module_2.StyleSheet import *
 
 def create_table_item(text=""):
     """Tạo QTableWidgetItem với cỡ chữ 11, font Segoe UI, in đậm và căn giữa."""
@@ -61,10 +61,6 @@ def _ensure_shotxmodel_column(cursor, connect_db=None):
 
 
 class SignalTableDelegate(QtWidgets.QStyledItemDelegate):
-    """Delegate tùy chỉnh cho bảng tableWidget tín hiệu PLC:
-    - Khi sửa trực tiếp (createEditor): ô nhập tự động cỡ 11, Segoe UI, in đậm, căn giữa.
-    - Khi vẽ (paint): vẽ thêm nét viền/đường kẻ phân cách giữa cột 3 (Read) và cột 4 (Write).
-    """
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -91,9 +87,6 @@ class SignalTableDelegate(QtWidgets.QStyledItemDelegate):
 
 
 class SignalTableSeparatorFilter(QtCore.QObject):
-    """Event filter vẽ đường phân cách rõ rệt (separator line) giữa khối READ (cột 1, 2, 3)
-    và khối WRITE (cột 4, 5, 6) trên cả TableView viewport lẫn HorizontalHeader viewport.
-    Đường vẽ này xuyên suốt từ trên đỉnh Header xuống tận đáy bảng."""
     def __init__(self, table_widget):
         super().__init__(table_widget)
         self.table = table_widget
@@ -141,21 +134,12 @@ class SignalTableHelper:
         self._init_table_style_and_formatting()
 
     def _init_table_style_and_formatting(self):
-        """Khởi tạo delegate, event filter đường phân cách Read/Write, 
-        và định dạng toàn bộ số/chữ trong bảng cỡ 11, căn giữa."""
-        # 1. Cài đặt Delegate cho bảng
         self.delegate = SignalTableDelegate(self.table)
         self.table.setItemDelegate(self.delegate)
-
-        # 2. Cài đặt EventFilter vẽ đường phân cách giữa cột 3 và cột 4
         self.separator_filter = SignalTableSeparatorFilter(self.table)
         self.table.viewport().installEventFilter(self.separator_filter)
         self.table.horizontalHeader().viewport().installEventFilter(self.separator_filter)
-
-        # 3. Lắng nghe sự kiện itemChanged để tự động áp dụng cỡ 11 + căn giữa khi người dùng gõ
         self.table.itemChanged.connect(self._on_table_item_changed)
-
-        # 4. Định dạng toàn bộ các item hiện hữu và Header
         self.format_all_table_items()
 
     def format_all_table_items(self):
@@ -258,15 +242,10 @@ class DataProcessSignal:
         self.dict_mode_params = {}
         self.check_connect_plc = False
         self.is_connected_plc = None
-        
-        # Thiết lập style cho bảng tableWidget_shotxmodel
         self._setup_shotxmodel_table_style()
-
-        # Thiết lập Context Menu cho bảng
         self.uic.tableWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.uic.tableWidget.customContextMenuRequested.connect(self.setup_context_menu)
 
-        # Thêm ComboBox DMA cho các hàng có sẵn
         for row in range(self.uic.tableWidget.rowCount()):
             self._add_dma_combobox_to_row(row)
 
@@ -275,8 +254,6 @@ class DataProcessSignal:
         self.program_signal_ready_mgr = ProgramSignalReadyManager(self.uic, self.signal_table, self)
         self.is_unlocked = False
 
-        # Tích hợp nút Lịch Sử Cấu Hình vào cùng hàng với pushButton_admin
-        # Đặt chung trong 1 QHBoxLayout tại hàng 2 cột 0 để KHÔNG tạo thêm cột 1 làm vỡ bố cục gridLayout_32
         if hasattr(self.uic, 'gridLayout_32') and hasattr(self.uic, 'pushButton_admin'):
             if not hasattr(self.uic, 'pushButton_config_history'):
                 self.uic.pushButton_config_history = QtWidgets.QPushButton(self.uic.scrollAreaWidgetContents)
@@ -287,19 +264,7 @@ class DataProcessSignal:
                 font.setPointSize(10)
                 font.setBold(True)
                 self.uic.pushButton_config_history.setFont(font)
-                self.uic.pushButton_config_history.setStyleSheet("""
-                    QPushButton {
-                        background-color: #0284c7;
-                        color: white;
-                        border: none;
-                        border-radius: 4px;
-                        font-weight: 600;
-                        padding: 4px 10px;
-                    }
-                    QPushButton:hover {
-                        background-color: #0369a1;
-                    }
-                """)
+                self.uic.pushButton_config_history.setStyleSheet(pushButton_config_history_DataProcessSignal)
                 self.uic.pushButton_config_history.setText("  🕒 Lịch Sử Cấu Hình")
                 self.uic.pushButton_config_history.setToolTip("🕒 Xem Lịch Sử Cấu Hình, So Sánh Diff & Rollback PLC/Mode")
 
@@ -316,48 +281,10 @@ class DataProcessSignal:
         self._setup_config_status_log_ui()
 
     def _setup_shotxmodel_table_style(self):
-        """Thiết lập phong cách đồ hoạ sang trọng, font chữ 11pt in đậm và căn giữa cho tableWidget_shotxmodel."""
         if not hasattr(self.uic, 'tableWidget_shotxmodel') or self.uic.tableWidget_shotxmodel is None:
             return
         table = self.uic.tableWidget_shotxmodel
-
-        # 1. Cập nhật StyleSheet đồng bộ viền xanh #325C62, nền Mint dịu mắt và Header nổi bật
-        table.setStyleSheet("""
-            /* Khung chính của bảng TableView */
-            QTableView {
-                background-color: #F7FFFA;
-                border: 1px solid #325C62;
-                border-radius: 4px;
-                gridline-color: #d0ebd5;
-            }
-            /* Header tiêu đề bảng */
-            QHeaderView::section {
-                background-color: #EAF7EF;
-                color: #1F4E78;
-                font-family: 'Segoe UI';
-                font-size: 11pt;
-                font-weight: bold;
-                border: 1px solid #d0ebd5;
-                padding: 4px;
-            }
-            /* Ô dữ liệu bên trong bảng */
-            QTableView::item {
-                background-color: #F7FFFA;
-                color: #2c3e50;
-                font-family: 'Segoe UI';
-                font-size: 11pt;
-                font-weight: bold;
-            }
-            /* Hiệu ứng di chuột */
-            QTableView::item:hover {
-                background-color: #F5FFE1;
-            }
-            /* Hiệu ứng khi chọn dòng */
-            QTableView::item:selected {
-                background-color: #E9F8FF;
-                color: black;
-            }
-        """)
+        table.setStyleSheet(setup_shotxmodel_table_style)
 
         # 2. Định dạng Font và Căn giữa cho Horizontal Header
         font_header = QtGui.QFont("Segoe UI", 11)
@@ -388,26 +315,7 @@ class DataProcessSignal:
         if current_val is not None:
             combo.setCurrentText(str(current_val))
             
-        combo.setStyleSheet("""
-            QComboBox { 
-                background-color: #F7FFFA; 
-                color: black; 
-                font-family: 'Segoe UI'; 
-                font-size: 11pt; 
-                font-weight: bold;
-                border: 1px solid #d0ebd5;
-                border-radius: 3px;
-                padding: 2px;
-            }
-            QComboBox QAbstractItemView {
-                text-align: center;
-                font-family: 'Segoe UI';
-                font-size: 11pt;
-                font-weight: bold;
-                selection-background-color: #E9F8FF;
-                selection-color: black;
-            }
-        """)
+        combo.setStyleSheet(create_model_combobox)
         combo.setEditable(True)
         combo.lineEdit().setAlignment(QtCore.Qt.AlignCenter)
         combo.lineEdit().setReadOnly(True)
@@ -455,8 +363,6 @@ class DataProcessSignal:
                 desc_item.setTextAlignment(QtCore.Qt.AlignCenter)
 
     def _setup_config_status_log_ui(self):
-        """Khởi tạo textBrowser_status_log động bên trong self.uic.groupBox_5
-        để không bị mất khi biên dịch lại file giao diện .ui."""
         if not hasattr(self.uic, 'groupBox_5'):
             return
 
@@ -475,14 +381,7 @@ class DataProcessSignal:
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         self.uic.textBrowser_status_log.setFont(font)
-        self.uic.textBrowser_status_log.setStyleSheet("""
-            QTextBrowser {
-                background-color: #FFFFFF;
-                border: 1px solid #000000;
-                border-radius: 4px;
-                padding: 8px;
-            }
-        """)
+        self.uic.textBrowser_status_log.setStyleSheet(setup_config_status_log_ui)
         self.uic.textBrowser_status_log.setObjectName("textBrowser_status_log")
         self.uic.gridLayout_4.addWidget(self.uic.textBrowser_status_log, 0, 0, 1, 1)
 
@@ -492,25 +391,7 @@ class DataProcessSignal:
     def _add_dma_combobox_to_row(self, row_index):
         combo = QtWidgets.QComboBox()
         combo.addItems(["DM", "MR", "R", "T", "C"])
-        
-        # 1. Thiết lập StyleSheet gộp toàn bộ cấu hình (Font Segoe UI, Size 11pt, in đậm, Nền xanh nhẹ, Chữ đen)
-        combo.setStyleSheet("""
-            QComboBox { 
-                background-color: #F7FFFA; 
-                color: black; 
-                font-family: 'Segoe UI'; 
-                font-size: 11pt; 
-                font-weight: bold;
-            }
-            QComboBox QAbstractItemView {
-                text-align: center;
-                font-family: 'Segoe UI';
-                font-size: 11pt;
-                font-weight: bold;
-            }
-        """)
-        
-        # 2. Bắt buộc thêm các dòng này để ép chữ trên khung chính phải căn giữa hoàn toàn
+        combo.setStyleSheet(add_dma_combobox_to_row)
         combo.setEditable(True)
         combo.lineEdit().setAlignment(QtCore.Qt.AlignCenter)
         combo.lineEdit().setReadOnly(True)

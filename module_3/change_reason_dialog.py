@@ -8,7 +8,7 @@ Hỗ trợ đánh dấu Bản Chuẩn (Golden Config) đối với tài khoản 
 from typing import Tuple, Optional
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import Qt
-
+from module_2.StyleSheet import *
 
 class ChangeReasonDialog(QtWidgets.QDialog):
     """
@@ -40,79 +40,7 @@ class ChangeReasonDialog(QtWidgets.QDialog):
 
     def _init_ui(self):
         # Phong cách Slate Industrial hiện đại, tone sáng trầm
-        self.setStyleSheet("""
-            QDialog {
-                background-color: #f8fafc;
-                font-family: 'Segoe UI', Arial, sans-serif;
-            }
-            QFrame#headerFrame {
-                background-color: #ffffff;
-                border-bottom: 1px solid #cbd5e1;
-                padding: 12px;
-            }
-            QLabel#lblTitle {
-                color: #0f172a;
-                font-size: 15px;
-                font-weight: bold;
-            }
-            QLabel#lblSub {
-                color: #64748b;
-                font-size: 12px;
-            }
-            QFrame#badgeFrame {
-                background-color: #f1f5f9;
-                border: 1px solid #e2e8f0;
-                border-radius: 6px;
-                padding: 6px 10px;
-            }
-            QTextEdit {
-                background-color: #ffffff;
-                border: 1.5px solid #cbd5e1;
-                border-radius: 6px;
-                padding: 8px;
-                font-size: 13px;
-                color: #0f172a;
-            }
-            QTextEdit:focus {
-                border-color: #2563eb;
-                background-color: #ffffff;
-            }
-            QCheckBox {
-                font-size: 13px;
-                font-weight: 600;
-                color: #1e293b;
-            }
-            QPushButton#btnSave {
-                background-color: #2563eb;
-                color: #ffffff;
-                font-weight: bold;
-                font-size: 13px;
-                border: 1px solid #1d4ed8;
-                border-radius: 6px;
-                padding: 8px 20px;
-            }
-            QPushButton#btnSave:hover {
-                background-color: #1d4ed8;
-            }
-            QPushButton#btnSave:disabled {
-                background-color: #94a3b8;
-                border-color: #cbd5e1;
-                color: #f1f5f9;
-            }
-            QPushButton#btnCancel {
-                background-color: #ffffff;
-                color: #475569;
-                font-weight: bold;
-                font-size: 13px;
-                border: 1px solid #cbd5e1;
-                border-radius: 6px;
-                padding: 8px 18px;
-            }
-            QPushButton#btnCancel:hover {
-                background-color: #f1f5f9;
-                color: #1e293b;
-            }
-        """)
+        self.setStyleSheet(ChangeReasonDialog_Style)
 
         layout = QtWidgets.QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 14)
@@ -259,68 +187,7 @@ class RollbackPasswordDialog(QtWidgets.QDialog):
         self._init_ui()
 
     def _init_ui(self):
-        self.setStyleSheet("""
-            QDialog {
-                background-color: #f8fafc;
-                font-family: 'Segoe UI', Arial, sans-serif;
-            }
-            QFrame#headerFrame {
-                background-color: #ffffff;
-                border-bottom: 1px solid #cbd5e1;
-                padding: 10px;
-            }
-            QLabel#lblTitle {
-                color: #b91c1c;
-                font-size: 15px;
-                font-weight: bold;
-            }
-            QLabel#lblSub {
-                color: #64748b;
-                font-size: 12px;
-            }
-            QFrame#warnBox {
-                background-color: #fef2f2;
-                border: 1px solid #fecaca;
-                border-radius: 6px;
-                padding: 8px;
-            }
-            QLineEdit {
-                background-color: #ffffff;
-                border: 1.5px solid #cbd5e1;
-                border-radius: 6px;
-                padding: 7px 10px;
-                font-size: 14px;
-                color: #0f172a;
-            }
-            QLineEdit:focus {
-                border-color: #dc2626;
-            }
-            QPushButton#btnConfirm {
-                background-color: #dc2626;
-                color: #ffffff;
-                font-weight: bold;
-                font-size: 13px;
-                border: 1px solid #b91c1c;
-                border-radius: 6px;
-                padding: 8px 20px;
-            }
-            QPushButton#btnConfirm:hover {
-                background-color: #b91c1c;
-            }
-            QPushButton#btnCancel {
-                background-color: #ffffff;
-                color: #475569;
-                font-weight: bold;
-                font-size: 13px;
-                border: 1px solid #cbd5e1;
-                border-radius: 6px;
-                padding: 8px 18px;
-            }
-            QPushButton#btnCancel:hover {
-                background-color: #f1f5f9;
-                color: #1e293b;
-            }
-        """)
+        self.setStyleSheet(RollbackPasswordDialog_style)
 
         layout = QtWidgets.QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 14)

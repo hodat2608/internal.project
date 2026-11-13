@@ -15,6 +15,7 @@ from mysql.connector import Error
 import cv2, numpy as np
 from pathlib import Path
 from typing import Final, Any, Optional, Dict
+from module_2.StyleSheet import *
 COLUMN_MAPPING: Final[dict[str, str]] = {
     "Label Name":     "`Label_Name`",
     "Enable":        "`Join`",
@@ -177,121 +178,9 @@ class RegisterDelegate(QStyledItemDelegate):
         model.setData(index, formatted, Qt.EditRole)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# CẤU HÌNH BỘ ĐIỀU KHIỂN SLIDER CHO CÁC CỘT THÔNG SỐ (TỪ QTY ĐẾN CONFIDENCE)
-# ─────────────────────────────────────────────────────────────────────────────
-SLIDER_COLUMN_CONFIGS: Final[dict[str, dict[str, Any]]] = {
-    "Qty": {
-        "min": 1,
-        "max": 100,
-        "step": 1,
-        "unit": "",
-        "prefix": "",
-        "presets": [1, 2, 5, 10, 20],
-        "title": "🔢 Số lượng (Qty)",
-    },
-    "Min Width": {
-        "min": 1,
-        "max": 10000,
-        "step": 1,
-        "unit": " px",
-        "prefix": "",
-        "presets": [1, 50, 100, 500, 2000, 10000],
-        "title": "📏 Chiều rộng tối thiểu (Min Width)",
-    },
-    "Max Width": {
-        "min": 1,
-        "max": 10000,
-        "step": 1,
-        "unit": " px",
-        "prefix": "",
-        "presets": [1, 50, 100, 500, 2000, 10000],
-        "title": "📏 Chiều rộng tối đa (Max Width)",
-    },
-    "Min Height": {
-        "min": 1,
-        "max": 10000,
-        "step": 1,
-        "unit": " px",
-        "prefix": "",
-        "presets": [1, 50, 100, 500, 2000, 10000],
-        "title": "📐 Chiều cao tối thiểu (Min Height)",
-    },
-    "Max Height": {
-        "min": 1,
-        "max": 10000,
-        "step": 1,
-        "unit": " px",
-        "prefix": "",
-        "presets": [1, 50, 100, 500, 2000, 10000],
-        "title": "📐 Chiều cao tối đa (Max Height)",
-    },
-    "Register": {
-        "min": 0,
-        "max": 9999,
-        "step": 1,
-        "unit": "",
-        "prefix": "",
-        "presets": [1000, 1010, 2000, 2001, 3000],
-        "title": "🔌 Thanh ghi PLC (Register)",
-    },
-    "Value State": {
-        "min": 0,
-        "max": 1000,
-        "step": 1,
-        "unit": "",
-        "prefix": "",
-        "presets": [0, 1, 2, 5, 10, 100],
-        "title": "🎯 Giá trị trạng thái (Value State)",
-    },
-    "Value OK": {
-        "min": 0,
-        "max": 1000,
-        "step": 1,
-        "unit": "",
-        "prefix": "",
-        "presets": [0, 1, 2, 5, 10, 100],
-        "title": "✔ Giá trị OK (Value OK)",
-    },
-    "Value NG": {
-        "min": 0,
-        "max": 1000,
-        "step": 1,
-        "unit": "",
-        "prefix": "",
-        "presets": [0, 1, 2, 5, 10, 100],
-        "title": "✘ Giá trị NG (Value NG)",
-    },
-    "Value": {
-        "min": 0,
-        "max": 1000,
-        "step": 1,
-        "unit": "",
-        "prefix": "",
-        "presets": [0, 1, 2, 5, 10, 100],
-        "title": "🎯 Giá trị ghi (Value)",
-    },
-    "Confidence": {
-        "min": 1,
-        "max": 100,
-        "step": 1,
-        "unit": "%",
-        "prefix": "",
-        "presets": [15, 30, 50, 70, 90],
-        "title": "⚡ Độ tin cậy (Confidence)",
-    },
-}
-
 
 class CellSliderPopup(QtWidgets.QWidget):
-    """
-    Popup thanh trượt (Slider) nổi chuyên nghiệp xuất hiện khi người dùng
-    trỏ chuột hoặc chọn ô của các cột thông số (Qty -> Confidence):
-    - Tự động định vị ngay dưới (hoặc trên) ô được trỏ.
-    - Cho phép kéo thanh slider để cập nhật thông số ô trong thời gian thực.
-    - Cung cấp nút tăng giảm tinh chỉnh (-) / (+) và các phím chọn nhanh (presets).
-    - Không cản trở việc click đúp vào ô để nhập số trực tiếp bằng bàn phím.
-    """
+
     def __init__(self, table):
         super().__init__(table.window(), Qt.ToolTip | Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground, True)
@@ -310,78 +199,7 @@ class CellSliderPopup(QtWidgets.QWidget):
 
         self.container = QtWidgets.QFrame(self)
         self.container.setObjectName("sliderPopupContainer")
-        self.container.setStyleSheet("""
-            QFrame#sliderPopupContainer {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #1E293B, stop:1 #0F172A);
-                border: 1px solid #38BDF8;
-                border-radius: 8px;
-            }
-            QLabel {
-                border: none;
-                background: transparent;
-                font-family: 'Segoe UI', Arial, sans-serif;
-            }
-            QSlider::groove:horizontal {
-                height: 6px;
-                background: #334155;
-                border-radius: 3px;
-            }
-            QSlider::sub-page:horizontal {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #06B6D4, stop:1 #3B82F6);
-                border-radius: 3px;
-            }
-            QSlider::handle:horizontal {
-                background: #FFFFFF;
-                border: 2px solid #0EA5E9;
-                width: 16px;
-                margin-top: -5px;
-                margin-bottom: -5px;
-                border-radius: 8px;
-            }
-            QSlider::handle:horizontal:hover {
-                background: #38BDF8;
-                border: 2px solid #FFFFFF;
-            }
-            QPushButton {
-                background: #1E293B;
-                border: 1px solid #475569;
-                border-radius: 4px;
-                color: #E2E8F0;
-                font-family: 'Segoe UI', Arial, sans-serif;
-                font-weight: bold;
-                padding: 2px 6px;
-            }
-            QPushButton:hover {
-                background: #0EA5E9;
-                border-color: #38BDF8;
-                color: #FFFFFF;
-            }
-            QPushButton#closeBtn {
-                background: transparent;
-                border: none;
-                color: #94A3B8;
-                font-size: 11pt;
-                font-weight: bold;
-                padding: 0;
-            }
-            QPushButton#closeBtn:hover {
-                color: #EF4444;
-            }
-            QPushButton.chipBtn {
-                background: #1E293B;
-                border: 1px solid #475569;
-                border-radius: 9px;
-                color: #94A3B8;
-                font-size: 8pt;
-                font-weight: bold;
-                padding: 1px 7px;
-            }
-            QPushButton.chipBtn:hover {
-                background: #0284C7;
-                border-color: #38BDF8;
-                color: #FFFFFF;
-            }
-        """)
+        self.container.setStyleSheet(CellSliderPopup_style)
 
         # Đổ bóng Drop Shadow cao cấp
         shadow = QtWidgets.QGraphicsDropShadowEffect(self.container)
@@ -400,14 +218,7 @@ class CellSliderPopup(QtWidgets.QWidget):
         self.lbl_title.setStyleSheet("font-weight: bold; color: #38BDF8; font-size: 10pt;")
 
         self.lbl_value = QtWidgets.QLabel("0")
-        self.lbl_value.setStyleSheet("""
-            background-color: #334155;
-            color: #38BDF8;
-            border-radius: 4px;
-            padding: 1px 8px;
-            font-weight: bold;
-            font-size: 10pt;
-        """)
+        self.lbl_value.setStyleSheet(lbl_value_style)
 
         self.btn_close = QtWidgets.QPushButton("✕")
         self.btn_close.setObjectName("closeBtn")
@@ -822,19 +633,7 @@ class Process_Model:
                 self.uic.pushButton_config_history = QtWidgets.QPushButton(self.uic.groupBox_4)
                 self.uic.pushButton_config_history.setMinimumSize(QtCore.QSize(0, 40))
                 self.uic.pushButton_config_history.setMaximumSize(QtCore.QSize(40, 16777215))
-                self.uic.pushButton_config_history.setStyleSheet("""
-                    QPushButton {
-                        background-color: transparent;
-                        border: none;
-                        border-radius: 6px;
-                    }
-                    QPushButton:hover {
-                        background-color: rgba(0, 0, 0, 25);
-                    }
-                    QPushButton:pressed {
-                        background-color: rgba(0, 0, 0, 50);
-                    }
-                """)
+                self.uic.pushButton_config_history.setStyleSheet(Process_Model_pushButton_config_history)
                 self.uic.pushButton_config_history.setText("")
                 icon_hist = QtGui.QIcon()
                 icon_hist.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/history.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -852,44 +651,7 @@ class Process_Model:
             return
         table = self.uic.tableView
 
-        table.setStyleSheet("""
-            /* Khung chính của bảng TableView */
-            QTableView {
-                background-color: #F7FFFA;
-                border: 1px solid #325C62;
-                border-radius: 4px;
-                gridline-color: #d0ebd5;
-                font-family: 'Segoe UI';
-                font-size: 11pt;
-            }
-            /* Header tiêu đề cột và hàng */
-            QHeaderView::section {
-                background-color: #EAF7EF;
-                color: #1F4E78;
-                font-family: 'Segoe UI';
-                font-size: 11pt;
-                font-weight: bold;
-                border: 1px solid #d0ebd5;
-                padding: 4px;
-            }
-            /* Ô dữ liệu bên trong bảng */
-            QTableView::item {
-                background-color: #F7FFFA;
-                color: #2c3e50;
-                font-family: 'Segoe UI';
-                font-size: 11pt;
-                font-weight: bold;
-            }
-            /* Hiệu ứng khi di chuột qua */
-            QTableView::item:hover {
-                background-color: #88FF7A;
-            }
-            /* Hiệu ứng khi chọn dòng */
-            QTableView::item:selected {
-                background-color: #1DB20D;
-                color: black;
-            }
-        """)
+        table.setStyleSheet(setup_table)
 
         table.verticalHeader().setDefaultSectionSize(36)
         table.setAlternatingRowColors(True)
@@ -1003,17 +765,6 @@ class Process_Model:
             model.blockSignals(False)
 
     def create_table_row_items(self, label_name: str, custom_values: Optional[dict] = None) -> list:
-        """
-        Tạo danh sách QStandardItem cho 1 hàng với các giá trị mặc định chuẩn xác:
-        - Font chữ 11, in đậm (Bold), căn giữa toàn bộ ô
-        - Max Width, Max Height: 10000
-        - Enabled [✓]: Có tích vào ô (Qt.Checked)
-        - Register: Bắt đầu bằng 'DM'
-        - Value: 1
-        - Confidence: 30
-        - Qty: 1
-        - Min Width, Min Height: 1
-        """
         values_dict = custom_values or {}
         row_items = []
         font_cell = QtGui.QFont("Segoe UI", 11)
@@ -1134,25 +885,7 @@ class Process_Model:
             return
 
         menu = QtWidgets.QMenu(self.uic.tableView)
-        menu.setStyleSheet("""
-            QMenu {
-                background-color: #313244;
-                color: #cdd6f4;
-                border: 1px solid #45475a;
-                border-radius: 6px;
-                padding: 4px;
-                font-family: 'Segoe UI', Arial, sans-serif;
-            }
-            QMenu::item {
-                padding: 6px 20px;
-                border-radius: 4px;
-            }
-            QMenu::item:selected {
-                background-color: #89b4fa;
-                color: #11111b;
-                font-weight: bold;
-            }
-        """)
+        menu.setStyleSheet(show_table_context_menu_style)
 
         action_add_task = menu.addAction(f"➕ Thêm {len(selected_labels)} nhãn đã chọn vào Task Calculator...")
         action = menu.exec_(self.uic.tableView.viewport().mapToGlobal(pos))
@@ -1254,13 +987,6 @@ class Process_Model:
             self.lock_gui(cursor, connect_db, method=True, boolen=True)
 
     def set_ui_enabled(self, enabled=False, role='full_control'):
-        """
-        Khóa hoặc mở khóa giao diện theo phân quyền:
-        - read_only / enabled=False: Khóa toàn bộ các đối tượng thao tác
-        - modify: Chỉ cho phép điều chỉnh bảng thông số (self.uic.tableView) và lưu bảng (pushButton_save_data)
-        - full_control / __ADMIN__: Mở toàn bộ đối tượng điều khiển
-        """
-        # Phân định trạng thái mở khóa
         self.is_unlocked = bool(enabled and role in ('modify', 'full_control', '__ADMIN__'))
 
         widget_types = [

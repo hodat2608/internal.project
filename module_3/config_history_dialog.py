@@ -22,7 +22,7 @@ from module_3.config_version_manager import (
     _get_history_table_name
 )
 from module_3.change_reason_dialog import RollbackPasswordDialog
-
+from module_2.StyleSheet import *
 
 CATEGORY_MAP = {
     'ALL': 'Tất cả phân loại',
@@ -92,128 +92,7 @@ class ConfigHistoryDialog(QtWidgets.QDialog):
 
     def _init_ui(self):
         # Thiết kế Slate Theme - Sang trọng, êm dịu, tương phản cao, chuẩn công nghiệp
-        self.setStyleSheet("""
-            QDialog {
-                background-color: #f1f5f9;
-                color: #0f172a;
-                font-family: 'Segoe UI';
-            }
-            QGroupBox {
-                background-color: #ffffff;
-                border: 1px solid #cbd5e1;
-                border-radius: 8px;
-                margin-top: 14px;
-                padding-top: 14px;
-                font-weight: bold;
-                font-size: 13px;
-                color: #0f172a;
-            }
-            QGroupBox::title {
-                subcontrol-origin: margin;
-                subcontrol-position: top left;
-                left: 12px;
-                padding: 0 8px;
-                background-color: #ffffff;
-                color: #1e293b;
-            }
-            QFrame#filterFrame, QFrame#bottomFrame {
-                background-color: #ffffff;
-                border: 1px solid #cbd5e1;
-                border-radius: 8px;
-            }
-            QLabel {
-                color: #334155;
-                font-size: 13px;
-                font-weight: 500;
-            }
-            QComboBox, QLineEdit {
-                background-color: #ffffff;
-                border: 1px solid #cbd5e1;
-                border-radius: 6px;
-                padding: 5px 8px;
-                font-size: 12px;
-                color: #0f172a;
-            }
-            QComboBox:focus, QLineEdit:focus {
-                border: 1.5px solid #2563eb;
-            }
-            QTableWidget {
-                background-color: #ffffff;
-                border: 1px solid #cbd5e1;
-                border-radius: 6px;
-                gridline-color: #f1f5f9;
-                font-size: 12px;
-                color: #1e293b;
-            }
-            QTableWidget::item {
-                padding: 4px 6px;
-                border-bottom: 1px solid #f1f5f9;
-            }
-            QTableWidget::item:selected {
-                background-color: #dbeafe;
-                color: #1e40af;
-                font-weight: bold;
-            }
-            QHeaderView::section {
-                background-color: #f8fafc;
-                color: #334155;
-                padding: 6px;
-                border: 1px solid #e2e8f0;
-                font-weight: bold;
-                font-size: 12px;
-            }
-            QTabWidget::pane {
-                border: 1px solid #cbd5e1;
-                background-color: #ffffff;
-                border-radius: 6px;
-            }
-            QTabBar::tab {
-                background-color: #e2e8f0;
-                color: #475569;
-                padding: 8px 16px;
-                font-weight: bold;
-                border-top-left-radius: 6px;
-                border-top-right-radius: 6px;
-                margin-right: 2px;
-            }
-            QTabBar::tab:selected {
-                background-color: #ffffff;
-                color: #2563eb;
-                border-bottom: 2px solid #2563eb;
-            }
-            QPushButton {
-                background-color: #ffffff;
-                color: #334155;
-                border: 1px solid #cbd5e1;
-                border-radius: 6px;
-                padding: 6px 14px;
-                font-weight: bold;
-                font-size: 12px;
-            }
-            QPushButton:hover {
-                background-color: #f1f5f9;
-                color: #0f172a;
-                border-color: #94a3b8;
-            }
-            QPushButton#btnRollback {
-                background-color: #ea580c;
-                color: #ffffff !important;
-                border: 1px solid #c2410c;
-                padding: 8px 20px;
-                font-size: 13px;
-            }
-            QPushButton#btnRollback:hover {
-                background-color: #c2410c;
-            }
-            QPushButton#btnGolden {
-                background-color: #fef3c7;
-                color: #b45309 !important;
-                border: 1px solid #fcd34d;
-            }
-            QPushButton#btnGolden:hover {
-                background-color: #fde68a;
-            }
-        """)
+        self.setStyleSheet(ConfigHistoryDialog_style)
 
         main_layout = QtWidgets.QVBoxLayout(self)
         main_layout.setContentsMargins(10, 10, 10, 10)

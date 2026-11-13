@@ -56,6 +56,8 @@ class core:
         self.line_code    = None
         self.date_time    = None
 
+        self._last_item_code_plc_val: dict[tuple, Any] = {}
+
         self.connection    = None
         self.driver_loader = None
 
@@ -374,6 +376,7 @@ class core:
                         {'item_code': row[0], 'register': row[1], 'value_bit_on': row[2], 'value_bit_off': row[3]} for row in item_codes
                     ]
 
+                self.reset_item_code_plc_latch()
                 _log.info("Successfully loaded items from %d databases", len(databases))
             except Exception as e:
                 _log.error("Error in collect_dict_item: %s", e)
@@ -560,6 +563,11 @@ class core:
             except Exception as e:
                 _log.debug("Error checking system action %s on %s: %s", action_type, register, e)
 
+    def reset_item_code_plc_latch(self):
+        """Reset latch đọc thanh ghi mã hàng PLC để cho phép đọc lại giá trị kích hoạt."""
+        if hasattr(self, '_last_item_code_plc_val') and isinstance(self._last_item_code_plc_val, dict):
+            self._last_item_code_plc_val.clear()
+
     def wait_for_signal(self):
         # Kiểm tra lệnh Restart / Close từ PLC
         self.check_system_action_triggers()
@@ -569,6 +577,12 @@ class core:
         if self.is_indirect_log_mode() and not self.dict_list_line:
             return
 
+        if not hasattr(self, '_last_item_code_plc_val') or not isinstance(self._last_item_code_plc_val, dict):
+            self._last_item_code_plc_val = {}
+
+        # Cache đọc PLC trong một lượt quét: tránh đọc lặp lại khi nhiều mã hàng dùng chung 1 thanh ghi
+        plc_read_cache: dict[str, Any] = {}
+
         for name_line, values in list(self.dict_list_line.items()):
             for entry in values:
                 item_code = entry.get('item_code')
@@ -576,23 +590,68 @@ class core:
                 value_bit_on = entry.get('value_bit_on')
                 value_bit_off = entry.get('value_bit_off')
 
-                if not register:
+                if not register or str(register).strip() == "" or str(register).strip().lower() in ('none', 'no value'):
                     continue
+
+                if value_bit_on is None or str(value_bit_on).strip() == "" or str(value_bit_on).strip().lower() in ('none', 'no value'):
+                    continue
+
                 try:
-                    current_value = self._safe_read_plc(register)
-                    if current_value is not None and int(current_value) == value_bit_on:
-                        _log.info("PLC Trigger detected: %s = %d (Item: %s)", register, value_bit_on, item_code)
-                        if value_bit_off is not None and str(value_bit_off).strip() != "" and str(value_bit_off).strip().lower() not in ('none', 'no value'):
+                    target_on = int(value_bit_on)
+                except (ValueError, TypeError):
+                    continue
+
+                reg_str = str(register).strip()
+
+                try:
+                    # Đọc có đệm trong lượt quét hiện tại
+                    if reg_str in plc_read_cache:
+                        current_value = plc_read_cache[reg_str]
+                    else:
+                        current_value = self._safe_read_plc(register)
+                        plc_read_cache[reg_str] = current_value
+
+                    if current_value is None or str(current_value).strip() == "":
+                        continue
+
+                    try:
+                        plc_val = int(current_value)
+                    except (ValueError, TypeError):
+                        continue
+
+                    # Cơ chế single-read latch: chỉ xử lý khi giá trị thay đổi (rising edge / edge-triggered)
+                    # Định danh theo (name_line, item_code, reg_str) để hỗ trợ nhiều mã hàng dùng chung 1 thanh ghi
+                    latch_key = (name_line, item_code, reg_str)
+                    last_val = self._last_item_code_plc_val.get(latch_key)
+                    if last_val is not None and last_val == plc_val:
+                        continue
+
+                    # Cập nhật latch giá trị vừa đọc từ PLC
+                    self._last_item_code_plc_val[latch_key] = plc_val
+
+                    # Chỉ kích hoạt mã hàng khi giá trị chuyển sang đúng value_bit_on
+                    if plc_val != target_on:
+                        continue
+
+                    _log.info("PLC Trigger detected: %s = %d (Line: %s, Item: %s)", reg_str, target_on, name_line, item_code)
+
+                    # Tắt bit kích hoạt (handshake với PLC nếu có value_bit_off)
+                    if value_bit_off is not None and str(value_bit_off).strip() != "" and str(value_bit_off).strip().lower() not in ('none', 'no value'):
+                        try:
                             self._safe_write_plc(register, value_bit_off)
+                            if reg_str in plc_read_cache:
+                                del plc_read_cache[reg_str]
+                        except Exception as e:
+                            _log.error("Error writing handshake OFF to %s: %s", register, e)
 
-                        date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                        self.item_code = item_code
-                        self.line_code = name_line
-                        self.write_data_save_default(date_time, item_code, name_line)
+                    date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    self.item_code = item_code
+                    self.line_code = name_line
+                    self.write_data_save_default(date_time, item_code, name_line)
 
-                        self.worker_thread.trigger_detected.emit(item_code, name_line)
+                    self.worker_thread.trigger_detected.emit(item_code, name_line)
                 except Exception as e:
-                    _log.error("Error while reading trigger %s: %s", register, e)
+                    _log.error("Error while reading trigger %s for item %s: %s", register, item_code, e)
 
     def startup(self):
         if self.connection and self.mode_init:
@@ -604,7 +663,26 @@ class core:
                         "Auto-restoring from last saved state: %s, %s (saved at %s)",
                         result[0][0], result[0][1], result[0][2]
                     )
-                    self.worker_thread.trigger_detected.emit(result[0][0], result[0][1])
+                    restored_item = result[0][0]
+                    restored_line = result[0][1]
+                    self.item_code = restored_item
+                    self.line_code = restored_line
+
+                    # Đồng bộ latch để tránh reload lặp lại nếu PLC vẫn giữ nguyên thanh ghi của mã hàng này
+                    if hasattr(self, '_last_item_code_plc_val') and isinstance(self._last_item_code_plc_val, dict):
+                        for n_line, entries in self.dict_list_line.items():
+                            if n_line == restored_line:
+                                for entry in entries:
+                                    if entry.get('item_code') == restored_item:
+                                        reg = entry.get('register')
+                                        val_on = entry.get('value_bit_on')
+                                        if reg and val_on is not None:
+                                            try:
+                                                self._last_item_code_plc_val[(n_line, restored_item, str(reg).strip())] = int(val_on)
+                                            except (ValueError, TypeError):
+                                                pass
+
+                    self.worker_thread.trigger_detected.emit(restored_item, restored_line)
                 else:
                     _log.warning('No data save default')
 

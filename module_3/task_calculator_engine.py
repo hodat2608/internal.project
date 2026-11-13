@@ -354,6 +354,7 @@ def evaluate_task_calculator(
     all_tasks_pass = True
     task_results = []
     plc_registers_to_send = []
+    _ng_task_registers: set[str] = set()
 
     if not tasks_config:
         return image_bgr, True, [], []
@@ -670,11 +671,19 @@ def evaluate_task_calculator(
             all_tasks_pass = False
             if assign_reg:
                 plc_val = val_ng if ('value_ng' in task or 'Value_NG' in task or 'value_bit_off' in task) else val_on
+                # BẢO VỆ NG: Xóa bỏ mọi giá trị OK đã thêm trước đó cho thanh ghi này nếu có task trước đó OK dùng chung thanh ghi
+                plc_registers_to_send = [(r, v) for r, v in plc_registers_to_send if str(r).strip() != assign_reg]
                 plc_registers_to_send.append((assign_reg, plc_val))
+                _ng_task_registers.add(assign_reg)
                 _log.warning("Task '%s' (ID: %s) [NG] -> Trigger PLC Register %s = %s", task_name, task_id, assign_reg, plc_val)
         else:
             if assign_reg and ('value_ok' in task or 'Value_OK' in task or 'value_bit_on' in task):
-                plc_registers_to_send.append((assign_reg, val_ok))
+                # BẢO VỆ NG: Chỉ thêm giá trị OK nếu thanh ghi này chưa từng bị NG bởi bất kỳ task nào trước đó
+                if assign_reg not in _ng_task_registers:
+                    if not any(str(r).strip() == assign_reg for r, _ in plc_registers_to_send):
+                        plc_registers_to_send.append((assign_reg, val_ok))
+                else:
+                    _log.warning("Task '%s' (ID: %s) [OK] nhưng thanh ghi %s đã ghi nhận NG từ task khác -> Bảo vệ NG!", task_name, task_id, assign_reg)
 
         task_results.append({
             'task_id': task_id,

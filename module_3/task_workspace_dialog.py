@@ -25,7 +25,7 @@ from module_3.task_calculator_db import (
     save_task_and_rules
 )
 from module_3.task_rule_editor_dialog import TaskRuleEditorDialog
-
+from module_2.StyleSheet import *
 _log = get_logger('module_3.task_workspace_dialog')
 
 
@@ -52,106 +52,7 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
 
         self.setWindowTitle(f"Quản Lý Workspace Task - {self.camera_name} [Mã Hàng: {self.item_code}]")
         self.resize(1000, 600)
-        self.setStyleSheet("""
-            QDialog {
-                background-color: #F0F9FF;
-                color: #0f172a;
-                font-family: 'Segoe UI', Arial, sans-serif;
-            }
-            QGroupBox {
-                background-color: #F0F9FF;
-                border: 1px solid #cbd5e1;
-                border-radius: 8px;
-                margin-top: 12px;
-                padding-top: 14px;
-                font-weight: bold;
-                color: #0f172a;
-            }
-            QGroupBox::title {
-                subcontrol-origin: margin;
-                left: 12px;
-                padding: 0 6px;
-                background-color: #ffffff;
-                color: #0f172a;
-            }
-            QLabel {
-                color: #334155;
-            }
-            QPushButton {
-                background-color: #ffffff;
-                border: 1px solid #cbd5e1;
-                border-radius: 6px;
-                padding: 7px 15px;
-                color: #334155;
-                font-weight: bold;
-                font-size: 13px;
-            }
-            QPushButton:hover {
-                background-color: #f8fafc;
-                border-color: #94a3b8;
-                color: #0f172a;
-            }
-            QPushButton#btnAddTask {
-                background-color: #2563eb;
-                color: #ffffff;
-                border: 1px solid #1d4ed8;
-            }
-            QPushButton#btnAddTask:hover {
-                background-color: #1d4ed8;
-            }
-            QPushButton#btnEditTask {
-                background-color: #d97706;
-                color: #ffffff;
-                border: 1px solid #b45309;
-            }
-            QPushButton#btnEditTask:hover {
-                background-color: #b45309;
-            }
-            QPushButton#btnDeleteTask {
-                background-color: #dc2626;
-                color: #ffffff;
-                border: 1px solid #b91c1c;
-            }
-            QPushButton#btnDeleteTask:hover {
-                background-color: #b91c1c;
-            }
-            QPushButton#btnCloneTask {
-                background-color: #7c3aed;
-                color: #ffffff;
-                border: 1px solid #6d28d9;
-            }
-            QPushButton#btnCloneTask:hover {
-                background-color: #6d28d9;
-            }
-            QTableWidget {
-                background-color: #ffffff;
-                alternate-background-color: #f8fafc;
-                border: 1px solid #cbd5e1;
-                gridline-color: #e2e8f0;
-                color: #0f172a;
-                border-radius: 8px;
-                font-size: 13px;
-                selection-background-color: #dbeafe;
-                selection-color: #1e40af;
-            }
-            QTableWidget::item:hover {
-                background-color: #f1f5f9;
-                color: #0f172a;
-            }
-            QTableWidget::item:selected {
-                background-color: #dbeafe;
-                color: #1e40af;
-                font-weight: bold;
-            }
-            QHeaderView::section {
-                background-color: #f8fafc;
-                color: #334155;
-                padding: 8px 6px;
-                border: 1px solid #e2e8f0;
-                font-weight: bold;
-                font-size: 13px;
-            }
-        """)
+        self.setStyleSheet(TaskWorkspaceDialog_style)
 
         self.init_ui()
         self.load_tasks()
@@ -208,21 +109,7 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
         toolbar_layout.addWidget(self.btn_refresh)
 
         self.btn_history = QtWidgets.QPushButton("🕒 Lịch Sử Cấu Hình")
-        self.btn_history.setStyleSheet("""
-            QPushButton {
-                background-color: #f1f5f9;
-                color: #0f172a;
-                border: 1px solid #cbd5e1;
-                border-radius: 6px;
-                font-weight: 600;
-                padding: 6px 14px;
-                font-size: 13px;
-            }
-            QPushButton:hover {
-                background-color: #e2e8f0;
-                border-color: #94a3b8;
-            }
-        """)
+        self.btn_history.setStyleSheet(btn_history_setStyleSheet)
         self.btn_history.clicked.connect(self.open_config_history)
         toolbar_layout.addWidget(self.btn_history)
 
@@ -325,36 +212,12 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
             btn_row_edit.clicked.connect(lambda _, tid=t['id']: self.edit_task_by_id(tid))
             action_layout.addWidget(btn_row_edit)
 
-            btn_row_edit.setStyleSheet("""
-                QPushButton {
-                    background-color: #eff6ff;
-                    color: #2563eb;
-                    border: 1px solid #bfdbfe;
-                    border-radius: 4px;
-                    font-size: 12px;
-                }
-                QPushButton:hover {
-                    background-color: #dbeafe;
-                    border-color: #3b82f6;
-                }
-            """)
+            btn_row_edit.setStyleSheet(btn_row_edit_setStyleSheet)
 
             btn_row_del = QtWidgets.QPushButton("🗑️")
             btn_row_del.setToolTip("Xóa Task")
             btn_row_del.setFixedSize(30, 26)
-            btn_row_del.setStyleSheet("""
-                QPushButton {
-                    background-color: #fef2f2;
-                    color: #dc2626;
-                    border: 1px solid #fecaca;
-                    border-radius: 4px;
-                    font-size: 12px;
-                }
-                QPushButton:hover {
-                    background-color: #fee2e2;
-                    border-color: #ef4444;
-                }
-            """)
+            btn_row_del.setStyleSheet(btn_row_del_setStyleSheet)
             btn_row_del.clicked.connect(lambda _, tid=t['id'], tname=t['task_name']: self.delete_task_by_id(tid, tname))
             action_layout.addWidget(btn_row_del)
 

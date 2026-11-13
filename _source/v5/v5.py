@@ -421,6 +421,7 @@ class v5s:
         flag          = True
         list_register = {}
         fail_labels   = set()
+        ng_registers  = set()
 
         # ── Per-label OK / NG quantity check (Tối ưu: Counter O(1) lookup) ────
         from collections import Counter
@@ -447,11 +448,14 @@ class v5s:
                 flag = False
                 fail_labels.add(f'* {label}')
                 if reg and any(c.isdigit() for c in reg):
+                    ng_registers.add(reg)
                     list_register[reg] = cfg.get('value_ng', 1)
             else:
                 # Nhãn đạt điều kiện OK
                 if reg and any(c.isdigit() for c in reg):
-                    list_register[reg] = cfg.get('value_ok', 1)
+                    # BẢO VỆ NG: Nếu thanh ghi này đã từng bị NG bởi nhãn khác trước đó (cùng chung thanh ghi) -> TUYỆT ĐỐI KHÔNG GHI ĐÈ BẰNG VALUE OK!
+                    if reg not in ng_registers:
+                        list_register[reg] = cfg.get('value_ok', 1)
 
         # ── Đổi màu đỏ cho các box thuộc nhãn bị NG ──────────────────────────
         for d in draw_candidates:
@@ -486,7 +490,8 @@ class v5s:
                 image, draw_candidates, pyuic, flag, list_register,
                 tasks_config=tasks_for_model,
                 key_model=key_model,
-                fail_labels=fail_labels
+                fail_labels=fail_labels,
+                ng_registers=ng_registers
             )
 
         # ── Chốt toàn bộ kết quả (nhãn + toán tử) rồi mới vẽ Bounding Boxes và HUD ──
@@ -519,6 +524,7 @@ class v5s:
         tasks_config: list = None,
         key_model: tuple = None,
         fail_labels: set = None,
+        ng_registers: set = None,
         *args,
         **kwargs
     ):
@@ -553,6 +559,9 @@ class v5s:
         if not tasks_config:
             return image_rgb, flag, list_register
 
+        if ng_registers is None:
+            ng_registers = set()
+
         try:
             from module_3.task_calculator_engine import evaluate_task_calculator as _eval_engine
             valid_boxes = []
@@ -578,14 +587,27 @@ class v5s:
 
             if not task_all_pass:
                 flag = False
-                for reg, val in plc_to_send:
-                    reg_str = str(reg or '').strip()
-                    if reg_str:
-                        list_register[reg_str] = val
-            else:
-                for reg, val in plc_to_send:
-                    reg_str = str(reg or '').strip()
-                    if reg_str and reg_str not in list_register:
+
+            # Xử lý các thanh ghi trả về từ Task Calculator: BẢO VỆ NG THẮNG OK TUYỆT ĐỐI
+            for reg, val in plc_to_send:
+                reg_str = str(reg or '').strip()
+                if not reg_str:
+                    continue
+
+                is_task_ng = False
+                if task_results:
+                    for t in task_results:
+                        if str(t.get('assign_register') or '').strip() == reg_str:
+                            if not t.get('pass'):
+                                is_task_ng = True
+                                break
+
+                if is_task_ng:
+                    ng_registers.add(reg_str)
+                    list_register[reg_str] = val
+                else:
+                    # Task OK: chỉ gán giá trị OK nếu thanh ghi này CHƯA TỪNG bị NG bởi bất kỳ label hay task nào!
+                    if reg_str not in ng_registers:
                         list_register[reg_str] = val
 
             # Trích xuất toàn bộ hạng mục Task vi phạm đưa vào fail_labels để hiển thị lên HUD
