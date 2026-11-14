@@ -35,7 +35,7 @@ class Ui_MainWindow(object):
         self.splitter.setObjectName("splitter")
         self.frame_2 = QtWidgets.QFrame(self.splitter)
         self.frame_2.setMinimumSize(QtCore.QSize(0, 0))
-        self.frame_2.setMaximumSize(QtCore.QSize(800, 16777215))
+        self.frame_2.setMaximumSize(QtCore.QSize(1000, 16777215))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         self.frame_2.setFont(font)
@@ -304,30 +304,6 @@ class Ui_MainWindow(object):
         self.pushButton_run_check.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_run_check.setObjectName("pushButton_run_check")
         self.horizontalLayout_2.addWidget(self.pushButton_run_check)
-        self.pushButton_save_result = QtWidgets.QPushButton(self.groupBox_run_check)
-        self.pushButton_save_result.setMinimumSize(QtCore.QSize(70, 35))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.pushButton_save_result.setFont(font)
-        self.pushButton_save_result.setStyleSheet("QPushButton {\n"
-"    background-color: transparent;\n"
-"    border: none;\n"
-"    border-radius: 6px;\n"
-"}\n"
-"QPushButton:hover {\n"
-"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
-"}\n"
-"QPushButton:pressed {\n"
-"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
-"}")
-        self.pushButton_save_result.setText("")
-        icon6 = QtGui.QIcon()
-        icon6.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/save_mirror.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_save_result.setIcon(icon6)
-        self.pushButton_save_result.setIconSize(QtCore.QSize(25, 25))
-        self.pushButton_save_result.setObjectName("pushButton_save_result")
-        self.horizontalLayout_2.addWidget(self.pushButton_save_result)
         self.pushButton_export_cfg = QtWidgets.QPushButton(self.groupBox_run_check)
         self.pushButton_export_cfg.setMinimumSize(QtCore.QSize(70, 35))
         font = QtGui.QFont()
@@ -346,9 +322,9 @@ class Ui_MainWindow(object):
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
         self.pushButton_export_cfg.setText("")
-        icon7 = QtGui.QIcon()
-        icon7.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/file-export.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_export_cfg.setIcon(icon7)
+        icon6 = QtGui.QIcon()
+        icon6.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/file-export.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_export_cfg.setIcon(icon6)
         self.pushButton_export_cfg.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_export_cfg.setObjectName("pushButton_export_cfg")
         self.horizontalLayout_2.addWidget(self.pushButton_export_cfg)
@@ -370,12 +346,68 @@ class Ui_MainWindow(object):
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
         self.pushButton_import_cfg.setText("")
-        icon8 = QtGui.QIcon()
-        icon8.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/file-importqq.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_import_cfg.setIcon(icon8)
+        icon7 = QtGui.QIcon()
+        icon7.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/file-importqq.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_import_cfg.setIcon(icon7)
         self.pushButton_import_cfg.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_import_cfg.setObjectName("pushButton_import_cfg")
         self.horizontalLayout_2.addWidget(self.pushButton_import_cfg)
+        self.checkBox_enable_send_data_plc = QtWidgets.QCheckBox(self.groupBox_run_check)
+        self.checkBox_enable_send_data_plc.setMaximumSize(QtCore.QSize(70, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.checkBox_enable_send_data_plc.setFont(font)
+        self.checkBox_enable_send_data_plc.setStyleSheet("QCheckBox {\n"
+"    color: #E2E8F0;\n"
+"    font-size: 13px;\n"
+"    spacing: 8px;\n"
+"    background: transparent;\n"
+"    border: none;\n"
+"}\n"
+"\n"
+"/* Ô vuông khi chưa tích chọn */\n"
+"QCheckBox::indicator {\n"
+"    width: 16px;\n"
+"    height: 16px;\n"
+"    border-radius: 4px;\n"
+"    border: 1.5px solid #64748B;\n"
+"    background-color: #1E293B;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào ô vuông */\n"
+"QCheckBox::indicator:hover {\n"
+"    border: 1.5px solid #38BDF8;\n"
+"    background-color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Ô vuông khi ĐÃ tích chọn */\n"
+"QCheckBox::indicator:checked {\n"
+"    border: 1.5px solid #3B82F6;\n"
+"    background-color: qradialgradient(\n"
+"        cx: 0.5, cy: 0.5, radius: 0.5,\n"
+"        fx: 0.5, fy: 0.5,\n"
+"        stop: 0 #FFFFFF,\n"
+"        stop: 0.45 #FFFFFF,\n"
+"        stop: 0.5 #3B82F6,\n"
+"        stop: 1 #3B82F6\n"
+"    );\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào ô đã tích */\n"
+"QCheckBox::indicator:checked:hover {\n"
+"    border: 1.5px solid #60A5FA;\n"
+"}\n"
+"")
+        self.checkBox_enable_send_data_plc.setText("")
+        icon8 = QtGui.QIcon()
+        icon8.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/send-data.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.checkBox_enable_send_data_plc.setIcon(icon8)
+        self.checkBox_enable_send_data_plc.setIconSize(QtCore.QSize(30, 30))
+        self.checkBox_enable_send_data_plc.setObjectName("checkBox_enable_send_data_plc")
+        self.horizontalLayout_2.addWidget(self.checkBox_enable_send_data_plc)
         self.hlayout_tools_row.addWidget(self.groupBox_run_check)
         self.groupBox_tools_draw = QtWidgets.QGroupBox(self.frame_2)
         font = QtGui.QFont()
@@ -571,7 +603,7 @@ class Ui_MainWindow(object):
         self.tableWidget_center_mirror.setAlternatingRowColors(True)
         self.tableWidget_center_mirror.setGridStyle(QtCore.Qt.DashDotLine)
         self.tableWidget_center_mirror.setObjectName("tableWidget_center_mirror")
-        self.tableWidget_center_mirror.setColumnCount(4)
+        self.tableWidget_center_mirror.setColumnCount(5)
         self.tableWidget_center_mirror.setRowCount(5)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
@@ -652,6 +684,15 @@ class Ui_MainWindow(object):
         self.tableWidget_center_mirror.setHorizontalHeaderItem(3, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
+        self.tableWidget_center_mirror.setHorizontalHeaderItem(4, item)
+        item = QtWidgets.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
         self.tableWidget_center_mirror.setItem(0, 0, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
@@ -711,7 +752,7 @@ class Ui_MainWindow(object):
         item.setTextAlignment(QtCore.Qt.AlignCenter)
         self.tableWidget_center_mirror.setItem(4, 3, item)
         self.tableWidget_center_mirror.horizontalHeader().setCascadingSectionResizes(True)
-        self.tableWidget_center_mirror.horizontalHeader().setDefaultSectionSize(160)
+        self.tableWidget_center_mirror.horizontalHeader().setDefaultSectionSize(165)
         self.tableWidget_center_mirror.horizontalHeader().setMinimumSectionSize(80)
         self.tableWidget_center_mirror.horizontalHeader().setSortIndicatorShown(True)
         self.tableWidget_center_mirror.horizontalHeader().setStretchLastSection(True)
@@ -786,7 +827,7 @@ class Ui_MainWindow(object):
         self.tableWidget_iris.setAlternatingRowColors(True)
         self.tableWidget_iris.setGridStyle(QtCore.Qt.DashDotLine)
         self.tableWidget_iris.setObjectName("tableWidget_iris")
-        self.tableWidget_iris.setColumnCount(4)
+        self.tableWidget_iris.setColumnCount(5)
         self.tableWidget_iris.setRowCount(4)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
@@ -857,6 +898,14 @@ class Ui_MainWindow(object):
         item.setFont(font)
         self.tableWidget_iris.setHorizontalHeaderItem(3, item)
         item = QtWidgets.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
+        self.tableWidget_iris.setHorizontalHeaderItem(4, item)
+        item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
         self.tableWidget_iris.setItem(0, 0, item)
         item = QtWidgets.QTableWidgetItem()
@@ -905,7 +954,7 @@ class Ui_MainWindow(object):
         item.setTextAlignment(QtCore.Qt.AlignCenter)
         self.tableWidget_iris.setItem(3, 3, item)
         self.tableWidget_iris.horizontalHeader().setCascadingSectionResizes(True)
-        self.tableWidget_iris.horizontalHeader().setDefaultSectionSize(160)
+        self.tableWidget_iris.horizontalHeader().setDefaultSectionSize(165)
         self.tableWidget_iris.horizontalHeader().setMinimumSectionSize(80)
         self.tableWidget_iris.horizontalHeader().setSortIndicatorShown(True)
         self.tableWidget_iris.horizontalHeader().setStretchLastSection(True)
@@ -980,7 +1029,7 @@ class Ui_MainWindow(object):
         self.tableWidget_focuss.setAlternatingRowColors(True)
         self.tableWidget_focuss.setGridStyle(QtCore.Qt.DashDotLine)
         self.tableWidget_focuss.setObjectName("tableWidget_focuss")
-        self.tableWidget_focuss.setColumnCount(4)
+        self.tableWidget_focuss.setColumnCount(5)
         self.tableWidget_focuss.setRowCount(4)
         item = QtWidgets.QTableWidgetItem()
         font = QtGui.QFont()
@@ -1047,6 +1096,14 @@ class Ui_MainWindow(object):
         item.setFont(font)
         self.tableWidget_focuss.setHorizontalHeaderItem(3, item)
         item = QtWidgets.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
+        self.tableWidget_focuss.setHorizontalHeaderItem(4, item)
+        item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
         self.tableWidget_focuss.setItem(0, 0, item)
         item = QtWidgets.QTableWidgetItem()
@@ -1095,7 +1152,7 @@ class Ui_MainWindow(object):
         item.setTextAlignment(QtCore.Qt.AlignCenter)
         self.tableWidget_focuss.setItem(3, 3, item)
         self.tableWidget_focuss.horizontalHeader().setCascadingSectionResizes(True)
-        self.tableWidget_focuss.horizontalHeader().setDefaultSectionSize(160)
+        self.tableWidget_focuss.horizontalHeader().setDefaultSectionSize(165)
         self.tableWidget_focuss.horizontalHeader().setMinimumSectionSize(80)
         self.tableWidget_focuss.horizontalHeader().setSortIndicatorShown(True)
         self.tableWidget_focuss.horizontalHeader().setStretchLastSection(True)
@@ -1157,7 +1214,9 @@ class Ui_MainWindow(object):
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
         self.pushButton_appl_setting.setText("")
-        self.pushButton_appl_setting.setIcon(icon6)
+        icon14 = QtGui.QIcon()
+        icon14.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/save_mirror.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_appl_setting.setIcon(icon14)
         self.pushButton_appl_setting.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_appl_setting.setObjectName("pushButton_appl_setting")
         self.hlayout_settings_btns.addWidget(self.pushButton_appl_setting)
@@ -1255,9 +1314,9 @@ class Ui_MainWindow(object):
         self.lineEdit_input_img_file.setPlaceholderText(_translate("MainWindow", " /*.jpg, png, bmp, jpeg,..."))
         self.groupBox_run_check.setTitle(_translate("MainWindow", "Run Check Mirror"))
         self.pushButton_run_check.setToolTip(_translate("MainWindow", "Run Check Mirror"))
-        self.pushButton_save_result.setToolTip(_translate("MainWindow", "Save config"))
         self.pushButton_export_cfg.setToolTip(_translate("MainWindow", "Export config"))
         self.pushButton_import_cfg.setToolTip(_translate("MainWindow", "Import config"))
+        self.checkBox_enable_send_data_plc.setToolTip(_translate("MainWindow", "Enable send result data to PLC by resgister."))
         self.groupBox_tools_draw.setTitle(_translate("MainWindow", "Tools Draw Line"))
         self.pushButton_show_crossline.setToolTip(_translate("MainWindow", "Show Cross Line"))
         self.pushButton_reset_cross.setToolTip(_translate("MainWindow", "Reset Cross Line"))
@@ -1283,6 +1342,8 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "Max"))
         item = self.tableWidget_center_mirror.horizontalHeaderItem(3)
         item.setText(_translate("MainWindow", "Status"))
+        item = self.tableWidget_center_mirror.horizontalHeaderItem(4)
+        item.setText(_translate("MainWindow", "Register"))
         __sortingEnabled = self.tableWidget_center_mirror.isSortingEnabled()
         self.tableWidget_center_mirror.setSortingEnabled(False)
         item = self.tableWidget_center_mirror.item(0, 0)
@@ -1329,13 +1390,13 @@ class Ui_MainWindow(object):
         self.groupBox_4.setTitle(_translate("MainWindow", "Iris Parameters"))
         self.tableWidget_iris.setSortingEnabled(True)
         item = self.tableWidget_iris.verticalHeaderItem(0)
-        item.setText(_translate("MainWindow", "Iris 1"))
+        item.setText(_translate("MainWindow", "      Iris 1      "))
         item = self.tableWidget_iris.verticalHeaderItem(1)
-        item.setText(_translate("MainWindow", "Iris 2"))
+        item.setText(_translate("MainWindow", "      Iris 2      "))
         item = self.tableWidget_iris.verticalHeaderItem(2)
-        item.setText(_translate("MainWindow", "Iris 3"))
+        item.setText(_translate("MainWindow", "      Iris 3      "))
         item = self.tableWidget_iris.verticalHeaderItem(3)
-        item.setText(_translate("MainWindow", "Iris 4"))
+        item.setText(_translate("MainWindow", "      Iris 4      "))
         item = self.tableWidget_iris.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Result Values"))
         item = self.tableWidget_iris.horizontalHeaderItem(1)
@@ -1344,6 +1405,8 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "Max"))
         item = self.tableWidget_iris.horizontalHeaderItem(3)
         item.setText(_translate("MainWindow", "Status"))
+        item = self.tableWidget_iris.horizontalHeaderItem(4)
+        item.setText(_translate("MainWindow", "Register"))
         __sortingEnabled = self.tableWidget_iris.isSortingEnabled()
         self.tableWidget_iris.setSortingEnabled(False)
         item = self.tableWidget_iris.item(0, 0)
@@ -1382,13 +1445,13 @@ class Ui_MainWindow(object):
         self.groupBox_5.setTitle(_translate("MainWindow", "Focus Parameters"))
         self.tableWidget_focuss.setSortingEnabled(True)
         item = self.tableWidget_focuss.verticalHeaderItem(0)
-        item.setText(_translate("MainWindow", "Focus 1"))
+        item.setText(_translate("MainWindow", "      Focus 1  "))
         item = self.tableWidget_focuss.verticalHeaderItem(1)
-        item.setText(_translate("MainWindow", "Focus 2"))
+        item.setText(_translate("MainWindow", "      Focus 2  "))
         item = self.tableWidget_focuss.verticalHeaderItem(2)
-        item.setText(_translate("MainWindow", "Focus 3"))
+        item.setText(_translate("MainWindow", "      Focus 3  "))
         item = self.tableWidget_focuss.verticalHeaderItem(3)
-        item.setText(_translate("MainWindow", "Focus 4"))
+        item.setText(_translate("MainWindow", "      Focus 4  "))
         item = self.tableWidget_focuss.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Result Values"))
         item = self.tableWidget_focuss.horizontalHeaderItem(1)
@@ -1397,6 +1460,8 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "Max"))
         item = self.tableWidget_focuss.horizontalHeaderItem(3)
         item.setText(_translate("MainWindow", "Status"))
+        item = self.tableWidget_focuss.horizontalHeaderItem(4)
+        item.setText(_translate("MainWindow", "Register"))
         __sortingEnabled = self.tableWidget_focuss.isSortingEnabled()
         self.tableWidget_focuss.setSortingEnabled(False)
         item = self.tableWidget_focuss.item(0, 0)

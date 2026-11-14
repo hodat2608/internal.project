@@ -116,5 +116,37 @@
 # if signals_selected  in signals:
 #     print('ccccccc')
 
-key = 'built-in-camera-3'
-print(key[3])
+# key = 'built-in-camera-3'
+# print(key[3])
+
+
+
+#Write data
+
+import struct
+def convert(value : float) -> int: 
+    return struct.unpack("!I", struct.pack("!f", value))[0]
+
+def write_plc_keyence_float(register, data, format1: str = ""):
+    with locked:
+        a = 'WR '
+        b = ' '
+        c = '\x0D'
+        d = a+ register + format1 + b + str(data) + c
+        datasend  = d.encode("UTF-8")
+        soc.sendall(datasend)
+        datares = soc.recv(1024)
+        # print(datares)
+brightness_roi1 = 245.68
+write_plc_keyence_float('ZF5000',convert(int(round(brightness_roi1,3))),".D")
+
+def write_plc_keyence(register, data):
+    with locked:
+        a = 'WR '
+        b = ' '
+        c = '\x0D'
+        d = a+ register + b + str(data) + c
+        datasend  = d.encode("UTF-8")
+        soc.sendall(datasend)
+        datares = soc.recv(1024)
+        # print(datares)

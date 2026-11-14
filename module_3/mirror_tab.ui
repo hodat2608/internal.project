@@ -61,7 +61,7 @@
        </property>
        <property name="maximumSize">
         <size>
-         <width>800</width>
+         <width>1000</width>
          <height>16777215</height>
         </size>
        </property>
@@ -551,51 +551,6 @@ QPushButton:pressed {
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton_save_result">
-               <property name="minimumSize">
-                <size>
-                 <width>70</width>
-                 <height>35</height>
-                </size>
-               </property>
-               <property name="font">
-                <font>
-                 <family>Segoe UI</family>
-                 <pointsize>10</pointsize>
-                </font>
-               </property>
-               <property name="toolTip">
-                <string>Save config</string>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">QPushButton {
-    background-color: transparent;
-    border: none;
-    border-radius: 6px;
-}
-QPushButton:hover {
-    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
-}
-QPushButton:pressed {
-    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
-}</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset>
-                 <normaloff>assert/icon/save_mirror.png</normaloff>assert/icon/save_mirror.png</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>25</width>
-                 <height>25</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
               <widget class="QPushButton" name="pushButton_export_cfg">
                <property name="minimumSize">
                 <size>
@@ -681,6 +636,83 @@ QPushButton:pressed {
                 <size>
                  <width>25</width>
                  <height>25</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="checkBox_enable_send_data_plc">
+               <property name="maximumSize">
+                <size>
+                 <width>70</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Segoe UI</family>
+                 <pointsize>-1</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="toolTip">
+                <string>Enable send result data to PLC by resgister.</string>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">QCheckBox {
+    color: #E2E8F0;
+    font-size: 13px;
+    spacing: 8px;
+    background: transparent;
+    border: none;
+}
+
+/* Ô vuông khi chưa tích chọn */
+QCheckBox::indicator {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 1.5px solid #64748B;
+    background-color: #1E293B;
+}
+
+/* Hiệu ứng khi di chuột vào ô vuông */
+QCheckBox::indicator:hover {
+    border: 1.5px solid #38BDF8;
+    background-color: #0F172A;
+}
+
+/* Ô vuông khi ĐÃ tích chọn */
+QCheckBox::indicator:checked {
+    border: 1.5px solid #3B82F6;
+    background-color: qradialgradient(
+        cx: 0.5, cy: 0.5, radius: 0.5,
+        fx: 0.5, fy: 0.5,
+        stop: 0 #FFFFFF,
+        stop: 0.45 #FFFFFF,
+        stop: 0.5 #3B82F6,
+        stop: 1 #3B82F6
+    );
+}
+
+/* Hiệu ứng khi di chuột vào ô đã tích */
+QCheckBox::indicator:checked:hover {
+    border: 1.5px solid #60A5FA;
+}
+</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset>
+                 <normaloff>assert/icon/send-data.png</normaloff>assert/icon/send-data.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>30</width>
+                 <height>30</height>
                 </size>
                </property>
               </widget>
@@ -1028,7 +1060,7 @@ QTableWidget QLineEdit {
               <number>80</number>
              </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
-              <number>160</number>
+              <number>165</number>
              </attribute>
              <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
               <bool>true</bool>
@@ -1181,6 +1213,22 @@ QTableWidget QLineEdit {
                 <weight>75</weight>
                 <bold>true</bold>
                </font>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Register</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
               </property>
              </column>
              <item row="0" column="0">
@@ -1447,7 +1495,7 @@ QTableWidget QLineEdit {
               <number>80</number>
              </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
-              <number>160</number>
+              <number>165</number>
              </attribute>
              <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
               <bool>true</bool>
@@ -1472,7 +1520,7 @@ QTableWidget QLineEdit {
              </attribute>
              <row>
               <property name="text">
-               <string>Iris 1</string>
+               <string>      Iris 1      </string>
               </property>
               <property name="font">
                <font>
@@ -1488,7 +1536,7 @@ QTableWidget QLineEdit {
              </row>
              <row>
               <property name="text">
-               <string>Iris 2</string>
+               <string>      Iris 2      </string>
               </property>
               <property name="font">
                <font>
@@ -1504,7 +1552,7 @@ QTableWidget QLineEdit {
              </row>
              <row>
               <property name="text">
-               <string>Iris 3</string>
+               <string>      Iris 3      </string>
               </property>
               <property name="font">
                <font>
@@ -1520,7 +1568,7 @@ QTableWidget QLineEdit {
              </row>
              <row>
               <property name="text">
-               <string>Iris 4</string>
+               <string>      Iris 4      </string>
               </property>
               <property name="font">
                <font>
@@ -1576,6 +1624,19 @@ QTableWidget QLineEdit {
              <column>
               <property name="text">
                <string>Status</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Register</string>
               </property>
               <property name="font">
                <font>
@@ -1818,7 +1879,7 @@ QTableWidget QLineEdit {
               <number>80</number>
              </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
-              <number>160</number>
+              <number>165</number>
              </attribute>
              <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
               <bool>true</bool>
@@ -1843,7 +1904,7 @@ QTableWidget QLineEdit {
              </attribute>
              <row>
               <property name="text">
-               <string>Focus 1</string>
+               <string>      Focus 1  </string>
               </property>
               <property name="font">
                <font>
@@ -1856,7 +1917,7 @@ QTableWidget QLineEdit {
              </row>
              <row>
               <property name="text">
-               <string>Focus 2</string>
+               <string>      Focus 2  </string>
               </property>
               <property name="font">
                <font>
@@ -1869,7 +1930,7 @@ QTableWidget QLineEdit {
              </row>
              <row>
               <property name="text">
-               <string>Focus 3</string>
+               <string>      Focus 3  </string>
               </property>
               <property name="font">
                <font>
@@ -1882,7 +1943,7 @@ QTableWidget QLineEdit {
              </row>
              <row>
               <property name="text">
-               <string>Focus 4</string>
+               <string>      Focus 4  </string>
               </property>
               <property name="font">
                <font>
@@ -1935,6 +1996,19 @@ QTableWidget QLineEdit {
              <column>
               <property name="text">
                <string>Status</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Register</string>
               </property>
               <property name="font">
                <font>
