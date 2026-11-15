@@ -94,8 +94,8 @@ QScrollBar::handle:vertical:hover {
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>-15</y>
-         <width>1668</width>
+         <y>0</y>
+         <width>1661</width>
          <height>1280</height>
         </rect>
        </property>
@@ -2939,33 +2939,110 @@ QGroupBox::title {
                <widget class="QTableView" name="tableView">
                 <property name="font">
                  <font>
-                  <pointsize>10</pointsize>
+                  <pointsize>-1</pointsize>
                  </font>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">/* Khung chính của bảng TableView */
-QTableView {
-    background-color: #F5F5F5; /* Màu xanh lá nhạt dịu mắt (Mint Light) */
-    border: 1px solid #c6c6c6;  /* Viền xám mảnh đồng bộ */
-    border-radius: 4px;         /* Bo tròn góc 4px */
-    gridline-color: #d0ebd5;    /* Màu của các đường lưới ngăn cách ô (xanh lá rất nhạt) */
+                 <string notr="true">/* Khung tổng thể của bảng */
+QTableView, QTableWidget {
+    background-color: #F8FAFC;
+    alternate-background-color: #F1F5F9;
+    color: #334155;
+    gridline-color: #E2E8F0;
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    font-size: 13px;
+    selection-background-color: #E2E8F0;
+    selection-color: #1E293B;
+    outline: 0;
 }
 
-/* Màu nền của từng ô dữ liệu bên trong bảng */
-QTableView::item {
-    background-color: #ebf7ee; /* Đồng bộ màu xanh lá nhạt cho các ô */
-    color: #2c3e50;            /* Màu chữ tối để dễ đọc */
+/* Từng ô dữ liệu bên trong bảng */
+QTableView::item, QTableWidget::item {
+    padding: 4px 10px;
+    border-bottom: 1px solid #E2E8F0;
 }
 
-/* Hiệu ứng khi di chuột qua một dòng/ô */
-QTableView::item:hover {
-    background-color: #d4edd9; /* Xanh lá đậm hơn một chút khi di chuột */
+/* Hiệu ứng khi di chuột qua từng ô */
+QTableView::item:hover, QTableWidget::item:hover {
+    background-color: #EEF2F6;
 }
 
-/* Hiệu ứng khi NGƯỜI DÙNG CLICK CHỌN một dòng/ô */
-QTableView::item:selected {
-    background-color: #27ae60; /* Đổi thành màu xanh lá đậm khi được chọn */
-    color: white;              /* Chữ chuyển sang trắng để nổi bật */
+/* Ô đang được chọn */
+QTableView::item:selected, QTableWidget::item:selected {
+    background-color: #E0E7FF;
+    color: #3730A3;
+    font-weight: bold;
+}
+
+/* Thanh tiêu đề cột (Header ngang) */
+QHeaderView::section {
+    background-color: #E2E8F0;
+    color: #475569;
+    font-weight: bold;
+    font-size: 12px;
+    text-transform: uppercase;
+    padding: 10px 12px;
+    border: none;
+    border-bottom: 1.5px solid #CBD5E1;
+    border-right: 1px solid #CBD5E1;
+}
+
+/* Hiệu ứng khi di chuột vào tiêu đề cột */
+QHeaderView::section:hover {
+    background-color: #CBD5E1;
+    color: #1E293B;
+}
+
+/* Góc trên bên trái giao giữa 2 thanh tiêu đề */
+QTableCornerButton::section {
+    background-color: #E2E8F0;
+    border: none;
+    border-bottom: 1.5px solid #CBD5E1;
+}
+
+/* Thanh cuộn dọc (Vertical Scrollbar) */
+QScrollBar:vertical {
+    background: #F1F5F9;
+    width: 8px;
+    margin: 0px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:vertical {
+    background: #CBD5E1;
+    min-height: 25px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #94A3B8;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+
+/* Thanh cuộn ngang (Horizontal Scrollbar) */
+QScrollBar:horizontal {
+    background: #F1F5F9;
+    height: 8px;
+    margin: 0px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:horizontal {
+    background: #CBD5E1;
+    min-width: 25px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background: #94A3B8;
+}
+
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    width: 0px;
 }
 </string>
                 </property>

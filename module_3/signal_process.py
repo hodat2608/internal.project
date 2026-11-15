@@ -242,7 +242,7 @@ class DataProcessSignal:
         self.dict_mode_params = {}
         self.check_connect_plc = False
         self.is_connected_plc = None
-        self._setup_shotxmodel_table_style()
+        # self._setup_shotxmodel_table_style()
         self.uic.tableWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.uic.tableWidget.customContextMenuRequested.connect(self.setup_context_menu)
 
@@ -264,10 +264,12 @@ class DataProcessSignal:
                 font.setPointSize(10)
                 font.setBold(True)
                 self.uic.pushButton_config_history.setFont(font)
-                self.uic.pushButton_config_history.setStyleSheet(pushButton_config_history_DataProcessSignal)
-                self.uic.pushButton_config_history.setText("  🕒 Lịch Sử Cấu Hình")
+                self.uic.pushButton_config_history.setStyleSheet(pushButton_config_history_style)
                 self.uic.pushButton_config_history.setToolTip("🕒 Xem Lịch Sử Cấu Hình, So Sánh Diff & Rollback PLC/Mode")
-
+                icon_h = QtGui.QIcon()
+                icon_h.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/history.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+                self.uic.pushButton_config_history.setIcon(icon_h)
+                self.uic.pushButton_config_history.setIconSize(QtCore.QSize(40, 40))
                 admin_row_layout = QtWidgets.QHBoxLayout()
                 admin_row_layout.setContentsMargins(0, 0, 0, 0)
                 admin_row_layout.setSpacing(10)
@@ -1510,7 +1512,7 @@ class DataProcessSignal:
             self.is_unlocked = False
             self.current_role = None
             self.current_user = None
-            self.uic.pushButton_admin.setText("ADMIN")
+            self.uic.pushButton_admin.setText("")
         else:
             self.lock_gui(cursor, connect_db, method=True, boolen=True)
 
@@ -1552,7 +1554,7 @@ class DataProcessSignal:
                 self.is_unlocked = False
                 self.current_role = None
                 self.current_user = None
-                self.uic.pushButton_admin.setText("ADMIN")
+                self.uic.pushButton_admin.setText("")
                 if hasattr(self, 'tab_manager') and self.tab_manager:
                     self.tab_manager.set_all_tabs_enabled(False, role='read_only')
                 return True
@@ -1578,7 +1580,7 @@ class DataProcessSignal:
                     self.is_unlocked = True
                     self.current_user = username
                     self.current_role = "full_control"
-                    self.uic.pushButton_admin.setText("LOCK")
+                    self.uic.pushButton_admin.setText("")
                     if hasattr(self, 'tab_manager') and self.tab_manager:
                         self.tab_manager.set_all_tabs_enabled(True, role='full_control', username=username)
 
@@ -1595,7 +1597,7 @@ class DataProcessSignal:
                     self.is_unlocked = False
                     self.current_user = username
                     self.current_role = role
-                    self.uic.pushButton_admin.setText("ADMIN")
+                    self.uic.pushButton_admin.setText("")
                     if hasattr(self, 'tab_manager') and self.tab_manager:
                         self.tab_manager.set_all_tabs_enabled(False, role='read_only')
                     QtWidgets.QMessageBox.warning(

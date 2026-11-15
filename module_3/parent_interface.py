@@ -9,7 +9,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from module_1.root_path import resource_path
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -20,7 +20,7 @@ class Ui_MainWindow(object):
         font.setPointSize(9)
         MainWindow.setFont(font)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/technology.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("assert/icon/technology.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         MainWindow.setStyleSheet("QMainWindow { background-color: #F1F5F9; }")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -36,7 +36,7 @@ class Ui_MainWindow(object):
         self.frame.setMinimumSize(QtCore.QSize(0, 0))
         self.frame.setMaximumSize(QtCore.QSize(16777215, 80))
         self.frame.setStyleSheet("QFrame { \n"
-"    background-color: #F0F9FF; \n"
+"    background-color: #CBCBCB; \n"
 "    border: none; \n"
 "    border-radius: 6px; \n"
 "}\n"
@@ -58,7 +58,7 @@ class Ui_MainWindow(object):
 "    color: #ffffff; /* Chữ màu đen xám hiện đại, tương phản cao trên nền trắng */\n"
 "    \n"
 "    background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #0B1E36, stop:1 #0F3B63); /* Nền màu trắng */\n"
-"    border: 1px solid #e0e0e0; /* Viền xám rất nhạt để định hình khối */\n"
+"    border: 5px solid #FFFFFF; /* Viền xám rất nhạt để định hình khối */\n"
 "    border-radius: 15px; /* Bo tròn góc mạnh hơn, tạo cảm giác mềm mại */\n"
 "    \n"
 "    padding: 12px 25px;\n"
@@ -73,7 +73,7 @@ class Ui_MainWindow(object):
         self.frame_3.setMinimumSize(QtCore.QSize(0, 0))
         self.frame_3.setMaximumSize(QtCore.QSize(16777215, 80))
         self.frame_3.setStyleSheet("QFrame { \n"
-"    background-color: #F0F9FF; \n"
+"    background-color: #CBCBCB; \n"
 "    border: none; \n"
 "    border-radius: 6px; \n"
 "}\n"
@@ -95,7 +95,7 @@ class Ui_MainWindow(object):
 "    color: #ffffff; /* Chữ màu đen xám hiện đại, tương phản cao trên nền trắng */\n"
 "    \n"
 "    background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #0B1E36, stop:1 #0F3B63); /* Nền màu trắng */\n"
-"    border: 1px solid #e0e0e0; /* Viền xám rất nhạt để định hình khối */\n"
+"    border: 5px solid #FFFFFF; /* Viền xám rất nhạt để định hình khối */\n"
 "    border-radius: 15px; /* Bo tròn góc mạnh hơn, tạo cảm giác mềm mại */\n"
 "    \n"
 "    padding: 12px 25px;\n"
@@ -111,40 +111,301 @@ class Ui_MainWindow(object):
         self.hlayout_mode.setSpacing(10)
         self.hlayout_mode.setObjectName("hlayout_mode")
         self.comboBox_display_mode = QtWidgets.QComboBox(self.centralwidget)
-        self.comboBox_display_mode.setMinimumSize(QtCore.QSize(170, 30))
-        self.comboBox_display_mode.setMaximumSize(QtCore.QSize(150, 16777215))
+        self.comboBox_display_mode.setMinimumSize(QtCore.QSize(170, 36))
+        self.comboBox_display_mode.setMaximumSize(QtCore.QSize(200, 16777215))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.comboBox_display_mode.setFont(font)
+        self.comboBox_display_mode.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
         self.comboBox_display_mode.setObjectName("comboBox_display_mode")
         self.comboBox_display_mode.addItem("")
         self.comboBox_display_mode.addItem("")
         self.hlayout_mode.addWidget(self.comboBox_display_mode)
         self.comboBox_layout_mode_by = QtWidgets.QComboBox(self.centralwidget)
-        self.comboBox_layout_mode_by.setMinimumSize(QtCore.QSize(170, 30))
-        self.comboBox_layout_mode_by.setMaximumSize(QtCore.QSize(150, 16777215))
+        self.comboBox_layout_mode_by.setMinimumSize(QtCore.QSize(170, 36))
+        self.comboBox_layout_mode_by.setMaximumSize(QtCore.QSize(200, 16777215))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.comboBox_layout_mode_by.setFont(font)
+        self.comboBox_layout_mode_by.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
         self.comboBox_layout_mode_by.setObjectName("comboBox_layout_mode_by")
         self.comboBox_layout_mode_by.addItem("")
         self.comboBox_layout_mode_by.addItem("")
         self.hlayout_mode.addWidget(self.comboBox_layout_mode_by)
         self.comboBox_show_ui = QtWidgets.QComboBox(self.centralwidget)
-        self.comboBox_show_ui.setMinimumSize(QtCore.QSize(170, 30))
-        self.comboBox_show_ui.setMaximumSize(QtCore.QSize(150, 16777215))
+        self.comboBox_show_ui.setMinimumSize(QtCore.QSize(170, 36))
+        self.comboBox_show_ui.setMaximumSize(QtCore.QSize(200, 16777215))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.comboBox_show_ui.setFont(font)
+        self.comboBox_show_ui.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
         self.comboBox_show_ui.setObjectName("comboBox_show_ui")
         self.comboBox_show_ui.addItem("")
         self.comboBox_show_ui.addItem("")
@@ -176,7 +437,7 @@ class Ui_MainWindow(object):
         self.scrollArea_display.setWidgetResizable(True)
         self.scrollArea_display.setObjectName("scrollArea_display")
         self.scrollAreaWidgetContents_display = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_display.setGeometry(QtCore.QRect(0, 0, 1894, 879))
+        self.scrollAreaWidgetContents_display.setGeometry(QtCore.QRect(0, 0, 1894, 873))
         self.scrollAreaWidgetContents_display.setStyleSheet("QWidget { background-color: #1a1a1a; }")
         self.scrollAreaWidgetContents_display.setObjectName("scrollAreaWidgetContents_display")
         self.vlayout_display = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents_display)

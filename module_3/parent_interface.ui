@@ -64,7 +64,7 @@
         </property>
         <property name="styleSheet">
          <string notr="true">QFrame { 
-    background-color: #F0F9FF; 
+    background-color: #CBCBCB; 
     border: none; 
     border-radius: 6px; 
 }
@@ -104,7 +104,7 @@
     color: #ffffff; /* Chữ màu đen xám hiện đại, tương phản cao trên nền trắng */
     
     background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #0B1E36, stop:1 #0F3B63); /* Nền màu trắng */
-    border: 1px solid #e0e0e0; /* Viền xám rất nhạt để định hình khối */
+    border: 5px solid #FFFFFF; /* Viền xám rất nhạt để định hình khối */
     border-radius: 15px; /* Bo tròn góc mạnh hơn, tạo cảm giác mềm mại */
     
     padding: 12px 25px;
@@ -139,7 +139,7 @@
         </property>
         <property name="styleSheet">
          <string notr="true">QFrame { 
-    background-color: #F0F9FF; 
+    background-color: #CBCBCB; 
     border: none; 
     border-radius: 6px; 
 }
@@ -179,7 +179,7 @@
     color: #ffffff; /* Chữ màu đen xám hiện đại, tương phản cao trên nền trắng */
     
     background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #0B1E36, stop:1 #0F3B63); /* Nền màu trắng */
-    border: 1px solid #e0e0e0; /* Viền xám rất nhạt để định hình khối */
+    border: 5px solid #FFFFFF; /* Viền xám rất nhạt để định hình khối */
     border-radius: 15px; /* Bo tròn góc mạnh hơn, tạo cảm giác mềm mại */
     
     padding: 12px 25px;
@@ -210,22 +210,111 @@
         <property name="minimumSize">
          <size>
           <width>170</width>
-          <height>30</height>
+          <height>36</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>150</width>
+          <width>200</width>
           <height>16777215</height>
          </size>
         </property>
         <property name="font">
          <font>
           <family>Segoe UI</family>
-          <pointsize>10</pointsize>
+          <pointsize>-1</pointsize>
           <weight>75</weight>
           <bold>true</bold>
          </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">
+
+/* Khung chính của ComboBox */
+QComboBox {
+    background-color: #F8FAFC;
+    color: #334155;
+    border: 1px solid #CBD5E1;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 13px;
+    min-height: 22px;
+
+}
+
+/* Hiệu ứng khi di chuột vào */
+QComboBox:hover {
+    background-color: #EEFAFF;
+    border: 1px solid #7DD3FC;
+    color: #0F172A;
+}
+
+/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */
+QComboBox:on, QComboBox:focus {
+    background-color: #FFFFFF;
+    border: 1.5px solid #0284C7;
+    color: #0F172A;
+}
+
+/* Khu vực nút bấm bên phải chứa mũi tên */
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 28px;
+    border-left: 1px solid #E2E8F0;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    background-color: transparent;
+}
+
+QComboBox::drop-down:hover {
+    background-color: #D7F2FF;
+}
+
+/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */
+QComboBox::down-arrow {
+    width: 0px;
+    height: 0px;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #475569;
+    margin-top: 2px;
+}
+
+QComboBox::down-arrow:hover {
+    border-top: 5px solid #0369A1;
+}
+
+/* Bảng danh sách thả xuống (Popup List) */
+QComboBox QAbstractItemView {
+    background-color: #FFFFFF;
+    color: #334155;
+    border: 1px solid #CBD5E1;
+    border-radius: 6px;
+    padding: 4px;
+    outline: 0;
+    selection-background-color: #D7F2FF;
+    selection-color: #0369A1;
+}
+
+/* Từng dòng lựa chọn bên trong danh sách thả xuống */
+QComboBox QAbstractItemView::item {
+    min-height: 28px;
+    padding: 4px 10px;
+    border-radius: 4px;
+}
+
+QComboBox QAbstractItemView::item:hover {
+    background-color: #EEFAFF;
+    color: #0369A1;
+}
+
+QComboBox QAbstractItemView::item:selected {
+    background-color: #D7F2FF;
+    color: #0369A1;
+    font-weight: bold;
+}
+</string>
         </property>
         <item>
          <property name="text">
@@ -244,22 +333,111 @@
         <property name="minimumSize">
          <size>
           <width>170</width>
-          <height>30</height>
+          <height>36</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>150</width>
+          <width>200</width>
           <height>16777215</height>
          </size>
         </property>
         <property name="font">
          <font>
           <family>Segoe UI</family>
-          <pointsize>10</pointsize>
+          <pointsize>-1</pointsize>
           <weight>75</weight>
           <bold>true</bold>
          </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">
+
+/* Khung chính của ComboBox */
+QComboBox {
+    background-color: #F8FAFC;
+    color: #334155;
+    border: 1px solid #CBD5E1;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 13px;
+    min-height: 22px;
+
+}
+
+/* Hiệu ứng khi di chuột vào */
+QComboBox:hover {
+    background-color: #EEFAFF;
+    border: 1px solid #7DD3FC;
+    color: #0F172A;
+}
+
+/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */
+QComboBox:on, QComboBox:focus {
+    background-color: #FFFFFF;
+    border: 1.5px solid #0284C7;
+    color: #0F172A;
+}
+
+/* Khu vực nút bấm bên phải chứa mũi tên */
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 28px;
+    border-left: 1px solid #E2E8F0;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    background-color: transparent;
+}
+
+QComboBox::drop-down:hover {
+    background-color: #D7F2FF;
+}
+
+/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */
+QComboBox::down-arrow {
+    width: 0px;
+    height: 0px;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #475569;
+    margin-top: 2px;
+}
+
+QComboBox::down-arrow:hover {
+    border-top: 5px solid #0369A1;
+}
+
+/* Bảng danh sách thả xuống (Popup List) */
+QComboBox QAbstractItemView {
+    background-color: #FFFFFF;
+    color: #334155;
+    border: 1px solid #CBD5E1;
+    border-radius: 6px;
+    padding: 4px;
+    outline: 0;
+    selection-background-color: #D7F2FF;
+    selection-color: #0369A1;
+}
+
+/* Từng dòng lựa chọn bên trong danh sách thả xuống */
+QComboBox QAbstractItemView::item {
+    min-height: 28px;
+    padding: 4px 10px;
+    border-radius: 4px;
+}
+
+QComboBox QAbstractItemView::item:hover {
+    background-color: #EEFAFF;
+    color: #0369A1;
+}
+
+QComboBox QAbstractItemView::item:selected {
+    background-color: #D7F2FF;
+    color: #0369A1;
+    font-weight: bold;
+}
+</string>
         </property>
         <item>
          <property name="text">
@@ -278,22 +456,111 @@
         <property name="minimumSize">
          <size>
           <width>170</width>
-          <height>30</height>
+          <height>36</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>150</width>
+          <width>200</width>
           <height>16777215</height>
          </size>
         </property>
         <property name="font">
          <font>
           <family>Segoe UI</family>
-          <pointsize>10</pointsize>
+          <pointsize>-1</pointsize>
           <weight>75</weight>
           <bold>true</bold>
          </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">
+
+/* Khung chính của ComboBox */
+QComboBox {
+    background-color: #F8FAFC;
+    color: #334155;
+    border: 1px solid #CBD5E1;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 13px;
+    min-height: 22px;
+
+}
+
+/* Hiệu ứng khi di chuột vào */
+QComboBox:hover {
+    background-color: #EEFAFF;
+    border: 1px solid #7DD3FC;
+    color: #0F172A;
+}
+
+/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */
+QComboBox:on, QComboBox:focus {
+    background-color: #FFFFFF;
+    border: 1.5px solid #0284C7;
+    color: #0F172A;
+}
+
+/* Khu vực nút bấm bên phải chứa mũi tên */
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 28px;
+    border-left: 1px solid #E2E8F0;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    background-color: transparent;
+}
+
+QComboBox::drop-down:hover {
+    background-color: #D7F2FF;
+}
+
+/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */
+QComboBox::down-arrow {
+    width: 0px;
+    height: 0px;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #475569;
+    margin-top: 2px;
+}
+
+QComboBox::down-arrow:hover {
+    border-top: 5px solid #0369A1;
+}
+
+/* Bảng danh sách thả xuống (Popup List) */
+QComboBox QAbstractItemView {
+    background-color: #FFFFFF;
+    color: #334155;
+    border: 1px solid #CBD5E1;
+    border-radius: 6px;
+    padding: 4px;
+    outline: 0;
+    selection-background-color: #D7F2FF;
+    selection-color: #0369A1;
+}
+
+/* Từng dòng lựa chọn bên trong danh sách thả xuống */
+QComboBox QAbstractItemView::item {
+    min-height: 28px;
+    padding: 4px 10px;
+    border-radius: 4px;
+}
+
+QComboBox QAbstractItemView::item:hover {
+    background-color: #EEFAFF;
+    color: #0369A1;
+}
+
+QComboBox QAbstractItemView::item:selected {
+    background-color: #D7F2FF;
+    color: #0369A1;
+    font-weight: bold;
+}
+</string>
         </property>
         <item>
          <property name="text">
@@ -389,7 +656,7 @@
             <x>0</x>
             <y>0</y>
             <width>1894</width>
-            <height>879</height>
+            <height>873</height>
            </rect>
           </property>
           <property name="styleSheet">

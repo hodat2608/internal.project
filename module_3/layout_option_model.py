@@ -66,7 +66,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, -15, 1668, 1280))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 1661, 1280))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.verticalLayout_scrollContents = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout_scrollContents.setContentsMargins(16, 16, 16, 16)
@@ -139,7 +139,7 @@ class Ui_MainWindow(object):
         self.groupBox_model_source.setMinimumSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_model_source.setFont(font)
@@ -297,7 +297,7 @@ class Ui_MainWindow(object):
         self.groupBox_weights.setMinimumSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_weights.setFont(font)
@@ -649,7 +649,7 @@ class Ui_MainWindow(object):
         self.groupBox_detection.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_detection.setFont(font)
@@ -831,7 +831,7 @@ class Ui_MainWindow(object):
         self.groupBox_identity.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_identity.setFont(font)
@@ -961,7 +961,7 @@ class Ui_MainWindow(object):
         self.groupBox_10 = QtWidgets.QGroupBox(self.leftPanel)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_10.setFont(font)
@@ -1335,7 +1335,7 @@ class Ui_MainWindow(object):
         self.groupBox_4 = QtWidgets.QGroupBox(self.leftPanel)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_4.setFont(font)
@@ -1480,7 +1480,7 @@ class Ui_MainWindow(object):
         self.groupBox_table.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_table.setFont(font)
@@ -1509,31 +1509,108 @@ class Ui_MainWindow(object):
         self.vlayout_group_table.setObjectName("vlayout_group_table")
         self.tableView = QtWidgets.QTableView(self.groupBox_table)
         font = QtGui.QFont()
-        font.setPointSize(10)
+        font.setPointSize(-1)
         self.tableView.setFont(font)
-        self.tableView.setStyleSheet("/* Khung chính của bảng TableView */\n"
-"QTableView {\n"
-"    background-color: #F5F5F5; /* Màu xanh lá nhạt dịu mắt (Mint Light) */\n"
-"    border: 1px solid #c6c6c6;  /* Viền xám mảnh đồng bộ */\n"
-"    border-radius: 4px;         /* Bo tròn góc 4px */\n"
-"    gridline-color: #d0ebd5;    /* Màu của các đường lưới ngăn cách ô (xanh lá rất nhạt) */\n"
+        self.tableView.setStyleSheet("/* Khung tổng thể của bảng */\n"
+"QTableView, QTableWidget {\n"
+"    background-color: #F8FAFC;\n"
+"    alternate-background-color: #F1F5F9;\n"
+"    color: #334155;\n"
+"    gridline-color: #E2E8F0;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 8px;\n"
+"    font-size: 13px;\n"
+"    selection-background-color: #E2E8F0;\n"
+"    selection-color: #1E293B;\n"
+"    outline: 0;\n"
 "}\n"
 "\n"
-"/* Màu nền của từng ô dữ liệu bên trong bảng */\n"
-"QTableView::item {\n"
-"    background-color: #ebf7ee; /* Đồng bộ màu xanh lá nhạt cho các ô */\n"
-"    color: #2c3e50;            /* Màu chữ tối để dễ đọc */\n"
+"/* Từng ô dữ liệu bên trong bảng */\n"
+"QTableView::item, QTableWidget::item {\n"
+"    padding: 4px 10px;\n"
+"    border-bottom: 1px solid #E2E8F0;\n"
 "}\n"
 "\n"
-"/* Hiệu ứng khi di chuột qua một dòng/ô */\n"
-"QTableView::item:hover {\n"
-"    background-color: #d4edd9; /* Xanh lá đậm hơn một chút khi di chuột */\n"
+"/* Hiệu ứng khi di chuột qua từng ô */\n"
+"QTableView::item:hover, QTableWidget::item:hover {\n"
+"    background-color: #EEF2F6;\n"
 "}\n"
 "\n"
-"/* Hiệu ứng khi NGƯỜI DÙNG CLICK CHỌN một dòng/ô */\n"
-"QTableView::item:selected {\n"
-"    background-color: #27ae60; /* Đổi thành màu xanh lá đậm khi được chọn */\n"
-"    color: white;              /* Chữ chuyển sang trắng để nổi bật */\n"
+"/* Ô đang được chọn */\n"
+"QTableView::item:selected, QTableWidget::item:selected {\n"
+"    background-color: #E0E7FF;\n"
+"    color: #3730A3;\n"
+"    font-weight: bold;\n"
+"}\n"
+"\n"
+"/* Thanh tiêu đề cột (Header ngang) */\n"
+"QHeaderView::section {\n"
+"    background-color: #E2E8F0;\n"
+"    color: #475569;\n"
+"    font-weight: bold;\n"
+"    font-size: 12px;\n"
+"    text-transform: uppercase;\n"
+"    padding: 10px 12px;\n"
+"    border: none;\n"
+"    border-bottom: 1.5px solid #CBD5E1;\n"
+"    border-right: 1px solid #CBD5E1;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào tiêu đề cột */\n"
+"QHeaderView::section:hover {\n"
+"    background-color: #CBD5E1;\n"
+"    color: #1E293B;\n"
+"}\n"
+"\n"
+"/* Góc trên bên trái giao giữa 2 thanh tiêu đề */\n"
+"QTableCornerButton::section {\n"
+"    background-color: #E2E8F0;\n"
+"    border: none;\n"
+"    border-bottom: 1.5px solid #CBD5E1;\n"
+"}\n"
+"\n"
+"/* Thanh cuộn dọc (Vertical Scrollbar) */\n"
+"QScrollBar:vertical {\n"
+"    background: #F1F5F9;\n"
+"    width: 8px;\n"
+"    margin: 0px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical {\n"
+"    background: #CBD5E1;\n"
+"    min-height: 25px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical:hover {\n"
+"    background: #94A3B8;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {\n"
+"    height: 0px;\n"
+"}\n"
+"\n"
+"/* Thanh cuộn ngang (Horizontal Scrollbar) */\n"
+"QScrollBar:horizontal {\n"
+"    background: #F1F5F9;\n"
+"    height: 8px;\n"
+"    margin: 0px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:horizontal {\n"
+"    background: #CBD5E1;\n"
+"    min-width: 25px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:horizontal:hover {\n"
+"    background: #94A3B8;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {\n"
+"    width: 0px;\n"
 "}\n"
 "")
         self.tableView.setAlternatingRowColors(True)

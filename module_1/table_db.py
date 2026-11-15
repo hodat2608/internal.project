@@ -127,6 +127,8 @@ TABLES = [
         min_value VARCHAR(255),
         max_value VARCHAR(255),
         status VARCHAR(255),
+        register_name VARCHAR(255) DEFAULT '',
+        enable_send_data_plc TINYINT(1) DEFAULT 0,
         camera_id INT NOT NULL,
         FOREIGN KEY (camera_id) REFERENCES NUMS_CAMERA(id) ON DELETE CASCADE
     )""",

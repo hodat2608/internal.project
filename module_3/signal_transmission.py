@@ -66,47 +66,18 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, -861, 1781, 1919))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 1804, 2034))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.gridLayout_32 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents)
         self.gridLayout_32.setObjectName("gridLayout_32")
-        self.label_25 = QtWidgets.QLabel(self.scrollAreaWidgetContents)
-        self.label_25.setMaximumSize(QtCore.QSize(16777215, 1))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_25.setFont(font)
-        self.label_25.setText("")
-        self.label_25.setObjectName("label_25")
-        self.gridLayout_32.addWidget(self.label_25, 3, 0, 1, 2)
-        self.label_5 = QtWidgets.QLabel(self.scrollAreaWidgetContents)
-        self.label_5.setMaximumSize(QtCore.QSize(16777215, 1))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_5.setFont(font)
-        self.label_5.setText("")
-        self.label_5.setObjectName("label_5")
-        self.gridLayout_32.addWidget(self.label_5, 1, 0, 1, 2)
-        self.pushButton_admin = QtWidgets.QPushButton(self.scrollAreaWidgetContents)
-        self.pushButton_admin.setMinimumSize(QtCore.QSize(0, 40))
-        self.pushButton_admin.setMaximumSize(QtCore.QSize(150, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(11)
-        font.setBold(True)
-        font.setWeight(75)
-        self.pushButton_admin.setFont(font)
-        self.pushButton_admin.setStyleSheet("QPushButton { background-color:#209E3D; color:white; border:none; border-radius:4px; font-weight:600; }QPushButton:hover { background-color:#005ba1; }")
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/admin-panel.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_admin.setIcon(icon)
-        self.pushButton_admin.setIconSize(QtCore.QSize(30, 30))
-        self.pushButton_admin.setObjectName("pushButton_admin")
-        self.gridLayout_32.addWidget(self.pushButton_admin, 2, 0, 1, 1)
         self.vlayout_midrow_container_wrap = QtWidgets.QVBoxLayout()
         self.vlayout_midrow_container_wrap.setContentsMargins(0, 0, 0, 0)
         self.vlayout_midrow_container_wrap.setObjectName("vlayout_midrow_container_wrap")
+        self.line_16 = QtWidgets.QFrame(self.scrollAreaWidgetContents)
+        self.line_16.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_16.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_16.setObjectName("line_16")
+        self.vlayout_midrow_container_wrap.addWidget(self.line_16)
         self.hlayout_midrow = QtWidgets.QHBoxLayout()
         self.hlayout_midrow.setSpacing(12)
         self.hlayout_midrow.setObjectName("hlayout_midrow")
@@ -118,13 +89,13 @@ class Ui_MainWindow(object):
         self.groupAssignPLC.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupAssignPLC.setFont(font)
         self.groupAssignPLC.setStyleSheet("/* Khung chính của GroupBox */\n"
 "QGroupBox {\n"
-"    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */\n"
+"    background-color: #FBFFF9; /* Màu nền theo yêu cầu của bạn */\n"
 "    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
 "    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
 "    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
@@ -151,31 +122,108 @@ class Ui_MainWindow(object):
         self.tableWidget.setMinimumSize(QtCore.QSize(0, 260))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         self.tableWidget.setFont(font)
-        self.tableWidget.setStyleSheet("/* Khung chính của bảng TableView */\n"
-"QTableView {\n"
-"    background-color: #F7FFFA; /* Màu xanh lá nhạt dịu mắt (Mint Light) */\n"
-"    border: 1px solid #325C62;  /* Viền xám mảnh đồng bộ */\n"
-"    border-radius: 4px;         /* Bo tròn góc 4px */\n"
-"    gridline-color: #d0ebd5;    /* Màu của các đường lưới ngăn cách ô (xanh lá rất nhạt) */\n"
+        self.tableWidget.setStyleSheet("/* Khung tổng thể của bảng */\n"
+"QTableWidget {\n"
+"    background-color: #F8FAFC;\n"
+"    alternate-background-color: #F1F5F9;\n"
+"    color: #334155;\n"
+"    gridline-color: #E2E8F0;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 8px;\n"
+"    font-size: 13px;\n"
+"    selection-background-color: #E2E8F0;\n"
+"    selection-color: #1E293B;\n"
+"    outline: 0;\n"
 "}\n"
 "\n"
-"/* Màu nền của từng ô dữ liệu bên trong bảng */\n"
-"QTableView::item {\n"
-"    background-color: #F7FFFA; /* Đồng bộ màu xanh lá nhạt cho các ô */\n"
-"    color: #2c3e50;            /* Màu chữ tối để dễ đọc */\n"
+"/* Từng ô dữ liệu bên trong bảng */\n"
+"QTableWidget::item {\n"
+"    padding: 4px 10px;\n"
+"    border-bottom: 1px solid #E2E8F0;\n"
 "}\n"
 "\n"
-"/* Hiệu ứng khi di chuột qua một dòng/ô */\n"
-"QTableView::item:hover {\n"
-"    background-color: #F5FFE1; /* Xanh lá đậm hơn một chút khi di chuột */\n"
+"/* Hiệu ứng khi di chuột qua từng ô */\n"
+"QTableWidget::item:hover {\n"
+"    background-color: #EEF2F6;\n"
 "}\n"
 "\n"
-"/* Hiệu ứng khi NGƯỜI DÙNG CLICK CHỌN một dòng/ô */\n"
-"QTableView::item:selected {\n"
-"    background-color: #E9F8FF; /* Đổi thành màu xanh lá đậm khi được chọn */\n"
-"    color: black;              /* Chữ chuyển sang trắng để nổi bật */\n"
+"/* Ô đang được chọn */\n"
+"QTableWidget::item:selected {\n"
+"    background-color: #E0E7FF;\n"
+"    color: #3730A3;\n"
+"    font-weight: bold;\n"
+"}\n"
+"\n"
+"/* Thanh tiêu đề cột (Header ngang) */\n"
+"QHeaderView::section {\n"
+"    background-color: #E2E8F0;\n"
+"    color: #475569;\n"
+"    font-weight: bold;\n"
+"    font-size: 12px;\n"
+"    text-transform: uppercase;\n"
+"    padding: 10px 12px;\n"
+"    border: none;\n"
+"    border-bottom: 1.5px solid #CBD5E1;\n"
+"    border-right: 1px solid #CBD5E1;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào tiêu đề cột */\n"
+"QHeaderView::section:hover {\n"
+"    background-color: #CBD5E1;\n"
+"    color: #1E293B;\n"
+"}\n"
+"\n"
+"/* Góc trên bên trái giao giữa 2 thanh tiêu đề */\n"
+"QTableCornerButton::section {\n"
+"    background-color: #E2E8F0;\n"
+"    border: none;\n"
+"    border-bottom: 1.5px solid #CBD5E1;\n"
+"}\n"
+"\n"
+"/* Thanh cuộn dọc (Vertical Scrollbar) */\n"
+"QScrollBar:vertical {\n"
+"    background: #F1F5F9;\n"
+"    width: 8px;\n"
+"    margin: 0px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical {\n"
+"    background: #CBD5E1;\n"
+"    min-height: 25px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical:hover {\n"
+"    background: #94A3B8;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {\n"
+"    height: 0px;\n"
+"}\n"
+"\n"
+"/* Thanh cuộn ngang (Horizontal Scrollbar) */\n"
+"QScrollBar:horizontal {\n"
+"    background: #F1F5F9;\n"
+"    height: 8px;\n"
+"    margin: 0px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:horizontal {\n"
+"    background: #CBD5E1;\n"
+"    min-width: 25px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:horizontal:hover {\n"
+"    background: #94A3B8;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {\n"
+"    width: 0px;\n"
 "}\n"
 "")
         self.tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.DoubleClicked|QtWidgets.QAbstractItemView.EditKeyPressed)
@@ -467,9 +515,9 @@ class Ui_MainWindow(object):
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
         self.pushButton_add_reg.setText("")
-        icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/new-file.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_add_reg.setIcon(icon1)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/new-file.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_add_reg.setIcon(icon)
         self.pushButton_add_reg.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_add_reg.setObjectName("pushButton_add_reg")
         self.gridLayout_11.addWidget(self.pushButton_add_reg, 0, 1, 1, 1)
@@ -505,9 +553,9 @@ class Ui_MainWindow(object):
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
         self.pushButton_applysignalplc.setText("")
-        icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/floppy-disk.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_applysignalplc.setIcon(icon2)
+        icon1 = QtGui.QIcon()
+        icon1.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/floppy-disk.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_applysignalplc.setIcon(icon1)
         self.pushButton_applysignalplc.setIconSize(QtCore.QSize(22, 22))
         self.pushButton_applysignalplc.setObjectName("pushButton_applysignalplc")
         self.gridLayout_11.addWidget(self.pushButton_applysignalplc, 0, 5, 1, 1)
@@ -532,9 +580,9 @@ class Ui_MainWindow(object):
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
         self.pushButton_clear_table.setText("")
-        icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/remove.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_clear_table.setIcon(icon3)
+        icon2 = QtGui.QIcon()
+        icon2.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/remove.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_clear_table.setIcon(icon2)
         self.pushButton_clear_table.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_clear_table.setObjectName("pushButton_clear_table")
         self.gridLayout_11.addWidget(self.pushButton_clear_table, 0, 3, 1, 1)
@@ -557,7 +605,7 @@ class Ui_MainWindow(object):
         self.groupFunction.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupFunction.setFont(font)
@@ -597,13 +645,13 @@ class Ui_MainWindow(object):
         self.groupSignalTransmission.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupSignalTransmission.setFont(font)
         self.groupSignalTransmission.setStyleSheet("/* Khung chính của GroupBox */\n"
 "QGroupBox {\n"
-"    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */\n"
+"    background-color: #FBFFF9; /* Màu nền theo yêu cầu của bạn */\n"
 "    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
 "    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
 "    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
@@ -631,175 +679,261 @@ class Ui_MainWindow(object):
         self.grid_trx1_grid = QtWidgets.QGridLayout()
         self.grid_trx1_grid.setSpacing(8)
         self.grid_trx1_grid.setObjectName("grid_trx1_grid")
-        self.trx1_header_0 = QtWidgets.QLabel(self.groupSignalTransmission)
-        self.trx1_header_0.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.trx1_header_0.setFont(font)
-        self.trx1_header_0.setStyleSheet("background-color:#ececec; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
-        self.trx1_header_0.setAlignment(QtCore.Qt.AlignCenter)
-        self.trx1_header_0.setObjectName("trx1_header_0")
-        self.grid_trx1_grid.addWidget(self.trx1_header_0, 0, 0, 1, 1)
-        self.trx1_header_1 = QtWidgets.QLabel(self.groupSignalTransmission)
-        self.trx1_header_1.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.trx1_header_1.setFont(font)
-        self.trx1_header_1.setStyleSheet("background-color:#ececec; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
-        self.trx1_header_1.setAlignment(QtCore.Qt.AlignCenter)
-        self.trx1_header_1.setObjectName("trx1_header_1")
-        self.grid_trx1_grid.addWidget(self.trx1_header_1, 0, 1, 1, 1)
-        self.trx1_header_2 = QtWidgets.QLabel(self.groupSignalTransmission)
-        self.trx1_header_2.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.trx1_header_2.setFont(font)
-        self.trx1_header_2.setStyleSheet("background-color:#ececec; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
-        self.trx1_header_2.setAlignment(QtCore.Qt.AlignCenter)
-        self.trx1_header_2.setObjectName("trx1_header_2")
-        self.grid_trx1_grid.addWidget(self.trx1_header_2, 0, 2, 1, 1)
-        self.trx1_header_3 = QtWidgets.QLabel(self.groupSignalTransmission)
-        self.trx1_header_3.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.trx1_header_3.setFont(font)
-        self.trx1_header_3.setStyleSheet("background-color:#ececec; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
-        self.trx1_header_3.setAlignment(QtCore.Qt.AlignCenter)
-        self.trx1_header_3.setObjectName("trx1_header_3")
-        self.grid_trx1_grid.addWidget(self.trx1_header_3, 0, 3, 1, 1)
-        self.trx1_Gate_lbl = QtWidgets.QPushButton(self.groupSignalTransmission)
-        self.trx1_Gate_lbl.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.trx1_Gate_lbl.setFont(font)
-        self.trx1_Gate_lbl.setStyleSheet("QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }")
-        self.trx1_Gate_lbl.setObjectName("trx1_Gate_lbl")
-        self.grid_trx1_grid.addWidget(self.trx1_Gate_lbl, 1, 0, 1, 1)
-        self.checkBox_join_gate_2 = QtWidgets.QCheckBox(self.groupSignalTransmission)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.checkBox_join_gate_2.setFont(font)
-        self.checkBox_join_gate_2.setStyleSheet("\n"
-"/* Căn giữa ô vuông tích check */\n"
-"QCheckBox::indicator {\n"
-"    subcontrol-origin: padding;\n"
-"    subcontrol-position: center; /* Đưa ô vuông vào chính giữa */\n"
-"}\n"
-"")
-        self.checkBox_join_gate_2.setText("")
-        self.checkBox_join_gate_2.setChecked(True)
-        self.checkBox_join_gate_2.setObjectName("checkBox_join_gate_2")
-        self.grid_trx1_grid.addWidget(self.checkBox_join_gate_2, 1, 1, 1, 1)
-        self.spinBox_Ordinal_gate_2 = QtWidgets.QSpinBox(self.groupSignalTransmission)
-        self.spinBox_Ordinal_gate_2.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.spinBox_Ordinal_gate_2.setFont(font)
-        self.spinBox_Ordinal_gate_2.setAlignment(QtCore.Qt.AlignCenter)
-        self.spinBox_Ordinal_gate_2.setMinimum(1)
-        self.spinBox_Ordinal_gate_2.setMaximum(99)
-        self.spinBox_Ordinal_gate_2.setProperty("value", 1)
-        self.spinBox_Ordinal_gate_2.setObjectName("spinBox_Ordinal_gate_2")
-        self.grid_trx1_grid.addWidget(self.spinBox_Ordinal_gate_2, 1, 2, 1, 1)
-        self.comboBox_value_gate_2 = QtWidgets.QComboBox(self.groupSignalTransmission)
-        self.comboBox_value_gate_2.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_value_gate_2.setFont(font)
-        self.comboBox_value_gate_2.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 37px; \n"
-"}\n"
-"")
-        self.comboBox_value_gate_2.setObjectName("comboBox_value_gate_2")
-        self.comboBox_value_gate_2.addItem("")
-        self.comboBox_value_gate_2.addItem("")
-        self.grid_trx1_grid.addWidget(self.comboBox_value_gate_2, 1, 3, 1, 1)
-        self.trx1_Busy_lbl = QtWidgets.QPushButton(self.groupSignalTransmission)
-        self.trx1_Busy_lbl.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.trx1_Busy_lbl.setFont(font)
-        self.trx1_Busy_lbl.setStyleSheet("QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }")
-        self.trx1_Busy_lbl.setObjectName("trx1_Busy_lbl")
-        self.grid_trx1_grid.addWidget(self.trx1_Busy_lbl, 2, 0, 1, 1)
-        self.checkBox_join_busy_2 = QtWidgets.QCheckBox(self.groupSignalTransmission)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.checkBox_join_busy_2.setFont(font)
-        self.checkBox_join_busy_2.setStyleSheet("\n"
-"/* Căn giữa ô vuông tích check */\n"
-"QCheckBox::indicator {\n"
-"    subcontrol-origin: padding;\n"
-"    subcontrol-position: center; /* Đưa ô vuông vào chính giữa */\n"
-"}\n"
-"")
-        self.checkBox_join_busy_2.setText("")
-        self.checkBox_join_busy_2.setChecked(True)
-        self.checkBox_join_busy_2.setObjectName("checkBox_join_busy_2")
-        self.grid_trx1_grid.addWidget(self.checkBox_join_busy_2, 2, 1, 1, 1)
         self.spinBox_Ordinal_busy_2 = QtWidgets.QSpinBox(self.groupSignalTransmission)
-        self.spinBox_Ordinal_busy_2.setMinimumSize(QtCore.QSize(0, 28))
+        self.spinBox_Ordinal_busy_2.setMinimumSize(QtCore.QSize(0, 36))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.spinBox_Ordinal_busy_2.setFont(font)
+        self.spinBox_Ordinal_busy_2.setStyleSheet("/* Khung chính của SpinBox */\n"
+"QSpinBox, QDoubleSpinBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 16px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QSpinBox:hover, QDoubleSpinBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi click chuột vào nhập số */\n"
+"QSpinBox:focus, QDoubleSpinBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút Tăng (Mũi tên lên) */\n"
+"QSpinBox::up-button, QDoubleSpinBox::up-button {\n"
+"    subcontrol-origin: border;\n"
+"    subcontrol-position: top right;\n"
+"    width: 24px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-bottom: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"QSpinBox::up-button:pressed, QDoubleSpinBox::up-button:pressed {\n"
+"    background-color: #BAE6FD;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ lên bằng CSS */\n"
+"QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 4px solid transparent;\n"
+"    border-right: 4px solid transparent;\n"
+"    border-bottom: 4px solid #475569;\n"
+"}\n"
+"\n"
+"QSpinBox::up-arrow:hover, QDoubleSpinBox::up-arrow:hover {\n"
+"    border-bottom: 4px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Khu vực nút Giảm (Mũi tên xuống) */\n"
+"QSpinBox::down-button, QDoubleSpinBox::down-button {\n"
+"    subcontrol-origin: border;\n"
+"    subcontrol-position: bottom right;\n"
+"    width: 24px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QSpinBox::down-button:hover, QDoubleSpinBox::down-button:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"QSpinBox::down-button:pressed, QDoubleSpinBox::down-button:pressed {\n"
+"    background-color: #BAE6FD;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS */\n"
+"QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 4px solid transparent;\n"
+"    border-right: 4px solid transparent;\n"
+"    border-top: 4px solid #475569;\n"
+"}\n"
+"\n"
+"QSpinBox::down-arrow:hover, QDoubleSpinBox::down-arrow:hover {\n"
+"    border-top: 4px solid #0369A1;\n"
+"}\n"
+"")
         self.spinBox_Ordinal_busy_2.setAlignment(QtCore.Qt.AlignCenter)
         self.spinBox_Ordinal_busy_2.setMinimum(1)
         self.spinBox_Ordinal_busy_2.setMaximum(99)
         self.spinBox_Ordinal_busy_2.setProperty("value", 2)
         self.spinBox_Ordinal_busy_2.setObjectName("spinBox_Ordinal_busy_2")
         self.grid_trx1_grid.addWidget(self.spinBox_Ordinal_busy_2, 2, 2, 1, 1)
-        self.comboBox_value_busy_2 = QtWidgets.QComboBox(self.groupSignalTransmission)
-        self.comboBox_value_busy_2.setMinimumSize(QtCore.QSize(0, 28))
+        self.label_43 = QtWidgets.QLabel(self.groupSignalTransmission)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_43.setFont(font)
+        self.label_43.setStyleSheet("QLabel {\n"
+"    background-color: #EEFAFF;\n"
+"    color: black;\n"
+"    border: 1px solid #BAE6FD;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.label_43.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_43.setObjectName("label_43")
+        self.grid_trx1_grid.addWidget(self.label_43, 3, 0, 1, 1)
+        self.label_20 = QtWidgets.QLabel(self.groupSignalTransmission)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_20.setFont(font)
+        self.label_20.setStyleSheet("QLabel {\n"
+"    background-color: #EEFAFF;\n"
+"    color: black;\n"
+"    border: 1px solid #BAE6FD;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.label_20.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_20.setObjectName("label_20")
+        self.grid_trx1_grid.addWidget(self.label_20, 2, 0, 1, 1)
+        self.trx1_header_3 = QtWidgets.QLabel(self.groupSignalTransmission)
+        self.trx1_header_3.setMinimumSize(QtCore.QSize(0, 30))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
+        self.trx1_header_3.setFont(font)
+        self.trx1_header_3.setStyleSheet("background-color:#D7E6E3; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
+        self.trx1_header_3.setAlignment(QtCore.Qt.AlignCenter)
+        self.trx1_header_3.setObjectName("trx1_header_3")
+        self.grid_trx1_grid.addWidget(self.trx1_header_3, 0, 3, 1, 1)
+        self.comboBox_value_busy_2 = QtWidgets.QComboBox(self.groupSignalTransmission)
+        self.comboBox_value_busy_2.setMinimumSize(QtCore.QSize(0, 36))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
         self.comboBox_value_busy_2.setFont(font)
-        self.comboBox_value_busy_2.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 37px; \n"
+        self.comboBox_value_busy_2.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"  padding-left: 37px; \n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
 "}\n"
 "")
         self.comboBox_value_busy_2.setObjectName("comboBox_value_busy_2")
         self.comboBox_value_busy_2.addItem("")
         self.comboBox_value_busy_2.addItem("")
         self.grid_trx1_grid.addWidget(self.comboBox_value_busy_2, 2, 3, 1, 1)
-        self.trx1_Ready_lbl = QtWidgets.QPushButton(self.groupSignalTransmission)
-        self.trx1_Ready_lbl.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.trx1_Ready_lbl.setFont(font)
-        self.trx1_Ready_lbl.setStyleSheet("QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }")
-        self.trx1_Ready_lbl.setObjectName("trx1_Ready_lbl")
-        self.grid_trx1_grid.addWidget(self.trx1_Ready_lbl, 3, 0, 1, 1)
         self.checkBox_join_ready_2 = QtWidgets.QCheckBox(self.groupSignalTransmission)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
@@ -816,31 +950,494 @@ class Ui_MainWindow(object):
         self.checkBox_join_ready_2.setChecked(True)
         self.checkBox_join_ready_2.setObjectName("checkBox_join_ready_2")
         self.grid_trx1_grid.addWidget(self.checkBox_join_ready_2, 3, 1, 1, 1)
-        self.spinBox_Ordinal_ready_2 = QtWidgets.QSpinBox(self.groupSignalTransmission)
-        self.spinBox_Ordinal_ready_2.setMinimumSize(QtCore.QSize(0, 28))
+        self.trx1_header_2 = QtWidgets.QLabel(self.groupSignalTransmission)
+        self.trx1_header_2.setMinimumSize(QtCore.QSize(0, 30))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
+        self.trx1_header_2.setFont(font)
+        self.trx1_header_2.setStyleSheet("background-color:#D7E6E3; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
+        self.trx1_header_2.setAlignment(QtCore.Qt.AlignCenter)
+        self.trx1_header_2.setObjectName("trx1_header_2")
+        self.grid_trx1_grid.addWidget(self.trx1_header_2, 0, 2, 1, 1)
+        self.comboBox_value_gate_2 = QtWidgets.QComboBox(self.groupSignalTransmission)
+        self.comboBox_value_gate_2.setMinimumSize(QtCore.QSize(0, 36))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_value_gate_2.setFont(font)
+        self.comboBox_value_gate_2.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"  padding-left: 37px; \n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.comboBox_value_gate_2.setObjectName("comboBox_value_gate_2")
+        self.comboBox_value_gate_2.addItem("")
+        self.comboBox_value_gate_2.addItem("")
+        self.grid_trx1_grid.addWidget(self.comboBox_value_gate_2, 1, 3, 1, 1)
+        self.checkBox_join_busy_2 = QtWidgets.QCheckBox(self.groupSignalTransmission)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.checkBox_join_busy_2.setFont(font)
+        self.checkBox_join_busy_2.setStyleSheet("\n"
+"/* Căn giữa ô vuông tích check */\n"
+"QCheckBox::indicator {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: center; /* Đưa ô vuông vào chính giữa */\n"
+"}\n"
+"")
+        self.checkBox_join_busy_2.setText("")
+        self.checkBox_join_busy_2.setChecked(True)
+        self.checkBox_join_busy_2.setObjectName("checkBox_join_busy_2")
+        self.grid_trx1_grid.addWidget(self.checkBox_join_busy_2, 2, 1, 1, 1)
+        self.trx1_header_1 = QtWidgets.QLabel(self.groupSignalTransmission)
+        self.trx1_header_1.setMinimumSize(QtCore.QSize(0, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.trx1_header_1.setFont(font)
+        self.trx1_header_1.setStyleSheet("background-color:#D7E6E3; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
+        self.trx1_header_1.setAlignment(QtCore.Qt.AlignCenter)
+        self.trx1_header_1.setObjectName("trx1_header_1")
+        self.grid_trx1_grid.addWidget(self.trx1_header_1, 0, 1, 1, 1)
+        self.label_42 = QtWidgets.QLabel(self.groupSignalTransmission)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_42.setFont(font)
+        self.label_42.setStyleSheet("QLabel {\n"
+"    background-color: #EEFAFF;\n"
+"    color: black;\n"
+"    border: 1px solid #BAE6FD;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.label_42.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_42.setObjectName("label_42")
+        self.grid_trx1_grid.addWidget(self.label_42, 1, 0, 1, 1)
+        self.spinBox_Ordinal_gate_2 = QtWidgets.QSpinBox(self.groupSignalTransmission)
+        self.spinBox_Ordinal_gate_2.setMinimumSize(QtCore.QSize(0, 36))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.spinBox_Ordinal_gate_2.setFont(font)
+        self.spinBox_Ordinal_gate_2.setStyleSheet("/* Khung chính của SpinBox */\n"
+"QSpinBox, QDoubleSpinBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 16px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QSpinBox:hover, QDoubleSpinBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi click chuột vào nhập số */\n"
+"QSpinBox:focus, QDoubleSpinBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút Tăng (Mũi tên lên) */\n"
+"QSpinBox::up-button, QDoubleSpinBox::up-button {\n"
+"    subcontrol-origin: border;\n"
+"    subcontrol-position: top right;\n"
+"    width: 24px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-bottom: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"QSpinBox::up-button:pressed, QDoubleSpinBox::up-button:pressed {\n"
+"    background-color: #BAE6FD;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ lên bằng CSS */\n"
+"QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 4px solid transparent;\n"
+"    border-right: 4px solid transparent;\n"
+"    border-bottom: 4px solid #475569;\n"
+"}\n"
+"\n"
+"QSpinBox::up-arrow:hover, QDoubleSpinBox::up-arrow:hover {\n"
+"    border-bottom: 4px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Khu vực nút Giảm (Mũi tên xuống) */\n"
+"QSpinBox::down-button, QDoubleSpinBox::down-button {\n"
+"    subcontrol-origin: border;\n"
+"    subcontrol-position: bottom right;\n"
+"    width: 24px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QSpinBox::down-button:hover, QDoubleSpinBox::down-button:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"QSpinBox::down-button:pressed, QDoubleSpinBox::down-button:pressed {\n"
+"    background-color: #BAE6FD;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS */\n"
+"QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 4px solid transparent;\n"
+"    border-right: 4px solid transparent;\n"
+"    border-top: 4px solid #475569;\n"
+"}\n"
+"\n"
+"QSpinBox::down-arrow:hover, QDoubleSpinBox::down-arrow:hover {\n"
+"    border-top: 4px solid #0369A1;\n"
+"}\n"
+"")
+        self.spinBox_Ordinal_gate_2.setAlignment(QtCore.Qt.AlignCenter)
+        self.spinBox_Ordinal_gate_2.setMinimum(1)
+        self.spinBox_Ordinal_gate_2.setMaximum(99)
+        self.spinBox_Ordinal_gate_2.setProperty("value", 1)
+        self.spinBox_Ordinal_gate_2.setObjectName("spinBox_Ordinal_gate_2")
+        self.grid_trx1_grid.addWidget(self.spinBox_Ordinal_gate_2, 1, 2, 1, 1)
+        self.trx1_header_0 = QtWidgets.QLabel(self.groupSignalTransmission)
+        self.trx1_header_0.setMinimumSize(QtCore.QSize(0, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.trx1_header_0.setFont(font)
+        self.trx1_header_0.setStyleSheet("background-color:#D7E6E3; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
+        self.trx1_header_0.setAlignment(QtCore.Qt.AlignCenter)
+        self.trx1_header_0.setObjectName("trx1_header_0")
+        self.grid_trx1_grid.addWidget(self.trx1_header_0, 0, 0, 1, 1)
+        self.spinBox_Ordinal_ready_2 = QtWidgets.QSpinBox(self.groupSignalTransmission)
+        self.spinBox_Ordinal_ready_2.setMinimumSize(QtCore.QSize(0, 36))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
         self.spinBox_Ordinal_ready_2.setFont(font)
+        self.spinBox_Ordinal_ready_2.setStyleSheet("/* Khung chính của SpinBox */\n"
+"QSpinBox, QDoubleSpinBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 16px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QSpinBox:hover, QDoubleSpinBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi click chuột vào nhập số */\n"
+"QSpinBox:focus, QDoubleSpinBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút Tăng (Mũi tên lên) */\n"
+"QSpinBox::up-button, QDoubleSpinBox::up-button {\n"
+"    subcontrol-origin: border;\n"
+"    subcontrol-position: top right;\n"
+"    width: 24px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-bottom: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"QSpinBox::up-button:pressed, QDoubleSpinBox::up-button:pressed {\n"
+"    background-color: #BAE6FD;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ lên bằng CSS */\n"
+"QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 4px solid transparent;\n"
+"    border-right: 4px solid transparent;\n"
+"    border-bottom: 4px solid #475569;\n"
+"}\n"
+"\n"
+"QSpinBox::up-arrow:hover, QDoubleSpinBox::up-arrow:hover {\n"
+"    border-bottom: 4px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Khu vực nút Giảm (Mũi tên xuống) */\n"
+"QSpinBox::down-button, QDoubleSpinBox::down-button {\n"
+"    subcontrol-origin: border;\n"
+"    subcontrol-position: bottom right;\n"
+"    width: 24px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QSpinBox::down-button:hover, QDoubleSpinBox::down-button:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"QSpinBox::down-button:pressed, QDoubleSpinBox::down-button:pressed {\n"
+"    background-color: #BAE6FD;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS */\n"
+"QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 4px solid transparent;\n"
+"    border-right: 4px solid transparent;\n"
+"    border-top: 4px solid #475569;\n"
+"}\n"
+"\n"
+"QSpinBox::down-arrow:hover, QDoubleSpinBox::down-arrow:hover {\n"
+"    border-top: 4px solid #0369A1;\n"
+"}\n"
+"")
         self.spinBox_Ordinal_ready_2.setAlignment(QtCore.Qt.AlignCenter)
         self.spinBox_Ordinal_ready_2.setMinimum(1)
         self.spinBox_Ordinal_ready_2.setMaximum(99)
         self.spinBox_Ordinal_ready_2.setProperty("value", 3)
         self.spinBox_Ordinal_ready_2.setObjectName("spinBox_Ordinal_ready_2")
         self.grid_trx1_grid.addWidget(self.spinBox_Ordinal_ready_2, 3, 2, 1, 1)
-        self.comboBox_value_ready_2 = QtWidgets.QComboBox(self.groupSignalTransmission)
-        self.comboBox_value_ready_2.setMinimumSize(QtCore.QSize(0, 28))
+        self.checkBox_join_gate_2 = QtWidgets.QCheckBox(self.groupSignalTransmission)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
+        self.checkBox_join_gate_2.setFont(font)
+        self.checkBox_join_gate_2.setStyleSheet("\n"
+"/* Căn giữa ô vuông tích check */\n"
+"QCheckBox::indicator {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: center; /* Đưa ô vuông vào chính giữa */\n"
+"}\n"
+"")
+        self.checkBox_join_gate_2.setText("")
+        self.checkBox_join_gate_2.setChecked(True)
+        self.checkBox_join_gate_2.setObjectName("checkBox_join_gate_2")
+        self.grid_trx1_grid.addWidget(self.checkBox_join_gate_2, 1, 1, 1, 1)
+        self.comboBox_value_ready_2 = QtWidgets.QComboBox(self.groupSignalTransmission)
+        self.comboBox_value_ready_2.setMinimumSize(QtCore.QSize(0, 36))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.comboBox_value_ready_2.setFont(font)
-        self.comboBox_value_ready_2.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 37px; \n"
+        self.comboBox_value_ready_2.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"  padding-left: 37px; \n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
 "}\n"
 "")
         self.comboBox_value_ready_2.setObjectName("comboBox_value_ready_2")
@@ -862,119 +1459,6 @@ class Ui_MainWindow(object):
         self.grid_trx2_grid = QtWidgets.QGridLayout()
         self.grid_trx2_grid.setSpacing(8)
         self.grid_trx2_grid.setObjectName("grid_trx2_grid")
-        self.trx2_header_0 = QtWidgets.QLabel(self.groupSignalTransmission)
-        self.trx2_header_0.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.trx2_header_0.setFont(font)
-        self.trx2_header_0.setStyleSheet("background-color:#ececec; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
-        self.trx2_header_0.setAlignment(QtCore.Qt.AlignCenter)
-        self.trx2_header_0.setObjectName("trx2_header_0")
-        self.grid_trx2_grid.addWidget(self.trx2_header_0, 0, 0, 1, 1)
-        self.trx2_header_1 = QtWidgets.QLabel(self.groupSignalTransmission)
-        self.trx2_header_1.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.trx2_header_1.setFont(font)
-        self.trx2_header_1.setStyleSheet("background-color:#ececec; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
-        self.trx2_header_1.setAlignment(QtCore.Qt.AlignCenter)
-        self.trx2_header_1.setObjectName("trx2_header_1")
-        self.grid_trx2_grid.addWidget(self.trx2_header_1, 0, 1, 1, 1)
-        self.trx2_header_2 = QtWidgets.QLabel(self.groupSignalTransmission)
-        self.trx2_header_2.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.trx2_header_2.setFont(font)
-        self.trx2_header_2.setStyleSheet("background-color:#ececec; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
-        self.trx2_header_2.setAlignment(QtCore.Qt.AlignCenter)
-        self.trx2_header_2.setObjectName("trx2_header_2")
-        self.grid_trx2_grid.addWidget(self.trx2_header_2, 0, 2, 1, 1)
-        self.trx2_header_3 = QtWidgets.QLabel(self.groupSignalTransmission)
-        self.trx2_header_3.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.trx2_header_3.setFont(font)
-        self.trx2_header_3.setStyleSheet("background-color:#ececec; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
-        self.trx2_header_3.setAlignment(QtCore.Qt.AlignCenter)
-        self.trx2_header_3.setObjectName("trx2_header_3")
-        self.grid_trx2_grid.addWidget(self.trx2_header_3, 0, 3, 1, 1)
-        self.trx2_Gate_lbl = QtWidgets.QPushButton(self.groupSignalTransmission)
-        self.trx2_Gate_lbl.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.trx2_Gate_lbl.setFont(font)
-        self.trx2_Gate_lbl.setStyleSheet("QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }")
-        self.trx2_Gate_lbl.setObjectName("trx2_Gate_lbl")
-        self.grid_trx2_grid.addWidget(self.trx2_Gate_lbl, 1, 0, 1, 1)
-        self.checkBox_join_gate_3 = QtWidgets.QCheckBox(self.groupSignalTransmission)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.checkBox_join_gate_3.setFont(font)
-        self.checkBox_join_gate_3.setStyleSheet("\n"
-"/* Căn giữa ô vuông tích check */\n"
-"QCheckBox::indicator {\n"
-"    subcontrol-origin: padding;\n"
-"    subcontrol-position: center; /* Đưa ô vuông vào chính giữa */\n"
-"}\n"
-"")
-        self.checkBox_join_gate_3.setText("")
-        self.checkBox_join_gate_3.setChecked(True)
-        self.checkBox_join_gate_3.setObjectName("checkBox_join_gate_3")
-        self.grid_trx2_grid.addWidget(self.checkBox_join_gate_3, 1, 1, 1, 1)
-        self.spinBox_Ordinal_gate_3 = QtWidgets.QSpinBox(self.groupSignalTransmission)
-        self.spinBox_Ordinal_gate_3.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.spinBox_Ordinal_gate_3.setFont(font)
-        self.spinBox_Ordinal_gate_3.setAlignment(QtCore.Qt.AlignCenter)
-        self.spinBox_Ordinal_gate_3.setMinimum(1)
-        self.spinBox_Ordinal_gate_3.setMaximum(99)
-        self.spinBox_Ordinal_gate_3.setProperty("value", 1)
-        self.spinBox_Ordinal_gate_3.setObjectName("spinBox_Ordinal_gate_3")
-        self.grid_trx2_grid.addWidget(self.spinBox_Ordinal_gate_3, 1, 2, 1, 1)
-        self.comboBox_value_gate_3 = QtWidgets.QComboBox(self.groupSignalTransmission)
-        self.comboBox_value_gate_3.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_value_gate_3.setFont(font)
-        self.comboBox_value_gate_3.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 37px; \n"
-"}\n"
-"")
-        self.comboBox_value_gate_3.setObjectName("comboBox_value_gate_3")
-        self.comboBox_value_gate_3.addItem("")
-        self.comboBox_value_gate_3.addItem("")
-        self.grid_trx2_grid.addWidget(self.comboBox_value_gate_3, 1, 3, 1, 1)
-        self.trx2_Busy_lbl = QtWidgets.QPushButton(self.groupSignalTransmission)
-        self.trx2_Busy_lbl.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.trx2_Busy_lbl.setFont(font)
-        self.trx2_Busy_lbl.setStyleSheet("QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }")
-        self.trx2_Busy_lbl.setObjectName("trx2_Busy_lbl")
-        self.grid_trx2_grid.addWidget(self.trx2_Busy_lbl, 2, 0, 1, 1)
         self.checkBox_join_busy_3 = QtWidgets.QCheckBox(self.groupSignalTransmission)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
@@ -991,46 +1475,154 @@ class Ui_MainWindow(object):
         self.checkBox_join_busy_3.setChecked(True)
         self.checkBox_join_busy_3.setObjectName("checkBox_join_busy_3")
         self.grid_trx2_grid.addWidget(self.checkBox_join_busy_3, 2, 1, 1, 1)
-        self.spinBox_Ordinal_busy_3 = QtWidgets.QSpinBox(self.groupSignalTransmission)
-        self.spinBox_Ordinal_busy_3.setMinimumSize(QtCore.QSize(0, 28))
+        self.trx2_header_2 = QtWidgets.QLabel(self.groupSignalTransmission)
+        self.trx2_header_2.setMinimumSize(QtCore.QSize(0, 30))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
-        self.spinBox_Ordinal_busy_3.setFont(font)
-        self.spinBox_Ordinal_busy_3.setAlignment(QtCore.Qt.AlignCenter)
-        self.spinBox_Ordinal_busy_3.setMinimum(1)
-        self.spinBox_Ordinal_busy_3.setMaximum(99)
-        self.spinBox_Ordinal_busy_3.setProperty("value", 2)
-        self.spinBox_Ordinal_busy_3.setObjectName("spinBox_Ordinal_busy_3")
-        self.grid_trx2_grid.addWidget(self.spinBox_Ordinal_busy_3, 2, 2, 1, 1)
-        self.comboBox_value_busy_3 = QtWidgets.QComboBox(self.groupSignalTransmission)
-        self.comboBox_value_busy_3.setMinimumSize(QtCore.QSize(0, 28))
+        self.trx2_header_2.setFont(font)
+        self.trx2_header_2.setStyleSheet("background-color:#D7E6E3; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
+        self.trx2_header_2.setAlignment(QtCore.Qt.AlignCenter)
+        self.trx2_header_2.setObjectName("trx2_header_2")
+        self.grid_trx2_grid.addWidget(self.trx2_header_2, 0, 2, 1, 1)
+        self.label_47 = QtWidgets.QLabel(self.groupSignalTransmission)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
-        self.comboBox_value_busy_3.setFont(font)
-        self.comboBox_value_busy_3.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 37px; \n"
+        self.label_47.setFont(font)
+        self.label_47.setStyleSheet("QLabel {\n"
+"    background-color: #EEFAFF;\n"
+"    color: black;\n"
+"    border: 1px solid #BAE6FD;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    font-weight: bold;\n"
 "}\n"
 "")
-        self.comboBox_value_busy_3.setObjectName("comboBox_value_busy_3")
-        self.comboBox_value_busy_3.addItem("")
-        self.comboBox_value_busy_3.addItem("")
-        self.grid_trx2_grid.addWidget(self.comboBox_value_busy_3, 2, 3, 1, 1)
-        self.trx2_Ready_lbl = QtWidgets.QPushButton(self.groupSignalTransmission)
-        self.trx2_Ready_lbl.setMinimumSize(QtCore.QSize(0, 28))
+        self.label_47.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_47.setObjectName("label_47")
+        self.grid_trx2_grid.addWidget(self.label_47, 2, 0, 1, 1)
+        self.spinBox_Ordinal_ready_3 = QtWidgets.QSpinBox(self.groupSignalTransmission)
+        self.spinBox_Ordinal_ready_3.setMinimumSize(QtCore.QSize(0, 36))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.spinBox_Ordinal_ready_3.setFont(font)
+        self.spinBox_Ordinal_ready_3.setStyleSheet("/* Khung chính của SpinBox */\n"
+"QSpinBox, QDoubleSpinBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 16px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QSpinBox:hover, QDoubleSpinBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi click chuột vào nhập số */\n"
+"QSpinBox:focus, QDoubleSpinBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút Tăng (Mũi tên lên) */\n"
+"QSpinBox::up-button, QDoubleSpinBox::up-button {\n"
+"    subcontrol-origin: border;\n"
+"    subcontrol-position: top right;\n"
+"    width: 24px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-bottom: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"QSpinBox::up-button:pressed, QDoubleSpinBox::up-button:pressed {\n"
+"    background-color: #BAE6FD;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ lên bằng CSS */\n"
+"QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 4px solid transparent;\n"
+"    border-right: 4px solid transparent;\n"
+"    border-bottom: 4px solid #475569;\n"
+"}\n"
+"\n"
+"QSpinBox::up-arrow:hover, QDoubleSpinBox::up-arrow:hover {\n"
+"    border-bottom: 4px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Khu vực nút Giảm (Mũi tên xuống) */\n"
+"QSpinBox::down-button, QDoubleSpinBox::down-button {\n"
+"    subcontrol-origin: border;\n"
+"    subcontrol-position: bottom right;\n"
+"    width: 24px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QSpinBox::down-button:hover, QDoubleSpinBox::down-button:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"QSpinBox::down-button:pressed, QDoubleSpinBox::down-button:pressed {\n"
+"    background-color: #BAE6FD;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS */\n"
+"QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 4px solid transparent;\n"
+"    border-right: 4px solid transparent;\n"
+"    border-top: 4px solid #475569;\n"
+"}\n"
+"\n"
+"QSpinBox::down-arrow:hover, QDoubleSpinBox::down-arrow:hover {\n"
+"    border-top: 4px solid #0369A1;\n"
+"}\n"
+"")
+        self.spinBox_Ordinal_ready_3.setAlignment(QtCore.Qt.AlignCenter)
+        self.spinBox_Ordinal_ready_3.setMinimum(1)
+        self.spinBox_Ordinal_ready_3.setMaximum(99)
+        self.spinBox_Ordinal_ready_3.setProperty("value", 3)
+        self.spinBox_Ordinal_ready_3.setObjectName("spinBox_Ordinal_ready_3")
+        self.grid_trx2_grid.addWidget(self.spinBox_Ordinal_ready_3, 3, 2, 1, 1)
+        self.trx2_header_0 = QtWidgets.QLabel(self.groupSignalTransmission)
+        self.trx2_header_0.setMinimumSize(QtCore.QSize(0, 30))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
-        self.trx2_Ready_lbl.setFont(font)
-        self.trx2_Ready_lbl.setStyleSheet("QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }")
-        self.trx2_Ready_lbl.setObjectName("trx2_Ready_lbl")
-        self.grid_trx2_grid.addWidget(self.trx2_Ready_lbl, 3, 0, 1, 1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.trx2_header_0.setFont(font)
+        self.trx2_header_0.setStyleSheet("background-color:#D7E6E3; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
+        self.trx2_header_0.setAlignment(QtCore.Qt.AlignCenter)
+        self.trx2_header_0.setObjectName("trx2_header_0")
+        self.grid_trx2_grid.addWidget(self.trx2_header_0, 0, 0, 1, 1)
         self.checkBox_join_ready_3 = QtWidgets.QCheckBox(self.groupSignalTransmission)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
@@ -1047,37 +1639,591 @@ class Ui_MainWindow(object):
         self.checkBox_join_ready_3.setChecked(True)
         self.checkBox_join_ready_3.setObjectName("checkBox_join_ready_3")
         self.grid_trx2_grid.addWidget(self.checkBox_join_ready_3, 3, 1, 1, 1)
-        self.spinBox_Ordinal_ready_3 = QtWidgets.QSpinBox(self.groupSignalTransmission)
-        self.spinBox_Ordinal_ready_3.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.spinBox_Ordinal_ready_3.setFont(font)
-        self.spinBox_Ordinal_ready_3.setAlignment(QtCore.Qt.AlignCenter)
-        self.spinBox_Ordinal_ready_3.setMinimum(1)
-        self.spinBox_Ordinal_ready_3.setMaximum(99)
-        self.spinBox_Ordinal_ready_3.setProperty("value", 3)
-        self.spinBox_Ordinal_ready_3.setObjectName("spinBox_Ordinal_ready_3")
-        self.grid_trx2_grid.addWidget(self.spinBox_Ordinal_ready_3, 3, 2, 1, 1)
         self.comboBox_value_ready_3 = QtWidgets.QComboBox(self.groupSignalTransmission)
-        self.comboBox_value_ready_3.setMinimumSize(QtCore.QSize(0, 28))
+        self.comboBox_value_ready_3.setMinimumSize(QtCore.QSize(0, 36))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.comboBox_value_ready_3.setFont(font)
-        self.comboBox_value_ready_3.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 37px; \n"
+        self.comboBox_value_ready_3.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"  padding-left: 37px; \n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
 "}\n"
 "")
         self.comboBox_value_ready_3.setObjectName("comboBox_value_ready_3")
         self.comboBox_value_ready_3.addItem("")
         self.comboBox_value_ready_3.addItem("")
         self.grid_trx2_grid.addWidget(self.comboBox_value_ready_3, 3, 3, 1, 1)
+        self.trx2_header_1 = QtWidgets.QLabel(self.groupSignalTransmission)
+        self.trx2_header_1.setMinimumSize(QtCore.QSize(0, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.trx2_header_1.setFont(font)
+        self.trx2_header_1.setStyleSheet("background-color:#D7E6E3; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
+        self.trx2_header_1.setAlignment(QtCore.Qt.AlignCenter)
+        self.trx2_header_1.setObjectName("trx2_header_1")
+        self.grid_trx2_grid.addWidget(self.trx2_header_1, 0, 1, 1, 1)
+        self.checkBox_join_gate_3 = QtWidgets.QCheckBox(self.groupSignalTransmission)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.checkBox_join_gate_3.setFont(font)
+        self.checkBox_join_gate_3.setStyleSheet("\n"
+"/* Căn giữa ô vuông tích check */\n"
+"QCheckBox::indicator {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: center; /* Đưa ô vuông vào chính giữa */\n"
+"}\n"
+"")
+        self.checkBox_join_gate_3.setText("")
+        self.checkBox_join_gate_3.setChecked(True)
+        self.checkBox_join_gate_3.setObjectName("checkBox_join_gate_3")
+        self.grid_trx2_grid.addWidget(self.checkBox_join_gate_3, 1, 1, 1, 1)
+        self.comboBox_value_gate_3 = QtWidgets.QComboBox(self.groupSignalTransmission)
+        self.comboBox_value_gate_3.setMinimumSize(QtCore.QSize(0, 36))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_value_gate_3.setFont(font)
+        self.comboBox_value_gate_3.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"  padding-left: 37px; \n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.comboBox_value_gate_3.setObjectName("comboBox_value_gate_3")
+        self.comboBox_value_gate_3.addItem("")
+        self.comboBox_value_gate_3.addItem("")
+        self.grid_trx2_grid.addWidget(self.comboBox_value_gate_3, 1, 3, 1, 1)
+        self.comboBox_value_busy_3 = QtWidgets.QComboBox(self.groupSignalTransmission)
+        self.comboBox_value_busy_3.setMinimumSize(QtCore.QSize(0, 36))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_value_busy_3.setFont(font)
+        self.comboBox_value_busy_3.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"  padding-left: 37px; \n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.comboBox_value_busy_3.setObjectName("comboBox_value_busy_3")
+        self.comboBox_value_busy_3.addItem("")
+        self.comboBox_value_busy_3.addItem("")
+        self.grid_trx2_grid.addWidget(self.comboBox_value_busy_3, 2, 3, 1, 1)
+        self.label_44 = QtWidgets.QLabel(self.groupSignalTransmission)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_44.setFont(font)
+        self.label_44.setStyleSheet("QLabel {\n"
+"    background-color: #EEFAFF;\n"
+"    color: black;\n"
+"    border: 1px solid #BAE6FD;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.label_44.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_44.setObjectName("label_44")
+        self.grid_trx2_grid.addWidget(self.label_44, 1, 0, 1, 1)
+        self.trx2_header_3 = QtWidgets.QLabel(self.groupSignalTransmission)
+        self.trx2_header_3.setMinimumSize(QtCore.QSize(0, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.trx2_header_3.setFont(font)
+        self.trx2_header_3.setStyleSheet("background-color:#D7E6E3; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
+        self.trx2_header_3.setAlignment(QtCore.Qt.AlignCenter)
+        self.trx2_header_3.setObjectName("trx2_header_3")
+        self.grid_trx2_grid.addWidget(self.trx2_header_3, 0, 3, 1, 1)
+        self.spinBox_Ordinal_busy_3 = QtWidgets.QSpinBox(self.groupSignalTransmission)
+        self.spinBox_Ordinal_busy_3.setMinimumSize(QtCore.QSize(0, 36))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.spinBox_Ordinal_busy_3.setFont(font)
+        self.spinBox_Ordinal_busy_3.setStyleSheet("/* Khung chính của SpinBox */\n"
+"QSpinBox, QDoubleSpinBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 16px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QSpinBox:hover, QDoubleSpinBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi click chuột vào nhập số */\n"
+"QSpinBox:focus, QDoubleSpinBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút Tăng (Mũi tên lên) */\n"
+"QSpinBox::up-button, QDoubleSpinBox::up-button {\n"
+"    subcontrol-origin: border;\n"
+"    subcontrol-position: top right;\n"
+"    width: 24px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-bottom: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"QSpinBox::up-button:pressed, QDoubleSpinBox::up-button:pressed {\n"
+"    background-color: #BAE6FD;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ lên bằng CSS */\n"
+"QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 4px solid transparent;\n"
+"    border-right: 4px solid transparent;\n"
+"    border-bottom: 4px solid #475569;\n"
+"}\n"
+"\n"
+"QSpinBox::up-arrow:hover, QDoubleSpinBox::up-arrow:hover {\n"
+"    border-bottom: 4px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Khu vực nút Giảm (Mũi tên xuống) */\n"
+"QSpinBox::down-button, QDoubleSpinBox::down-button {\n"
+"    subcontrol-origin: border;\n"
+"    subcontrol-position: bottom right;\n"
+"    width: 24px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QSpinBox::down-button:hover, QDoubleSpinBox::down-button:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"QSpinBox::down-button:pressed, QDoubleSpinBox::down-button:pressed {\n"
+"    background-color: #BAE6FD;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS */\n"
+"QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 4px solid transparent;\n"
+"    border-right: 4px solid transparent;\n"
+"    border-top: 4px solid #475569;\n"
+"}\n"
+"\n"
+"QSpinBox::down-arrow:hover, QDoubleSpinBox::down-arrow:hover {\n"
+"    border-top: 4px solid #0369A1;\n"
+"}\n"
+"")
+        self.spinBox_Ordinal_busy_3.setAlignment(QtCore.Qt.AlignCenter)
+        self.spinBox_Ordinal_busy_3.setMinimum(1)
+        self.spinBox_Ordinal_busy_3.setMaximum(99)
+        self.spinBox_Ordinal_busy_3.setProperty("value", 2)
+        self.spinBox_Ordinal_busy_3.setObjectName("spinBox_Ordinal_busy_3")
+        self.grid_trx2_grid.addWidget(self.spinBox_Ordinal_busy_3, 2, 2, 1, 1)
+        self.label_48 = QtWidgets.QLabel(self.groupSignalTransmission)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_48.setFont(font)
+        self.label_48.setStyleSheet("QLabel {\n"
+"    background-color: #EEFAFF;\n"
+"    color: black;\n"
+"    border: 1px solid #BAE6FD;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.label_48.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_48.setObjectName("label_48")
+        self.grid_trx2_grid.addWidget(self.label_48, 3, 0, 1, 1)
+        self.spinBox_Ordinal_gate_3 = QtWidgets.QSpinBox(self.groupSignalTransmission)
+        self.spinBox_Ordinal_gate_3.setMinimumSize(QtCore.QSize(0, 36))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.spinBox_Ordinal_gate_3.setFont(font)
+        self.spinBox_Ordinal_gate_3.setStyleSheet("/* Khung chính của SpinBox */\n"
+"QSpinBox, QDoubleSpinBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 16px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QSpinBox:hover, QDoubleSpinBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi click chuột vào nhập số */\n"
+"QSpinBox:focus, QDoubleSpinBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút Tăng (Mũi tên lên) */\n"
+"QSpinBox::up-button, QDoubleSpinBox::up-button {\n"
+"    subcontrol-origin: border;\n"
+"    subcontrol-position: top right;\n"
+"    width: 24px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-bottom: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"QSpinBox::up-button:pressed, QDoubleSpinBox::up-button:pressed {\n"
+"    background-color: #BAE6FD;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ lên bằng CSS */\n"
+"QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 4px solid transparent;\n"
+"    border-right: 4px solid transparent;\n"
+"    border-bottom: 4px solid #475569;\n"
+"}\n"
+"\n"
+"QSpinBox::up-arrow:hover, QDoubleSpinBox::up-arrow:hover {\n"
+"    border-bottom: 4px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Khu vực nút Giảm (Mũi tên xuống) */\n"
+"QSpinBox::down-button, QDoubleSpinBox::down-button {\n"
+"    subcontrol-origin: border;\n"
+"    subcontrol-position: bottom right;\n"
+"    width: 24px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QSpinBox::down-button:hover, QDoubleSpinBox::down-button:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"QSpinBox::down-button:pressed, QDoubleSpinBox::down-button:pressed {\n"
+"    background-color: #BAE6FD;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS */\n"
+"QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 4px solid transparent;\n"
+"    border-right: 4px solid transparent;\n"
+"    border-top: 4px solid #475569;\n"
+"}\n"
+"\n"
+"QSpinBox::down-arrow:hover, QDoubleSpinBox::down-arrow:hover {\n"
+"    border-top: 4px solid #0369A1;\n"
+"}\n"
+"")
+        self.spinBox_Ordinal_gate_3.setAlignment(QtCore.Qt.AlignCenter)
+        self.spinBox_Ordinal_gate_3.setMinimum(1)
+        self.spinBox_Ordinal_gate_3.setMaximum(99)
+        self.spinBox_Ordinal_gate_3.setProperty("value", 1)
+        self.spinBox_Ordinal_gate_3.setObjectName("spinBox_Ordinal_gate_3")
+        self.grid_trx2_grid.addWidget(self.spinBox_Ordinal_gate_3, 1, 2, 1, 1)
         self.vlayout_trans_v.addLayout(self.grid_trx2_grid)
         self.vlayout_groupSignalTransmission_outer.addLayout(self.vlayout_trans_v)
         self.hlayout_func_sub_row.addWidget(self.groupSignalTransmission)
@@ -1089,13 +2235,13 @@ class Ui_MainWindow(object):
         self.groupDelayHandling.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupDelayHandling.setFont(font)
         self.groupDelayHandling.setStyleSheet("/* Khung chính của GroupBox */\n"
 "QGroupBox {\n"
-"    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */\n"
+"    background-color: #FBFFF9; /* Màu nền theo yêu cầu của bạn */\n"
 "    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
 "    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
 "    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
@@ -1123,63 +2269,6 @@ class Ui_MainWindow(object):
         self.grid_dly1_grid = QtWidgets.QGridLayout()
         self.grid_dly1_grid.setSpacing(8)
         self.grid_dly1_grid.setObjectName("grid_dly1_grid")
-        self.dly1_header_0 = QtWidgets.QLabel(self.groupDelayHandling)
-        self.dly1_header_0.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.dly1_header_0.setFont(font)
-        self.dly1_header_0.setStyleSheet("background-color:#ececec; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
-        self.dly1_header_0.setAlignment(QtCore.Qt.AlignCenter)
-        self.dly1_header_0.setObjectName("dly1_header_0")
-        self.grid_dly1_grid.addWidget(self.dly1_header_0, 0, 0, 1, 1)
-        self.dly1_header_1 = QtWidgets.QLabel(self.groupDelayHandling)
-        self.dly1_header_1.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.dly1_header_1.setFont(font)
-        self.dly1_header_1.setStyleSheet("background-color:#ececec; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
-        self.dly1_header_1.setAlignment(QtCore.Qt.AlignCenter)
-        self.dly1_header_1.setObjectName("dly1_header_1")
-        self.grid_dly1_grid.addWidget(self.dly1_header_1, 0, 1, 1, 1)
-        self.dly1_header_2 = QtWidgets.QLabel(self.groupDelayHandling)
-        self.dly1_header_2.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.dly1_header_2.setFont(font)
-        self.dly1_header_2.setStyleSheet("background-color:#ececec; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
-        self.dly1_header_2.setAlignment(QtCore.Qt.AlignCenter)
-        self.dly1_header_2.setObjectName("dly1_header_2")
-        self.grid_dly1_grid.addWidget(self.dly1_header_2, 0, 2, 1, 1)
-        self.dly1_header_3 = QtWidgets.QLabel(self.groupDelayHandling)
-        self.dly1_header_3.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.dly1_header_3.setFont(font)
-        self.dly1_header_3.setStyleSheet("background-color:#ececec; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
-        self.dly1_header_3.setAlignment(QtCore.Qt.AlignCenter)
-        self.dly1_header_3.setObjectName("dly1_header_3")
-        self.grid_dly1_grid.addWidget(self.dly1_header_3, 0, 3, 1, 1)
-        self.dly1_Gate_lbl = QtWidgets.QPushButton(self.groupDelayHandling)
-        self.dly1_Gate_lbl.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.dly1_Gate_lbl.setFont(font)
-        self.dly1_Gate_lbl.setStyleSheet("QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }")
-        self.dly1_Gate_lbl.setObjectName("dly1_Gate_lbl")
-        self.grid_dly1_grid.addWidget(self.dly1_Gate_lbl, 1, 0, 1, 1)
         self.checkBox_before_gate_2 = QtWidgets.QCheckBox(self.groupDelayHandling)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
@@ -1195,110 +2284,6 @@ class Ui_MainWindow(object):
         self.checkBox_before_gate_2.setText("")
         self.checkBox_before_gate_2.setObjectName("checkBox_before_gate_2")
         self.grid_dly1_grid.addWidget(self.checkBox_before_gate_2, 1, 1, 1, 1)
-        self.checkBox_after_gate_2 = QtWidgets.QCheckBox(self.groupDelayHandling)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.checkBox_after_gate_2.setFont(font)
-        self.checkBox_after_gate_2.setStyleSheet("\n"
-"/* Căn giữa ô vuông tích check */\n"
-"QCheckBox::indicator {\n"
-"    subcontrol-origin: padding;\n"
-"    subcontrol-position: center; /* Đưa ô vuông vào chính giữa */\n"
-"}\n"
-"")
-        self.checkBox_after_gate_2.setText("")
-        self.checkBox_after_gate_2.setChecked(True)
-        self.checkBox_after_gate_2.setObjectName("checkBox_after_gate_2")
-        self.grid_dly1_grid.addWidget(self.checkBox_after_gate_2, 1, 2, 1, 1)
-        self.lineEdit_timer_gate_2 = QtWidgets.QLineEdit(self.groupDelayHandling)
-        self.lineEdit_timer_gate_2.setMinimumSize(QtCore.QSize(0, 28))
-        self.lineEdit_timer_gate_2.setMaximumSize(QtCore.QSize(100, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.lineEdit_timer_gate_2.setFont(font)
-        self.lineEdit_timer_gate_2.setAlignment(QtCore.Qt.AlignCenter)
-        self.lineEdit_timer_gate_2.setObjectName("lineEdit_timer_gate_2")
-        self.grid_dly1_grid.addWidget(self.lineEdit_timer_gate_2, 1, 3, 1, 1)
-        self.dly1_Busy_lbl = QtWidgets.QPushButton(self.groupDelayHandling)
-        self.dly1_Busy_lbl.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.dly1_Busy_lbl.setFont(font)
-        self.dly1_Busy_lbl.setStyleSheet("QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }")
-        self.dly1_Busy_lbl.setObjectName("dly1_Busy_lbl")
-        self.grid_dly1_grid.addWidget(self.dly1_Busy_lbl, 2, 0, 1, 1)
-        self.checkBox_before_busy_2 = QtWidgets.QCheckBox(self.groupDelayHandling)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.checkBox_before_busy_2.setFont(font)
-        self.checkBox_before_busy_2.setStyleSheet("\n"
-"/* Căn giữa ô vuông tích check */\n"
-"QCheckBox::indicator {\n"
-"    subcontrol-origin: padding;\n"
-"    subcontrol-position: center; /* Đưa ô vuông vào chính giữa */\n"
-"}\n"
-"")
-        self.checkBox_before_busy_2.setText("")
-        self.checkBox_before_busy_2.setObjectName("checkBox_before_busy_2")
-        self.grid_dly1_grid.addWidget(self.checkBox_before_busy_2, 2, 1, 1, 1)
-        self.checkBox_after_busy_2 = QtWidgets.QCheckBox(self.groupDelayHandling)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.checkBox_after_busy_2.setFont(font)
-        self.checkBox_after_busy_2.setStyleSheet("\n"
-"/* Căn giữa ô vuông tích check */\n"
-"QCheckBox::indicator {\n"
-"    subcontrol-origin: padding;\n"
-"    subcontrol-position: center; /* Đưa ô vuông vào chính giữa */\n"
-"}\n"
-"")
-        self.checkBox_after_busy_2.setText("")
-        self.checkBox_after_busy_2.setChecked(True)
-        self.checkBox_after_busy_2.setObjectName("checkBox_after_busy_2")
-        self.grid_dly1_grid.addWidget(self.checkBox_after_busy_2, 2, 2, 1, 1)
-        self.lineEdit_timer_busy_2 = QtWidgets.QLineEdit(self.groupDelayHandling)
-        self.lineEdit_timer_busy_2.setMinimumSize(QtCore.QSize(0, 28))
-        self.lineEdit_timer_busy_2.setMaximumSize(QtCore.QSize(100, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.lineEdit_timer_busy_2.setFont(font)
-        self.lineEdit_timer_busy_2.setAlignment(QtCore.Qt.AlignCenter)
-        self.lineEdit_timer_busy_2.setObjectName("lineEdit_timer_busy_2")
-        self.grid_dly1_grid.addWidget(self.lineEdit_timer_busy_2, 2, 3, 1, 1)
-        self.dly1_Ready_lbl = QtWidgets.QPushButton(self.groupDelayHandling)
-        self.dly1_Ready_lbl.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.dly1_Ready_lbl.setFont(font)
-        self.dly1_Ready_lbl.setStyleSheet("QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }")
-        self.dly1_Ready_lbl.setObjectName("dly1_Ready_lbl")
-        self.grid_dly1_grid.addWidget(self.dly1_Ready_lbl, 3, 0, 1, 1)
-        self.checkBox_before_ready_2 = QtWidgets.QCheckBox(self.groupDelayHandling)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.checkBox_before_ready_2.setFont(font)
-        self.checkBox_before_ready_2.setStyleSheet("\n"
-"/* Căn giữa ô vuông tích check */\n"
-"QCheckBox::indicator {\n"
-"    subcontrol-origin: padding;\n"
-"    subcontrol-position: center; /* Đưa ô vuông vào chính giữa */\n"
-"}\n"
-"")
-        self.checkBox_before_ready_2.setText("")
-        self.checkBox_before_ready_2.setObjectName("checkBox_before_ready_2")
-        self.grid_dly1_grid.addWidget(self.checkBox_before_ready_2, 3, 1, 1, 1)
         self.checkBox_after_ready_2 = QtWidgets.QCheckBox(self.groupDelayHandling)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
@@ -1315,18 +2300,297 @@ class Ui_MainWindow(object):
         self.checkBox_after_ready_2.setChecked(True)
         self.checkBox_after_ready_2.setObjectName("checkBox_after_ready_2")
         self.grid_dly1_grid.addWidget(self.checkBox_after_ready_2, 3, 2, 1, 1)
-        self.lineEdit_timer_ready_2 = QtWidgets.QLineEdit(self.groupDelayHandling)
-        self.lineEdit_timer_ready_2.setMinimumSize(QtCore.QSize(0, 28))
-        self.lineEdit_timer_ready_2.setMaximumSize(QtCore.QSize(100, 16777215))
+        self.checkBox_after_busy_2 = QtWidgets.QCheckBox(self.groupDelayHandling)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.checkBox_after_busy_2.setFont(font)
+        self.checkBox_after_busy_2.setStyleSheet("\n"
+"/* Căn giữa ô vuông tích check */\n"
+"QCheckBox::indicator {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: center; /* Đưa ô vuông vào chính giữa */\n"
+"}\n"
+"")
+        self.checkBox_after_busy_2.setText("")
+        self.checkBox_after_busy_2.setChecked(True)
+        self.checkBox_after_busy_2.setObjectName("checkBox_after_busy_2")
+        self.grid_dly1_grid.addWidget(self.checkBox_after_busy_2, 2, 2, 1, 1)
+        self.checkBox_before_busy_2 = QtWidgets.QCheckBox(self.groupDelayHandling)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.checkBox_before_busy_2.setFont(font)
+        self.checkBox_before_busy_2.setStyleSheet("\n"
+"/* Căn giữa ô vuông tích check */\n"
+"QCheckBox::indicator {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: center; /* Đưa ô vuông vào chính giữa */\n"
+"}\n"
+"")
+        self.checkBox_before_busy_2.setText("")
+        self.checkBox_before_busy_2.setObjectName("checkBox_before_busy_2")
+        self.grid_dly1_grid.addWidget(self.checkBox_before_busy_2, 2, 1, 1, 1)
+        self.dly1_header_1 = QtWidgets.QLabel(self.groupDelayHandling)
+        self.dly1_header_1.setMinimumSize(QtCore.QSize(0, 30))
+        self.dly1_header_1.setMaximumSize(QtCore.QSize(16777215, 28))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
+        self.dly1_header_1.setFont(font)
+        self.dly1_header_1.setStyleSheet("background-color:#D7E6E3; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
+        self.dly1_header_1.setAlignment(QtCore.Qt.AlignCenter)
+        self.dly1_header_1.setObjectName("dly1_header_1")
+        self.grid_dly1_grid.addWidget(self.dly1_header_1, 0, 1, 1, 1)
+        self.checkBox_before_ready_2 = QtWidgets.QCheckBox(self.groupDelayHandling)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.checkBox_before_ready_2.setFont(font)
+        self.checkBox_before_ready_2.setStyleSheet("\n"
+"/* Căn giữa ô vuông tích check */\n"
+"QCheckBox::indicator {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: center; /* Đưa ô vuông vào chính giữa */\n"
+"}\n"
+"")
+        self.checkBox_before_ready_2.setText("")
+        self.checkBox_before_ready_2.setObjectName("checkBox_before_ready_2")
+        self.grid_dly1_grid.addWidget(self.checkBox_before_ready_2, 3, 1, 1, 1)
+        self.dly1_header_3 = QtWidgets.QLabel(self.groupDelayHandling)
+        self.dly1_header_3.setMinimumSize(QtCore.QSize(0, 30))
+        self.dly1_header_3.setMaximumSize(QtCore.QSize(16777215, 28))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.dly1_header_3.setFont(font)
+        self.dly1_header_3.setStyleSheet("background-color:#D7E6E3; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
+        self.dly1_header_3.setAlignment(QtCore.Qt.AlignCenter)
+        self.dly1_header_3.setObjectName("dly1_header_3")
+        self.grid_dly1_grid.addWidget(self.dly1_header_3, 0, 3, 1, 1)
+        self.dly1_header_2 = QtWidgets.QLabel(self.groupDelayHandling)
+        self.dly1_header_2.setMinimumSize(QtCore.QSize(0, 30))
+        self.dly1_header_2.setMaximumSize(QtCore.QSize(16777215, 28))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.dly1_header_2.setFont(font)
+        self.dly1_header_2.setStyleSheet("background-color:#D7E6E3; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
+        self.dly1_header_2.setAlignment(QtCore.Qt.AlignCenter)
+        self.dly1_header_2.setObjectName("dly1_header_2")
+        self.grid_dly1_grid.addWidget(self.dly1_header_2, 0, 2, 1, 1)
+        self.lineEdit_timer_ready_2 = QtWidgets.QLineEdit(self.groupDelayHandling)
+        self.lineEdit_timer_ready_2.setMinimumSize(QtCore.QSize(0, 36))
+        self.lineEdit_timer_ready_2.setMaximumSize(QtCore.QSize(100, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
         self.lineEdit_timer_ready_2.setFont(font)
+        self.lineEdit_timer_ready_2.setStyleSheet("/* Khung chính của LineEdit */\n"
+"QLineEdit {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QLineEdit:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi click chuột vào để gõ chữ (Focus) */\n"
+"QLineEdit:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"")
         self.lineEdit_timer_ready_2.setAlignment(QtCore.Qt.AlignCenter)
         self.lineEdit_timer_ready_2.setObjectName("lineEdit_timer_ready_2")
         self.grid_dly1_grid.addWidget(self.lineEdit_timer_ready_2, 3, 3, 1, 1)
+        self.lineEdit_timer_gate_2 = QtWidgets.QLineEdit(self.groupDelayHandling)
+        self.lineEdit_timer_gate_2.setMinimumSize(QtCore.QSize(0, 36))
+        self.lineEdit_timer_gate_2.setMaximumSize(QtCore.QSize(100, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lineEdit_timer_gate_2.setFont(font)
+        self.lineEdit_timer_gate_2.setStyleSheet("/* Khung chính của LineEdit */\n"
+"QLineEdit {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QLineEdit:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi click chuột vào để gõ chữ (Focus) */\n"
+"QLineEdit:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"")
+        self.lineEdit_timer_gate_2.setAlignment(QtCore.Qt.AlignCenter)
+        self.lineEdit_timer_gate_2.setObjectName("lineEdit_timer_gate_2")
+        self.grid_dly1_grid.addWidget(self.lineEdit_timer_gate_2, 1, 3, 1, 1)
+        self.dly1_header_0 = QtWidgets.QLabel(self.groupDelayHandling)
+        self.dly1_header_0.setMinimumSize(QtCore.QSize(0, 30))
+        self.dly1_header_0.setMaximumSize(QtCore.QSize(16777215, 28))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.dly1_header_0.setFont(font)
+        self.dly1_header_0.setStyleSheet("background-color:#D7E6E3; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
+        self.dly1_header_0.setAlignment(QtCore.Qt.AlignCenter)
+        self.dly1_header_0.setObjectName("dly1_header_0")
+        self.grid_dly1_grid.addWidget(self.dly1_header_0, 0, 0, 1, 1)
+        self.lineEdit_timer_busy_2 = QtWidgets.QLineEdit(self.groupDelayHandling)
+        self.lineEdit_timer_busy_2.setMinimumSize(QtCore.QSize(0, 36))
+        self.lineEdit_timer_busy_2.setMaximumSize(QtCore.QSize(100, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lineEdit_timer_busy_2.setFont(font)
+        self.lineEdit_timer_busy_2.setStyleSheet("/* Khung chính của LineEdit */\n"
+"QLineEdit {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QLineEdit:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi click chuột vào để gõ chữ (Focus) */\n"
+"QLineEdit:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"")
+        self.lineEdit_timer_busy_2.setAlignment(QtCore.Qt.AlignCenter)
+        self.lineEdit_timer_busy_2.setObjectName("lineEdit_timer_busy_2")
+        self.grid_dly1_grid.addWidget(self.lineEdit_timer_busy_2, 2, 3, 1, 1)
+        self.checkBox_after_gate_2 = QtWidgets.QCheckBox(self.groupDelayHandling)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.checkBox_after_gate_2.setFont(font)
+        self.checkBox_after_gate_2.setStyleSheet("\n"
+"/* Căn giữa ô vuông tích check */\n"
+"QCheckBox::indicator {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: center; /* Đưa ô vuông vào chính giữa */\n"
+"}\n"
+"")
+        self.checkBox_after_gate_2.setText("")
+        self.checkBox_after_gate_2.setChecked(True)
+        self.checkBox_after_gate_2.setObjectName("checkBox_after_gate_2")
+        self.grid_dly1_grid.addWidget(self.checkBox_after_gate_2, 1, 2, 1, 1)
+        self.label_49 = QtWidgets.QLabel(self.groupDelayHandling)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_49.setFont(font)
+        self.label_49.setStyleSheet("QLabel {\n"
+"    background-color: #EEFAFF;\n"
+"    color: black;\n"
+"    border: 1px solid #BAE6FD;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.label_49.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_49.setObjectName("label_49")
+        self.grid_dly1_grid.addWidget(self.label_49, 1, 0, 1, 1)
+        self.label_50 = QtWidgets.QLabel(self.groupDelayHandling)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_50.setFont(font)
+        self.label_50.setStyleSheet("QLabel {\n"
+"    background-color: #EEFAFF;\n"
+"    color: black;\n"
+"    border: 1px solid #BAE6FD;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.label_50.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_50.setObjectName("label_50")
+        self.grid_dly1_grid.addWidget(self.label_50, 2, 0, 1, 1)
+        self.label_51 = QtWidgets.QLabel(self.groupDelayHandling)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_51.setFont(font)
+        self.label_51.setStyleSheet("QLabel {\n"
+"    background-color: #EEFAFF;\n"
+"    color: black;\n"
+"    border: 1px solid #BAE6FD;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.label_51.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_51.setObjectName("label_51")
+        self.grid_dly1_grid.addWidget(self.label_51, 3, 0, 1, 1)
         self.vlayout_delay_v.addLayout(self.grid_dly1_grid)
         self.btnRetrieveImageBuffer2 = QtWidgets.QPushButton(self.groupDelayHandling)
         self.btnRetrieveImageBuffer2.setMinimumSize(QtCore.QSize(0, 28))
@@ -1342,63 +2606,58 @@ class Ui_MainWindow(object):
         self.grid_dly2_grid = QtWidgets.QGridLayout()
         self.grid_dly2_grid.setSpacing(8)
         self.grid_dly2_grid.setObjectName("grid_dly2_grid")
-        self.dly2_header_0 = QtWidgets.QLabel(self.groupDelayHandling)
-        self.dly2_header_0.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.dly2_header_0.setFont(font)
-        self.dly2_header_0.setStyleSheet("background-color:#ececec; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
-        self.dly2_header_0.setAlignment(QtCore.Qt.AlignCenter)
-        self.dly2_header_0.setObjectName("dly2_header_0")
-        self.grid_dly2_grid.addWidget(self.dly2_header_0, 0, 0, 1, 1)
         self.dly2_header_1 = QtWidgets.QLabel(self.groupDelayHandling)
-        self.dly2_header_1.setMinimumSize(QtCore.QSize(0, 28))
+        self.dly2_header_1.setMinimumSize(QtCore.QSize(0, 30))
+        self.dly2_header_1.setMaximumSize(QtCore.QSize(16777215, 28))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.dly2_header_1.setFont(font)
-        self.dly2_header_1.setStyleSheet("background-color:#ececec; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
+        self.dly2_header_1.setStyleSheet("background-color:#D7E6E3; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
         self.dly2_header_1.setAlignment(QtCore.Qt.AlignCenter)
         self.dly2_header_1.setObjectName("dly2_header_1")
         self.grid_dly2_grid.addWidget(self.dly2_header_1, 0, 1, 1, 1)
-        self.dly2_header_2 = QtWidgets.QLabel(self.groupDelayHandling)
-        self.dly2_header_2.setMinimumSize(QtCore.QSize(0, 28))
+        self.lineEdit_timer_gate_3 = QtWidgets.QLineEdit(self.groupDelayHandling)
+        self.lineEdit_timer_gate_3.setMinimumSize(QtCore.QSize(0, 36))
+        self.lineEdit_timer_gate_3.setMaximumSize(QtCore.QSize(100, 16777215))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
-        self.dly2_header_2.setFont(font)
-        self.dly2_header_2.setStyleSheet("background-color:#ececec; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
-        self.dly2_header_2.setAlignment(QtCore.Qt.AlignCenter)
-        self.dly2_header_2.setObjectName("dly2_header_2")
-        self.grid_dly2_grid.addWidget(self.dly2_header_2, 0, 2, 1, 1)
-        self.dly2_header_3 = QtWidgets.QLabel(self.groupDelayHandling)
-        self.dly2_header_3.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.dly2_header_3.setFont(font)
-        self.dly2_header_3.setStyleSheet("background-color:#ececec; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
-        self.dly2_header_3.setAlignment(QtCore.Qt.AlignCenter)
-        self.dly2_header_3.setObjectName("dly2_header_3")
-        self.grid_dly2_grid.addWidget(self.dly2_header_3, 0, 3, 1, 1)
-        self.dly2_Gate_lbl = QtWidgets.QPushButton(self.groupDelayHandling)
-        self.dly2_Gate_lbl.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.dly2_Gate_lbl.setFont(font)
-        self.dly2_Gate_lbl.setStyleSheet("QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }")
-        self.dly2_Gate_lbl.setObjectName("dly2_Gate_lbl")
-        self.grid_dly2_grid.addWidget(self.dly2_Gate_lbl, 1, 0, 1, 1)
+        self.lineEdit_timer_gate_3.setFont(font)
+        self.lineEdit_timer_gate_3.setStyleSheet("/* Khung chính của LineEdit */\n"
+"QLineEdit {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QLineEdit:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi click chuột vào để gõ chữ (Focus) */\n"
+"QLineEdit:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"")
+        self.lineEdit_timer_gate_3.setAlignment(QtCore.Qt.AlignCenter)
+        self.lineEdit_timer_gate_3.setObjectName("lineEdit_timer_gate_3")
+        self.grid_dly2_grid.addWidget(self.lineEdit_timer_gate_3, 1, 3, 1, 1)
         self.checkBox_before_gate_3 = QtWidgets.QCheckBox(self.groupDelayHandling)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
@@ -1414,58 +2673,73 @@ class Ui_MainWindow(object):
         self.checkBox_before_gate_3.setText("")
         self.checkBox_before_gate_3.setObjectName("checkBox_before_gate_3")
         self.grid_dly2_grid.addWidget(self.checkBox_before_gate_3, 1, 1, 1, 1)
-        self.checkBox_after_gate_3 = QtWidgets.QCheckBox(self.groupDelayHandling)
+        self.lineEdit_timer_busy_3 = QtWidgets.QLineEdit(self.groupDelayHandling)
+        self.lineEdit_timer_busy_3.setMinimumSize(QtCore.QSize(0, 36))
+        self.lineEdit_timer_busy_3.setMaximumSize(QtCore.QSize(100, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lineEdit_timer_busy_3.setFont(font)
+        self.lineEdit_timer_busy_3.setStyleSheet("/* Khung chính của LineEdit */\n"
+"QLineEdit {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QLineEdit:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi click chuột vào để gõ chữ (Focus) */\n"
+"QLineEdit:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"")
+        self.lineEdit_timer_busy_3.setAlignment(QtCore.Qt.AlignCenter)
+        self.lineEdit_timer_busy_3.setObjectName("lineEdit_timer_busy_3")
+        self.grid_dly2_grid.addWidget(self.lineEdit_timer_busy_3, 2, 3, 1, 1)
+        self.checkBox_before_ready_3 = QtWidgets.QCheckBox(self.groupDelayHandling)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
-        self.checkBox_after_gate_3.setFont(font)
-        self.checkBox_after_gate_3.setStyleSheet("\n"
+        self.checkBox_before_ready_3.setFont(font)
+        self.checkBox_before_ready_3.setStyleSheet("\n"
 "/* Căn giữa ô vuông tích check */\n"
 "QCheckBox::indicator {\n"
 "    subcontrol-origin: padding;\n"
 "    subcontrol-position: center; /* Đưa ô vuông vào chính giữa */\n"
 "}\n"
 "")
-        self.checkBox_after_gate_3.setText("")
-        self.checkBox_after_gate_3.setChecked(True)
-        self.checkBox_after_gate_3.setObjectName("checkBox_after_gate_3")
-        self.grid_dly2_grid.addWidget(self.checkBox_after_gate_3, 1, 2, 1, 1)
-        self.lineEdit_timer_gate_3 = QtWidgets.QLineEdit(self.groupDelayHandling)
-        self.lineEdit_timer_gate_3.setMinimumSize(QtCore.QSize(0, 28))
-        self.lineEdit_timer_gate_3.setMaximumSize(QtCore.QSize(100, 16777215))
+        self.checkBox_before_ready_3.setText("")
+        self.checkBox_before_ready_3.setObjectName("checkBox_before_ready_3")
+        self.grid_dly2_grid.addWidget(self.checkBox_before_ready_3, 3, 1, 1, 1)
+        self.dly2_header_0 = QtWidgets.QLabel(self.groupDelayHandling)
+        self.dly2_header_0.setMinimumSize(QtCore.QSize(0, 30))
+        self.dly2_header_0.setMaximumSize(QtCore.QSize(16777215, 28))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
-        self.lineEdit_timer_gate_3.setFont(font)
-        self.lineEdit_timer_gate_3.setAlignment(QtCore.Qt.AlignCenter)
-        self.lineEdit_timer_gate_3.setObjectName("lineEdit_timer_gate_3")
-        self.grid_dly2_grid.addWidget(self.lineEdit_timer_gate_3, 1, 3, 1, 1)
-        self.dly2_Busy_lbl = QtWidgets.QPushButton(self.groupDelayHandling)
-        self.dly2_Busy_lbl.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.dly2_Busy_lbl.setFont(font)
-        self.dly2_Busy_lbl.setStyleSheet("QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }")
-        self.dly2_Busy_lbl.setObjectName("dly2_Busy_lbl")
-        self.grid_dly2_grid.addWidget(self.dly2_Busy_lbl, 2, 0, 1, 1)
-        self.checkBox_before_busy_3 = QtWidgets.QCheckBox(self.groupDelayHandling)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.checkBox_before_busy_3.setFont(font)
-        self.checkBox_before_busy_3.setStyleSheet("\n"
-"/* Căn giữa ô vuông tích check */\n"
-"QCheckBox::indicator {\n"
-"    subcontrol-origin: padding;\n"
-"    subcontrol-position: center; /* Đưa ô vuông vào chính giữa */\n"
-"}\n"
-"")
-        self.checkBox_before_busy_3.setText("")
-        self.checkBox_before_busy_3.setObjectName("checkBox_before_busy_3")
-        self.grid_dly2_grid.addWidget(self.checkBox_before_busy_3, 2, 1, 1, 1)
+        self.dly2_header_0.setFont(font)
+        self.dly2_header_0.setStyleSheet("background-color:#D7E6E3; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
+        self.dly2_header_0.setAlignment(QtCore.Qt.AlignCenter)
+        self.dly2_header_0.setObjectName("dly2_header_0")
+        self.grid_dly2_grid.addWidget(self.dly2_header_0, 0, 0, 1, 1)
         self.checkBox_after_busy_3 = QtWidgets.QCheckBox(self.groupDelayHandling)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
@@ -1482,42 +2756,102 @@ class Ui_MainWindow(object):
         self.checkBox_after_busy_3.setChecked(True)
         self.checkBox_after_busy_3.setObjectName("checkBox_after_busy_3")
         self.grid_dly2_grid.addWidget(self.checkBox_after_busy_3, 2, 2, 1, 1)
-        self.lineEdit_timer_busy_3 = QtWidgets.QLineEdit(self.groupDelayHandling)
-        self.lineEdit_timer_busy_3.setMinimumSize(QtCore.QSize(0, 28))
-        self.lineEdit_timer_busy_3.setMaximumSize(QtCore.QSize(100, 16777215))
+        self.dly2_header_3 = QtWidgets.QLabel(self.groupDelayHandling)
+        self.dly2_header_3.setMinimumSize(QtCore.QSize(0, 30))
+        self.dly2_header_3.setMaximumSize(QtCore.QSize(16777215, 28))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
-        self.lineEdit_timer_busy_3.setFont(font)
-        self.lineEdit_timer_busy_3.setAlignment(QtCore.Qt.AlignCenter)
-        self.lineEdit_timer_busy_3.setObjectName("lineEdit_timer_busy_3")
-        self.grid_dly2_grid.addWidget(self.lineEdit_timer_busy_3, 2, 3, 1, 1)
-        self.dly2_Ready_lbl = QtWidgets.QPushButton(self.groupDelayHandling)
-        self.dly2_Ready_lbl.setMinimumSize(QtCore.QSize(0, 28))
+        self.dly2_header_3.setFont(font)
+        self.dly2_header_3.setStyleSheet("background-color:#D7E6E3; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
+        self.dly2_header_3.setAlignment(QtCore.Qt.AlignCenter)
+        self.dly2_header_3.setObjectName("dly2_header_3")
+        self.grid_dly2_grid.addWidget(self.dly2_header_3, 0, 3, 1, 1)
+        self.checkBox_before_busy_3 = QtWidgets.QCheckBox(self.groupDelayHandling)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
-        self.dly2_Ready_lbl.setFont(font)
-        self.dly2_Ready_lbl.setStyleSheet("QPushButton { background-color:#fbfbfb; border:1px solid #c6c6c6; border-radius:4px; }QPushButton:hover { background-color:#f0f0f0; }")
-        self.dly2_Ready_lbl.setObjectName("dly2_Ready_lbl")
-        self.grid_dly2_grid.addWidget(self.dly2_Ready_lbl, 3, 0, 1, 1)
-        self.checkBox_before_ready_3 = QtWidgets.QCheckBox(self.groupDelayHandling)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.checkBox_before_ready_3.setFont(font)
-        self.checkBox_before_ready_3.setStyleSheet("\n"
+        self.checkBox_before_busy_3.setFont(font)
+        self.checkBox_before_busy_3.setStyleSheet("\n"
 "/* Căn giữa ô vuông tích check */\n"
 "QCheckBox::indicator {\n"
 "    subcontrol-origin: padding;\n"
 "    subcontrol-position: center; /* Đưa ô vuông vào chính giữa */\n"
 "}\n"
 "")
-        self.checkBox_before_ready_3.setText("")
-        self.checkBox_before_ready_3.setObjectName("checkBox_before_ready_3")
-        self.grid_dly2_grid.addWidget(self.checkBox_before_ready_3, 3, 1, 1, 1)
+        self.checkBox_before_busy_3.setText("")
+        self.checkBox_before_busy_3.setObjectName("checkBox_before_busy_3")
+        self.grid_dly2_grid.addWidget(self.checkBox_before_busy_3, 2, 1, 1, 1)
+        self.lineEdit_timer_ready_3 = QtWidgets.QLineEdit(self.groupDelayHandling)
+        self.lineEdit_timer_ready_3.setMinimumSize(QtCore.QSize(0, 36))
+        self.lineEdit_timer_ready_3.setMaximumSize(QtCore.QSize(100, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lineEdit_timer_ready_3.setFont(font)
+        self.lineEdit_timer_ready_3.setStyleSheet("/* Khung chính của LineEdit */\n"
+"QLineEdit {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QLineEdit:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi click chuột vào để gõ chữ (Focus) */\n"
+"QLineEdit:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"")
+        self.lineEdit_timer_ready_3.setAlignment(QtCore.Qt.AlignCenter)
+        self.lineEdit_timer_ready_3.setObjectName("lineEdit_timer_ready_3")
+        self.grid_dly2_grid.addWidget(self.lineEdit_timer_ready_3, 3, 3, 1, 1)
+        self.dly2_header_2 = QtWidgets.QLabel(self.groupDelayHandling)
+        self.dly2_header_2.setMinimumSize(QtCore.QSize(0, 30))
+        self.dly2_header_2.setMaximumSize(QtCore.QSize(16777215, 28))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.dly2_header_2.setFont(font)
+        self.dly2_header_2.setStyleSheet("background-color:#D7E6E3; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
+        self.dly2_header_2.setAlignment(QtCore.Qt.AlignCenter)
+        self.dly2_header_2.setObjectName("dly2_header_2")
+        self.grid_dly2_grid.addWidget(self.dly2_header_2, 0, 2, 1, 1)
+        self.checkBox_after_gate_3 = QtWidgets.QCheckBox(self.groupDelayHandling)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.checkBox_after_gate_3.setFont(font)
+        self.checkBox_after_gate_3.setStyleSheet("\n"
+"/* Căn giữa ô vuông tích check */\n"
+"QCheckBox::indicator {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: center; /* Đưa ô vuông vào chính giữa */\n"
+"}\n"
+"")
+        self.checkBox_after_gate_3.setText("")
+        self.checkBox_after_gate_3.setChecked(True)
+        self.checkBox_after_gate_3.setObjectName("checkBox_after_gate_3")
+        self.grid_dly2_grid.addWidget(self.checkBox_after_gate_3, 1, 2, 1, 1)
         self.checkBox_after_ready_3 = QtWidgets.QCheckBox(self.groupDelayHandling)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
@@ -1534,18 +2868,66 @@ class Ui_MainWindow(object):
         self.checkBox_after_ready_3.setChecked(True)
         self.checkBox_after_ready_3.setObjectName("checkBox_after_ready_3")
         self.grid_dly2_grid.addWidget(self.checkBox_after_ready_3, 3, 2, 1, 1)
-        self.lineEdit_timer_ready_3 = QtWidgets.QLineEdit(self.groupDelayHandling)
-        self.lineEdit_timer_ready_3.setMinimumSize(QtCore.QSize(0, 28))
-        self.lineEdit_timer_ready_3.setMaximumSize(QtCore.QSize(100, 16777215))
+        self.label_52 = QtWidgets.QLabel(self.groupDelayHandling)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
-        self.lineEdit_timer_ready_3.setFont(font)
-        self.lineEdit_timer_ready_3.setAlignment(QtCore.Qt.AlignCenter)
-        self.lineEdit_timer_ready_3.setObjectName("lineEdit_timer_ready_3")
-        self.grid_dly2_grid.addWidget(self.lineEdit_timer_ready_3, 3, 3, 1, 1)
+        self.label_52.setFont(font)
+        self.label_52.setStyleSheet("QLabel {\n"
+"    background-color: #EEFAFF;\n"
+"    color: black;\n"
+"    border: 1px solid #BAE6FD;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.label_52.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_52.setObjectName("label_52")
+        self.grid_dly2_grid.addWidget(self.label_52, 1, 0, 1, 1)
+        self.label_53 = QtWidgets.QLabel(self.groupDelayHandling)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_53.setFont(font)
+        self.label_53.setStyleSheet("QLabel {\n"
+"    background-color: #EEFAFF;\n"
+"    color: black;\n"
+"    border: 1px solid #BAE6FD;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.label_53.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_53.setObjectName("label_53")
+        self.grid_dly2_grid.addWidget(self.label_53, 2, 0, 1, 1)
+        self.label_54 = QtWidgets.QLabel(self.groupDelayHandling)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_54.setFont(font)
+        self.label_54.setStyleSheet("QLabel {\n"
+"    background-color: #EEFAFF;\n"
+"    color: black;\n"
+"    border: 1px solid #BAE6FD;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.label_54.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_54.setObjectName("label_54")
+        self.grid_dly2_grid.addWidget(self.label_54, 3, 0, 1, 1)
         self.vlayout_delay_v.addLayout(self.grid_dly2_grid)
         self.vlayout_groupDelayHandling_outer.addLayout(self.vlayout_delay_v)
         self.hlayout_func_sub_row.addWidget(self.groupDelayHandling)
@@ -1595,7 +2977,7 @@ class Ui_MainWindow(object):
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
         self.pushButton_apply_tranmission_reception.setText("")
-        self.pushButton_apply_tranmission_reception.setIcon(icon2)
+        self.pushButton_apply_tranmission_reception.setIcon(icon1)
         self.pushButton_apply_tranmission_reception.setIconSize(QtCore.QSize(22, 22))
         self.pushButton_apply_tranmission_reception.setObjectName("pushButton_apply_tranmission_reception")
         self.gridLayout_12.addWidget(self.pushButton_apply_tranmission_reception, 0, 4, 1, 1)
@@ -1629,9 +3011,9 @@ class Ui_MainWindow(object):
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
         self.pushButton_load_tranmission_reception.setText("")
-        icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/apply-now.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_load_tranmission_reception.setIcon(icon4)
+        icon3 = QtGui.QIcon()
+        icon3.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/apply-now.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_load_tranmission_reception.setIcon(icon3)
         self.pushButton_load_tranmission_reception.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_load_tranmission_reception.setObjectName("pushButton_load_tranmission_reception")
         self.gridLayout_12.addWidget(self.pushButton_load_tranmission_reception, 0, 2, 1, 1)
@@ -1639,6 +3021,2193 @@ class Ui_MainWindow(object):
         self.hlayout_midrow.addWidget(self.groupFunction)
         self.vlayout_midrow_container_wrap.addLayout(self.hlayout_midrow)
         self.gridLayout_32.addLayout(self.vlayout_midrow_container_wrap, 5, 0, 1, 2)
+        self.hlayout_toprow = QtWidgets.QHBoxLayout()
+        self.hlayout_toprow.setSpacing(12)
+        self.hlayout_toprow.setObjectName("hlayout_toprow")
+        self.groupModeOption = QtWidgets.QGroupBox(self.scrollAreaWidgetContents)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(3)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.groupModeOption.sizePolicy().hasHeightForWidth())
+        self.groupModeOption.setSizePolicy(sizePolicy)
+        self.groupModeOption.setMaximumSize(QtCore.QSize(350, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.groupModeOption.setFont(font)
+        self.groupModeOption.setStyleSheet("/* Khung chính của GroupBox */\n"
+"QGroupBox {\n"
+"    background-color: #FBFFF9; /* Màu nền theo yêu cầu của bạn */\n"
+"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
+"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
+"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
+"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
+"    color: #333333;            /* Màu chữ tiêu đề */\n"
+"}\n"
+"\n"
+"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
+"QGroupBox::title {\n"
+"    subcontrol-origin: margin;\n"
+"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
+"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
+"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
+"}\n"
+"")
+        self.groupModeOption.setObjectName("groupModeOption")
+        self.gridLayout_18 = QtWidgets.QGridLayout(self.groupModeOption)
+        self.gridLayout_18.setObjectName("gridLayout_18")
+        self.grid_modeoption = QtWidgets.QGridLayout()
+        self.grid_modeoption.setSpacing(8)
+        self.grid_modeoption.setObjectName("grid_modeoption")
+        self.labelModeSector = QtWidgets.QLabel(self.groupModeOption)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(11)
+        self.labelModeSector.setFont(font)
+        self.labelModeSector.setObjectName("labelModeSector")
+        self.grid_modeoption.addWidget(self.labelModeSector, 0, 0, 2, 1)
+        self.label_9 = QtWidgets.QLabel(self.groupModeOption)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.label_9.setFont(font)
+        self.label_9.setObjectName("label_9")
+        self.grid_modeoption.addWidget(self.label_9, 1, 2, 1, 1)
+        self.labelRegisterMode = QtWidgets.QLabel(self.groupModeOption)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(11)
+        self.labelRegisterMode.setFont(font)
+        self.labelRegisterMode.setObjectName("labelRegisterMode")
+        self.grid_modeoption.addWidget(self.labelRegisterMode, 7, 0, 1, 1)
+        self.line_2 = QtWidgets.QFrame(self.groupModeOption)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.line_2.setFont(font)
+        self.line_2.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_2.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_2.setObjectName("line_2")
+        self.grid_modeoption.addWidget(self.line_2, 5, 0, 1, 4)
+        self.labelDefaultMode = QtWidgets.QLabel(self.groupModeOption)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(11)
+        self.labelDefaultMode.setFont(font)
+        self.labelDefaultMode.setObjectName("labelDefaultMode")
+        self.grid_modeoption.addWidget(self.labelDefaultMode, 3, 0, 1, 1)
+        self.comboBox_mode_auto = QtWidgets.QComboBox(self.groupModeOption)
+        self.comboBox_mode_auto.setMinimumSize(QtCore.QSize(0, 36))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_mode_auto.setFont(font)
+        self.comboBox_mode_auto.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.comboBox_mode_auto.setObjectName("comboBox_mode_auto")
+        self.comboBox_mode_auto.addItem("")
+        self.comboBox_mode_auto.addItem("")
+        self.comboBox_mode_auto.addItem("")
+        self.grid_modeoption.addWidget(self.comboBox_mode_auto, 0, 1, 2, 1)
+        self.line_10 = QtWidgets.QFrame(self.groupModeOption)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.line_10.setFont(font)
+        self.line_10.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_10.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_10.setObjectName("line_10")
+        self.grid_modeoption.addWidget(self.line_10, 8, 0, 1, 4)
+        self.comboBox_value_mode_selector_bit_on = QtWidgets.QComboBox(self.groupModeOption)
+        self.comboBox_value_mode_selector_bit_on.setMinimumSize(QtCore.QSize(0, 30))
+        self.comboBox_value_mode_selector_bit_on.setMaximumSize(QtCore.QSize(70, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_value_mode_selector_bit_on.setFont(font)
+        self.comboBox_value_mode_selector_bit_on.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.comboBox_value_mode_selector_bit_on.setObjectName("comboBox_value_mode_selector_bit_on")
+        self.comboBox_value_mode_selector_bit_on.addItem("")
+        self.comboBox_value_mode_selector_bit_on.addItem("")
+        self.comboBox_value_mode_selector_bit_on.addItem("")
+        self.comboBox_value_mode_selector_bit_on.addItem("")
+        self.comboBox_value_mode_selector_bit_on.addItem("")
+        self.comboBox_value_mode_selector_bit_on.addItem("")
+        self.comboBox_value_mode_selector_bit_on.addItem("")
+        self.comboBox_value_mode_selector_bit_on.addItem("")
+        self.comboBox_value_mode_selector_bit_on.addItem("")
+        self.comboBox_value_mode_selector_bit_on.addItem("")
+        self.grid_modeoption.addWidget(self.comboBox_value_mode_selector_bit_on, 0, 3, 1, 1)
+        self.label_7 = QtWidgets.QLabel(self.groupModeOption)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.label_7.setFont(font)
+        self.label_7.setObjectName("label_7")
+        self.grid_modeoption.addWidget(self.label_7, 0, 2, 1, 1)
+        self.line = QtWidgets.QFrame(self.groupModeOption)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.line.setFont(font)
+        self.line.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line.setObjectName("line")
+        self.grid_modeoption.addWidget(self.line, 2, 0, 1, 4)
+        self.comboBox_value_mode_selector_bit_off = QtWidgets.QComboBox(self.groupModeOption)
+        self.comboBox_value_mode_selector_bit_off.setMinimumSize(QtCore.QSize(0, 30))
+        self.comboBox_value_mode_selector_bit_off.setMaximumSize(QtCore.QSize(70, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_value_mode_selector_bit_off.setFont(font)
+        self.comboBox_value_mode_selector_bit_off.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.comboBox_value_mode_selector_bit_off.setObjectName("comboBox_value_mode_selector_bit_off")
+        self.comboBox_value_mode_selector_bit_off.addItem("")
+        self.comboBox_value_mode_selector_bit_off.addItem("")
+        self.comboBox_value_mode_selector_bit_off.addItem("")
+        self.comboBox_value_mode_selector_bit_off.addItem("")
+        self.comboBox_value_mode_selector_bit_off.addItem("")
+        self.comboBox_value_mode_selector_bit_off.addItem("")
+        self.comboBox_value_mode_selector_bit_off.addItem("")
+        self.comboBox_value_mode_selector_bit_off.addItem("")
+        self.comboBox_value_mode_selector_bit_off.addItem("")
+        self.comboBox_value_mode_selector_bit_off.addItem("")
+        self.comboBox_value_mode_selector_bit_off.addItem("")
+        self.grid_modeoption.addWidget(self.comboBox_value_mode_selector_bit_off, 1, 3, 1, 1)
+        self.comboBox_default_mode = QtWidgets.QComboBox(self.groupModeOption)
+        self.comboBox_default_mode.setMinimumSize(QtCore.QSize(0, 36))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_default_mode.setFont(font)
+        self.comboBox_default_mode.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.comboBox_default_mode.setObjectName("comboBox_default_mode")
+        self.comboBox_default_mode.addItem("")
+        self.comboBox_default_mode.addItem("")
+        self.comboBox_default_mode.addItem("")
+        self.grid_modeoption.addWidget(self.comboBox_default_mode, 3, 1, 1, 1)
+        self.lineEdit_register_mode = QtWidgets.QLineEdit(self.groupModeOption)
+        self.lineEdit_register_mode.setMinimumSize(QtCore.QSize(0, 0))
+        self.lineEdit_register_mode.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lineEdit_register_mode.setFont(font)
+        self.lineEdit_register_mode.setStyleSheet("/* Khung chính của LineEdit */\n"
+"QLineEdit {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QLineEdit:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi click chuột vào để gõ chữ (Focus) */\n"
+"QLineEdit:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"")
+        self.lineEdit_register_mode.setObjectName("lineEdit_register_mode")
+        self.grid_modeoption.addWidget(self.lineEdit_register_mode, 7, 1, 1, 1)
+        self.gridLayout_18.addLayout(self.grid_modeoption, 0, 0, 1, 1)
+        self.gridLayout_9 = QtWidgets.QGridLayout()
+        self.gridLayout_9.setSpacing(0)
+        self.gridLayout_9.setObjectName("gridLayout_9")
+        self.pushButton_add_mode = QtWidgets.QPushButton(self.groupModeOption)
+        self.pushButton_add_mode.setMinimumSize(QtCore.QSize(0, 30))
+        self.pushButton_add_mode.setMaximumSize(QtCore.QSize(30, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.pushButton_add_mode.setFont(font)
+        self.pushButton_add_mode.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.pushButton_add_mode.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
+        self.pushButton_add_mode.setText("")
+        self.pushButton_add_mode.setIcon(icon)
+        self.pushButton_add_mode.setIconSize(QtCore.QSize(25, 25))
+        self.pushButton_add_mode.setObjectName("pushButton_add_mode")
+        self.gridLayout_9.addWidget(self.pushButton_add_mode, 0, 1, 1, 1)
+        spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_9.addItem(spacerItem2, 0, 0, 1, 1)
+        self.label_26 = QtWidgets.QLabel(self.groupModeOption)
+        self.label_26.setMinimumSize(QtCore.QSize(20, 0))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.label_26.setFont(font)
+        self.label_26.setText("")
+        self.label_26.setObjectName("label_26")
+        self.gridLayout_9.addWidget(self.label_26, 0, 2, 1, 1)
+        self.pushButton_set_save_mode = QtWidgets.QPushButton(self.groupModeOption)
+        self.pushButton_set_save_mode.setMinimumSize(QtCore.QSize(0, 30))
+        self.pushButton_set_save_mode.setMaximumSize(QtCore.QSize(30, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.pushButton_set_save_mode.setFont(font)
+        self.pushButton_set_save_mode.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
+        self.pushButton_set_save_mode.setText("")
+        self.pushButton_set_save_mode.setIcon(icon1)
+        self.pushButton_set_save_mode.setIconSize(QtCore.QSize(22, 22))
+        self.pushButton_set_save_mode.setObjectName("pushButton_set_save_mode")
+        self.gridLayout_9.addWidget(self.pushButton_set_save_mode, 0, 5, 1, 1)
+        self.pushButton_load_params_from_mode = QtWidgets.QPushButton(self.groupModeOption)
+        self.pushButton_load_params_from_mode.setMinimumSize(QtCore.QSize(0, 30))
+        self.pushButton_load_params_from_mode.setMaximumSize(QtCore.QSize(30, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.pushButton_load_params_from_mode.setFont(font)
+        self.pushButton_load_params_from_mode.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
+        self.pushButton_load_params_from_mode.setText("")
+        self.pushButton_load_params_from_mode.setIcon(icon3)
+        self.pushButton_load_params_from_mode.setIconSize(QtCore.QSize(25, 25))
+        self.pushButton_load_params_from_mode.setObjectName("pushButton_load_params_from_mode")
+        self.gridLayout_9.addWidget(self.pushButton_load_params_from_mode, 0, 3, 1, 1)
+        self.label_27 = QtWidgets.QLabel(self.groupModeOption)
+        self.label_27.setMinimumSize(QtCore.QSize(20, 0))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.label_27.setFont(font)
+        self.label_27.setText("")
+        self.label_27.setObjectName("label_27")
+        self.gridLayout_9.addWidget(self.label_27, 0, 4, 1, 1)
+        self.gridLayout_18.addLayout(self.gridLayout_9, 1, 0, 1, 1)
+        self.hlayout_toprow.addWidget(self.groupModeOption)
+        self.groupItemLineCode = QtWidgets.QGroupBox(self.scrollAreaWidgetContents)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(3)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.groupItemLineCode.sizePolicy().hasHeightForWidth())
+        self.groupItemLineCode.setSizePolicy(sizePolicy)
+        self.groupItemLineCode.setMinimumSize(QtCore.QSize(350, 0))
+        self.groupItemLineCode.setMaximumSize(QtCore.QSize(350, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.groupItemLineCode.setFont(font)
+        self.groupItemLineCode.setStyleSheet("/* Khung chính của GroupBox */\n"
+"QGroupBox {\n"
+"    background-color: #FBFFF9; /* Màu nền theo yêu cầu của bạn */\n"
+"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
+"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
+"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
+"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
+"    color: #333333;            /* Màu chữ tiêu đề */\n"
+"}\n"
+"\n"
+"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
+"QGroupBox::title {\n"
+"    subcontrol-origin: margin;\n"
+"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
+"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
+"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
+"}\n"
+"")
+        self.groupItemLineCode.setObjectName("groupItemLineCode")
+        self.gridLayout_19 = QtWidgets.QGridLayout(self.groupItemLineCode)
+        self.gridLayout_19.setObjectName("gridLayout_19")
+        self.gridLayout_10 = QtWidgets.QGridLayout()
+        self.gridLayout_10.setSpacing(0)
+        self.gridLayout_10.setObjectName("gridLayout_10")
+        self.pushButton_apply_itemcode_assign = QtWidgets.QPushButton(self.groupItemLineCode)
+        self.pushButton_apply_itemcode_assign.setMinimumSize(QtCore.QSize(0, 30))
+        self.pushButton_apply_itemcode_assign.setMaximumSize(QtCore.QSize(30, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.pushButton_apply_itemcode_assign.setFont(font)
+        self.pushButton_apply_itemcode_assign.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
+        self.pushButton_apply_itemcode_assign.setText("")
+        self.pushButton_apply_itemcode_assign.setIcon(icon1)
+        self.pushButton_apply_itemcode_assign.setIconSize(QtCore.QSize(22, 22))
+        self.pushButton_apply_itemcode_assign.setObjectName("pushButton_apply_itemcode_assign")
+        self.gridLayout_10.addWidget(self.pushButton_apply_itemcode_assign, 0, 4, 1, 1)
+        self.pushButton_load_itemcode_assign = QtWidgets.QPushButton(self.groupItemLineCode)
+        self.pushButton_load_itemcode_assign.setMinimumSize(QtCore.QSize(0, 30))
+        self.pushButton_load_itemcode_assign.setMaximumSize(QtCore.QSize(30, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.pushButton_load_itemcode_assign.setFont(font)
+        self.pushButton_load_itemcode_assign.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
+        self.pushButton_load_itemcode_assign.setText("")
+        self.pushButton_load_itemcode_assign.setIcon(icon3)
+        self.pushButton_load_itemcode_assign.setIconSize(QtCore.QSize(25, 25))
+        self.pushButton_load_itemcode_assign.setObjectName("pushButton_load_itemcode_assign")
+        self.gridLayout_10.addWidget(self.pushButton_load_itemcode_assign, 0, 2, 1, 1)
+        self.label_29 = QtWidgets.QLabel(self.groupItemLineCode)
+        self.label_29.setMinimumSize(QtCore.QSize(20, 0))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.label_29.setFont(font)
+        self.label_29.setText("")
+        self.label_29.setObjectName("label_29")
+        self.gridLayout_10.addWidget(self.label_29, 0, 3, 1, 1)
+        self.label_28 = QtWidgets.QLabel(self.groupItemLineCode)
+        self.label_28.setMinimumSize(QtCore.QSize(20, 0))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.label_28.setFont(font)
+        self.label_28.setText("")
+        self.label_28.setObjectName("label_28")
+        self.gridLayout_10.addWidget(self.label_28, 0, 1, 1, 1)
+        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_10.addItem(spacerItem3, 0, 0, 1, 1)
+        self.gridLayout_19.addLayout(self.gridLayout_10, 1, 0, 1, 1)
+        self.grid_itemlinecode = QtWidgets.QGridLayout()
+        self.grid_itemlinecode.setSpacing(8)
+        self.grid_itemlinecode.setObjectName("grid_itemlinecode")
+        self.line_3 = QtWidgets.QFrame(self.groupItemLineCode)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.line_3.setFont(font)
+        self.line_3.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_3.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_3.setObjectName("line_3")
+        self.grid_itemlinecode.addWidget(self.line_3, 3, 0, 1, 3)
+        self.label_12 = QtWidgets.QLabel(self.groupItemLineCode)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.label_12.setFont(font)
+        self.label_12.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.label_12.setObjectName("label_12")
+        self.grid_itemlinecode.addWidget(self.label_12, 5, 1, 1, 1)
+        self.label = QtWidgets.QLabel(self.groupItemLineCode)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(11)
+        self.label.setFont(font)
+        self.label.setObjectName("label")
+        self.grid_itemlinecode.addWidget(self.label, 2, 0, 1, 1)
+        self.line_5 = QtWidgets.QFrame(self.groupItemLineCode)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.line_5.setFont(font)
+        self.line_5.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_5.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_5.setObjectName("line_5")
+        self.grid_itemlinecode.addWidget(self.line_5, 1, 0, 1, 3)
+        self.comboBox_value_register_bit_off = QtWidgets.QComboBox(self.groupItemLineCode)
+        self.comboBox_value_register_bit_off.setMinimumSize(QtCore.QSize(0, 36))
+        self.comboBox_value_register_bit_off.setMaximumSize(QtCore.QSize(70, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_value_register_bit_off.setFont(font)
+        self.comboBox_value_register_bit_off.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.comboBox_value_register_bit_off.setObjectName("comboBox_value_register_bit_off")
+        self.comboBox_value_register_bit_off.addItem("")
+        self.comboBox_value_register_bit_off.addItem("")
+        self.comboBox_value_register_bit_off.addItem("")
+        self.comboBox_value_register_bit_off.addItem("")
+        self.comboBox_value_register_bit_off.addItem("")
+        self.comboBox_value_register_bit_off.addItem("")
+        self.comboBox_value_register_bit_off.addItem("")
+        self.comboBox_value_register_bit_off.addItem("")
+        self.comboBox_value_register_bit_off.addItem("")
+        self.comboBox_value_register_bit_off.addItem("")
+        self.comboBox_value_register_bit_off.addItem("")
+        self.grid_itemlinecode.addWidget(self.comboBox_value_register_bit_off, 5, 2, 1, 1)
+        self.comboBox_value_register_bit_on = QtWidgets.QComboBox(self.groupItemLineCode)
+        self.comboBox_value_register_bit_on.setMinimumSize(QtCore.QSize(0, 36))
+        self.comboBox_value_register_bit_on.setMaximumSize(QtCore.QSize(70, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_value_register_bit_on.setFont(font)
+        self.comboBox_value_register_bit_on.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.comboBox_value_register_bit_on.setObjectName("comboBox_value_register_bit_on")
+        self.comboBox_value_register_bit_on.addItem("")
+        self.comboBox_value_register_bit_on.addItem("")
+        self.comboBox_value_register_bit_on.addItem("")
+        self.comboBox_value_register_bit_on.addItem("")
+        self.comboBox_value_register_bit_on.addItem("")
+        self.comboBox_value_register_bit_on.addItem("")
+        self.comboBox_value_register_bit_on.addItem("")
+        self.comboBox_value_register_bit_on.addItem("")
+        self.comboBox_value_register_bit_on.addItem("")
+        self.comboBox_value_register_bit_on.addItem("")
+        self.grid_itemlinecode.addWidget(self.comboBox_value_register_bit_on, 4, 2, 1, 1)
+        self.label_11 = QtWidgets.QLabel(self.groupItemLineCode)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.label_11.setFont(font)
+        self.label_11.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.label_11.setObjectName("label_11")
+        self.grid_itemlinecode.addWidget(self.label_11, 4, 1, 1, 1)
+        self.label_2 = QtWidgets.QLabel(self.groupItemLineCode)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(11)
+        self.label_2.setFont(font)
+        self.label_2.setObjectName("label_2")
+        self.grid_itemlinecode.addWidget(self.label_2, 0, 0, 1, 1)
+        self.line_4 = QtWidgets.QFrame(self.groupItemLineCode)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.line_4.setFont(font)
+        self.line_4.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_4.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_4.setObjectName("line_4")
+        self.grid_itemlinecode.addWidget(self.line_4, 6, 0, 1, 3)
+        self.label_3 = QtWidgets.QLabel(self.groupItemLineCode)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(11)
+        self.label_3.setFont(font)
+        self.label_3.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.label_3.setObjectName("label_3")
+        self.grid_itemlinecode.addWidget(self.label_3, 4, 0, 2, 1)
+        self.comboBox_Itemcode = QtWidgets.QComboBox(self.groupItemLineCode)
+        self.comboBox_Itemcode.setMinimumSize(QtCore.QSize(0, 36))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_Itemcode.setFont(font)
+        self.comboBox_Itemcode.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.comboBox_Itemcode.setObjectName("comboBox_Itemcode")
+        self.comboBox_Itemcode.addItem("")
+        self.grid_itemlinecode.addWidget(self.comboBox_Itemcode, 0, 1, 1, 2)
+        self.lineEdit_assign_itemcode_plc = QtWidgets.QLineEdit(self.groupItemLineCode)
+        self.lineEdit_assign_itemcode_plc.setMinimumSize(QtCore.QSize(0, 36))
+        self.lineEdit_assign_itemcode_plc.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.lineEdit_assign_itemcode_plc.setFont(font)
+        self.lineEdit_assign_itemcode_plc.setStyleSheet("/* Khung chính của LineEdit */\n"
+"QLineEdit {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QLineEdit:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi click chuột vào để gõ chữ (Focus) */\n"
+"QLineEdit:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"")
+        self.lineEdit_assign_itemcode_plc.setAlignment(QtCore.Qt.AlignCenter)
+        self.lineEdit_assign_itemcode_plc.setObjectName("lineEdit_assign_itemcode_plc")
+        self.grid_itemlinecode.addWidget(self.lineEdit_assign_itemcode_plc, 2, 1, 1, 2)
+        self.gridLayout_19.addLayout(self.grid_itemlinecode, 0, 0, 1, 1)
+        self.hlayout_toprow.addWidget(self.groupItemLineCode)
+        self.groupIndexCamera = QtWidgets.QGroupBox(self.scrollAreaWidgetContents)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(2)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.groupIndexCamera.sizePolicy().hasHeightForWidth())
+        self.groupIndexCamera.setSizePolicy(sizePolicy)
+        self.groupIndexCamera.setMinimumSize(QtCore.QSize(350, 0))
+        self.groupIndexCamera.setMaximumSize(QtCore.QSize(350, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.groupIndexCamera.setFont(font)
+        self.groupIndexCamera.setStyleSheet("/* Khung chính của GroupBox */\n"
+"QGroupBox {\n"
+"    background-color: #FBFFF9; /* Màu nền theo yêu cầu của bạn */\n"
+"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
+"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
+"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
+"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
+"    color: #333333;            /* Màu chữ tiêu đề */\n"
+"}\n"
+"\n"
+"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
+"QGroupBox::title {\n"
+"    subcontrol-origin: margin;\n"
+"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
+"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
+"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
+"}\n"
+"")
+        self.groupIndexCamera.setObjectName("groupIndexCamera")
+        self.vlayout_groupIndexCamera_outer = QtWidgets.QVBoxLayout(self.groupIndexCamera)
+        self.vlayout_groupIndexCamera_outer.setContentsMargins(14, 18, 14, 14)
+        self.vlayout_groupIndexCamera_outer.setObjectName("vlayout_groupIndexCamera_outer")
+        self.grid_indexcamera = QtWidgets.QGridLayout()
+        self.grid_indexcamera.setSpacing(8)
+        self.grid_indexcamera.setObjectName("grid_indexcamera")
+        self.comboBox_n_model = QtWidgets.QComboBox(self.groupIndexCamera)
+        self.comboBox_n_model.setMinimumSize(QtCore.QSize(120, 36))
+        self.comboBox_n_model.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_n_model.setFont(font)
+        self.comboBox_n_model.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"  padding-left: 58px; \n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.comboBox_n_model.setObjectName("comboBox_n_model")
+        self.comboBox_n_model.addItem("")
+        self.comboBox_n_model.addItem("")
+        self.comboBox_n_model.addItem("")
+        self.comboBox_n_model.addItem("")
+        self.comboBox_n_model.addItem("")
+        self.comboBox_n_model.addItem("")
+        self.comboBox_n_model.addItem("")
+        self.comboBox_n_model.addItem("")
+        self.comboBox_n_model.addItem("")
+        self.comboBox_n_model.addItem("")
+        self.comboBox_n_model.addItem("")
+        self.comboBox_n_model.addItem("")
+        self.comboBox_n_model.addItem("")
+        self.comboBox_n_model.addItem("")
+        self.comboBox_n_model.addItem("")
+        self.comboBox_n_model.addItem("")
+        self.comboBox_n_model.addItem("")
+        self.comboBox_n_model.addItem("")
+        self.comboBox_n_model.addItem("")
+        self.comboBox_n_model.addItem("")
+        self.grid_indexcamera.addWidget(self.comboBox_n_model, 2, 1, 1, 1)
+        self.labelCameraIndex = QtWidgets.QLabel(self.groupIndexCamera)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(11)
+        self.labelCameraIndex.setFont(font)
+        self.labelCameraIndex.setObjectName("labelCameraIndex")
+        self.grid_indexcamera.addWidget(self.labelCameraIndex, 0, 0, 1, 1)
+        self.label_4 = QtWidgets.QLabel(self.groupIndexCamera)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(11)
+        self.label_4.setFont(font)
+        self.label_4.setObjectName("label_4")
+        self.grid_indexcamera.addWidget(self.label_4, 4, 0, 1, 1)
+        self.line_6 = QtWidgets.QFrame(self.groupIndexCamera)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.line_6.setFont(font)
+        self.line_6.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_6.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_6.setObjectName("line_6")
+        self.grid_indexcamera.addWidget(self.line_6, 1, 0, 1, 2)
+        self.comboBox_camera = QtWidgets.QComboBox(self.groupIndexCamera)
+        self.comboBox_camera.setMinimumSize(QtCore.QSize(120, 36))
+        self.comboBox_camera.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_camera.setFont(font)
+        self.comboBox_camera.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"  padding-left: 58px; \n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.comboBox_camera.setObjectName("comboBox_camera")
+        self.comboBox_camera.addItem("")
+        self.comboBox_camera.addItem("")
+        self.comboBox_camera.addItem("")
+        self.comboBox_camera.addItem("")
+        self.comboBox_camera.addItem("")
+        self.comboBox_camera.addItem("")
+        self.comboBox_camera.addItem("")
+        self.comboBox_camera.addItem("")
+        self.grid_indexcamera.addWidget(self.comboBox_camera, 0, 1, 1, 1)
+        self.labelNumModels = QtWidgets.QLabel(self.groupIndexCamera)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(11)
+        self.labelNumModels.setFont(font)
+        self.labelNumModels.setObjectName("labelNumModels")
+        self.grid_indexcamera.addWidget(self.labelNumModels, 2, 0, 1, 1)
+        self.line_7 = QtWidgets.QFrame(self.groupIndexCamera)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.line_7.setFont(font)
+        self.line_7.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_7.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_7.setObjectName("line_7")
+        self.grid_indexcamera.addWidget(self.line_7, 3, 0, 1, 2)
+        self.spinBox_num_shot = QtWidgets.QSpinBox(self.groupIndexCamera)
+        self.spinBox_num_shot.setMinimumSize(QtCore.QSize(50, 36))
+        self.spinBox_num_shot.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.spinBox_num_shot.setFont(font)
+        self.spinBox_num_shot.setStyleSheet("/* Khung chính của SpinBox */\n"
+"QSpinBox, QDoubleSpinBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 16px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QSpinBox:hover, QDoubleSpinBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi click chuột vào nhập số */\n"
+"QSpinBox:focus, QDoubleSpinBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút Tăng (Mũi tên lên) */\n"
+"QSpinBox::up-button, QDoubleSpinBox::up-button {\n"
+"    subcontrol-origin: border;\n"
+"    subcontrol-position: top right;\n"
+"    width: 24px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-bottom: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"QSpinBox::up-button:pressed, QDoubleSpinBox::up-button:pressed {\n"
+"    background-color: #BAE6FD;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ lên bằng CSS */\n"
+"QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 4px solid transparent;\n"
+"    border-right: 4px solid transparent;\n"
+"    border-bottom: 4px solid #475569;\n"
+"}\n"
+"\n"
+"QSpinBox::up-arrow:hover, QDoubleSpinBox::up-arrow:hover {\n"
+"    border-bottom: 4px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Khu vực nút Giảm (Mũi tên xuống) */\n"
+"QSpinBox::down-button, QDoubleSpinBox::down-button {\n"
+"    subcontrol-origin: border;\n"
+"    subcontrol-position: bottom right;\n"
+"    width: 24px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QSpinBox::down-button:hover, QDoubleSpinBox::down-button:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"QSpinBox::down-button:pressed, QDoubleSpinBox::down-button:pressed {\n"
+"    background-color: #BAE6FD;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS */\n"
+"QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 4px solid transparent;\n"
+"    border-right: 4px solid transparent;\n"
+"    border-top: 4px solid #475569;\n"
+"}\n"
+"\n"
+"QSpinBox::down-arrow:hover, QDoubleSpinBox::down-arrow:hover {\n"
+"    border-top: 4px solid #0369A1;\n"
+"}\n"
+"")
+        self.spinBox_num_shot.setAlignment(QtCore.Qt.AlignCenter)
+        self.spinBox_num_shot.setMinimum(1)
+        self.spinBox_num_shot.setMaximum(64)
+        self.spinBox_num_shot.setProperty("value", 1)
+        self.spinBox_num_shot.setObjectName("spinBox_num_shot")
+        self.grid_indexcamera.addWidget(self.spinBox_num_shot, 4, 1, 1, 1)
+        self.vlayout_groupIndexCamera_outer.addLayout(self.grid_indexcamera)
+        spacerItem4 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.vlayout_groupIndexCamera_outer.addItem(spacerItem4)
+        self.hlayout_toprow.addWidget(self.groupIndexCamera)
+        self.groupDeviceProtocol = QtWidgets.QGroupBox(self.scrollAreaWidgetContents)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(3)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.groupDeviceProtocol.sizePolicy().hasHeightForWidth())
+        self.groupDeviceProtocol.setSizePolicy(sizePolicy)
+        self.groupDeviceProtocol.setMinimumSize(QtCore.QSize(350, 0))
+        self.groupDeviceProtocol.setMaximumSize(QtCore.QSize(350, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.groupDeviceProtocol.setFont(font)
+        self.groupDeviceProtocol.setStyleSheet("/* Khung chính của GroupBox */\n"
+"QGroupBox {\n"
+"    background-color: #FBFFF9; /* Màu nền theo yêu cầu của bạn */\n"
+"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
+"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
+"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
+"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
+"    color: #333333;            /* Màu chữ tiêu đề */\n"
+"}\n"
+"\n"
+"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
+"QGroupBox::title {\n"
+"    subcontrol-origin: margin;\n"
+"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
+"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
+"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
+"}\n"
+"")
+        self.groupDeviceProtocol.setObjectName("groupDeviceProtocol")
+        self.vlayout_groupDeviceProtocol_outer = QtWidgets.QVBoxLayout(self.groupDeviceProtocol)
+        self.vlayout_groupDeviceProtocol_outer.setContentsMargins(14, 18, 14, 14)
+        self.vlayout_groupDeviceProtocol_outer.setObjectName("vlayout_groupDeviceProtocol_outer")
+        self.grid_deviceprotocol = QtWidgets.QGridLayout()
+        self.grid_deviceprotocol.setSpacing(8)
+        self.grid_deviceprotocol.setObjectName("grid_deviceprotocol")
+        self.comboBox_type_dev = QtWidgets.QComboBox(self.groupDeviceProtocol)
+        self.comboBox_type_dev.setMinimumSize(QtCore.QSize(0, 36))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_type_dev.setFont(font)
+        self.comboBox_type_dev.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"  padding-left: 37px; \n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.comboBox_type_dev.setObjectName("comboBox_type_dev")
+        self.comboBox_type_dev.addItem("")
+        self.comboBox_type_dev.addItem("")
+        self.comboBox_type_dev.addItem("")
+        self.comboBox_type_dev.addItem("")
+        self.grid_deviceprotocol.addWidget(self.comboBox_type_dev, 0, 1, 1, 1)
+        self.comboBox_protocol = QtWidgets.QComboBox(self.groupDeviceProtocol)
+        self.comboBox_protocol.setMinimumSize(QtCore.QSize(0, 36))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_protocol.setFont(font)
+        self.comboBox_protocol.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"  padding-left: 37px; \n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.comboBox_protocol.setObjectName("comboBox_protocol")
+        self.comboBox_protocol.addItem("")
+        self.comboBox_protocol.addItem("")
+        self.grid_deviceprotocol.addWidget(self.comboBox_protocol, 2, 1, 1, 1)
+        self.labelDeviceType = QtWidgets.QLabel(self.groupDeviceProtocol)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(11)
+        self.labelDeviceType.setFont(font)
+        self.labelDeviceType.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.labelDeviceType.setObjectName("labelDeviceType")
+        self.grid_deviceprotocol.addWidget(self.labelDeviceType, 0, 0, 1, 1)
+        self.line_8 = QtWidgets.QFrame(self.groupDeviceProtocol)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.line_8.setFont(font)
+        self.line_8.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_8.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_8.setObjectName("line_8")
+        self.grid_deviceprotocol.addWidget(self.line_8, 1, 0, 1, 2)
+        self.labelCommMethod = QtWidgets.QLabel(self.groupDeviceProtocol)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(11)
+        self.labelCommMethod.setFont(font)
+        self.labelCommMethod.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.labelCommMethod.setObjectName("labelCommMethod")
+        self.grid_deviceprotocol.addWidget(self.labelCommMethod, 2, 0, 1, 1)
+        self.labelProtocol = QtWidgets.QLabel(self.groupDeviceProtocol)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(11)
+        self.labelProtocol.setFont(font)
+        self.labelProtocol.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.labelProtocol.setObjectName("labelProtocol")
+        self.grid_deviceprotocol.addWidget(self.labelProtocol, 4, 0, 1, 1)
+        self.comboProtocol = QtWidgets.QComboBox(self.groupDeviceProtocol)
+        self.comboProtocol.setMinimumSize(QtCore.QSize(0, 36))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboProtocol.setFont(font)
+        self.comboProtocol.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"  padding-left: 37px; \n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.comboProtocol.setObjectName("comboProtocol")
+        self.comboProtocol.addItem("")
+        self.comboProtocol.addItem("")
+        self.comboProtocol.addItem("")
+        self.grid_deviceprotocol.addWidget(self.comboProtocol, 4, 1, 1, 1)
+        self.line_9 = QtWidgets.QFrame(self.groupDeviceProtocol)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.line_9.setFont(font)
+        self.line_9.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_9.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_9.setObjectName("line_9")
+        self.grid_deviceprotocol.addWidget(self.line_9, 3, 0, 1, 2)
+        self.vlayout_groupDeviceProtocol_outer.addLayout(self.grid_deviceprotocol)
+        spacerItem5 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.vlayout_groupDeviceProtocol_outer.addItem(spacerItem5)
+        self.hlayout_toprow.addWidget(self.groupDeviceProtocol)
+        self.groupControlPanel = QtWidgets.QGroupBox(self.scrollAreaWidgetContents)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(4)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.groupControlPanel.sizePolicy().hasHeightForWidth())
+        self.groupControlPanel.setSizePolicy(sizePolicy)
+        self.groupControlPanel.setMinimumSize(QtCore.QSize(350, 0))
+        self.groupControlPanel.setMaximumSize(QtCore.QSize(350, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.groupControlPanel.setFont(font)
+        self.groupControlPanel.setStyleSheet("/* Khung chính của GroupBox */\n"
+"QGroupBox {\n"
+"    background-color: #FBFFF9; /* Màu nền theo yêu cầu của bạn */\n"
+"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
+"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
+"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
+"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
+"    color: #333333;            /* Màu chữ tiêu đề */\n"
+"}\n"
+"\n"
+"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
+"QGroupBox::title {\n"
+"    subcontrol-origin: margin;\n"
+"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
+"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
+"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
+"}\n"
+"")
+        self.groupControlPanel.setObjectName("groupControlPanel")
+        self.gridLayout_2 = QtWidgets.QGridLayout(self.groupControlPanel)
+        self.gridLayout_2.setObjectName("gridLayout_2")
+        self.gridLayout_3 = QtWidgets.QGridLayout()
+        self.gridLayout_3.setObjectName("gridLayout_3")
+        self.labelAdapterName_2 = QtWidgets.QLabel(self.groupControlPanel)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(62)
+        self.labelAdapterName_2.setFont(font)
+        self.labelAdapterName_2.setStyleSheet("font-weight: 500; color: #111827;")
+        self.labelAdapterName_2.setObjectName("labelAdapterName_2")
+        self.gridLayout_3.addWidget(self.labelAdapterName_2, 2, 1, 1, 1)
+        self.label_16 = QtWidgets.QLabel(self.groupControlPanel)
+        self.label_16.setMinimumSize(QtCore.QSize(0, 22))
+        self.label_16.setMaximumSize(QtCore.QSize(100, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(11)
+        self.label_16.setFont(font)
+        self.label_16.setObjectName("label_16")
+        self.gridLayout_3.addWidget(self.label_16, 1, 0, 1, 1)
+        self.labelAdapterNameTitle_2 = QtWidgets.QLabel(self.groupControlPanel)
+        self.labelAdapterNameTitle_2.setMinimumSize(QtCore.QSize(0, 22))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(11)
+        self.labelAdapterNameTitle_2.setFont(font)
+        self.labelAdapterNameTitle_2.setObjectName("labelAdapterNameTitle_2")
+        self.gridLayout_3.addWidget(self.labelAdapterNameTitle_2, 2, 0, 1, 1)
+        self.labelIPv6Title_2 = QtWidgets.QLabel(self.groupControlPanel)
+        self.labelIPv6Title_2.setMinimumSize(QtCore.QSize(0, 22))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(11)
+        self.labelIPv6Title_2.setFont(font)
+        self.labelIPv6Title_2.setObjectName("labelIPv6Title_2")
+        self.gridLayout_3.addWidget(self.labelIPv6Title_2, 5, 0, 1, 1)
+        self.IPV4_PLC = QtWidgets.QLabel(self.groupControlPanel)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(62)
+        self.IPV4_PLC.setFont(font)
+        self.IPV4_PLC.setStyleSheet("font-weight: 500; color: #111827;")
+        self.IPV4_PLC.setObjectName("IPV4_PLC")
+        self.gridLayout_3.addWidget(self.IPV4_PLC, 1, 1, 1, 1)
+        self.labelIPv4Title_2 = QtWidgets.QLabel(self.groupControlPanel)
+        self.labelIPv4Title_2.setMinimumSize(QtCore.QSize(0, 22))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(11)
+        self.labelIPv4Title_2.setFont(font)
+        self.labelIPv4Title_2.setObjectName("labelIPv4Title_2")
+        self.gridLayout_3.addWidget(self.labelIPv4Title_2, 4, 0, 1, 1)
+        self.labelIPv4_2 = QtWidgets.QLabel(self.groupControlPanel)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(62)
+        self.labelIPv4_2.setFont(font)
+        self.labelIPv4_2.setStyleSheet("font-weight: 500; color: #111827;")
+        self.labelIPv4_2.setObjectName("labelIPv4_2")
+        self.gridLayout_3.addWidget(self.labelIPv4_2, 4, 1, 1, 1)
+        self.labelIPv6_2 = QtWidgets.QLabel(self.groupControlPanel)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(62)
+        self.labelIPv6_2.setFont(font)
+        self.labelIPv6_2.setStyleSheet("font-weight: 500; color: #111827;")
+        self.labelIPv6_2.setWordWrap(True)
+        self.labelIPv6_2.setObjectName("labelIPv6_2")
+        self.gridLayout_3.addWidget(self.labelIPv6_2, 5, 1, 1, 1)
+        self.labelModuleAdapter = QtWidgets.QLabel(self.groupControlPanel)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(62)
+        self.labelModuleAdapter.setFont(font)
+        self.labelModuleAdapter.setStyleSheet("font-weight: 500; color: #111827;")
+        self.labelModuleAdapter.setObjectName("labelModuleAdapter")
+        self.gridLayout_3.addWidget(self.labelModuleAdapter, 3, 1, 1, 1)
+        self.labelConnTypeTitle_2 = QtWidgets.QLabel(self.groupControlPanel)
+        self.labelConnTypeTitle_2.setMinimumSize(QtCore.QSize(0, 22))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(11)
+        self.labelConnTypeTitle_2.setFont(font)
+        self.labelConnTypeTitle_2.setObjectName("labelConnTypeTitle_2")
+        self.gridLayout_3.addWidget(self.labelConnTypeTitle_2, 3, 0, 1, 1)
+        self.gridLayout_2.addLayout(self.gridLayout_3, 1, 0, 1, 1)
+        self.infoRow_2 = QtWidgets.QHBoxLayout()
+        self.infoRow_2.setSpacing(24)
+        self.infoRow_2.setObjectName("infoRow_2")
+        self.frameGraph = QtWidgets.QFrame(self.groupControlPanel)
+        self.frameGraph.setMinimumSize(QtCore.QSize(0, 70))
+        self.frameGraph.setMaximumSize(QtCore.QSize(16777215, 70))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.frameGraph.setFont(font)
+        self.frameGraph.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frameGraph.setObjectName("frameGraph")
+        self.layoutGraph = QtWidgets.QVBoxLayout(self.frameGraph)
+        self.layoutGraph.setContentsMargins(8, 4, 8, 4)
+        self.layoutGraph.setSpacing(0)
+        self.layoutGraph.setObjectName("layoutGraph")
+        self.gridLayout_6 = QtWidgets.QGridLayout()
+        self.gridLayout_6.setObjectName("gridLayout_6")
+        self.labelRecvTitle_2 = QtWidgets.QLabel(self.frameGraph)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(11)
+        self.labelRecvTitle_2.setFont(font)
+        self.labelRecvTitle_2.setObjectName("labelRecvTitle_2")
+        self.gridLayout_6.addWidget(self.labelRecvTitle_2, 1, 0, 1, 1)
+        self.labelSendValue_2 = QtWidgets.QLabel(self.frameGraph)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.labelSendValue_2.setFont(font)
+        self.labelSendValue_2.setObjectName("labelSendValue_2")
+        self.gridLayout_6.addWidget(self.labelSendValue_2, 0, 1, 1, 1)
+        self.labelSendTitle_2 = QtWidgets.QLabel(self.frameGraph)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(11)
+        self.labelSendTitle_2.setFont(font)
+        self.labelSendTitle_2.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.labelSendTitle_2.setObjectName("labelSendTitle_2")
+        self.gridLayout_6.addWidget(self.labelSendTitle_2, 0, 0, 1, 1)
+        self.labelRecvValue_2 = QtWidgets.QLabel(self.frameGraph)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.labelRecvValue_2.setFont(font)
+        self.labelRecvValue_2.setObjectName("labelRecvValue_2")
+        self.gridLayout_6.addWidget(self.labelRecvValue_2, 1, 1, 1, 1)
+        self.labelConnStatus = QtWidgets.QLabel(self.frameGraph)
+        self.labelConnStatus.setMaximumSize(QtCore.QSize(200, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.labelConnStatus.setFont(font)
+        self.labelConnStatus.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.labelConnStatus.setObjectName("labelConnStatus")
+        self.gridLayout_6.addWidget(self.labelConnStatus, 0, 2, 2, 1)
+        self.layoutGraph.addLayout(self.gridLayout_6)
+        self.infoRow_2.addWidget(self.frameGraph)
+        self.gridLayout_2.addLayout(self.infoRow_2, 2, 0, 1, 1)
+        self.hlayout_toprow.addWidget(self.groupControlPanel)
+        self.gridLayout_32.addLayout(self.hlayout_toprow, 4, 0, 1, 2)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setSpacing(12)
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -1650,13 +5219,13 @@ class Ui_MainWindow(object):
         self.groupBox_5.setMinimumSize(QtCore.QSize(500, 0))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_5.setFont(font)
         self.groupBox_5.setStyleSheet("/* Khung chính của GroupBox */\n"
 "QGroupBox {\n"
-"    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */\n"
+"    background-color: #FBFFF9; /* Màu nền theo yêu cầu của bạn */\n"
 "    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
 "    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
 "    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
@@ -1676,8 +5245,8 @@ class Ui_MainWindow(object):
         self.groupBox_5.setObjectName("groupBox_5")
         self.gridLayout_4 = QtWidgets.QGridLayout(self.groupBox_5)
         self.gridLayout_4.setObjectName("gridLayout_4")
-        spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_4.addItem(spacerItem2, 1, 0, 1, 1)
+        spacerItem6 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_4.addItem(spacerItem6, 1, 0, 1, 1)
         self.verticalLayout_2.addWidget(self.groupBox_5)
         self.horizontalLayout.addLayout(self.verticalLayout_2)
         self.verticalLayout = QtWidgets.QVBoxLayout()
@@ -1688,7 +5257,7 @@ class Ui_MainWindow(object):
         self.groupBox_4.setMinimumSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_4.setFont(font)
@@ -1738,7 +5307,7 @@ class Ui_MainWindow(object):
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
         self.pushButton_load_Set_mode.setText("")
-        self.pushButton_load_Set_mode.setIcon(icon4)
+        self.pushButton_load_Set_mode.setIcon(icon3)
         self.pushButton_load_Set_mode.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_load_Set_mode.setObjectName("pushButton_load_Set_mode")
         self.gridLayout_14.addWidget(self.pushButton_load_Set_mode, 0, 2, 1, 1)
@@ -1751,8 +5320,8 @@ class Ui_MainWindow(object):
         self.label_36.setText("")
         self.label_36.setObjectName("label_36")
         self.gridLayout_14.addWidget(self.label_36, 0, 3, 1, 1)
-        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_14.addItem(spacerItem3, 0, 0, 1, 1)
+        spacerItem7 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_14.addItem(spacerItem7, 0, 0, 1, 1)
         self.pushButton_apply_Set_mode = QtWidgets.QPushButton(self.groupBox_4)
         self.pushButton_apply_Set_mode.setMinimumSize(QtCore.QSize(0, 30))
         self.pushButton_apply_Set_mode.setMaximumSize(QtCore.QSize(30, 16777215))
@@ -1774,7 +5343,7 @@ class Ui_MainWindow(object):
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
         self.pushButton_apply_Set_mode.setText("")
-        self.pushButton_apply_Set_mode.setIcon(icon2)
+        self.pushButton_apply_Set_mode.setIcon(icon1)
         self.pushButton_apply_Set_mode.setIconSize(QtCore.QSize(22, 22))
         self.pushButton_apply_Set_mode.setObjectName("pushButton_apply_Set_mode")
         self.gridLayout_14.addWidget(self.pushButton_apply_Set_mode, 0, 4, 1, 1)
@@ -1791,13 +5360,13 @@ class Ui_MainWindow(object):
         self.groupBox_2 = QtWidgets.QGroupBox(self.groupBox_4)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_2.setFont(font)
         self.groupBox_2.setStyleSheet("/* Khung chính của GroupBox */\n"
 "QGroupBox {\n"
-"    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */\n"
+"    background-color: #FBFFF9; /* Màu nền theo yêu cầu của bạn */\n"
 "    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
 "    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
 "    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
@@ -1819,379 +5388,1305 @@ class Ui_MainWindow(object):
         self.gridLayout_8 = QtWidgets.QGridLayout(self.groupBox_2)
         self.gridLayout_8.setObjectName("gridLayout_8")
         self.gridLayout_13 = QtWidgets.QGridLayout()
-        self.gridLayout_13.setContentsMargins(40, 10, -1, 10)
+        self.gridLayout_13.setContentsMargins(40, 10, 0, 10)
         self.gridLayout_13.setHorizontalSpacing(10)
         self.gridLayout_13.setVerticalSpacing(20)
         self.gridLayout_13.setObjectName("gridLayout_13")
-        self.comboBox_set_trigger_logging = QtWidgets.QComboBox(self.groupBox_2)
-        self.comboBox_set_trigger_logging.setMinimumSize(QtCore.QSize(0, 30))
-        self.comboBox_set_trigger_logging.setMaximumSize(QtCore.QSize(16777215, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_set_trigger_logging.setFont(font)
-        self.comboBox_set_trigger_logging.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 50px; \n"
-"}\n"
-"")
-        self.comboBox_set_trigger_logging.setObjectName("comboBox_set_trigger_logging")
-        self.comboBox_set_trigger_logging.addItem("")
-        self.gridLayout_13.addWidget(self.comboBox_set_trigger_logging, 4, 4, 1, 1)
-        self.comboBox_set_completed_mirror = QtWidgets.QComboBox(self.groupBox_2)
-        self.comboBox_set_completed_mirror.setMinimumSize(QtCore.QSize(0, 30))
-        self.comboBox_set_completed_mirror.setMaximumSize(QtCore.QSize(16777215, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_set_completed_mirror.setFont(font)
-        self.comboBox_set_completed_mirror.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 50px; \n"
-"}\n"
-"")
-        self.comboBox_set_completed_mirror.setObjectName("comboBox_set_completed_mirror")
-        self.comboBox_set_completed_mirror.addItem("")
-        self.gridLayout_13.addWidget(self.comboBox_set_completed_mirror, 3, 8, 1, 1)
         self.label_22 = QtWidgets.QLabel(self.groupBox_2)
-        self.label_22.setMinimumSize(QtCore.QSize(0, 30))
-        self.label_22.setMaximumSize(QtCore.QSize(16777215, 30))
+        self.label_22.setMinimumSize(QtCore.QSize(0, 40))
+        self.label_22.setMaximumSize(QtCore.QSize(16777215, 40))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.label_22.setFont(font)
+        self.label_22.setStyleSheet("background-color:#BFD8D3; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
         self.label_22.setAlignment(QtCore.Qt.AlignCenter)
         self.label_22.setObjectName("label_22")
-        self.gridLayout_13.addWidget(self.label_22, 0, 6, 1, 1)
-        self.line_18 = QtWidgets.QFrame(self.groupBox_2)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_18.setFont(font)
-        self.line_18.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line_18.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_18.setObjectName("line_18")
-        self.gridLayout_13.addWidget(self.line_18, 2, 3, 3, 1)
+        self.gridLayout_13.addWidget(self.label_22, 0, 3, 1, 1)
         self.comboBox_set_component_logging = QtWidgets.QComboBox(self.groupBox_2)
-        self.comboBox_set_component_logging.setMinimumSize(QtCore.QSize(0, 30))
+        self.comboBox_set_component_logging.setMinimumSize(QtCore.QSize(0, 36))
         self.comboBox_set_component_logging.setMaximumSize(QtCore.QSize(16777215, 30))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.comboBox_set_component_logging.setFont(font)
-        self.comboBox_set_component_logging.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 50px; \n"
+        self.comboBox_set_component_logging.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"  padding-left: 50px; \n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
 "}\n"
 "")
         self.comboBox_set_component_logging.setObjectName("comboBox_set_component_logging")
         self.comboBox_set_component_logging.addItem("")
-        self.gridLayout_13.addWidget(self.comboBox_set_component_logging, 4, 6, 1, 1)
-        self.comboBox_set_trigger_automatic = QtWidgets.QComboBox(self.groupBox_2)
-        self.comboBox_set_trigger_automatic.setMinimumSize(QtCore.QSize(0, 30))
-        self.comboBox_set_trigger_automatic.setMaximumSize(QtCore.QSize(16777215, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_set_trigger_automatic.setFont(font)
-        self.comboBox_set_trigger_automatic.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 50px; \n"
-"}\n"
-"")
-        self.comboBox_set_trigger_automatic.setObjectName("comboBox_set_trigger_automatic")
-        self.comboBox_set_trigger_automatic.addItem("")
-        self.gridLayout_13.addWidget(self.comboBox_set_trigger_automatic, 2, 4, 1, 1)
-        self.label_23 = QtWidgets.QLabel(self.groupBox_2)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_23.setFont(font)
-        self.label_23.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_23.setObjectName("label_23")
-        self.gridLayout_13.addWidget(self.label_23, 0, 8, 1, 1)
-        self.label_21 = QtWidgets.QLabel(self.groupBox_2)
-        self.label_21.setMinimumSize(QtCore.QSize(0, 30))
-        self.label_21.setMaximumSize(QtCore.QSize(16777215, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_21.setFont(font)
-        self.label_21.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_21.setObjectName("label_21")
-        self.gridLayout_13.addWidget(self.label_21, 0, 4, 1, 1)
-        self.comboBox_set_trigger_mirror = QtWidgets.QComboBox(self.groupBox_2)
-        self.comboBox_set_trigger_mirror.setMinimumSize(QtCore.QSize(0, 30))
-        self.comboBox_set_trigger_mirror.setMaximumSize(QtCore.QSize(16777215, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_set_trigger_mirror.setFont(font)
-        self.comboBox_set_trigger_mirror.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 50px; \n"
-"}\n"
-"")
-        self.comboBox_set_trigger_mirror.setObjectName("comboBox_set_trigger_mirror")
-        self.comboBox_set_trigger_mirror.addItem("")
-        self.gridLayout_13.addWidget(self.comboBox_set_trigger_mirror, 3, 4, 1, 1)
+        self.gridLayout_13.addWidget(self.comboBox_set_component_logging, 3, 3, 1, 1)
         self.comboBox_set_completed_automatic = QtWidgets.QComboBox(self.groupBox_2)
-        self.comboBox_set_completed_automatic.setMinimumSize(QtCore.QSize(0, 30))
+        self.comboBox_set_completed_automatic.setMinimumSize(QtCore.QSize(0, 36))
         self.comboBox_set_completed_automatic.setMaximumSize(QtCore.QSize(16777215, 30))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.comboBox_set_completed_automatic.setFont(font)
-        self.comboBox_set_completed_automatic.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 50px; \n"
+        self.comboBox_set_completed_automatic.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"  padding-left: 50px; \n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
 "}\n"
 "")
         self.comboBox_set_completed_automatic.setObjectName("comboBox_set_completed_automatic")
         self.comboBox_set_completed_automatic.addItem("")
-        self.gridLayout_13.addWidget(self.comboBox_set_completed_automatic, 2, 8, 1, 1)
-        self.comboBox_set_completed_logging = QtWidgets.QComboBox(self.groupBox_2)
-        self.comboBox_set_completed_logging.setMinimumSize(QtCore.QSize(0, 30))
-        self.comboBox_set_completed_logging.setMaximumSize(QtCore.QSize(16777215, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_set_completed_logging.setFont(font)
-        self.comboBox_set_completed_logging.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 50px; \n"
-"}\n"
-"")
-        self.comboBox_set_completed_logging.setObjectName("comboBox_set_completed_logging")
-        self.comboBox_set_completed_logging.addItem("")
-        self.gridLayout_13.addWidget(self.comboBox_set_completed_logging, 4, 8, 1, 1)
-        self.label_17 = QtWidgets.QLabel(self.groupBox_2)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_17.setFont(font)
-        self.label_17.setObjectName("label_17")
-        self.gridLayout_13.addWidget(self.label_17, 3, 0, 1, 1)
-        self.comboBox_automatic_mode = QtWidgets.QComboBox(self.groupBox_2)
-        self.comboBox_automatic_mode.setMinimumSize(QtCore.QSize(0, 30))
-        self.comboBox_automatic_mode.setMaximumSize(QtCore.QSize(16777215, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_automatic_mode.setFont(font)
-        self.comboBox_automatic_mode.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 50px; \n"
-"}\n"
-"")
-        self.comboBox_automatic_mode.setObjectName("comboBox_automatic_mode")
-        self.comboBox_automatic_mode.addItem("")
-        self.comboBox_automatic_mode.addItem("")
-        self.comboBox_automatic_mode.addItem("")
-        self.gridLayout_13.addWidget(self.comboBox_automatic_mode, 2, 2, 1, 1)
-        self.label_8 = QtWidgets.QLabel(self.groupBox_2)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_8.setFont(font)
-        self.label_8.setObjectName("label_8")
-        self.gridLayout_13.addWidget(self.label_8, 2, 0, 1, 1)
-        self.line_19 = QtWidgets.QFrame(self.groupBox_2)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_19.setFont(font)
-        self.line_19.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line_19.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_19.setObjectName("line_19")
-        self.gridLayout_13.addWidget(self.line_19, 2, 5, 3, 1)
-        self.line_17 = QtWidgets.QFrame(self.groupBox_2)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_17.setFont(font)
-        self.line_17.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line_17.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_17.setObjectName("line_17")
-        self.gridLayout_13.addWidget(self.line_17, 2, 1, 3, 1)
-        self.label_18 = QtWidgets.QLabel(self.groupBox_2)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_18.setFont(font)
-        self.label_18.setObjectName("label_18")
-        self.gridLayout_13.addWidget(self.label_18, 4, 0, 1, 1)
-        self.comboBox_set_component_mirror = QtWidgets.QComboBox(self.groupBox_2)
-        self.comboBox_set_component_mirror.setMinimumSize(QtCore.QSize(0, 30))
-        self.comboBox_set_component_mirror.setMaximumSize(QtCore.QSize(16777215, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_set_component_mirror.setFont(font)
-        self.comboBox_set_component_mirror.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 50px; \n"
-"}\n"
-"")
-        self.comboBox_set_component_mirror.setObjectName("comboBox_set_component_mirror")
-        self.comboBox_set_component_mirror.addItem("")
-        self.gridLayout_13.addWidget(self.comboBox_set_component_mirror, 3, 6, 1, 1)
+        self.gridLayout_13.addWidget(self.comboBox_set_completed_automatic, 1, 4, 1, 1)
         self.label_40 = QtWidgets.QLabel(self.groupBox_2)
-        self.label_40.setMinimumSize(QtCore.QSize(0, 30))
-        self.label_40.setMaximumSize(QtCore.QSize(16777215, 30))
+        self.label_40.setMinimumSize(QtCore.QSize(0, 40))
+        self.label_40.setMaximumSize(QtCore.QSize(16777215, 40))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.label_40.setFont(font)
+        self.label_40.setStyleSheet("background-color:#BFD8D3; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
         self.label_40.setAlignment(QtCore.Qt.AlignCenter)
         self.label_40.setObjectName("label_40")
-        self.gridLayout_13.addWidget(self.label_40, 0, 2, 1, 1)
-        self.comboBox_set_component_automatic = QtWidgets.QComboBox(self.groupBox_2)
-        self.comboBox_set_component_automatic.setMinimumSize(QtCore.QSize(0, 30))
-        self.comboBox_set_component_automatic.setMaximumSize(QtCore.QSize(16777215, 30))
+        self.gridLayout_13.addWidget(self.label_40, 0, 1, 1, 1)
+        self.comboBox_automatic_mode = QtWidgets.QComboBox(self.groupBox_2)
+        self.comboBox_automatic_mode.setMinimumSize(QtCore.QSize(0, 36))
+        self.comboBox_automatic_mode.setMaximumSize(QtCore.QSize(16777215, 30))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
-        self.comboBox_set_component_automatic.setFont(font)
-        self.comboBox_set_component_automatic.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 50px; \n"
+        self.comboBox_automatic_mode.setFont(font)
+        self.comboBox_automatic_mode.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"  padding-left: 50px; \n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
 "}\n"
 "")
-        self.comboBox_set_component_automatic.setObjectName("comboBox_set_component_automatic")
-        self.comboBox_set_component_automatic.addItem("")
-        self.gridLayout_13.addWidget(self.comboBox_set_component_automatic, 2, 6, 1, 1)
-        self.comboBox_logging_mode = QtWidgets.QComboBox(self.groupBox_2)
-        self.comboBox_logging_mode.setMinimumSize(QtCore.QSize(0, 30))
-        self.comboBox_logging_mode.setMaximumSize(QtCore.QSize(16777215, 30))
+        self.comboBox_automatic_mode.setObjectName("comboBox_automatic_mode")
+        self.comboBox_automatic_mode.addItem("")
+        self.comboBox_automatic_mode.addItem("")
+        self.comboBox_automatic_mode.addItem("")
+        self.gridLayout_13.addWidget(self.comboBox_automatic_mode, 1, 1, 1, 1)
+        self.comboBox_set_component_mirror = QtWidgets.QComboBox(self.groupBox_2)
+        self.comboBox_set_component_mirror.setMinimumSize(QtCore.QSize(0, 36))
+        self.comboBox_set_component_mirror.setMaximumSize(QtCore.QSize(16777215, 30))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
-        self.comboBox_logging_mode.setFont(font)
-        self.comboBox_logging_mode.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 50px; \n"
+        self.comboBox_set_component_mirror.setFont(font)
+        self.comboBox_set_component_mirror.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"  padding-left: 50px; \n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
 "}\n"
 "")
-        self.comboBox_logging_mode.setObjectName("comboBox_logging_mode")
-        self.comboBox_logging_mode.addItem("")
-        self.comboBox_logging_mode.addItem("")
-        self.comboBox_logging_mode.addItem("")
-        self.gridLayout_13.addWidget(self.comboBox_logging_mode, 4, 2, 1, 1)
-        self.line_16 = QtWidgets.QFrame(self.groupBox_2)
+        self.comboBox_set_component_mirror.setObjectName("comboBox_set_component_mirror")
+        self.comboBox_set_component_mirror.addItem("")
+        self.gridLayout_13.addWidget(self.comboBox_set_component_mirror, 2, 3, 1, 1)
+        self.comboBox_set_trigger_logging = QtWidgets.QComboBox(self.groupBox_2)
+        self.comboBox_set_trigger_logging.setMinimumSize(QtCore.QSize(0, 36))
+        self.comboBox_set_trigger_logging.setMaximumSize(QtCore.QSize(16777215, 30))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_16.setFont(font)
-        self.line_16.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_16.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_16.setObjectName("line_16")
-        self.gridLayout_13.addWidget(self.line_16, 1, 0, 1, 9)
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_set_trigger_logging.setFont(font)
+        self.comboBox_set_trigger_logging.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"  padding-left: 50px; \n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.comboBox_set_trigger_logging.setObjectName("comboBox_set_trigger_logging")
+        self.comboBox_set_trigger_logging.addItem("")
+        self.gridLayout_13.addWidget(self.comboBox_set_trigger_logging, 3, 2, 1, 1)
         self.comboBox_mirror_mode = QtWidgets.QComboBox(self.groupBox_2)
-        self.comboBox_mirror_mode.setMinimumSize(QtCore.QSize(0, 30))
+        self.comboBox_mirror_mode.setMinimumSize(QtCore.QSize(0, 36))
         self.comboBox_mirror_mode.setMaximumSize(QtCore.QSize(16777215, 30))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.comboBox_mirror_mode.setFont(font)
-        self.comboBox_mirror_mode.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 50px; \n"
+        self.comboBox_mirror_mode.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"  padding-left: 50px; \n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
 "}\n"
 "")
         self.comboBox_mirror_mode.setObjectName("comboBox_mirror_mode")
         self.comboBox_mirror_mode.addItem("")
         self.comboBox_mirror_mode.addItem("")
         self.comboBox_mirror_mode.addItem("")
-        self.gridLayout_13.addWidget(self.comboBox_mirror_mode, 3, 2, 1, 1)
+        self.gridLayout_13.addWidget(self.comboBox_mirror_mode, 2, 1, 1, 1)
+        self.label_17 = QtWidgets.QLabel(self.groupBox_2)
+        self.label_17.setMinimumSize(QtCore.QSize(0, 40))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_17.setFont(font)
+        self.label_17.setStyleSheet("background-color:#BFD8D3; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
+        self.label_17.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.label_17.setObjectName("label_17")
+        self.gridLayout_13.addWidget(self.label_17, 2, 0, 1, 1)
         self.label_6 = QtWidgets.QLabel(self.groupBox_2)
-        self.label_6.setMinimumSize(QtCore.QSize(0, 30))
-        self.label_6.setMaximumSize(QtCore.QSize(16777215, 30))
+        self.label_6.setMinimumSize(QtCore.QSize(0, 40))
+        self.label_6.setMaximumSize(QtCore.QSize(16777215, 40))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.label_6.setFont(font)
+        self.label_6.setStyleSheet("background-color:#BFD8D3; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
+        self.label_6.setAlignment(QtCore.Qt.AlignCenter)
         self.label_6.setObjectName("label_6")
         self.gridLayout_13.addWidget(self.label_6, 0, 0, 1, 1)
-        self.line_20 = QtWidgets.QFrame(self.groupBox_2)
+        self.comboBox_set_completed_mirror = QtWidgets.QComboBox(self.groupBox_2)
+        self.comboBox_set_completed_mirror.setMinimumSize(QtCore.QSize(0, 36))
+        self.comboBox_set_completed_mirror.setMaximumSize(QtCore.QSize(16777215, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_set_completed_mirror.setFont(font)
+        self.comboBox_set_completed_mirror.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"  padding-left: 50px; \n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.comboBox_set_completed_mirror.setObjectName("comboBox_set_completed_mirror")
+        self.comboBox_set_completed_mirror.addItem("")
+        self.gridLayout_13.addWidget(self.comboBox_set_completed_mirror, 2, 4, 1, 1)
+        self.label_8 = QtWidgets.QLabel(self.groupBox_2)
+        self.label_8.setMinimumSize(QtCore.QSize(0, 40))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
-        self.line_20.setFont(font)
-        self.line_20.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line_20.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_20.setObjectName("line_20")
-        self.gridLayout_13.addWidget(self.line_20, 2, 7, 3, 1)
-        self.line_21 = QtWidgets.QFrame(self.groupBox_2)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_8.setFont(font)
+        self.label_8.setStyleSheet("background-color:#BFD8D3; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
+        self.label_8.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.label_8.setObjectName("label_8")
+        self.gridLayout_13.addWidget(self.label_8, 1, 0, 1, 1)
+        self.comboBox_set_trigger_mirror = QtWidgets.QComboBox(self.groupBox_2)
+        self.comboBox_set_trigger_mirror.setMinimumSize(QtCore.QSize(0, 36))
+        self.comboBox_set_trigger_mirror.setMaximumSize(QtCore.QSize(16777215, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_set_trigger_mirror.setFont(font)
+        self.comboBox_set_trigger_mirror.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"  padding-left: 50px; \n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.comboBox_set_trigger_mirror.setObjectName("comboBox_set_trigger_mirror")
+        self.comboBox_set_trigger_mirror.addItem("")
+        self.gridLayout_13.addWidget(self.comboBox_set_trigger_mirror, 2, 2, 1, 1)
+        self.label_18 = QtWidgets.QLabel(self.groupBox_2)
+        self.label_18.setMinimumSize(QtCore.QSize(0, 40))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
-        self.line_21.setFont(font)
-        self.line_21.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line_21.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_21.setObjectName("line_21")
-        self.gridLayout_13.addWidget(self.line_21, 0, 1, 1, 1)
-        self.line_22 = QtWidgets.QFrame(self.groupBox_2)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_18.setFont(font)
+        self.label_18.setStyleSheet("background-color:#BFD8D3; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
+        self.label_18.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.label_18.setObjectName("label_18")
+        self.gridLayout_13.addWidget(self.label_18, 3, 0, 1, 1)
+        self.comboBox_set_component_automatic = QtWidgets.QComboBox(self.groupBox_2)
+        self.comboBox_set_component_automatic.setMinimumSize(QtCore.QSize(0, 36))
+        self.comboBox_set_component_automatic.setMaximumSize(QtCore.QSize(16777215, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_set_component_automatic.setFont(font)
+        self.comboBox_set_component_automatic.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"  padding-left: 50px; \n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.comboBox_set_component_automatic.setObjectName("comboBox_set_component_automatic")
+        self.comboBox_set_component_automatic.addItem("")
+        self.gridLayout_13.addWidget(self.comboBox_set_component_automatic, 1, 3, 1, 1)
+        self.label_23 = QtWidgets.QLabel(self.groupBox_2)
+        self.label_23.setMinimumSize(QtCore.QSize(0, 40))
+        self.label_23.setMaximumSize(QtCore.QSize(16777215, 40))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
-        self.line_22.setFont(font)
-        self.line_22.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line_22.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_22.setObjectName("line_22")
-        self.gridLayout_13.addWidget(self.line_22, 0, 3, 1, 1)
-        self.line_23 = QtWidgets.QFrame(self.groupBox_2)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_23.setFont(font)
+        self.label_23.setStyleSheet("background-color:#BFD8D3; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
+        self.label_23.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_23.setObjectName("label_23")
+        self.gridLayout_13.addWidget(self.label_23, 0, 4, 1, 1)
+        self.comboBox_set_trigger_automatic = QtWidgets.QComboBox(self.groupBox_2)
+        self.comboBox_set_trigger_automatic.setMinimumSize(QtCore.QSize(0, 36))
+        self.comboBox_set_trigger_automatic.setMaximumSize(QtCore.QSize(16777215, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_set_trigger_automatic.setFont(font)
+        self.comboBox_set_trigger_automatic.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"  padding-left: 50px; \n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.comboBox_set_trigger_automatic.setObjectName("comboBox_set_trigger_automatic")
+        self.comboBox_set_trigger_automatic.addItem("")
+        self.gridLayout_13.addWidget(self.comboBox_set_trigger_automatic, 1, 2, 1, 1)
+        self.comboBox_set_completed_logging = QtWidgets.QComboBox(self.groupBox_2)
+        self.comboBox_set_completed_logging.setMinimumSize(QtCore.QSize(0, 36))
+        self.comboBox_set_completed_logging.setMaximumSize(QtCore.QSize(16777215, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_set_completed_logging.setFont(font)
+        self.comboBox_set_completed_logging.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"  padding-left: 50px; \n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.comboBox_set_completed_logging.setObjectName("comboBox_set_completed_logging")
+        self.comboBox_set_completed_logging.addItem("")
+        self.gridLayout_13.addWidget(self.comboBox_set_completed_logging, 3, 4, 1, 1)
+        self.comboBox_logging_mode = QtWidgets.QComboBox(self.groupBox_2)
+        self.comboBox_logging_mode.setMinimumSize(QtCore.QSize(0, 36))
+        self.comboBox_logging_mode.setMaximumSize(QtCore.QSize(16777215, 30))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_logging_mode.setFont(font)
+        self.comboBox_logging_mode.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"  padding-left: 50px; \n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.comboBox_logging_mode.setObjectName("comboBox_logging_mode")
+        self.comboBox_logging_mode.addItem("")
+        self.comboBox_logging_mode.addItem("")
+        self.comboBox_logging_mode.addItem("")
+        self.gridLayout_13.addWidget(self.comboBox_logging_mode, 3, 1, 1, 1)
+        self.label_21 = QtWidgets.QLabel(self.groupBox_2)
+        self.label_21.setMinimumSize(QtCore.QSize(0, 40))
+        self.label_21.setMaximumSize(QtCore.QSize(16777215, 40))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
-        self.line_23.setFont(font)
-        self.line_23.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line_23.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_23.setObjectName("line_23")
-        self.gridLayout_13.addWidget(self.line_23, 0, 5, 1, 1)
-        self.line_24 = QtWidgets.QFrame(self.groupBox_2)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_24.setFont(font)
-        self.line_24.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line_24.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_24.setObjectName("line_24")
-        self.gridLayout_13.addWidget(self.line_24, 0, 7, 1, 1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_21.setFont(font)
+        self.label_21.setStyleSheet("background-color:#BFD8D3; border:1px solid #c8c8c8; border-radius:3px; padding:4px; font-weight:600;")
+        self.label_21.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_21.setObjectName("label_21")
+        self.gridLayout_13.addWidget(self.label_21, 0, 2, 1, 1)
         self.gridLayout_8.addLayout(self.gridLayout_13, 0, 0, 1, 1)
         self.gridLayout_24.addWidget(self.groupBox_2, 1, 0, 1, 1)
         self.line_15 = QtWidgets.QFrame(self.groupBox_4)
@@ -2206,6 +6701,242 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.groupBox_4)
         self.horizontalLayout.addLayout(self.verticalLayout)
         self.gridLayout_32.addLayout(self.horizontalLayout, 7, 0, 1, 2)
+        self.label_14 = QtWidgets.QLabel(self.scrollAreaWidgetContents)
+        self.label_14.setMinimumSize(QtCore.QSize(0, 50))
+        self.label_14.setMaximumSize(QtCore.QSize(16777215, 60))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(22)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_14.setFont(font)
+        self.label_14.setStyleSheet("QLabel {\n"
+"    color: #ffffff; /* Chữ màu đen xám hiện đại, tương phản cao trên nền trắng */\n"
+"    \n"
+"    background-color:  qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #0B1E36, stop:1 #0F3B63); /* Nền màu trắng */\n"
+"    border: 2px solid #7A7A7A; /* Viền xám rất nhạt để định hình khối */\n"
+"    border-radius: 15px; /* Bo tròn góc mạnh hơn, tạo cảm giác mềm mại */\n"
+"    \n"
+"    padding: 12px 25px;\n"
+"    qproperty-alignment: AlignCenter; /* Căn chữ ra chính giữa label */\n"
+"}\n"
+"")
+        self.label_14.setObjectName("label_14")
+        self.gridLayout_32.addWidget(self.label_14, 0, 0, 1, 2)
+        self.vlayout_bottomrow_container_wrap_2 = QtWidgets.QVBoxLayout()
+        self.vlayout_bottomrow_container_wrap_2.setContentsMargins(0, 0, 0, 0)
+        self.vlayout_bottomrow_container_wrap_2.setObjectName("vlayout_bottomrow_container_wrap_2")
+        self.hlayout_bottomrow_2 = QtWidgets.QHBoxLayout()
+        self.hlayout_bottomrow_2.setSpacing(12)
+        self.hlayout_bottomrow_2.setObjectName("hlayout_bottomrow_2")
+        self.groupAssignShot_2 = QtWidgets.QGroupBox(self.scrollAreaWidgetContents)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(1)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.groupAssignShot_2.sizePolicy().hasHeightForWidth())
+        self.groupAssignShot_2.setSizePolicy(sizePolicy)
+        self.groupAssignShot_2.setMaximumSize(QtCore.QSize(16777215, 350))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.groupAssignShot_2.setFont(font)
+        self.groupAssignShot_2.setStyleSheet("/* Khung chính của GroupBox */\n"
+"QGroupBox {\n"
+"    background-color: #FBFFF9; /* Màu nền theo yêu cầu của bạn */\n"
+"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
+"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
+"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
+"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
+"    color: #333333;            /* Màu chữ tiêu đề */\n"
+"}\n"
+"\n"
+"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
+"QGroupBox::title {\n"
+"    subcontrol-origin: margin;\n"
+"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
+"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
+"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
+"}\n"
+"")
+        self.groupAssignShot_2.setTitle("")
+        self.groupAssignShot_2.setObjectName("groupAssignShot_2")
+        self.gridLayout_26 = QtWidgets.QGridLayout(self.groupAssignShot_2)
+        self.gridLayout_26.setObjectName("gridLayout_26")
+        self.gridLayout_27 = QtWidgets.QGridLayout()
+        self.gridLayout_27.setSpacing(0)
+        self.gridLayout_27.setObjectName("gridLayout_27")
+        spacerItem8 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_27.addItem(spacerItem8, 0, 0, 1, 1)
+        self.gridLayout_26.addLayout(self.gridLayout_27, 0, 0, 1, 1)
+        self.hlayout_bottomrow_2.addWidget(self.groupAssignShot_2)
+        self.groupProgramSignalReady = QtWidgets.QGroupBox(self.scrollAreaWidgetContents)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(1)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.groupProgramSignalReady.sizePolicy().hasHeightForWidth())
+        self.groupProgramSignalReady.setSizePolicy(sizePolicy)
+        self.groupProgramSignalReady.setMinimumSize(QtCore.QSize(0, 350))
+        self.groupProgramSignalReady.setMaximumSize(QtCore.QSize(16777215, 350))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.groupProgramSignalReady.setFont(font)
+        self.groupProgramSignalReady.setStyleSheet("/* Khung chính của GroupBox */\n"
+"QGroupBox {\n"
+"    background-color: #FBFFF9; /* Màu nền theo yêu cầu của bạn */\n"
+"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
+"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
+"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
+"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
+"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
+"    color: #333333;            /* Màu chữ tiêu đề */\n"
+"}\n"
+"\n"
+"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
+"QGroupBox::title {\n"
+"    subcontrol-origin: margin;\n"
+"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
+"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
+"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
+"}\n"
+"")
+        self.groupProgramSignalReady.setObjectName("groupProgramSignalReady")
+        self.gridLayout_28 = QtWidgets.QGridLayout(self.groupProgramSignalReady)
+        self.gridLayout_28.setObjectName("gridLayout_28")
+        self.scrollArea_ProgramSignalReady = QtWidgets.QScrollArea(self.groupProgramSignalReady)
+        self.scrollArea_ProgramSignalReady.setStyleSheet("/* Khung ngoài của ScrollArea */\n"
+"QScrollArea {\n"
+"    background-color: #FBFFF9; /* Màu vàng nhạt (Soft Yellow) */\n"
+"    border: 1px solid #c6c6c6;  /* Viền xám mảnh đồng bộ */\n"
+"    border-radius: 4px;         /* Bo tròn góc 4px */\n"
+"}\n"
+"\n"
+"/* BẮT BUỘC: Đổi nền của widget con bên trong sang suốt \n"
+"   để màu vàng nhạt của khung ngoài được hiển thị hoàn toàn */\n"
+"QScrollArea > QWidget > QWidget {\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"/* Tùy chỉnh thanh cuộn dọc (Nếu bạn muốn tinh tế hơn) */\n"
+"QScrollBar:vertical {\n"
+"    background-color: #f5f5f5;\n"
+"    width: 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical {\n"
+"    background-color: #dcdde1; /* Cục kéo màu xám nhạt */\n"
+"    border-radius: 4px;\n"
+"    min-height: 20px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical:hover {\n"
+"    background-color: #c6c6c6; /* Cục kéo đậm hơn khi di chuột */\n"
+"}\n"
+"")
+        self.scrollArea_ProgramSignalReady.setWidgetResizable(True)
+        self.scrollArea_ProgramSignalReady.setObjectName("scrollArea_ProgramSignalReady")
+        self.scrollAreaWidgetContents_2 = QtWidgets.QWidget()
+        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 860, 269))
+        self.scrollAreaWidgetContents_2.setObjectName("scrollAreaWidgetContents_2")
+        self.scrollArea_ProgramSignalReady.setWidget(self.scrollAreaWidgetContents_2)
+        self.gridLayout_28.addWidget(self.scrollArea_ProgramSignalReady, 0, 0, 1, 1)
+        self.gridLayout_29 = QtWidgets.QGridLayout()
+        self.gridLayout_29.setSpacing(0)
+        self.gridLayout_29.setObjectName("gridLayout_29")
+        spacerItem9 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_29.addItem(spacerItem9, 0, 0, 1, 1)
+        self.pushButton_load_setting_ProgramSignalReady = QtWidgets.QPushButton(self.groupProgramSignalReady)
+        self.pushButton_load_setting_ProgramSignalReady.setMinimumSize(QtCore.QSize(0, 30))
+        self.pushButton_load_setting_ProgramSignalReady.setMaximumSize(QtCore.QSize(30, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.pushButton_load_setting_ProgramSignalReady.setFont(font)
+        self.pushButton_load_setting_ProgramSignalReady.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
+        self.pushButton_load_setting_ProgramSignalReady.setText("")
+        self.pushButton_load_setting_ProgramSignalReady.setIcon(icon3)
+        self.pushButton_load_setting_ProgramSignalReady.setIconSize(QtCore.QSize(25, 25))
+        self.pushButton_load_setting_ProgramSignalReady.setObjectName("pushButton_load_setting_ProgramSignalReady")
+        self.gridLayout_29.addWidget(self.pushButton_load_setting_ProgramSignalReady, 0, 2, 1, 1)
+        self.label_45 = QtWidgets.QLabel(self.groupProgramSignalReady)
+        self.label_45.setMinimumSize(QtCore.QSize(20, 0))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.label_45.setFont(font)
+        self.label_45.setText("")
+        self.label_45.setObjectName("label_45")
+        self.gridLayout_29.addWidget(self.label_45, 0, 3, 1, 1)
+        self.label_46 = QtWidgets.QLabel(self.groupProgramSignalReady)
+        self.label_46.setMinimumSize(QtCore.QSize(20, 0))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.label_46.setFont(font)
+        self.label_46.setText("")
+        self.label_46.setObjectName("label_46")
+        self.gridLayout_29.addWidget(self.label_46, 0, 1, 1, 1)
+        self.pushButton_apply_setting_ProgramSignalReady = QtWidgets.QPushButton(self.groupProgramSignalReady)
+        self.pushButton_apply_setting_ProgramSignalReady.setMinimumSize(QtCore.QSize(0, 30))
+        self.pushButton_apply_setting_ProgramSignalReady.setMaximumSize(QtCore.QSize(30, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.pushButton_apply_setting_ProgramSignalReady.setFont(font)
+        self.pushButton_apply_setting_ProgramSignalReady.setStyleSheet("QPushButton {\n"
+"    background-color: transparent;\n"
+"    border: none;\n"
+"    border-radius: 6px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
+"}")
+        self.pushButton_apply_setting_ProgramSignalReady.setText("")
+        self.pushButton_apply_setting_ProgramSignalReady.setIcon(icon1)
+        self.pushButton_apply_setting_ProgramSignalReady.setIconSize(QtCore.QSize(22, 22))
+        self.pushButton_apply_setting_ProgramSignalReady.setObjectName("pushButton_apply_setting_ProgramSignalReady")
+        self.gridLayout_29.addWidget(self.pushButton_apply_setting_ProgramSignalReady, 0, 4, 1, 1)
+        self.gridLayout_28.addLayout(self.gridLayout_29, 2, 0, 1, 1)
+        self.line_28 = QtWidgets.QFrame(self.groupProgramSignalReady)
+        self.line_28.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_28.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_28.setObjectName("line_28")
+        self.gridLayout_28.addWidget(self.line_28, 1, 0, 1, 1)
+        self.hlayout_bottomrow_2.addWidget(self.groupProgramSignalReady)
+        self.vlayout_bottomrow_container_wrap_2.addLayout(self.hlayout_bottomrow_2)
+        self.gridLayout_32.addLayout(self.vlayout_bottomrow_container_wrap_2, 8, 0, 1, 1)
+        self.label_25 = QtWidgets.QLabel(self.scrollAreaWidgetContents)
+        self.label_25.setMaximumSize(QtCore.QSize(16777215, 1))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.label_25.setFont(font)
+        self.label_25.setText("")
+        self.label_25.setObjectName("label_25")
+        self.gridLayout_32.addWidget(self.label_25, 3, 0, 1, 2)
         self.vlayout_bottomrow_container_wrap = QtWidgets.QVBoxLayout()
         self.vlayout_bottomrow_container_wrap.setContentsMargins(0, 0, 0, 0)
         self.vlayout_bottomrow_container_wrap.setObjectName("vlayout_bottomrow_container_wrap")
@@ -2221,13 +6952,13 @@ class Ui_MainWindow(object):
         self.groupAssignShot.setMaximumSize(QtCore.QSize(16777215, 350))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupAssignShot.setFont(font)
         self.groupAssignShot.setStyleSheet("/* Khung chính của GroupBox */\n"
 "QGroupBox {\n"
-"    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */\n"
+"    background-color: #FBFFF9; /* Màu nền theo yêu cầu của bạn */\n"
 "    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
 "    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
 "    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
@@ -2254,31 +6985,108 @@ class Ui_MainWindow(object):
         self.tableWidget_shotxmodel.setMinimumSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         self.tableWidget_shotxmodel.setFont(font)
-        self.tableWidget_shotxmodel.setStyleSheet("/* Khung chính của bảng TableView */\n"
-"QTableView {\n"
-"    background-color: #F7FFFA; /* Màu xanh lá nhạt dịu mắt (Mint Light) */\n"
-"    border: 1px solid #c6c6c6;  /* Viền xám mảnh đồng bộ */\n"
-"    border-radius: 4px;         /* Bo tròn góc 4px */\n"
-"    gridline-color: #d0ebd5;    /* Màu của các đường lưới ngăn cách ô (xanh lá rất nhạt) */\n"
+        self.tableWidget_shotxmodel.setStyleSheet("/* Khung tổng thể của bảng */\n"
+"QTableWidget {\n"
+"    background-color: #F8FAFC;\n"
+"    alternate-background-color: #F1F5F9;\n"
+"    color: #334155;\n"
+"    gridline-color: #E2E8F0;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 8px;\n"
+"    font-size: 13px;\n"
+"    selection-background-color: #E2E8F0;\n"
+"    selection-color: #1E293B;\n"
+"    outline: 0;\n"
 "}\n"
 "\n"
-"/* Màu nền của từng ô dữ liệu bên trong bảng */\n"
-"QTableView::item {\n"
-"    background-color: #F7FFFA; /* Đồng bộ màu xanh lá nhạt cho các ô */\n"
-"    color: #2c3e50;            /* Màu chữ tối để dễ đọc */\n"
+"/* Từng ô dữ liệu bên trong bảng */\n"
+"QTableWidget::item {\n"
+"    padding: 4px 10px;\n"
+"    border-bottom: 1px solid #E2E8F0;\n"
 "}\n"
 "\n"
-"/* Hiệu ứng khi di chuột qua một dòng/ô */\n"
-"QTableView::item:hover {\n"
-"    background-color: #F5FFE1; /* Xanh lá đậm hơn một chút khi di chuột */\n"
+"/* Hiệu ứng khi di chuột qua từng ô */\n"
+"QTableWidget::item:hover {\n"
+"    background-color: #EEF2F6;\n"
 "}\n"
 "\n"
-"/* Hiệu ứng khi NGƯỜI DÙNG CLICK CHỌN một dòng/ô */\n"
-"QTableView::item:selected {\n"
-"    background-color: #E9F8FF; /* Đổi thành màu xanh lá đậm khi được chọn */\n"
-"    color: black;              /* Chữ chuyển sang trắng để nổi bật */\n"
+"/* Ô đang được chọn */\n"
+"QTableWidget::item:selected {\n"
+"    background-color: #E0E7FF;\n"
+"    color: #3730A3;\n"
+"    font-weight: bold;\n"
+"}\n"
+"\n"
+"/* Thanh tiêu đề cột (Header ngang) */\n"
+"QHeaderView::section {\n"
+"    background-color: #E2E8F0;\n"
+"    color: #475569;\n"
+"    font-weight: bold;\n"
+"    font-size: 12px;\n"
+"    text-transform: uppercase;\n"
+"    padding: 10px 12px;\n"
+"    border: none;\n"
+"    border-bottom: 1.5px solid #CBD5E1;\n"
+"    border-right: 1px solid #CBD5E1;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào tiêu đề cột */\n"
+"QHeaderView::section:hover {\n"
+"    background-color: #CBD5E1;\n"
+"    color: #1E293B;\n"
+"}\n"
+"\n"
+"/* Góc trên bên trái giao giữa 2 thanh tiêu đề */\n"
+"QTableCornerButton::section {\n"
+"    background-color: #E2E8F0;\n"
+"    border: none;\n"
+"    border-bottom: 1.5px solid #CBD5E1;\n"
+"}\n"
+"\n"
+"/* Thanh cuộn dọc (Vertical Scrollbar) */\n"
+"QScrollBar:vertical {\n"
+"    background: #F1F5F9;\n"
+"    width: 8px;\n"
+"    margin: 0px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical {\n"
+"    background: #CBD5E1;\n"
+"    min-height: 25px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical:hover {\n"
+"    background: #94A3B8;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {\n"
+"    height: 0px;\n"
+"}\n"
+"\n"
+"/* Thanh cuộn ngang (Horizontal Scrollbar) */\n"
+"QScrollBar:horizontal {\n"
+"    background: #F1F5F9;\n"
+"    height: 8px;\n"
+"    margin: 0px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:horizontal {\n"
+"    background: #CBD5E1;\n"
+"    min-width: 25px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:horizontal:hover {\n"
+"    background: #94A3B8;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {\n"
+"    width: 0px;\n"
 "}\n"
 "")
         self.tableWidget_shotxmodel.setEditTriggers(QtWidgets.QAbstractItemView.DoubleClicked|QtWidgets.QAbstractItemView.EditKeyPressed)
@@ -2350,7 +7158,7 @@ class Ui_MainWindow(object):
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
         self.pushButton_clear_shotx.setText("")
-        self.pushButton_clear_shotx.setIcon(icon3)
+        self.pushButton_clear_shotx.setIcon(icon2)
         self.pushButton_clear_shotx.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_clear_shotx.setObjectName("pushButton_clear_shotx")
         self.gridLayout_21.addWidget(self.pushButton_clear_shotx, 0, 2, 1, 1)
@@ -2363,8 +7171,8 @@ class Ui_MainWindow(object):
         self.label_38.setText("")
         self.label_38.setObjectName("label_38")
         self.gridLayout_21.addWidget(self.label_38, 0, 3, 1, 1)
-        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_21.addItem(spacerItem4, 0, 0, 1, 1)
+        spacerItem10 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_21.addItem(spacerItem10, 0, 0, 1, 1)
         self.pushButton_applyshotxmodel = QtWidgets.QPushButton(self.groupAssignShot)
         self.pushButton_applyshotxmodel.setMinimumSize(QtCore.QSize(0, 30))
         self.pushButton_applyshotxmodel.setMaximumSize(QtCore.QSize(30, 16777215))
@@ -2386,7 +7194,7 @@ class Ui_MainWindow(object):
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
         self.pushButton_applyshotxmodel.setText("")
-        self.pushButton_applyshotxmodel.setIcon(icon2)
+        self.pushButton_applyshotxmodel.setIcon(icon1)
         self.pushButton_applyshotxmodel.setIconSize(QtCore.QSize(22, 22))
         self.pushButton_applyshotxmodel.setObjectName("pushButton_applyshotxmodel")
         self.gridLayout_21.addWidget(self.pushButton_applyshotxmodel, 0, 4, 1, 1)
@@ -2411,7 +7219,7 @@ class Ui_MainWindow(object):
         self.groupAnimationEffect.setMaximumSize(QtCore.QSize(16777215, 350))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupAnimationEffect.setFont(font)
@@ -2442,13 +7250,13 @@ class Ui_MainWindow(object):
         self.groupBox_3.setMinimumSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_3.setFont(font)
         self.groupBox_3.setStyleSheet("/* Khung chính của GroupBox */\n"
 "QGroupBox {\n"
-"    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */\n"
+"    background-color: #FBFFF9; /* Màu nền theo yêu cầu của bạn */\n"
 "    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
 "    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
 "    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
@@ -2468,50 +7276,6 @@ class Ui_MainWindow(object):
         self.groupBox_3.setObjectName("groupBox_3")
         self.gridLayout_5 = QtWidgets.QGridLayout(self.groupBox_3)
         self.gridLayout_5.setObjectName("gridLayout_5")
-        self.radioButton_counter_plc = QtWidgets.QRadioButton(self.groupBox_3)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.radioButton_counter_plc.setFont(font)
-        self.radioButton_counter_plc.setObjectName("radioButton_counter_plc")
-        self.gridLayout_5.addWidget(self.radioButton_counter_plc, 1, 2, 1, 1)
-        self.comboBox_increment_counter_signal_selected = QtWidgets.QComboBox(self.groupBox_3)
-        self.comboBox_increment_counter_signal_selected.setMinimumSize(QtCore.QSize(0, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_increment_counter_signal_selected.setFont(font)
-        self.comboBox_increment_counter_signal_selected.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 60px; \n"
-"}\n"
-"")
-        self.comboBox_increment_counter_signal_selected.setObjectName("comboBox_increment_counter_signal_selected")
-        self.comboBox_increment_counter_signal_selected.addItem("")
-        self.gridLayout_5.addWidget(self.comboBox_increment_counter_signal_selected, 1, 7, 1, 1)
-        self.radioButton_condition_plc_pc = QtWidgets.QRadioButton(self.groupBox_3)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.radioButton_condition_plc_pc.setFont(font)
-        self.radioButton_condition_plc_pc.setObjectName("radioButton_condition_plc_pc")
-        self.gridLayout_5.addWidget(self.radioButton_condition_plc_pc, 1, 4, 1, 1)
-        self.label_24 = QtWidgets.QLabel(self.groupBox_3)
-        self.label_24.setMaximumSize(QtCore.QSize(100, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_24.setFont(font)
-        self.label_24.setObjectName("label_24")
-        self.gridLayout_5.addWidget(self.label_24, 1, 6, 1, 1)
         self.radioButton_counter_pc = QtWidgets.QRadioButton(self.groupBox_3)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
@@ -2521,7 +7285,110 @@ class Ui_MainWindow(object):
         self.radioButton_counter_pc.setFont(font)
         self.radioButton_counter_pc.setChecked(True)
         self.radioButton_counter_pc.setObjectName("radioButton_counter_pc")
-        self.gridLayout_5.addWidget(self.radioButton_counter_pc, 1, 1, 1, 1)
+        self.gridLayout_5.addWidget(self.radioButton_counter_pc, 1, 2, 1, 1)
+        self.line_33 = QtWidgets.QFrame(self.groupBox_3)
+        self.line_33.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_33.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_33.setObjectName("line_33")
+        self.gridLayout_5.addWidget(self.line_33, 1, 1, 1, 1)
+        self.comboBox_increment_counter_signal_selected = QtWidgets.QComboBox(self.groupBox_3)
+        self.comboBox_increment_counter_signal_selected.setMinimumSize(QtCore.QSize(0, 36))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_increment_counter_signal_selected.setFont(font)
+        self.comboBox_increment_counter_signal_selected.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"  padding-left: 50px; \n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.comboBox_increment_counter_signal_selected.setObjectName("comboBox_increment_counter_signal_selected")
+        self.comboBox_increment_counter_signal_selected.addItem("")
+        self.gridLayout_5.addWidget(self.comboBox_increment_counter_signal_selected, 1, 9, 1, 1)
         self.label_10 = QtWidgets.QLabel(self.groupBox_3)
         self.label_10.setMaximumSize(QtCore.QSize(50, 16777215))
         font = QtGui.QFont()
@@ -2531,6 +7398,20 @@ class Ui_MainWindow(object):
         self.label_10.setText("")
         self.label_10.setObjectName("label_10")
         self.gridLayout_5.addWidget(self.label_10, 1, 0, 1, 1)
+        self.line_29 = QtWidgets.QFrame(self.groupBox_3)
+        self.line_29.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_29.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_29.setObjectName("line_29")
+        self.gridLayout_5.addWidget(self.line_29, 1, 10, 1, 1)
+        self.radioButton_counter_plc = QtWidgets.QRadioButton(self.groupBox_3)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.radioButton_counter_plc.setFont(font)
+        self.radioButton_counter_plc.setObjectName("radioButton_counter_plc")
+        self.gridLayout_5.addWidget(self.radioButton_counter_plc, 1, 4, 1, 1)
         self.line_25 = QtWidgets.QFrame(self.groupBox_3)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
@@ -2539,7 +7420,36 @@ class Ui_MainWindow(object):
         self.line_25.setFrameShape(QtWidgets.QFrame.VLine)
         self.line_25.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_25.setObjectName("line_25")
-        self.gridLayout_5.addWidget(self.line_25, 1, 5, 1, 1)
+        self.gridLayout_5.addWidget(self.line_25, 1, 7, 1, 1)
+        self.label_24 = QtWidgets.QLabel(self.groupBox_3)
+        self.label_24.setMaximumSize(QtCore.QSize(120, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_24.setFont(font)
+        self.label_24.setObjectName("label_24")
+        self.gridLayout_5.addWidget(self.label_24, 1, 8, 1, 1)
+        self.radioButton_condition_plc_pc = QtWidgets.QRadioButton(self.groupBox_3)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.radioButton_condition_plc_pc.setFont(font)
+        self.radioButton_condition_plc_pc.setObjectName("radioButton_condition_plc_pc")
+        self.gridLayout_5.addWidget(self.radioButton_condition_plc_pc, 1, 6, 1, 1)
+        self.line_39 = QtWidgets.QFrame(self.groupBox_3)
+        self.line_39.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_39.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_39.setObjectName("line_39")
+        self.gridLayout_5.addWidget(self.line_39, 1, 5, 1, 1)
+        self.line_38 = QtWidgets.QFrame(self.groupBox_3)
+        self.line_38.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_38.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_38.setObjectName("line_38")
+        self.gridLayout_5.addWidget(self.line_38, 1, 3, 1, 1)
         self.gridLayout_23.addWidget(self.groupBox_3, 0, 0, 1, 2)
         self.gridLayout_20 = QtWidgets.QGridLayout()
         self.gridLayout_20.setSpacing(0)
@@ -2565,7 +7475,7 @@ class Ui_MainWindow(object):
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
         self.pushButton_load_setting_for_counter.setText("")
-        self.pushButton_load_setting_for_counter.setIcon(icon4)
+        self.pushButton_load_setting_for_counter.setIcon(icon3)
         self.pushButton_load_setting_for_counter.setIconSize(QtCore.QSize(25, 25))
         self.pushButton_load_setting_for_counter.setObjectName("pushButton_load_setting_for_counter")
         self.gridLayout_20.addWidget(self.pushButton_load_setting_for_counter, 0, 2, 1, 1)
@@ -2578,8 +7488,8 @@ class Ui_MainWindow(object):
         self.label_34.setText("")
         self.label_34.setObjectName("label_34")
         self.gridLayout_20.addWidget(self.label_34, 0, 3, 1, 1)
-        spacerItem5 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_20.addItem(spacerItem5, 0, 0, 1, 1)
+        spacerItem11 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_20.addItem(spacerItem11, 0, 0, 1, 1)
         self.pushButton_apply_setting_for_counter = QtWidgets.QPushButton(self.groupAnimationEffect)
         self.pushButton_apply_setting_for_counter.setMinimumSize(QtCore.QSize(0, 30))
         self.pushButton_apply_setting_for_counter.setMaximumSize(QtCore.QSize(30, 16777215))
@@ -2601,7 +7511,7 @@ class Ui_MainWindow(object):
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
         self.pushButton_apply_setting_for_counter.setText("")
-        self.pushButton_apply_setting_for_counter.setIcon(icon2)
+        self.pushButton_apply_setting_for_counter.setIcon(icon1)
         self.pushButton_apply_setting_for_counter.setIconSize(QtCore.QSize(22, 22))
         self.pushButton_apply_setting_for_counter.setObjectName("pushButton_apply_setting_for_counter")
         self.gridLayout_20.addWidget(self.pushButton_apply_setting_for_counter, 0, 4, 1, 1)
@@ -2628,13 +7538,13 @@ class Ui_MainWindow(object):
         self.groupBox.setMinimumSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox.setFont(font)
         self.groupBox.setStyleSheet("/* Khung chính của GroupBox */\n"
 "QGroupBox {\n"
-"    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */\n"
+"    background-color: #FBFFF9; /* Màu nền theo yêu cầu của bạn */\n"
 "    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
 "    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
 "    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
@@ -2654,6 +7564,138 @@ class Ui_MainWindow(object):
         self.groupBox.setObjectName("groupBox")
         self.gridLayout_7 = QtWidgets.QGridLayout(self.groupBox)
         self.gridLayout_7.setObjectName("gridLayout_7")
+        self.label_19 = QtWidgets.QLabel(self.groupBox)
+        self.label_19.setMaximumSize(QtCore.QSize(120, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_19.setFont(font)
+        self.label_19.setObjectName("label_19")
+        self.gridLayout_7.addWidget(self.label_19, 0, 8, 1, 1)
+        self.comboBox_reset_counter_signal_selected = QtWidgets.QComboBox(self.groupBox)
+        self.comboBox_reset_counter_signal_selected.setMinimumSize(QtCore.QSize(0, 36))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_reset_counter_signal_selected.setFont(font)
+        self.comboBox_reset_counter_signal_selected.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"  padding-left: 50px; \n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.comboBox_reset_counter_signal_selected.setObjectName("comboBox_reset_counter_signal_selected")
+        self.comboBox_reset_counter_signal_selected.addItem("")
+        self.gridLayout_7.addWidget(self.comboBox_reset_counter_signal_selected, 0, 9, 1, 1)
+        self.line_40 = QtWidgets.QFrame(self.groupBox)
+        self.line_40.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_40.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_40.setObjectName("line_40")
+        self.gridLayout_7.addWidget(self.line_40, 0, 3, 1, 1)
+        self.line_26 = QtWidgets.QFrame(self.groupBox)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.line_26.setFont(font)
+        self.line_26.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_26.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_26.setObjectName("line_26")
+        self.gridLayout_7.addWidget(self.line_26, 0, 7, 1, 1)
+        self.line_35 = QtWidgets.QFrame(self.groupBox)
+        self.line_35.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_35.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_35.setObjectName("line_35")
+        self.gridLayout_7.addWidget(self.line_35, 0, 1, 1, 1)
+        self.line_41 = QtWidgets.QFrame(self.groupBox)
+        self.line_41.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_41.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_41.setObjectName("line_41")
+        self.gridLayout_7.addWidget(self.line_41, 0, 5, 1, 1)
         self.radioButton_reset = QtWidgets.QRadioButton(self.groupBox)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
@@ -2663,7 +7705,21 @@ class Ui_MainWindow(object):
         self.radioButton_reset.setFont(font)
         self.radioButton_reset.setChecked(True)
         self.radioButton_reset.setObjectName("radioButton_reset")
-        self.gridLayout_7.addWidget(self.radioButton_reset, 0, 1, 1, 1)
+        self.gridLayout_7.addWidget(self.radioButton_reset, 0, 2, 1, 1)
+        self.radioButton_none_1 = QtWidgets.QRadioButton(self.groupBox)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.radioButton_none_1.setFont(font)
+        self.radioButton_none_1.setObjectName("radioButton_none_1")
+        self.gridLayout_7.addWidget(self.radioButton_none_1, 0, 6, 1, 1)
+        self.line_30 = QtWidgets.QFrame(self.groupBox)
+        self.line_30.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_30.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_30.setObjectName("line_30")
+        self.gridLayout_7.addWidget(self.line_30, 0, 10, 1, 1)
         self.label_13 = QtWidgets.QLabel(self.groupBox)
         self.label_13.setMaximumSize(QtCore.QSize(50, 16777215))
         font = QtGui.QFont()
@@ -2673,50 +7729,6 @@ class Ui_MainWindow(object):
         self.label_13.setText("")
         self.label_13.setObjectName("label_13")
         self.gridLayout_7.addWidget(self.label_13, 0, 0, 1, 1)
-        self.line_26 = QtWidgets.QFrame(self.groupBox)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_26.setFont(font)
-        self.line_26.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line_26.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_26.setObjectName("line_26")
-        self.gridLayout_7.addWidget(self.line_26, 0, 4, 1, 1)
-        self.comboBox_reset_counter_signal_selected = QtWidgets.QComboBox(self.groupBox)
-        self.comboBox_reset_counter_signal_selected.setMinimumSize(QtCore.QSize(0, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_reset_counter_signal_selected.setFont(font)
-        self.comboBox_reset_counter_signal_selected.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 60px; \n"
-"}\n"
-"")
-        self.comboBox_reset_counter_signal_selected.setObjectName("comboBox_reset_counter_signal_selected")
-        self.comboBox_reset_counter_signal_selected.addItem("")
-        self.gridLayout_7.addWidget(self.comboBox_reset_counter_signal_selected, 0, 6, 1, 1)
-        self.label_19 = QtWidgets.QLabel(self.groupBox)
-        self.label_19.setMaximumSize(QtCore.QSize(100, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_19.setFont(font)
-        self.label_19.setObjectName("label_19")
-        self.gridLayout_7.addWidget(self.label_19, 0, 5, 1, 1)
-        self.radioButton_none_1 = QtWidgets.QRadioButton(self.groupBox)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.radioButton_none_1.setFont(font)
-        self.radioButton_none_1.setObjectName("radioButton_none_1")
-        self.gridLayout_7.addWidget(self.radioButton_none_1, 0, 3, 1, 1)
         self.radioButton_none_reset = QtWidgets.QRadioButton(self.groupBox)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
@@ -2725,19 +7737,19 @@ class Ui_MainWindow(object):
         font.setWeight(75)
         self.radioButton_none_reset.setFont(font)
         self.radioButton_none_reset.setObjectName("radioButton_none_reset")
-        self.gridLayout_7.addWidget(self.radioButton_none_reset, 0, 2, 1, 1)
+        self.gridLayout_7.addWidget(self.radioButton_none_reset, 0, 4, 1, 1)
         self.gridLayout_23.addWidget(self.groupBox, 1, 0, 1, 2)
         self.groupBox_6 = QtWidgets.QGroupBox(self.groupAnimationEffect)
         self.groupBox_6.setMinimumSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         font.setBold(True)
         font.setWeight(75)
         self.groupBox_6.setFont(font)
         self.groupBox_6.setStyleSheet("/* Khung chính của GroupBox */\n"
 "QGroupBox {\n"
-"    background-color: #F7FFFD; /* Màu nền theo yêu cầu của bạn */\n"
+"    background-color: #FBFFF9; /* Màu nền theo yêu cầu của bạn */\n"
 "    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
 "    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
 "    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
@@ -2757,31 +7769,6 @@ class Ui_MainWindow(object):
         self.groupBox_6.setObjectName("groupBox_6")
         self.gridLayout_25 = QtWidgets.QGridLayout(self.groupBox_6)
         self.gridLayout_25.setObjectName("gridLayout_25")
-        self.line_27 = QtWidgets.QFrame(self.groupBox_6)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_27.setFont(font)
-        self.line_27.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line_27.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_27.setObjectName("line_27")
-        self.gridLayout_25.addWidget(self.line_27, 0, 4, 1, 1)
-        self.comboBox_method_use_signal_selected = QtWidgets.QComboBox(self.groupBox_6)
-        self.comboBox_method_use_signal_selected.setMinimumSize(QtCore.QSize(0, 30))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_method_use_signal_selected.setFont(font)
-        self.comboBox_method_use_signal_selected.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 60px; \n"
-"}\n"
-"")
-        self.comboBox_method_use_signal_selected.setObjectName("comboBox_method_use_signal_selected")
-        self.comboBox_method_use_signal_selected.addItem("")
-        self.gridLayout_25.addWidget(self.comboBox_method_use_signal_selected, 0, 6, 1, 1)
         self.radioButton_cycle_frame = QtWidgets.QRadioButton(self.groupBox_6)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
@@ -2791,7 +7778,139 @@ class Ui_MainWindow(object):
         self.radioButton_cycle_frame.setFont(font)
         self.radioButton_cycle_frame.setChecked(True)
         self.radioButton_cycle_frame.setObjectName("radioButton_cycle_frame")
-        self.gridLayout_25.addWidget(self.radioButton_cycle_frame, 0, 2, 1, 1)
+        self.gridLayout_25.addWidget(self.radioButton_cycle_frame, 0, 4, 1, 1)
+        self.line_37 = QtWidgets.QFrame(self.groupBox_6)
+        self.line_37.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_37.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_37.setObjectName("line_37")
+        self.gridLayout_25.addWidget(self.line_37, 0, 1, 1, 1)
+        self.comboBox_method_use_signal_selected = QtWidgets.QComboBox(self.groupBox_6)
+        self.comboBox_method_use_signal_selected.setMinimumSize(QtCore.QSize(0, 36))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.comboBox_method_use_signal_selected.setFont(font)
+        self.comboBox_method_use_signal_selected.setStyleSheet("\n"
+"\n"
+"/* Khung chính của ComboBox */\n"
+"QComboBox {\n"
+"    background-color: #F8FAFC;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 12px;\n"
+"    font-size: 13px;\n"
+"    min-height: 22px;\n"
+"  padding-left: 50px; \n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột vào */\n"
+"QComboBox:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    border: 1px solid #7DD3FC;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi đang mở danh sách chọn (Focus / On) */\n"
+"QComboBox:on, QComboBox:focus {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1.5px solid #0284C7;\n"
+"    color: #0F172A;\n"
+"}\n"
+"\n"
+"/* Khu vực nút bấm bên phải chứa mũi tên */\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 28px;\n"
+"    border-left: 1px solid #E2E8F0;\n"
+"    border-top-right-radius: 6px;\n"
+"    border-bottom-right-radius: 6px;\n"
+"    background-color: transparent;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down:hover {\n"
+"    background-color: #D7F2FF;\n"
+"}\n"
+"\n"
+"/* Vẽ mũi tên chỉ xuống bằng CSS thuần (Không cần file ảnh) */\n"
+"QComboBox::down-arrow {\n"
+"    width: 0px;\n"
+"    height: 0px;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 5px solid #475569;\n"
+"    margin-top: 2px;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow:hover {\n"
+"    border-top: 5px solid #0369A1;\n"
+"}\n"
+"\n"
+"/* Bảng danh sách thả xuống (Popup List) */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    color: #334155;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    outline: 0;\n"
+"    selection-background-color: #D7F2FF;\n"
+"    selection-color: #0369A1;\n"
+"}\n"
+"\n"
+"/* Từng dòng lựa chọn bên trong danh sách thả xuống */\n"
+"QComboBox QAbstractItemView::item {\n"
+"    min-height: 28px;\n"
+"    padding: 4px 10px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:hover {\n"
+"    background-color: #EEFAFF;\n"
+"    color: #0369A1;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView::item:selected {\n"
+"    background-color: #D7F2FF;\n"
+"    color: #0369A1;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
+        self.comboBox_method_use_signal_selected.setObjectName("comboBox_method_use_signal_selected")
+        self.comboBox_method_use_signal_selected.addItem("")
+        self.gridLayout_25.addWidget(self.comboBox_method_use_signal_selected, 0, 9, 1, 1)
+        self.label_41 = QtWidgets.QLabel(self.groupBox_6)
+        self.label_41.setMaximumSize(QtCore.QSize(120, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_41.setFont(font)
+        self.label_41.setObjectName("label_41")
+        self.gridLayout_25.addWidget(self.label_41, 0, 8, 1, 1)
+        self.line_27 = QtWidgets.QFrame(self.groupBox_6)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        self.line_27.setFont(font)
+        self.line_27.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_27.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_27.setObjectName("line_27")
+        self.gridLayout_25.addWidget(self.line_27, 0, 7, 1, 1)
+        self.line_31 = QtWidgets.QFrame(self.groupBox_6)
+        self.line_31.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_31.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_31.setObjectName("line_31")
+        self.gridLayout_25.addWidget(self.line_31, 0, 10, 1, 1)
+        self.line_42 = QtWidgets.QFrame(self.groupBox_6)
+        self.line_42.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_42.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_42.setObjectName("line_42")
+        self.gridLayout_25.addWidget(self.line_42, 0, 3, 1, 1)
         self.label_15 = QtWidgets.QLabel(self.groupBox_6)
         self.label_15.setMaximumSize(QtCore.QSize(50, 16777215))
         font = QtGui.QFont()
@@ -2801,25 +7920,6 @@ class Ui_MainWindow(object):
         self.label_15.setText("")
         self.label_15.setObjectName("label_15")
         self.gridLayout_25.addWidget(self.label_15, 0, 0, 1, 1)
-        self.radioButton_single_frame = QtWidgets.QRadioButton(self.groupBox_6)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.radioButton_single_frame.setFont(font)
-        self.radioButton_single_frame.setObjectName("radioButton_single_frame")
-        self.gridLayout_25.addWidget(self.radioButton_single_frame, 0, 1, 1, 1)
-        self.label_41 = QtWidgets.QLabel(self.groupBox_6)
-        self.label_41.setMaximumSize(QtCore.QSize(100, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_41.setFont(font)
-        self.label_41.setObjectName("label_41")
-        self.gridLayout_25.addWidget(self.label_41, 0, 5, 1, 1)
         self.radioButton_none_2 = QtWidgets.QRadioButton(self.groupBox_6)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
@@ -2828,246 +7928,44 @@ class Ui_MainWindow(object):
         font.setWeight(75)
         self.radioButton_none_2.setFont(font)
         self.radioButton_none_2.setObjectName("radioButton_none_2")
-        self.gridLayout_25.addWidget(self.radioButton_none_2, 0, 3, 1, 1)
+        self.gridLayout_25.addWidget(self.radioButton_none_2, 0, 6, 1, 1)
+        self.radioButton_single_frame = QtWidgets.QRadioButton(self.groupBox_6)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.radioButton_single_frame.setFont(font)
+        self.radioButton_single_frame.setObjectName("radioButton_single_frame")
+        self.gridLayout_25.addWidget(self.radioButton_single_frame, 0, 2, 1, 1)
+        self.line_43 = QtWidgets.QFrame(self.groupBox_6)
+        self.line_43.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_43.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_43.setObjectName("line_43")
+        self.gridLayout_25.addWidget(self.line_43, 0, 5, 1, 1)
         self.gridLayout_23.addWidget(self.groupBox_6, 2, 0, 1, 2)
         self.hlayout_bottomrow.addWidget(self.groupAnimationEffect)
         self.vlayout_bottomrow_container_wrap.addLayout(self.hlayout_bottomrow)
         self.gridLayout_32.addLayout(self.vlayout_bottomrow_container_wrap, 6, 0, 1, 1)
-        self.label_14 = QtWidgets.QLabel(self.scrollAreaWidgetContents)
-        self.label_14.setMinimumSize(QtCore.QSize(0, 50))
-        self.label_14.setMaximumSize(QtCore.QSize(16777215, 60))
+        self.label_5 = QtWidgets.QLabel(self.scrollAreaWidgetContents)
+        self.label_5.setMaximumSize(QtCore.QSize(16777215, 1))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(22)
+        font.setPointSize(10)
+        self.label_5.setFont(font)
+        self.label_5.setText("")
+        self.label_5.setObjectName("label_5")
+        self.gridLayout_32.addWidget(self.label_5, 1, 0, 1, 2)
+        self.pushButton_admin = QtWidgets.QPushButton(self.scrollAreaWidgetContents)
+        self.pushButton_admin.setMinimumSize(QtCore.QSize(0, 50))
+        self.pushButton_admin.setMaximumSize(QtCore.QSize(50, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(11)
         font.setBold(True)
         font.setWeight(75)
-        self.label_14.setFont(font)
-        self.label_14.setStyleSheet("QLabel {\n"
-"    color: #ffffff; /* Chữ màu đen xám hiện đại, tương phản cao trên nền trắng */\n"
-"    \n"
-"    background-color:  qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #0B1E36, stop:1 #0F3B63); /* Nền màu trắng */\n"
-"    border: 2px solid #7A7A7A; /* Viền xám rất nhạt để định hình khối */\n"
-"    border-radius: 15px; /* Bo tròn góc mạnh hơn, tạo cảm giác mềm mại */\n"
-"    \n"
-"    padding: 12px 25px;\n"
-"    qproperty-alignment: AlignCenter; /* Căn chữ ra chính giữa label */\n"
-"}\n"
-"")
-        self.label_14.setObjectName("label_14")
-        self.gridLayout_32.addWidget(self.label_14, 0, 0, 1, 2)
-        self.hlayout_toprow = QtWidgets.QHBoxLayout()
-        self.hlayout_toprow.setSpacing(12)
-        self.hlayout_toprow.setObjectName("hlayout_toprow")
-        self.groupModeOption = QtWidgets.QGroupBox(self.scrollAreaWidgetContents)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(3)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.groupModeOption.sizePolicy().hasHeightForWidth())
-        self.groupModeOption.setSizePolicy(sizePolicy)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.groupModeOption.setFont(font)
-        self.groupModeOption.setStyleSheet("/* Khung chính của GroupBox */\n"
-"QGroupBox {\n"
-"    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */\n"
-"    border: 1px solid #5B5B5B; /* Viền xám mảnh để định hình khối */\n"
-"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
-"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
-"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
-"    color: #333333;            /* Màu chữ tiêu đề */\n"
-"}\n"
-"\n"
-"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
-"QGroupBox::title {\n"
-"    subcontrol-origin: margin;\n"
-"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
-"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
-"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
-"}\n"
-"")
-        self.groupModeOption.setObjectName("groupModeOption")
-        self.gridLayout_18 = QtWidgets.QGridLayout(self.groupModeOption)
-        self.gridLayout_18.setObjectName("gridLayout_18")
-        self.grid_modeoption = QtWidgets.QGridLayout()
-        self.grid_modeoption.setSpacing(8)
-        self.grid_modeoption.setObjectName("grid_modeoption")
-        self.lineEdit_register_mode = QtWidgets.QLineEdit(self.groupModeOption)
-        self.lineEdit_register_mode.setMinimumSize(QtCore.QSize(100, 28))
-        self.lineEdit_register_mode.setMaximumSize(QtCore.QSize(80, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.lineEdit_register_mode.setFont(font)
-        self.lineEdit_register_mode.setObjectName("lineEdit_register_mode")
-        self.grid_modeoption.addWidget(self.lineEdit_register_mode, 7, 1, 1, 1)
-        self.labelModeSector = QtWidgets.QLabel(self.groupModeOption)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.labelModeSector.setFont(font)
-        self.labelModeSector.setObjectName("labelModeSector")
-        self.grid_modeoption.addWidget(self.labelModeSector, 0, 0, 2, 1)
-        self.label_9 = QtWidgets.QLabel(self.groupModeOption)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_9.setFont(font)
-        self.label_9.setObjectName("label_9")
-        self.grid_modeoption.addWidget(self.label_9, 1, 2, 1, 1)
-        self.labelRegisterMode = QtWidgets.QLabel(self.groupModeOption)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.labelRegisterMode.setFont(font)
-        self.labelRegisterMode.setObjectName("labelRegisterMode")
-        self.grid_modeoption.addWidget(self.labelRegisterMode, 7, 0, 1, 1)
-        self.line_2 = QtWidgets.QFrame(self.groupModeOption)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_2.setFont(font)
-        self.line_2.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_2.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_2.setObjectName("line_2")
-        self.grid_modeoption.addWidget(self.line_2, 5, 0, 1, 4)
-        self.labelDefaultMode = QtWidgets.QLabel(self.groupModeOption)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.labelDefaultMode.setFont(font)
-        self.labelDefaultMode.setObjectName("labelDefaultMode")
-        self.grid_modeoption.addWidget(self.labelDefaultMode, 3, 0, 1, 1)
-        self.comboBox_default_mode = QtWidgets.QComboBox(self.groupModeOption)
-        self.comboBox_default_mode.setMinimumSize(QtCore.QSize(100, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_default_mode.setFont(font)
-        self.comboBox_default_mode.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 25px; \n"
-"}\n"
-"")
-        self.comboBox_default_mode.setObjectName("comboBox_default_mode")
-        self.comboBox_default_mode.addItem("")
-        self.comboBox_default_mode.addItem("")
-        self.comboBox_default_mode.addItem("")
-        self.grid_modeoption.addWidget(self.comboBox_default_mode, 3, 1, 1, 1)
-        self.comboBox_mode_auto = QtWidgets.QComboBox(self.groupModeOption)
-        self.comboBox_mode_auto.setMinimumSize(QtCore.QSize(100, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_mode_auto.setFont(font)
-        self.comboBox_mode_auto.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 25px; \n"
-"}\n"
-"")
-        self.comboBox_mode_auto.setObjectName("comboBox_mode_auto")
-        self.comboBox_mode_auto.addItem("")
-        self.comboBox_mode_auto.addItem("")
-        self.comboBox_mode_auto.addItem("")
-        self.grid_modeoption.addWidget(self.comboBox_mode_auto, 0, 1, 2, 1)
-        self.line_10 = QtWidgets.QFrame(self.groupModeOption)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_10.setFont(font)
-        self.line_10.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_10.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_10.setObjectName("line_10")
-        self.grid_modeoption.addWidget(self.line_10, 8, 0, 1, 4)
-        self.comboBox_value_mode_selector_bit_on = QtWidgets.QComboBox(self.groupModeOption)
-        self.comboBox_value_mode_selector_bit_on.setMinimumSize(QtCore.QSize(100, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_value_mode_selector_bit_on.setFont(font)
-        self.comboBox_value_mode_selector_bit_on.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 45px; \n"
-"}\n"
-"")
-        self.comboBox_value_mode_selector_bit_on.setObjectName("comboBox_value_mode_selector_bit_on")
-        self.comboBox_value_mode_selector_bit_on.addItem("")
-        self.comboBox_value_mode_selector_bit_on.addItem("")
-        self.comboBox_value_mode_selector_bit_on.addItem("")
-        self.comboBox_value_mode_selector_bit_on.addItem("")
-        self.comboBox_value_mode_selector_bit_on.addItem("")
-        self.comboBox_value_mode_selector_bit_on.addItem("")
-        self.comboBox_value_mode_selector_bit_on.addItem("")
-        self.comboBox_value_mode_selector_bit_on.addItem("")
-        self.comboBox_value_mode_selector_bit_on.addItem("")
-        self.comboBox_value_mode_selector_bit_on.addItem("")
-        self.grid_modeoption.addWidget(self.comboBox_value_mode_selector_bit_on, 0, 3, 1, 1)
-        self.label_7 = QtWidgets.QLabel(self.groupModeOption)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_7.setFont(font)
-        self.label_7.setObjectName("label_7")
-        self.grid_modeoption.addWidget(self.label_7, 0, 2, 1, 1)
-        self.line = QtWidgets.QFrame(self.groupModeOption)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line.setFont(font)
-        self.line.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line.setObjectName("line")
-        self.grid_modeoption.addWidget(self.line, 2, 0, 1, 4)
-        self.comboBox_value_mode_selector_bit_off = QtWidgets.QComboBox(self.groupModeOption)
-        self.comboBox_value_mode_selector_bit_off.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_value_mode_selector_bit_off.setFont(font)
-        self.comboBox_value_mode_selector_bit_off.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 45px; \n"
-"}\n"
-"")
-        self.comboBox_value_mode_selector_bit_off.setObjectName("comboBox_value_mode_selector_bit_off")
-        self.comboBox_value_mode_selector_bit_off.addItem("")
-        self.comboBox_value_mode_selector_bit_off.addItem("")
-        self.comboBox_value_mode_selector_bit_off.addItem("")
-        self.comboBox_value_mode_selector_bit_off.addItem("")
-        self.comboBox_value_mode_selector_bit_off.addItem("")
-        self.comboBox_value_mode_selector_bit_off.addItem("")
-        self.comboBox_value_mode_selector_bit_off.addItem("")
-        self.comboBox_value_mode_selector_bit_off.addItem("")
-        self.comboBox_value_mode_selector_bit_off.addItem("")
-        self.comboBox_value_mode_selector_bit_off.addItem("")
-        self.comboBox_value_mode_selector_bit_off.addItem("")
-        self.grid_modeoption.addWidget(self.comboBox_value_mode_selector_bit_off, 1, 3, 1, 1)
-        self.gridLayout_18.addLayout(self.grid_modeoption, 0, 0, 1, 1)
-        self.gridLayout_9 = QtWidgets.QGridLayout()
-        self.gridLayout_9.setSpacing(0)
-        self.gridLayout_9.setObjectName("gridLayout_9")
-        self.pushButton_add_mode = QtWidgets.QPushButton(self.groupModeOption)
-        self.pushButton_add_mode.setMinimumSize(QtCore.QSize(0, 30))
-        self.pushButton_add_mode.setMaximumSize(QtCore.QSize(30, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.pushButton_add_mode.setFont(font)
-        self.pushButton_add_mode.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.pushButton_add_mode.setStyleSheet("QPushButton {\n"
+        self.pushButton_admin.setFont(font)
+        self.pushButton_admin.setStyleSheet("QPushButton {\n"
 "    background-color: transparent;\n"
 "    border: none;\n"
 "    border-radius: 6px;\n"
@@ -3078,1023 +7976,13 @@ class Ui_MainWindow(object):
 "QPushButton:pressed {\n"
 "    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
 "}")
-        self.pushButton_add_mode.setText("")
-        self.pushButton_add_mode.setIcon(icon1)
-        self.pushButton_add_mode.setIconSize(QtCore.QSize(25, 25))
-        self.pushButton_add_mode.setObjectName("pushButton_add_mode")
-        self.gridLayout_9.addWidget(self.pushButton_add_mode, 0, 1, 1, 1)
-        spacerItem6 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_9.addItem(spacerItem6, 0, 0, 1, 1)
-        self.label_26 = QtWidgets.QLabel(self.groupModeOption)
-        self.label_26.setMinimumSize(QtCore.QSize(20, 0))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_26.setFont(font)
-        self.label_26.setText("")
-        self.label_26.setObjectName("label_26")
-        self.gridLayout_9.addWidget(self.label_26, 0, 2, 1, 1)
-        self.pushButton_set_save_mode = QtWidgets.QPushButton(self.groupModeOption)
-        self.pushButton_set_save_mode.setMinimumSize(QtCore.QSize(0, 30))
-        self.pushButton_set_save_mode.setMaximumSize(QtCore.QSize(30, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.pushButton_set_save_mode.setFont(font)
-        self.pushButton_set_save_mode.setStyleSheet("QPushButton {\n"
-"    background-color: transparent;\n"
-"    border: none;\n"
-"    border-radius: 6px;\n"
-"}\n"
-"QPushButton:hover {\n"
-"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
-"}\n"
-"QPushButton:pressed {\n"
-"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
-"}")
-        self.pushButton_set_save_mode.setText("")
-        self.pushButton_set_save_mode.setIcon(icon2)
-        self.pushButton_set_save_mode.setIconSize(QtCore.QSize(22, 22))
-        self.pushButton_set_save_mode.setObjectName("pushButton_set_save_mode")
-        self.gridLayout_9.addWidget(self.pushButton_set_save_mode, 0, 5, 1, 1)
-        self.pushButton_load_params_from_mode = QtWidgets.QPushButton(self.groupModeOption)
-        self.pushButton_load_params_from_mode.setMinimumSize(QtCore.QSize(0, 30))
-        self.pushButton_load_params_from_mode.setMaximumSize(QtCore.QSize(30, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.pushButton_load_params_from_mode.setFont(font)
-        self.pushButton_load_params_from_mode.setStyleSheet("QPushButton {\n"
-"    background-color: transparent;\n"
-"    border: none;\n"
-"    border-radius: 6px;\n"
-"}\n"
-"QPushButton:hover {\n"
-"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
-"}\n"
-"QPushButton:pressed {\n"
-"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
-"}")
-        self.pushButton_load_params_from_mode.setText("")
-        self.pushButton_load_params_from_mode.setIcon(icon4)
-        self.pushButton_load_params_from_mode.setIconSize(QtCore.QSize(25, 25))
-        self.pushButton_load_params_from_mode.setObjectName("pushButton_load_params_from_mode")
-        self.gridLayout_9.addWidget(self.pushButton_load_params_from_mode, 0, 3, 1, 1)
-        self.label_27 = QtWidgets.QLabel(self.groupModeOption)
-        self.label_27.setMinimumSize(QtCore.QSize(20, 0))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_27.setFont(font)
-        self.label_27.setText("")
-        self.label_27.setObjectName("label_27")
-        self.gridLayout_9.addWidget(self.label_27, 0, 4, 1, 1)
-        self.gridLayout_18.addLayout(self.gridLayout_9, 1, 0, 1, 1)
-        self.hlayout_toprow.addWidget(self.groupModeOption)
-        self.groupItemLineCode = QtWidgets.QGroupBox(self.scrollAreaWidgetContents)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(3)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.groupItemLineCode.sizePolicy().hasHeightForWidth())
-        self.groupItemLineCode.setSizePolicy(sizePolicy)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.groupItemLineCode.setFont(font)
-        self.groupItemLineCode.setStyleSheet("/* Khung chính của GroupBox */\n"
-"QGroupBox {\n"
-"    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */\n"
-"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
-"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
-"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
-"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
-"    color: #333333;            /* Màu chữ tiêu đề */\n"
-"}\n"
-"\n"
-"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
-"QGroupBox::title {\n"
-"    subcontrol-origin: margin;\n"
-"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
-"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
-"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
-"}\n"
-"")
-        self.groupItemLineCode.setObjectName("groupItemLineCode")
-        self.gridLayout_19 = QtWidgets.QGridLayout(self.groupItemLineCode)
-        self.gridLayout_19.setObjectName("gridLayout_19")
-        self.grid_itemlinecode = QtWidgets.QGridLayout()
-        self.grid_itemlinecode.setSpacing(8)
-        self.grid_itemlinecode.setObjectName("grid_itemlinecode")
-        self.line_3 = QtWidgets.QFrame(self.groupItemLineCode)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_3.setFont(font)
-        self.line_3.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_3.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_3.setObjectName("line_3")
-        self.grid_itemlinecode.addWidget(self.line_3, 3, 0, 1, 3)
-        self.label_12 = QtWidgets.QLabel(self.groupItemLineCode)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_12.setFont(font)
-        self.label_12.setObjectName("label_12")
-        self.grid_itemlinecode.addWidget(self.label_12, 5, 1, 1, 1)
-        self.label = QtWidgets.QLabel(self.groupItemLineCode)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label.setFont(font)
-        self.label.setObjectName("label")
-        self.grid_itemlinecode.addWidget(self.label, 2, 0, 1, 1)
-        self.line_5 = QtWidgets.QFrame(self.groupItemLineCode)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_5.setFont(font)
-        self.line_5.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_5.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_5.setObjectName("line_5")
-        self.grid_itemlinecode.addWidget(self.line_5, 1, 0, 1, 3)
-        self.comboBox_value_register_bit_off = QtWidgets.QComboBox(self.groupItemLineCode)
-        self.comboBox_value_register_bit_off.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_value_register_bit_off.setFont(font)
-        self.comboBox_value_register_bit_off.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 35px; \n"
-"}\n"
-"")
-        self.comboBox_value_register_bit_off.setObjectName("comboBox_value_register_bit_off")
-        self.comboBox_value_register_bit_off.addItem("")
-        self.comboBox_value_register_bit_off.addItem("")
-        self.comboBox_value_register_bit_off.addItem("")
-        self.comboBox_value_register_bit_off.addItem("")
-        self.comboBox_value_register_bit_off.addItem("")
-        self.comboBox_value_register_bit_off.addItem("")
-        self.comboBox_value_register_bit_off.addItem("")
-        self.comboBox_value_register_bit_off.addItem("")
-        self.comboBox_value_register_bit_off.addItem("")
-        self.comboBox_value_register_bit_off.addItem("")
-        self.comboBox_value_register_bit_off.addItem("")
-        self.grid_itemlinecode.addWidget(self.comboBox_value_register_bit_off, 5, 2, 1, 1)
-        self.comboBox_value_register_bit_on = QtWidgets.QComboBox(self.groupItemLineCode)
-        self.comboBox_value_register_bit_on.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_value_register_bit_on.setFont(font)
-        self.comboBox_value_register_bit_on.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 35px; \n"
-"}\n"
-"")
-        self.comboBox_value_register_bit_on.setObjectName("comboBox_value_register_bit_on")
-        self.comboBox_value_register_bit_on.addItem("")
-        self.comboBox_value_register_bit_on.addItem("")
-        self.comboBox_value_register_bit_on.addItem("")
-        self.comboBox_value_register_bit_on.addItem("")
-        self.comboBox_value_register_bit_on.addItem("")
-        self.comboBox_value_register_bit_on.addItem("")
-        self.comboBox_value_register_bit_on.addItem("")
-        self.comboBox_value_register_bit_on.addItem("")
-        self.comboBox_value_register_bit_on.addItem("")
-        self.comboBox_value_register_bit_on.addItem("")
-        self.grid_itemlinecode.addWidget(self.comboBox_value_register_bit_on, 4, 2, 1, 1)
-        self.label_11 = QtWidgets.QLabel(self.groupItemLineCode)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_11.setFont(font)
-        self.label_11.setObjectName("label_11")
-        self.grid_itemlinecode.addWidget(self.label_11, 4, 1, 1, 1)
-        self.label_2 = QtWidgets.QLabel(self.groupItemLineCode)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_2.setFont(font)
-        self.label_2.setObjectName("label_2")
-        self.grid_itemlinecode.addWidget(self.label_2, 0, 0, 1, 1)
-        self.comboBox_Itemcode = QtWidgets.QComboBox(self.groupItemLineCode)
-        self.comboBox_Itemcode.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_Itemcode.setFont(font)
-        self.comboBox_Itemcode.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 45px; \n"
-"}\n"
-"")
-        self.comboBox_Itemcode.setObjectName("comboBox_Itemcode")
-        self.comboBox_Itemcode.addItem("")
-        self.grid_itemlinecode.addWidget(self.comboBox_Itemcode, 0, 1, 1, 2)
-        self.line_4 = QtWidgets.QFrame(self.groupItemLineCode)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_4.setFont(font)
-        self.line_4.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_4.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_4.setObjectName("line_4")
-        self.grid_itemlinecode.addWidget(self.line_4, 6, 0, 1, 3)
-        self.lineEdit_assign_itemcode_plc = QtWidgets.QLineEdit(self.groupItemLineCode)
-        self.lineEdit_assign_itemcode_plc.setMinimumSize(QtCore.QSize(0, 28))
-        self.lineEdit_assign_itemcode_plc.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.lineEdit_assign_itemcode_plc.setFont(font)
-        self.lineEdit_assign_itemcode_plc.setAlignment(QtCore.Qt.AlignCenter)
-        self.lineEdit_assign_itemcode_plc.setObjectName("lineEdit_assign_itemcode_plc")
-        self.grid_itemlinecode.addWidget(self.lineEdit_assign_itemcode_plc, 2, 1, 1, 2)
-        self.label_3 = QtWidgets.QLabel(self.groupItemLineCode)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_3.setFont(font)
-        self.label_3.setObjectName("label_3")
-        self.grid_itemlinecode.addWidget(self.label_3, 4, 0, 2, 1)
-        self.gridLayout_19.addLayout(self.grid_itemlinecode, 0, 0, 1, 1)
-        self.gridLayout_10 = QtWidgets.QGridLayout()
-        self.gridLayout_10.setSpacing(0)
-        self.gridLayout_10.setObjectName("gridLayout_10")
-        self.pushButton_load_itemcode_assign = QtWidgets.QPushButton(self.groupItemLineCode)
-        self.pushButton_load_itemcode_assign.setMinimumSize(QtCore.QSize(0, 30))
-        self.pushButton_load_itemcode_assign.setMaximumSize(QtCore.QSize(30, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.pushButton_load_itemcode_assign.setFont(font)
-        self.pushButton_load_itemcode_assign.setStyleSheet("QPushButton {\n"
-"    background-color: transparent;\n"
-"    border: none;\n"
-"    border-radius: 6px;\n"
-"}\n"
-"QPushButton:hover {\n"
-"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
-"}\n"
-"QPushButton:pressed {\n"
-"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
-"}")
-        self.pushButton_load_itemcode_assign.setText("")
-        self.pushButton_load_itemcode_assign.setIcon(icon4)
-        self.pushButton_load_itemcode_assign.setIconSize(QtCore.QSize(25, 25))
-        self.pushButton_load_itemcode_assign.setObjectName("pushButton_load_itemcode_assign")
-        self.gridLayout_10.addWidget(self.pushButton_load_itemcode_assign, 0, 2, 1, 1)
-        self.label_29 = QtWidgets.QLabel(self.groupItemLineCode)
-        self.label_29.setMinimumSize(QtCore.QSize(20, 0))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_29.setFont(font)
-        self.label_29.setText("")
-        self.label_29.setObjectName("label_29")
-        self.gridLayout_10.addWidget(self.label_29, 0, 3, 1, 1)
-        spacerItem7 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_10.addItem(spacerItem7, 0, 0, 1, 1)
-        self.pushButton_apply_itemcode_assign = QtWidgets.QPushButton(self.groupItemLineCode)
-        self.pushButton_apply_itemcode_assign.setMinimumSize(QtCore.QSize(0, 30))
-        self.pushButton_apply_itemcode_assign.setMaximumSize(QtCore.QSize(30, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.pushButton_apply_itemcode_assign.setFont(font)
-        self.pushButton_apply_itemcode_assign.setStyleSheet("QPushButton {\n"
-"    background-color: transparent;\n"
-"    border: none;\n"
-"    border-radius: 6px;\n"
-"}\n"
-"QPushButton:hover {\n"
-"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
-"}\n"
-"QPushButton:pressed {\n"
-"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
-"}")
-        self.pushButton_apply_itemcode_assign.setText("")
-        self.pushButton_apply_itemcode_assign.setIcon(icon2)
-        self.pushButton_apply_itemcode_assign.setIconSize(QtCore.QSize(22, 22))
-        self.pushButton_apply_itemcode_assign.setObjectName("pushButton_apply_itemcode_assign")
-        self.gridLayout_10.addWidget(self.pushButton_apply_itemcode_assign, 0, 4, 1, 1)
-        self.label_28 = QtWidgets.QLabel(self.groupItemLineCode)
-        self.label_28.setMinimumSize(QtCore.QSize(20, 0))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_28.setFont(font)
-        self.label_28.setText("")
-        self.label_28.setObjectName("label_28")
-        self.gridLayout_10.addWidget(self.label_28, 0, 1, 1, 1)
-        self.gridLayout_19.addLayout(self.gridLayout_10, 1, 0, 1, 1)
-        self.hlayout_toprow.addWidget(self.groupItemLineCode)
-        self.groupIndexCamera = QtWidgets.QGroupBox(self.scrollAreaWidgetContents)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(2)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.groupIndexCamera.sizePolicy().hasHeightForWidth())
-        self.groupIndexCamera.setSizePolicy(sizePolicy)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.groupIndexCamera.setFont(font)
-        self.groupIndexCamera.setStyleSheet("/* Khung chính của GroupBox */\n"
-"QGroupBox {\n"
-"    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */\n"
-"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
-"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
-"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
-"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
-"    color: #333333;            /* Màu chữ tiêu đề */\n"
-"}\n"
-"\n"
-"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
-"QGroupBox::title {\n"
-"    subcontrol-origin: margin;\n"
-"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
-"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
-"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
-"}\n"
-"")
-        self.groupIndexCamera.setObjectName("groupIndexCamera")
-        self.vlayout_groupIndexCamera_outer = QtWidgets.QVBoxLayout(self.groupIndexCamera)
-        self.vlayout_groupIndexCamera_outer.setContentsMargins(14, 18, 14, 14)
-        self.vlayout_groupIndexCamera_outer.setObjectName("vlayout_groupIndexCamera_outer")
-        self.grid_indexcamera = QtWidgets.QGridLayout()
-        self.grid_indexcamera.setSpacing(8)
-        self.grid_indexcamera.setObjectName("grid_indexcamera")
-        self.comboBox_n_model = QtWidgets.QComboBox(self.groupIndexCamera)
-        self.comboBox_n_model.setMinimumSize(QtCore.QSize(120, 28))
-        self.comboBox_n_model.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_n_model.setFont(font)
-        self.comboBox_n_model.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 50px; \n"
-"}\n"
-"")
-        self.comboBox_n_model.setObjectName("comboBox_n_model")
-        self.comboBox_n_model.addItem("")
-        self.comboBox_n_model.addItem("")
-        self.comboBox_n_model.addItem("")
-        self.comboBox_n_model.addItem("")
-        self.comboBox_n_model.addItem("")
-        self.comboBox_n_model.addItem("")
-        self.comboBox_n_model.addItem("")
-        self.comboBox_n_model.addItem("")
-        self.comboBox_n_model.addItem("")
-        self.comboBox_n_model.addItem("")
-        self.comboBox_n_model.addItem("")
-        self.comboBox_n_model.addItem("")
-        self.comboBox_n_model.addItem("")
-        self.comboBox_n_model.addItem("")
-        self.comboBox_n_model.addItem("")
-        self.comboBox_n_model.addItem("")
-        self.comboBox_n_model.addItem("")
-        self.comboBox_n_model.addItem("")
-        self.comboBox_n_model.addItem("")
-        self.comboBox_n_model.addItem("")
-        self.grid_indexcamera.addWidget(self.comboBox_n_model, 2, 1, 1, 1)
-        self.labelCameraIndex = QtWidgets.QLabel(self.groupIndexCamera)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.labelCameraIndex.setFont(font)
-        self.labelCameraIndex.setObjectName("labelCameraIndex")
-        self.grid_indexcamera.addWidget(self.labelCameraIndex, 0, 0, 1, 1)
-        self.label_4 = QtWidgets.QLabel(self.groupIndexCamera)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_4.setFont(font)
-        self.label_4.setObjectName("label_4")
-        self.grid_indexcamera.addWidget(self.label_4, 4, 0, 1, 1)
-        self.line_6 = QtWidgets.QFrame(self.groupIndexCamera)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_6.setFont(font)
-        self.line_6.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_6.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_6.setObjectName("line_6")
-        self.grid_indexcamera.addWidget(self.line_6, 1, 0, 1, 2)
-        self.comboBox_camera = QtWidgets.QComboBox(self.groupIndexCamera)
-        self.comboBox_camera.setMinimumSize(QtCore.QSize(120, 28))
-        self.comboBox_camera.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_camera.setFont(font)
-        self.comboBox_camera.setStyleSheet("QComboBox {\n"
-"    /* Tăng dần số px bên dưới cho đến khi chữ dịch vào chính giữa */\n"
-"    padding-left: 50px; \n"
-"}\n"
-"")
-        self.comboBox_camera.setObjectName("comboBox_camera")
-        self.comboBox_camera.addItem("")
-        self.comboBox_camera.addItem("")
-        self.comboBox_camera.addItem("")
-        self.comboBox_camera.addItem("")
-        self.comboBox_camera.addItem("")
-        self.comboBox_camera.addItem("")
-        self.comboBox_camera.addItem("")
-        self.comboBox_camera.addItem("")
-        self.grid_indexcamera.addWidget(self.comboBox_camera, 0, 1, 1, 1)
-        self.labelNumModels = QtWidgets.QLabel(self.groupIndexCamera)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.labelNumModels.setFont(font)
-        self.labelNumModels.setObjectName("labelNumModels")
-        self.grid_indexcamera.addWidget(self.labelNumModels, 2, 0, 1, 1)
-        self.line_7 = QtWidgets.QFrame(self.groupIndexCamera)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_7.setFont(font)
-        self.line_7.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_7.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_7.setObjectName("line_7")
-        self.grid_indexcamera.addWidget(self.line_7, 3, 0, 1, 2)
-        self.spinBox_num_shot = QtWidgets.QSpinBox(self.groupIndexCamera)
-        self.spinBox_num_shot.setMinimumSize(QtCore.QSize(50, 30))
-        self.spinBox_num_shot.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.spinBox_num_shot.setFont(font)
-        self.spinBox_num_shot.setAlignment(QtCore.Qt.AlignCenter)
-        self.spinBox_num_shot.setMinimum(1)
-        self.spinBox_num_shot.setMaximum(64)
-        self.spinBox_num_shot.setProperty("value", 1)
-        self.spinBox_num_shot.setObjectName("spinBox_num_shot")
-        self.grid_indexcamera.addWidget(self.spinBox_num_shot, 4, 1, 1, 1)
-        self.vlayout_groupIndexCamera_outer.addLayout(self.grid_indexcamera)
-        spacerItem8 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.vlayout_groupIndexCamera_outer.addItem(spacerItem8)
-        self.hlayout_toprow.addWidget(self.groupIndexCamera)
-        self.groupDeviceProtocol = QtWidgets.QGroupBox(self.scrollAreaWidgetContents)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(3)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.groupDeviceProtocol.sizePolicy().hasHeightForWidth())
-        self.groupDeviceProtocol.setSizePolicy(sizePolicy)
-        self.groupDeviceProtocol.setMaximumSize(QtCore.QSize(350, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.groupDeviceProtocol.setFont(font)
-        self.groupDeviceProtocol.setStyleSheet("/* Khung chính của GroupBox */\n"
-"QGroupBox {\n"
-"    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */\n"
-"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
-"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
-"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
-"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
-"    color: #333333;            /* Màu chữ tiêu đề */\n"
-"}\n"
-"\n"
-"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
-"QGroupBox::title {\n"
-"    subcontrol-origin: margin;\n"
-"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
-"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
-"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
-"}\n"
-"")
-        self.groupDeviceProtocol.setObjectName("groupDeviceProtocol")
-        self.vlayout_groupDeviceProtocol_outer = QtWidgets.QVBoxLayout(self.groupDeviceProtocol)
-        self.vlayout_groupDeviceProtocol_outer.setContentsMargins(14, 18, 14, 14)
-        self.vlayout_groupDeviceProtocol_outer.setObjectName("vlayout_groupDeviceProtocol_outer")
-        self.grid_deviceprotocol = QtWidgets.QGridLayout()
-        self.grid_deviceprotocol.setSpacing(8)
-        self.grid_deviceprotocol.setObjectName("grid_deviceprotocol")
-        self.comboBox_type_dev = QtWidgets.QComboBox(self.groupDeviceProtocol)
-        self.comboBox_type_dev.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_type_dev.setFont(font)
-        self.comboBox_type_dev.setStyleSheet("")
-        self.comboBox_type_dev.setObjectName("comboBox_type_dev")
-        self.comboBox_type_dev.addItem("")
-        self.comboBox_type_dev.addItem("")
-        self.comboBox_type_dev.addItem("")
-        self.comboBox_type_dev.addItem("")
-        self.grid_deviceprotocol.addWidget(self.comboBox_type_dev, 0, 1, 1, 1)
-        self.comboBox_protocol = QtWidgets.QComboBox(self.groupDeviceProtocol)
-        self.comboBox_protocol.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboBox_protocol.setFont(font)
-        self.comboBox_protocol.setStyleSheet("")
-        self.comboBox_protocol.setObjectName("comboBox_protocol")
-        self.comboBox_protocol.addItem("")
-        self.comboBox_protocol.addItem("")
-        self.grid_deviceprotocol.addWidget(self.comboBox_protocol, 2, 1, 1, 1)
-        self.labelDeviceType = QtWidgets.QLabel(self.groupDeviceProtocol)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.labelDeviceType.setFont(font)
-        self.labelDeviceType.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
-        self.labelDeviceType.setObjectName("labelDeviceType")
-        self.grid_deviceprotocol.addWidget(self.labelDeviceType, 0, 0, 1, 1)
-        self.line_8 = QtWidgets.QFrame(self.groupDeviceProtocol)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_8.setFont(font)
-        self.line_8.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_8.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_8.setObjectName("line_8")
-        self.grid_deviceprotocol.addWidget(self.line_8, 1, 0, 1, 2)
-        self.labelCommMethod = QtWidgets.QLabel(self.groupDeviceProtocol)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.labelCommMethod.setFont(font)
-        self.labelCommMethod.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
-        self.labelCommMethod.setObjectName("labelCommMethod")
-        self.grid_deviceprotocol.addWidget(self.labelCommMethod, 2, 0, 1, 1)
-        self.labelProtocol = QtWidgets.QLabel(self.groupDeviceProtocol)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.labelProtocol.setFont(font)
-        self.labelProtocol.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
-        self.labelProtocol.setObjectName("labelProtocol")
-        self.grid_deviceprotocol.addWidget(self.labelProtocol, 4, 0, 1, 1)
-        self.comboProtocol = QtWidgets.QComboBox(self.groupDeviceProtocol)
-        self.comboProtocol.setMinimumSize(QtCore.QSize(0, 28))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.comboProtocol.setFont(font)
-        self.comboProtocol.setStyleSheet("")
-        self.comboProtocol.setObjectName("comboProtocol")
-        self.comboProtocol.addItem("")
-        self.comboProtocol.addItem("")
-        self.comboProtocol.addItem("")
-        self.grid_deviceprotocol.addWidget(self.comboProtocol, 4, 1, 1, 1)
-        self.line_9 = QtWidgets.QFrame(self.groupDeviceProtocol)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.line_9.setFont(font)
-        self.line_9.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_9.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_9.setObjectName("line_9")
-        self.grid_deviceprotocol.addWidget(self.line_9, 3, 0, 1, 2)
-        self.vlayout_groupDeviceProtocol_outer.addLayout(self.grid_deviceprotocol)
-        spacerItem9 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.vlayout_groupDeviceProtocol_outer.addItem(spacerItem9)
-        self.hlayout_toprow.addWidget(self.groupDeviceProtocol)
-        self.groupControlPanel = QtWidgets.QGroupBox(self.scrollAreaWidgetContents)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(4)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.groupControlPanel.sizePolicy().hasHeightForWidth())
-        self.groupControlPanel.setSizePolicy(sizePolicy)
-        self.groupControlPanel.setMinimumSize(QtCore.QSize(400, 0))
-        self.groupControlPanel.setMaximumSize(QtCore.QSize(350, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.groupControlPanel.setFont(font)
-        self.groupControlPanel.setStyleSheet("/* Khung chính của GroupBox */\n"
-"QGroupBox {\n"
-"    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */\n"
-"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
-"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
-"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
-"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
-"    color: #333333;            /* Màu chữ tiêu đề */\n"
-"}\n"
-"\n"
-"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
-"QGroupBox::title {\n"
-"    subcontrol-origin: margin;\n"
-"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
-"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
-"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
-"}\n"
-"")
-        self.groupControlPanel.setObjectName("groupControlPanel")
-        self.gridLayout_2 = QtWidgets.QGridLayout(self.groupControlPanel)
-        self.gridLayout_2.setObjectName("gridLayout_2")
-        self.gridLayout_3 = QtWidgets.QGridLayout()
-        self.gridLayout_3.setObjectName("gridLayout_3")
-        self.labelAdapterName_2 = QtWidgets.QLabel(self.groupControlPanel)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(62)
-        self.labelAdapterName_2.setFont(font)
-        self.labelAdapterName_2.setStyleSheet("font-weight: 500; color: #111827;")
-        self.labelAdapterName_2.setObjectName("labelAdapterName_2")
-        self.gridLayout_3.addWidget(self.labelAdapterName_2, 2, 1, 1, 1)
-        self.label_16 = QtWidgets.QLabel(self.groupControlPanel)
-        self.label_16.setMinimumSize(QtCore.QSize(0, 22))
-        self.label_16.setMaximumSize(QtCore.QSize(100, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_16.setFont(font)
-        self.label_16.setObjectName("label_16")
-        self.gridLayout_3.addWidget(self.label_16, 1, 0, 1, 1)
-        self.labelAdapterNameTitle_2 = QtWidgets.QLabel(self.groupControlPanel)
-        self.labelAdapterNameTitle_2.setMinimumSize(QtCore.QSize(0, 22))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.labelAdapterNameTitle_2.setFont(font)
-        self.labelAdapterNameTitle_2.setObjectName("labelAdapterNameTitle_2")
-        self.gridLayout_3.addWidget(self.labelAdapterNameTitle_2, 2, 0, 1, 1)
-        self.labelIPv6Title_2 = QtWidgets.QLabel(self.groupControlPanel)
-        self.labelIPv6Title_2.setMinimumSize(QtCore.QSize(0, 22))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.labelIPv6Title_2.setFont(font)
-        self.labelIPv6Title_2.setObjectName("labelIPv6Title_2")
-        self.gridLayout_3.addWidget(self.labelIPv6Title_2, 5, 0, 1, 1)
-        self.IPV4_PLC = QtWidgets.QLabel(self.groupControlPanel)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(62)
-        self.IPV4_PLC.setFont(font)
-        self.IPV4_PLC.setStyleSheet("font-weight: 500; color: #111827;")
-        self.IPV4_PLC.setObjectName("IPV4_PLC")
-        self.gridLayout_3.addWidget(self.IPV4_PLC, 1, 1, 1, 1)
-        self.labelIPv4Title_2 = QtWidgets.QLabel(self.groupControlPanel)
-        self.labelIPv4Title_2.setMinimumSize(QtCore.QSize(0, 22))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.labelIPv4Title_2.setFont(font)
-        self.labelIPv4Title_2.setObjectName("labelIPv4Title_2")
-        self.gridLayout_3.addWidget(self.labelIPv4Title_2, 4, 0, 1, 1)
-        self.labelIPv4_2 = QtWidgets.QLabel(self.groupControlPanel)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(62)
-        self.labelIPv4_2.setFont(font)
-        self.labelIPv4_2.setStyleSheet("font-weight: 500; color: #111827;")
-        self.labelIPv4_2.setObjectName("labelIPv4_2")
-        self.gridLayout_3.addWidget(self.labelIPv4_2, 4, 1, 1, 1)
-        self.labelIPv6_2 = QtWidgets.QLabel(self.groupControlPanel)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(62)
-        self.labelIPv6_2.setFont(font)
-        self.labelIPv6_2.setStyleSheet("font-weight: 500; color: #111827;")
-        self.labelIPv6_2.setWordWrap(True)
-        self.labelIPv6_2.setObjectName("labelIPv6_2")
-        self.gridLayout_3.addWidget(self.labelIPv6_2, 5, 1, 1, 1)
-        self.labelModuleAdapter = QtWidgets.QLabel(self.groupControlPanel)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(62)
-        self.labelModuleAdapter.setFont(font)
-        self.labelModuleAdapter.setStyleSheet("font-weight: 500; color: #111827;")
-        self.labelModuleAdapter.setObjectName("labelModuleAdapter")
-        self.gridLayout_3.addWidget(self.labelModuleAdapter, 3, 1, 1, 1)
-        self.labelConnTypeTitle_2 = QtWidgets.QLabel(self.groupControlPanel)
-        self.labelConnTypeTitle_2.setMinimumSize(QtCore.QSize(0, 22))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.labelConnTypeTitle_2.setFont(font)
-        self.labelConnTypeTitle_2.setObjectName("labelConnTypeTitle_2")
-        self.gridLayout_3.addWidget(self.labelConnTypeTitle_2, 3, 0, 1, 1)
-        self.gridLayout_2.addLayout(self.gridLayout_3, 1, 0, 1, 1)
-        self.infoRow_2 = QtWidgets.QHBoxLayout()
-        self.infoRow_2.setSpacing(24)
-        self.infoRow_2.setObjectName("infoRow_2")
-        self.frameGraph = QtWidgets.QFrame(self.groupControlPanel)
-        self.frameGraph.setMinimumSize(QtCore.QSize(0, 70))
-        self.frameGraph.setMaximumSize(QtCore.QSize(16777215, 70))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.frameGraph.setFont(font)
-        self.frameGraph.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frameGraph.setObjectName("frameGraph")
-        self.layoutGraph = QtWidgets.QVBoxLayout(self.frameGraph)
-        self.layoutGraph.setContentsMargins(8, 4, 8, 4)
-        self.layoutGraph.setSpacing(0)
-        self.layoutGraph.setObjectName("layoutGraph")
-        self.gridLayout_6 = QtWidgets.QGridLayout()
-        self.gridLayout_6.setObjectName("gridLayout_6")
-        self.labelRecvTitle_2 = QtWidgets.QLabel(self.frameGraph)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.labelRecvTitle_2.setFont(font)
-        self.labelRecvTitle_2.setObjectName("labelRecvTitle_2")
-        self.gridLayout_6.addWidget(self.labelRecvTitle_2, 1, 0, 1, 1)
-        self.labelSendValue_2 = QtWidgets.QLabel(self.frameGraph)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.labelSendValue_2.setFont(font)
-        self.labelSendValue_2.setObjectName("labelSendValue_2")
-        self.gridLayout_6.addWidget(self.labelSendValue_2, 0, 1, 1, 1)
-        self.labelSendTitle_2 = QtWidgets.QLabel(self.frameGraph)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.labelSendTitle_2.setFont(font)
-        self.labelSendTitle_2.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.labelSendTitle_2.setObjectName("labelSendTitle_2")
-        self.gridLayout_6.addWidget(self.labelSendTitle_2, 0, 0, 1, 1)
-        self.labelRecvValue_2 = QtWidgets.QLabel(self.frameGraph)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.labelRecvValue_2.setFont(font)
-        self.labelRecvValue_2.setObjectName("labelRecvValue_2")
-        self.gridLayout_6.addWidget(self.labelRecvValue_2, 1, 1, 1, 1)
-        self.labelConnStatus = QtWidgets.QLabel(self.frameGraph)
-        self.labelConnStatus.setMaximumSize(QtCore.QSize(200, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.labelConnStatus.setFont(font)
-        self.labelConnStatus.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.labelConnStatus.setObjectName("labelConnStatus")
-        self.gridLayout_6.addWidget(self.labelConnStatus, 0, 2, 2, 1)
-        self.layoutGraph.addLayout(self.gridLayout_6)
-        self.infoRow_2.addWidget(self.frameGraph)
-        self.gridLayout_2.addLayout(self.infoRow_2, 2, 0, 1, 1)
-        self.hlayout_toprow.addWidget(self.groupControlPanel)
-        self.gridLayout_32.addLayout(self.hlayout_toprow, 4, 0, 1, 2)
-        self.vlayout_bottomrow_container_wrap_2 = QtWidgets.QVBoxLayout()
-        self.vlayout_bottomrow_container_wrap_2.setContentsMargins(0, 0, 0, 0)
-        self.vlayout_bottomrow_container_wrap_2.setObjectName("vlayout_bottomrow_container_wrap_2")
-        self.hlayout_bottomrow_2 = QtWidgets.QHBoxLayout()
-        self.hlayout_bottomrow_2.setSpacing(12)
-        self.hlayout_bottomrow_2.setObjectName("hlayout_bottomrow_2")
-        self.groupAssignShot_2 = QtWidgets.QGroupBox(self.scrollAreaWidgetContents)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(1)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.groupAssignShot_2.sizePolicy().hasHeightForWidth())
-        self.groupAssignShot_2.setSizePolicy(sizePolicy)
-        self.groupAssignShot_2.setMaximumSize(QtCore.QSize(16777215, 350))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.groupAssignShot_2.setFont(font)
-        self.groupAssignShot_2.setStyleSheet("/* Khung chính của GroupBox */\n"
-"QGroupBox {\n"
-"    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */\n"
-"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
-"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
-"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
-"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
-"    color: #333333;            /* Màu chữ tiêu đề */\n"
-"}\n"
-"\n"
-"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
-"QGroupBox::title {\n"
-"    subcontrol-origin: margin;\n"
-"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
-"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
-"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
-"}\n"
-"")
-        self.groupAssignShot_2.setTitle("")
-        self.groupAssignShot_2.setObjectName("groupAssignShot_2")
-        self.gridLayout_26 = QtWidgets.QGridLayout(self.groupAssignShot_2)
-        self.gridLayout_26.setObjectName("gridLayout_26")
-        self.gridLayout_27 = QtWidgets.QGridLayout()
-        self.gridLayout_27.setSpacing(0)
-        self.gridLayout_27.setObjectName("gridLayout_27")
-        spacerItem10 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_27.addItem(spacerItem10, 0, 0, 1, 1)
-        self.gridLayout_26.addLayout(self.gridLayout_27, 0, 0, 1, 1)
-        self.hlayout_bottomrow_2.addWidget(self.groupAssignShot_2)
-        self.groupProgramSignalReady = QtWidgets.QGroupBox(self.scrollAreaWidgetContents)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(1)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.groupProgramSignalReady.sizePolicy().hasHeightForWidth())
-        self.groupProgramSignalReady.setSizePolicy(sizePolicy)
-        self.groupProgramSignalReady.setMinimumSize(QtCore.QSize(0, 350))
-        self.groupProgramSignalReady.setMaximumSize(QtCore.QSize(16777215, 350))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.groupProgramSignalReady.setFont(font)
-        self.groupProgramSignalReady.setStyleSheet("/* Khung chính của GroupBox */\n"
-"QGroupBox {\n"
-"    background-color: #F0F9FF; /* Màu nền theo yêu cầu của bạn */\n"
-"    border: 1px solid #000000; /* Viền xám mảnh để định hình khối */\n"
-"    border-radius: 4px;        /* Bo tròn góc 4px đồng bộ với QPushButton */\n"
-"    margin-top: 12px;          /* Tạo khoảng cách phía trên để nhường chỗ cho chữ tiêu đề */\n"
-"    font-size: 15px;           /* Kích thước chữ tiêu đề */\n"
-"    font-weight: bold;         /* Làm đậm chữ tiêu đề */\n"
-"    color: #333333;            /* Màu chữ tiêu đề */\n"
-"}\n"
-"\n"
-"/* Tùy chỉnh vị trí của chữ tiêu đề GroupBox */\n"
-"QGroupBox::title {\n"
-"    subcontrol-origin: margin;\n"
-"    subcontrol-position: top left; /* Đặt tiêu đề ở góc trên bên trái */\n"
-"    left: 10px;                    /* Đẩy chữ dịch vào trong một chút cho đẹp */\n"
-"    padding: 0px 5px;              /* Khoảng cách đệm xung quanh chữ */\n"
-"}\n"
-"")
-        self.groupProgramSignalReady.setObjectName("groupProgramSignalReady")
-        self.gridLayout_28 = QtWidgets.QGridLayout(self.groupProgramSignalReady)
-        self.gridLayout_28.setObjectName("gridLayout_28")
-        self.scrollArea_ProgramSignalReady = QtWidgets.QScrollArea(self.groupProgramSignalReady)
-        self.scrollArea_ProgramSignalReady.setStyleSheet("/* Khung ngoài của ScrollArea */\n"
-"QScrollArea {\n"
-"    background-color: #F7FFFD; /* Màu vàng nhạt (Soft Yellow) */\n"
-"    border: 1px solid #c6c6c6;  /* Viền xám mảnh đồng bộ */\n"
-"    border-radius: 4px;         /* Bo tròn góc 4px */\n"
-"}\n"
-"\n"
-"/* BẮT BUỘC: Đổi nền của widget con bên trong sang suốt \n"
-"   để màu vàng nhạt của khung ngoài được hiển thị hoàn toàn */\n"
-"QScrollArea > QWidget > QWidget {\n"
-"    background-color: transparent;\n"
-"}\n"
-"\n"
-"/* Tùy chỉnh thanh cuộn dọc (Nếu bạn muốn tinh tế hơn) */\n"
-"QScrollBar:vertical {\n"
-"    background-color: #f5f5f5;\n"
-"    width: 10px;\n"
-"    border-radius: 4px;\n"
-"}\n"
-"\n"
-"QScrollBar::handle:vertical {\n"
-"    background-color: #dcdde1; /* Cục kéo màu xám nhạt */\n"
-"    border-radius: 4px;\n"
-"    min-height: 20px;\n"
-"}\n"
-"\n"
-"QScrollBar::handle:vertical:hover {\n"
-"    background-color: #c6c6c6; /* Cục kéo đậm hơn khi di chuột */\n"
-"}\n"
-"")
-        self.scrollArea_ProgramSignalReady.setWidgetResizable(True)
-        self.scrollArea_ProgramSignalReady.setObjectName("scrollArea_ProgramSignalReady")
-        self.scrollAreaWidgetContents_2 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 848, 269))
-        self.scrollAreaWidgetContents_2.setObjectName("scrollAreaWidgetContents_2")
-        self.scrollArea_ProgramSignalReady.setWidget(self.scrollAreaWidgetContents_2)
-        self.gridLayout_28.addWidget(self.scrollArea_ProgramSignalReady, 0, 0, 1, 1)
-        self.gridLayout_29 = QtWidgets.QGridLayout()
-        self.gridLayout_29.setSpacing(0)
-        self.gridLayout_29.setObjectName("gridLayout_29")
-        spacerItem11 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_29.addItem(spacerItem11, 0, 0, 1, 1)
-        self.pushButton_load_setting_ProgramSignalReady = QtWidgets.QPushButton(self.groupProgramSignalReady)
-        self.pushButton_load_setting_ProgramSignalReady.setMinimumSize(QtCore.QSize(0, 30))
-        self.pushButton_load_setting_ProgramSignalReady.setMaximumSize(QtCore.QSize(30, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.pushButton_load_setting_ProgramSignalReady.setFont(font)
-        self.pushButton_load_setting_ProgramSignalReady.setStyleSheet("QPushButton {\n"
-"    background-color: transparent;\n"
-"    border: none;\n"
-"    border-radius: 6px;\n"
-"}\n"
-"QPushButton:hover {\n"
-"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
-"}\n"
-"QPushButton:pressed {\n"
-"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
-"}")
-        self.pushButton_load_setting_ProgramSignalReady.setText("")
-        self.pushButton_load_setting_ProgramSignalReady.setIcon(icon4)
-        self.pushButton_load_setting_ProgramSignalReady.setIconSize(QtCore.QSize(25, 25))
-        self.pushButton_load_setting_ProgramSignalReady.setObjectName("pushButton_load_setting_ProgramSignalReady")
-        self.gridLayout_29.addWidget(self.pushButton_load_setting_ProgramSignalReady, 0, 2, 1, 1)
-        self.label_45 = QtWidgets.QLabel(self.groupProgramSignalReady)
-        self.label_45.setMinimumSize(QtCore.QSize(20, 0))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_45.setFont(font)
-        self.label_45.setText("")
-        self.label_45.setObjectName("label_45")
-        self.gridLayout_29.addWidget(self.label_45, 0, 3, 1, 1)
-        self.label_46 = QtWidgets.QLabel(self.groupProgramSignalReady)
-        self.label_46.setMinimumSize(QtCore.QSize(20, 0))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        self.label_46.setFont(font)
-        self.label_46.setText("")
-        self.label_46.setObjectName("label_46")
-        self.gridLayout_29.addWidget(self.label_46, 0, 1, 1, 1)
-        self.pushButton_apply_setting_ProgramSignalReady = QtWidgets.QPushButton(self.groupProgramSignalReady)
-        self.pushButton_apply_setting_ProgramSignalReady.setMinimumSize(QtCore.QSize(0, 30))
-        self.pushButton_apply_setting_ProgramSignalReady.setMaximumSize(QtCore.QSize(30, 16777215))
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.pushButton_apply_setting_ProgramSignalReady.setFont(font)
-        self.pushButton_apply_setting_ProgramSignalReady.setStyleSheet("QPushButton {\n"
-"    background-color: transparent;\n"
-"    border: none;\n"
-"    border-radius: 6px;\n"
-"}\n"
-"QPushButton:hover {\n"
-"    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */\n"
-"}\n"
-"QPushButton:pressed {\n"
-"    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */\n"
-"}")
-        self.pushButton_apply_setting_ProgramSignalReady.setText("")
-        self.pushButton_apply_setting_ProgramSignalReady.setIcon(icon2)
-        self.pushButton_apply_setting_ProgramSignalReady.setIconSize(QtCore.QSize(22, 22))
-        self.pushButton_apply_setting_ProgramSignalReady.setObjectName("pushButton_apply_setting_ProgramSignalReady")
-        self.gridLayout_29.addWidget(self.pushButton_apply_setting_ProgramSignalReady, 0, 4, 1, 1)
-        self.gridLayout_28.addLayout(self.gridLayout_29, 2, 0, 1, 1)
-        self.line_28 = QtWidgets.QFrame(self.groupProgramSignalReady)
-        self.line_28.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_28.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_28.setObjectName("line_28")
-        self.gridLayout_28.addWidget(self.line_28, 1, 0, 1, 1)
-        self.hlayout_bottomrow_2.addWidget(self.groupProgramSignalReady)
-        self.vlayout_bottomrow_container_wrap_2.addLayout(self.hlayout_bottomrow_2)
-        self.gridLayout_32.addLayout(self.vlayout_bottomrow_container_wrap_2, 8, 0, 1, 1)
+        self.pushButton_admin.setText("")
+        icon4 = QtGui.QIcon()
+        icon4.addPixmap(QtGui.QPixmap(resource_path("module_3/assert/icon/settings_admin.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_admin.setIcon(icon4)
+        self.pushButton_admin.setIconSize(QtCore.QSize(40, 40))
+        self.pushButton_admin.setObjectName("pushButton_admin")
+        self.gridLayout_32.addWidget(self.pushButton_admin, 2, 0, 1, 1)
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         self.gridLayout_15.addWidget(self.scrollArea, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
@@ -4103,8 +7991,8 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.comboBox_logging_mode.setCurrentIndex(2)
         self.comboBox_mirror_mode.setCurrentIndex(1)
+        self.comboBox_logging_mode.setCurrentIndex(2)
         self.radioButton_counter_pc.clicked['bool'].connect(self.radioButton_reset.setChecked) # type: ignore
         self.radioButton_counter_plc.clicked['bool'].connect(self.radioButton_none_1.setChecked) # type: ignore
         self.radioButton_reset.clicked['bool'].connect(self.radioButton_counter_pc.setChecked) # type: ignore
@@ -4114,7 +8002,6 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Camera/PLC Control Panel"))
-        self.pushButton_admin.setText(_translate("MainWindow", "Administrator"))
         self.groupAssignPLC.setTitle(_translate("MainWindow", "PC 🡮 🡬 PLC"))
         item = self.tableWidget.verticalHeaderItem(0)
         item.setText(_translate("MainWindow", "ready"))
@@ -4135,15 +8022,15 @@ class Ui_MainWindow(object):
         item = self.tableWidget.verticalHeaderItem(8)
         item.setText(_translate("MainWindow", "counter_plc"))
         item = self.tableWidget.horizontalHeaderItem(0)
-        item.setText(_translate("MainWindow", "⦾ DMA"))
+        item.setText(_translate("MainWindow", "ADDRESS"))
         item = self.tableWidget.horizontalHeaderItem(1)
-        item.setText(_translate("MainWindow", "✦ read"))
+        item.setText(_translate("MainWindow", "Read"))
         item = self.tableWidget.horizontalHeaderItem(2)
         item.setText(_translate("MainWindow", "🡩 ON"))
         item = self.tableWidget.horizontalHeaderItem(3)
         item.setText(_translate("MainWindow", "🡫 OFF"))
         item = self.tableWidget.horizontalHeaderItem(4)
-        item.setText(_translate("MainWindow", "✦ write"))
+        item.setText(_translate("MainWindow", "Write"))
         item = self.tableWidget.horizontalHeaderItem(5)
         item.setText(_translate("MainWindow", "🡩 ON"))
         item = self.tableWidget.horizontalHeaderItem(6)
@@ -4154,127 +8041,62 @@ class Ui_MainWindow(object):
         self.pushButton_add_reg.setToolTip(_translate("MainWindow", "Add more Mode"))
         self.pushButton_applysignalplc.setToolTip(_translate("MainWindow", "Save Parameters for Mode selected"))
         self.pushButton_clear_table.setToolTip(_translate("MainWindow", "Load Parameter from Mode selected"))
-        self.groupFunction.setTitle(_translate("MainWindow", "Timer Setup"))
-        self.trx1_header_0.setText(_translate("MainWindow", "Signal"))
-        self.trx1_header_1.setText(_translate("MainWindow", "Join"))
-        self.trx1_header_2.setText(_translate("MainWindow", "Ordinal"))
+        self.groupFunction.setTitle(_translate("MainWindow", "Image Processor"))
+        self.label_43.setText(_translate("MainWindow", "Ready"))
+        self.label_20.setText(_translate("MainWindow", "Busy"))
         self.trx1_header_3.setText(_translate("MainWindow", "Value"))
-        self.trx1_Gate_lbl.setText(_translate("MainWindow", "Gate"))
-        self.comboBox_value_gate_2.setItemText(0, _translate("MainWindow", "0"))
-        self.comboBox_value_gate_2.setItemText(1, _translate("MainWindow", "1"))
-        self.trx1_Busy_lbl.setText(_translate("MainWindow", "Busy"))
         self.comboBox_value_busy_2.setItemText(0, _translate("MainWindow", "0"))
         self.comboBox_value_busy_2.setItemText(1, _translate("MainWindow", "1"))
-        self.trx1_Ready_lbl.setText(_translate("MainWindow", "Ready"))
+        self.trx1_header_2.setText(_translate("MainWindow", "Ordinal"))
+        self.comboBox_value_gate_2.setItemText(0, _translate("MainWindow", "0"))
+        self.comboBox_value_gate_2.setItemText(1, _translate("MainWindow", "1"))
+        self.trx1_header_1.setText(_translate("MainWindow", "Join"))
+        self.label_42.setText(_translate("MainWindow", "Gate"))
+        self.trx1_header_0.setText(_translate("MainWindow", "Signal"))
         self.comboBox_value_ready_2.setItemText(0, _translate("MainWindow", "0"))
         self.comboBox_value_ready_2.setItemText(1, _translate("MainWindow", "1"))
-        self.btnRetrieveImageBuffer1.setText(_translate("MainWindow", "device.Retrieve_Image_Buffer()"))
-        self.trx2_header_0.setText(_translate("MainWindow", "Signal"))
-        self.trx2_header_1.setText(_translate("MainWindow", "Join"))
+        self.btnRetrieveImageBuffer1.setText(_translate("MainWindow", "🡻 Take Image From the Camera"))
         self.trx2_header_2.setText(_translate("MainWindow", "Ordinal"))
-        self.trx2_header_3.setText(_translate("MainWindow", "Value"))
-        self.trx2_Gate_lbl.setText(_translate("MainWindow", "Gate"))
-        self.comboBox_value_gate_3.setItemText(0, _translate("MainWindow", "0"))
-        self.comboBox_value_gate_3.setItemText(1, _translate("MainWindow", "1"))
-        self.trx2_Busy_lbl.setText(_translate("MainWindow", "Busy"))
-        self.comboBox_value_busy_3.setItemText(0, _translate("MainWindow", "0"))
-        self.comboBox_value_busy_3.setItemText(1, _translate("MainWindow", "1"))
-        self.trx2_Ready_lbl.setText(_translate("MainWindow", "Ready"))
+        self.label_47.setText(_translate("MainWindow", "Busy"))
+        self.trx2_header_0.setText(_translate("MainWindow", "Signal"))
         self.comboBox_value_ready_3.setItemText(0, _translate("MainWindow", "0"))
         self.comboBox_value_ready_3.setItemText(1, _translate("MainWindow", "1"))
-        self.dly1_header_0.setText(_translate("MainWindow", "Signal"))
+        self.trx2_header_1.setText(_translate("MainWindow", "Join"))
+        self.comboBox_value_gate_3.setItemText(0, _translate("MainWindow", "0"))
+        self.comboBox_value_gate_3.setItemText(1, _translate("MainWindow", "1"))
+        self.comboBox_value_busy_3.setItemText(0, _translate("MainWindow", "0"))
+        self.comboBox_value_busy_3.setItemText(1, _translate("MainWindow", "1"))
+        self.label_44.setText(_translate("MainWindow", "Gate"))
+        self.trx2_header_3.setText(_translate("MainWindow", "Value"))
+        self.label_48.setText(_translate("MainWindow", "Ready"))
         self.dly1_header_1.setText(_translate("MainWindow", "Before"))
-        self.dly1_header_2.setText(_translate("MainWindow", "After"))
         self.dly1_header_3.setText(_translate("MainWindow", "Timer(ms)"))
-        self.dly1_Gate_lbl.setText(_translate("MainWindow", "Gate"))
-        self.lineEdit_timer_gate_2.setText(_translate("MainWindow", "0"))
-        self.dly1_Busy_lbl.setText(_translate("MainWindow", "Busy"))
-        self.lineEdit_timer_busy_2.setText(_translate("MainWindow", "0"))
-        self.dly1_Ready_lbl.setText(_translate("MainWindow", "Ready"))
+        self.dly1_header_2.setText(_translate("MainWindow", "After"))
         self.lineEdit_timer_ready_2.setText(_translate("MainWindow", "0"))
-        self.btnRetrieveImageBuffer2.setText(_translate("MainWindow", "device.Retrieve_Image_Buffer()"))
-        self.dly2_header_0.setText(_translate("MainWindow", "Signal"))
+        self.lineEdit_timer_gate_2.setText(_translate("MainWindow", "0"))
+        self.dly1_header_0.setText(_translate("MainWindow", "Signal"))
+        self.lineEdit_timer_busy_2.setText(_translate("MainWindow", "0"))
+        self.label_49.setText(_translate("MainWindow", "Gate"))
+        self.label_50.setText(_translate("MainWindow", "Busy"))
+        self.label_51.setText(_translate("MainWindow", "Ready"))
+        self.btnRetrieveImageBuffer2.setText(_translate("MainWindow", "🡻 Take Image From the Camera"))
         self.dly2_header_1.setText(_translate("MainWindow", "Before"))
-        self.dly2_header_2.setText(_translate("MainWindow", "After"))
-        self.dly2_header_3.setText(_translate("MainWindow", "Timer(ms)"))
-        self.dly2_Gate_lbl.setText(_translate("MainWindow", "Gate"))
         self.lineEdit_timer_gate_3.setText(_translate("MainWindow", "0"))
-        self.dly2_Busy_lbl.setText(_translate("MainWindow", "Busy"))
         self.lineEdit_timer_busy_3.setText(_translate("MainWindow", "0"))
-        self.dly2_Ready_lbl.setText(_translate("MainWindow", "Ready"))
+        self.dly2_header_0.setText(_translate("MainWindow", "Signal"))
+        self.dly2_header_3.setText(_translate("MainWindow", "Timer(ms)"))
         self.lineEdit_timer_ready_3.setText(_translate("MainWindow", "0"))
+        self.dly2_header_2.setText(_translate("MainWindow", "After"))
+        self.label_52.setText(_translate("MainWindow", "Gate"))
+        self.label_53.setText(_translate("MainWindow", "Busy"))
+        self.label_54.setText(_translate("MainWindow", "Ready"))
         self.pushButton_apply_tranmission_reception.setToolTip(_translate("MainWindow", "Save Parameters for Mode selected"))
         self.pushButton_load_tranmission_reception.setToolTip(_translate("MainWindow", "Load Parameter from Mode selected"))
-        self.groupBox_5.setTitle(_translate("MainWindow", "Transmit Result Signals"))
-        self.groupBox_4.setTitle(_translate("MainWindow", "Mode Configuration"))
-        self.pushButton_load_Set_mode.setToolTip(_translate("MainWindow", "Load Parameter from Mode selected"))
-        self.pushButton_apply_Set_mode.setToolTip(_translate("MainWindow", "Save Parameters for Mode selected"))
-        self.comboBox_set_trigger_logging.setItemText(0, _translate("MainWindow", "None"))
-        self.comboBox_set_completed_mirror.setItemText(0, _translate("MainWindow", "None"))
-        self.label_22.setText(_translate("MainWindow", "Component"))
-        self.comboBox_set_component_logging.setItemText(0, _translate("MainWindow", "None"))
-        self.comboBox_set_trigger_automatic.setItemText(0, _translate("MainWindow", "None"))
-        self.label_23.setText(_translate("MainWindow", "Completed"))
-        self.label_21.setText(_translate("MainWindow", "Trigger Selected"))
-        self.comboBox_set_trigger_mirror.setItemText(0, _translate("MainWindow", "None"))
-        self.comboBox_set_completed_automatic.setItemText(0, _translate("MainWindow", "None"))
-        self.comboBox_set_completed_logging.setItemText(0, _translate("MainWindow", "None"))
-        self.label_17.setText(_translate("MainWindow", "⬥ Mirror"))
-        self.comboBox_automatic_mode.setItemText(0, _translate("MainWindow", "Auto 1"))
-        self.comboBox_automatic_mode.setItemText(1, _translate("MainWindow", "Auto 2"))
-        self.comboBox_automatic_mode.setItemText(2, _translate("MainWindow", "Auto 3"))
-        self.label_8.setText(_translate("MainWindow", "⬥ Automatic"))
-        self.label_18.setText(_translate("MainWindow", "⬥ Logging"))
-        self.comboBox_set_component_mirror.setItemText(0, _translate("MainWindow", "None"))
-        self.label_40.setText(_translate("MainWindow", "Mapping Mode"))
-        self.comboBox_set_component_automatic.setItemText(0, _translate("MainWindow", "None"))
-        self.comboBox_logging_mode.setCurrentText(_translate("MainWindow", "Auto 3"))
-        self.comboBox_logging_mode.setItemText(0, _translate("MainWindow", "Auto 1"))
-        self.comboBox_logging_mode.setItemText(1, _translate("MainWindow", "Auto 2"))
-        self.comboBox_logging_mode.setItemText(2, _translate("MainWindow", "Auto 3"))
-        self.comboBox_mirror_mode.setCurrentText(_translate("MainWindow", "Auto 2"))
-        self.comboBox_mirror_mode.setItemText(0, _translate("MainWindow", "Auto 1"))
-        self.comboBox_mirror_mode.setItemText(1, _translate("MainWindow", "Auto 2"))
-        self.comboBox_mirror_mode.setItemText(2, _translate("MainWindow", "Auto 3"))
-        self.label_6.setText(_translate("MainWindow", "Mode Name"))
-        self.groupAssignShot.setTitle(_translate("MainWindow", "Shot x Model"))
-        item = self.tableWidget_shotxmodel.horizontalHeaderItem(0)
-        item.setText(_translate("MainWindow", "Shot Reference"))
-        item = self.tableWidget_shotxmodel.horizontalHeaderItem(1)
-        item.setText(_translate("MainWindow", "Model Link to Shot"))
-        item = self.tableWidget_shotxmodel.horizontalHeaderItem(2)
-        item.setText(_translate("MainWindow", "Discription"))
-        self.pushButton_clear_shotx.setToolTip(_translate("MainWindow", "Load Parameter from Mode selected"))
-        self.pushButton_applyshotxmodel.setToolTip(_translate("MainWindow", "Save Parameters for Mode selected"))
-        self.groupBox_3.setTitle(_translate("MainWindow", "Increment Counter"))
-        self.radioButton_counter_plc.setText(_translate("MainWindow", "PLC"))
-        self.comboBox_increment_counter_signal_selected.setItemText(0, _translate("MainWindow", "None"))
-        self.radioButton_condition_plc_pc.setText(_translate("MainWindow", "PLC 🗲 PC"))
-        self.label_24.setText(_translate("MainWindow", "Signal:"))
-        self.radioButton_counter_pc.setText(_translate("MainWindow", "PC"))
-        self.pushButton_load_setting_for_counter.setToolTip(_translate("MainWindow", "Load Parameter from Mode selected"))
-        self.pushButton_apply_setting_for_counter.setToolTip(_translate("MainWindow", "Save Parameters for Mode selected"))
-        self.groupBox.setTitle(_translate("MainWindow", "Reset Counter"))
-        self.radioButton_reset.setText(_translate("MainWindow", "Reset "))
-        self.comboBox_reset_counter_signal_selected.setItemText(0, _translate("MainWindow", "None"))
-        self.label_19.setText(_translate("MainWindow", "Signal:"))
-        self.radioButton_none_1.setText(_translate("MainWindow", "None"))
-        self.radioButton_none_reset.setText(_translate("MainWindow", "No Reset"))
-        self.groupBox_6.setTitle(_translate("MainWindow", "Method Complete"))
-        self.comboBox_method_use_signal_selected.setItemText(0, _translate("MainWindow", "None"))
-        self.radioButton_cycle_frame.setText(_translate("MainWindow", "Cycle"))
-        self.radioButton_single_frame.setText(_translate("MainWindow", "Single"))
-        self.label_41.setText(_translate("MainWindow", "Signal:"))
-        self.radioButton_none_2.setText(_translate("MainWindow", "None"))
-        self.label_14.setText(_translate("MainWindow", "SINALS  TRANMISSION SECTION"))
         self.groupModeOption.setTitle(_translate("MainWindow", "Register 🡺 Mode"))
-        self.labelModeSector.setText(_translate("MainWindow", "⬥ Mode Sector:"))
-        self.label_9.setText(_translate("MainWindow", "🔴 Bit OFF:"))
-        self.labelRegisterMode.setText(_translate("MainWindow", "⬥ Register Mode:"))
-        self.labelDefaultMode.setText(_translate("MainWindow", "⬥ Default Mode:"))
-        self.comboBox_default_mode.setItemText(0, _translate("MainWindow", "Auto 1"))
-        self.comboBox_default_mode.setItemText(1, _translate("MainWindow", "Auto 2"))
-        self.comboBox_default_mode.setItemText(2, _translate("MainWindow", "Auto 3"))
+        self.labelModeSector.setText(_translate("MainWindow", "⬥ Mode:"))
+        self.label_9.setText(_translate("MainWindow", "🔴 OFF:"))
+        self.labelRegisterMode.setText(_translate("MainWindow", "⬥ Register:"))
+        self.labelDefaultMode.setText(_translate("MainWindow", "⬥ Default:"))
         self.comboBox_mode_auto.setItemText(0, _translate("MainWindow", "Auto 1"))
         self.comboBox_mode_auto.setItemText(1, _translate("MainWindow", "Auto 2"))
         self.comboBox_mode_auto.setItemText(2, _translate("MainWindow", "Auto 3"))
@@ -4288,7 +8110,7 @@ class Ui_MainWindow(object):
         self.comboBox_value_mode_selector_bit_on.setItemText(7, _translate("MainWindow", "8"))
         self.comboBox_value_mode_selector_bit_on.setItemText(8, _translate("MainWindow", "9"))
         self.comboBox_value_mode_selector_bit_on.setItemText(9, _translate("MainWindow", "10"))
-        self.label_7.setText(_translate("MainWindow", "🟢 Bit ON :"))
+        self.label_7.setText(_translate("MainWindow", "🟢 ON :"))
         self.comboBox_value_mode_selector_bit_off.setItemText(0, _translate("MainWindow", "0"))
         self.comboBox_value_mode_selector_bit_off.setItemText(1, _translate("MainWindow", "1"))
         self.comboBox_value_mode_selector_bit_off.setItemText(2, _translate("MainWindow", "2"))
@@ -4300,11 +8122,16 @@ class Ui_MainWindow(object):
         self.comboBox_value_mode_selector_bit_off.setItemText(8, _translate("MainWindow", "8"))
         self.comboBox_value_mode_selector_bit_off.setItemText(9, _translate("MainWindow", "9"))
         self.comboBox_value_mode_selector_bit_off.setItemText(10, _translate("MainWindow", "No Value"))
+        self.comboBox_default_mode.setItemText(0, _translate("MainWindow", "Auto 1"))
+        self.comboBox_default_mode.setItemText(1, _translate("MainWindow", "Auto 2"))
+        self.comboBox_default_mode.setItemText(2, _translate("MainWindow", "Auto 3"))
         self.pushButton_add_mode.setToolTip(_translate("MainWindow", "Add more Mode"))
         self.pushButton_set_save_mode.setToolTip(_translate("MainWindow", "Save Parameters for Mode selected"))
         self.pushButton_load_params_from_mode.setToolTip(_translate("MainWindow", "Load Parameter from Mode selected"))
-        self.groupItemLineCode.setTitle(_translate("MainWindow", "Register 🡺 Item Code"))
-        self.label_12.setText(_translate("MainWindow", "🔴 Bit OFF:"))
+        self.groupItemLineCode.setTitle(_translate("MainWindow", "Register 🡺 Item Code Product"))
+        self.pushButton_apply_itemcode_assign.setToolTip(_translate("MainWindow", "Save Parameters for Mode selected"))
+        self.pushButton_load_itemcode_assign.setToolTip(_translate("MainWindow", "Load Parameter from Mode selected"))
+        self.label_12.setText(_translate("MainWindow", "🔴 OFF:"))
         self.label.setText(_translate("MainWindow", "⬥ Register:"))
         self.comboBox_value_register_bit_off.setItemText(0, _translate("MainWindow", "0"))
         self.comboBox_value_register_bit_off.setItemText(1, _translate("MainWindow", "1"))
@@ -4327,12 +8154,10 @@ class Ui_MainWindow(object):
         self.comboBox_value_register_bit_on.setItemText(7, _translate("MainWindow", "8"))
         self.comboBox_value_register_bit_on.setItemText(8, _translate("MainWindow", "9"))
         self.comboBox_value_register_bit_on.setItemText(9, _translate("MainWindow", "10"))
-        self.label_11.setText(_translate("MainWindow", "🟢 Bit ON:"))
+        self.label_11.setText(_translate("MainWindow", "🟢 ON:"))
         self.label_2.setText(_translate("MainWindow", "⬥ Product Code:"))
-        self.comboBox_Itemcode.setItemText(0, _translate("MainWindow", "#N/A"))
         self.label_3.setText(_translate("MainWindow", "⬥ Value:"))
-        self.pushButton_load_itemcode_assign.setToolTip(_translate("MainWindow", "Load Parameter from Mode selected"))
-        self.pushButton_apply_itemcode_assign.setToolTip(_translate("MainWindow", "Save Parameters for Mode selected"))
+        self.comboBox_Itemcode.setItemText(0, _translate("MainWindow", "#N/A"))
         self.groupIndexCamera.setTitle(_translate("MainWindow", "Camera/Models/Free shot"))
         self.comboBox_n_model.setItemText(0, _translate("MainWindow", "1"))
         self.comboBox_n_model.setItemText(1, _translate("MainWindow", "2"))
@@ -4394,9 +8219,71 @@ class Ui_MainWindow(object):
         self.labelSendTitle_2.setText(_translate("MainWindow", "Send:"))
         self.labelRecvValue_2.setText(_translate("MainWindow", "0 Kbps"))
         self.labelConnStatus.setText(_translate("MainWindow", "🔴 Disconnect"))
+        self.groupBox_5.setTitle(_translate("MainWindow", "Transmit Result Signals"))
+        self.groupBox_4.setTitle(_translate("MainWindow", "Mode Configuration"))
+        self.pushButton_load_Set_mode.setToolTip(_translate("MainWindow", "Load Parameter from Mode selected"))
+        self.pushButton_apply_Set_mode.setToolTip(_translate("MainWindow", "Save Parameters for Mode selected"))
+        self.label_22.setText(_translate("MainWindow", "Result Signal"))
+        self.comboBox_set_component_logging.setItemText(0, _translate("MainWindow", "None"))
+        self.comboBox_set_completed_automatic.setItemText(0, _translate("MainWindow", "None"))
+        self.label_40.setText(_translate("MainWindow", "Reference Mode"))
+        self.comboBox_automatic_mode.setItemText(0, _translate("MainWindow", "Auto 1"))
+        self.comboBox_automatic_mode.setItemText(1, _translate("MainWindow", "Auto 2"))
+        self.comboBox_automatic_mode.setItemText(2, _translate("MainWindow", "Auto 3"))
+        self.comboBox_set_component_mirror.setItemText(0, _translate("MainWindow", "None"))
+        self.comboBox_set_trigger_logging.setItemText(0, _translate("MainWindow", "None"))
+        self.comboBox_mirror_mode.setCurrentText(_translate("MainWindow", "Auto 2"))
+        self.comboBox_mirror_mode.setItemText(0, _translate("MainWindow", "Auto 1"))
+        self.comboBox_mirror_mode.setItemText(1, _translate("MainWindow", "Auto 2"))
+        self.comboBox_mirror_mode.setItemText(2, _translate("MainWindow", "Auto 3"))
+        self.label_17.setText(_translate("MainWindow", "⬥ Auto Mirror"))
+        self.label_6.setText(_translate("MainWindow", "Mode Name"))
+        self.comboBox_set_completed_mirror.setItemText(0, _translate("MainWindow", "None"))
+        self.label_8.setText(_translate("MainWindow", "⬥ Auto Product"))
+        self.comboBox_set_trigger_mirror.setItemText(0, _translate("MainWindow", "None"))
+        self.label_18.setText(_translate("MainWindow", "⬥ Auto Logging "))
+        self.comboBox_set_component_automatic.setItemText(0, _translate("MainWindow", "None"))
+        self.label_23.setText(_translate("MainWindow", "Complete Signal"))
+        self.comboBox_set_trigger_automatic.setItemText(0, _translate("MainWindow", "None"))
+        self.comboBox_set_completed_logging.setItemText(0, _translate("MainWindow", "None"))
+        self.comboBox_logging_mode.setCurrentText(_translate("MainWindow", "Auto 3"))
+        self.comboBox_logging_mode.setItemText(0, _translate("MainWindow", "Auto 1"))
+        self.comboBox_logging_mode.setItemText(1, _translate("MainWindow", "Auto 2"))
+        self.comboBox_logging_mode.setItemText(2, _translate("MainWindow", "Auto 3"))
+        self.label_21.setText(_translate("MainWindow", "Trigger Signal"))
+        self.label_14.setText(_translate("MainWindow", "SINALS  TRANMISSION SECTION"))
         self.groupProgramSignalReady.setTitle(_translate("MainWindow", " Program Signal Ready"))
         self.pushButton_load_setting_ProgramSignalReady.setToolTip(_translate("MainWindow", "Load Parameter from Mode selected"))
         self.pushButton_apply_setting_ProgramSignalReady.setToolTip(_translate("MainWindow", "Save Parameters for Mode selected"))
+        self.groupAssignShot.setTitle(_translate("MainWindow", "Shot 🡭🡯 Model"))
+        item = self.tableWidget_shotxmodel.horizontalHeaderItem(0)
+        item.setText(_translate("MainWindow", "Shot"))
+        item = self.tableWidget_shotxmodel.horizontalHeaderItem(1)
+        item.setText(_translate("MainWindow", "Reference Model"))
+        item = self.tableWidget_shotxmodel.horizontalHeaderItem(2)
+        item.setText(_translate("MainWindow", "Discription"))
+        self.pushButton_clear_shotx.setToolTip(_translate("MainWindow", "Load Parameter from Mode selected"))
+        self.pushButton_applyshotxmodel.setToolTip(_translate("MainWindow", "Save Parameters for Mode selected"))
+        self.groupBox_3.setTitle(_translate("MainWindow", "Increment Counter"))
+        self.radioButton_counter_pc.setText(_translate("MainWindow", "PC"))
+        self.comboBox_increment_counter_signal_selected.setItemText(0, _translate("MainWindow", "None"))
+        self.radioButton_counter_plc.setText(_translate("MainWindow", "PLC"))
+        self.label_24.setText(_translate("MainWindow", "Signal Reference:"))
+        self.radioButton_condition_plc_pc.setText(_translate("MainWindow", "PC 🡮 🡬 PLC"))
+        self.pushButton_load_setting_for_counter.setToolTip(_translate("MainWindow", "Load Parameter from Mode selected"))
+        self.pushButton_apply_setting_for_counter.setToolTip(_translate("MainWindow", "Save Parameters for Mode selected"))
+        self.groupBox.setTitle(_translate("MainWindow", "Reset Counter"))
+        self.label_19.setText(_translate("MainWindow", "Signal Reference:"))
+        self.comboBox_reset_counter_signal_selected.setItemText(0, _translate("MainWindow", "None"))
+        self.radioButton_reset.setText(_translate("MainWindow", "Reset "))
+        self.radioButton_none_1.setText(_translate("MainWindow", "None"))
+        self.radioButton_none_reset.setText(_translate("MainWindow", "No Reset"))
+        self.groupBox_6.setTitle(_translate("MainWindow", "Method Complete"))
+        self.radioButton_cycle_frame.setText(_translate("MainWindow", "Cycle"))
+        self.comboBox_method_use_signal_selected.setItemText(0, _translate("MainWindow", "None"))
+        self.label_41.setText(_translate("MainWindow", "Signal Reference:"))
+        self.radioButton_none_2.setText(_translate("MainWindow", "None"))
+        self.radioButton_single_frame.setText(_translate("MainWindow", "Single"))
 
 
 if __name__ == "__main__":

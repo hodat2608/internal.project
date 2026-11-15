@@ -11,15 +11,66 @@ self.ui_mirror_tab.label_display_image o day chinh la instance CrosshairLabel
 duoc tao ra va gan de (monkey-patch) vao thay cho QLabel goc trong setupUi.
 """
 
+import os
 import cv2
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt, QRect, QPointF, pyqtSignal
 from PyQt5.QtGui import QPixmap, QPainter, QPen, QColor, QFont
 from PyQt5.QtWidgets import QLabel, QSizePolicy, QMessageBox
 from module_3.mirror_test import KiemGuong
+from app_logger.app_logger import get_logger as _get_logger
 
-# Neu cac hang mau/cau hinh nay da khai bao san o noi khac trong project,
-# xoa doan duoi day di de tranh dinh nghia trung ten.
+_log = _get_logger('module_3.mirror_process')
+
+
+def _ensure_mirror_config_columns(cursor, connect_db=None):
+    """
+    Tự động kiểm tra và thêm các cột mới vào bảng MIRROR_CONFIG nếu chưa tồn tại:
+    - register_name: Lưu địa chỉ thanh ghi PLC của từng thông số (Center X/Y, Radius, Iris, Focus,...)
+    - enable_send_data_plc: Lưu trạng thái bật/tắt gửi dữ liệu sang PLC (TINYINT 1/0)
+    """
+    if cursor is None:
+        return
+    try:
+        cursor.execute("SHOW COLUMNS FROM MIRROR_CONFIG")
+        existing_cols = [c[0].lower() for c in cursor.fetchall()]
+
+        if 'register_name' not in existing_cols and 'register' not in existing_cols:
+            try:
+                cursor.execute("ALTER TABLE MIRROR_CONFIG ADD COLUMN register_name VARCHAR(255) DEFAULT '' AFTER status")
+                if connect_db and hasattr(connect_db, 'connection') and connect_db.connection:
+                    connect_db.connection.commit()
+                _log.info("Đã tự động thêm cột register_name vào bảng MIRROR_CONFIG")
+            except Exception as e:
+                _log.debug("Lỗi thêm cột register_name: %s", e)
+
+        if 'enable_send_data_plc' not in existing_cols:
+            try:
+                cursor.execute("ALTER TABLE MIRROR_CONFIG ADD COLUMN enable_send_data_plc TINYINT(1) DEFAULT 0 AFTER register_name")
+                if connect_db and hasattr(connect_db, 'connection') and connect_db.connection:
+                    connect_db.connection.commit()
+                _log.info("Đã tự động thêm cột enable_send_data_plc vào bảng MIRROR_CONFIG")
+            except Exception as e:
+                _log.debug("Lỗi thêm cột enable_send_data_plc: %s", e)
+    except Exception as e:
+        _log.debug("Lỗi _ensure_mirror_config_columns: %s", e)
+
+
+def _get_register_column_name(cursor) -> str:
+    """Xác định tên cột thanh ghi trong MIRROR_CONFIG ('register_name' hoặc 'register')."""
+    if cursor is not None:
+        try:
+            cursor.execute("SHOW COLUMNS FROM MIRROR_CONFIG")
+            cols = [c[0].lower() for c in cursor.fetchall()]
+            if 'register_name' in cols:
+                return 'register_name'
+            if 'register' in cols:
+                return 'register'
+        except Exception:
+            pass
+    return 'register_name'
+
+
 COLOR_BG = "#101116"
 COLOR_CROSS = "#FF7A1A"
 COLOR_CROSS_ACTIVE = "#FFC400"
@@ -30,14 +81,14 @@ GRID_ROWS = 10
 
 class SignalTable:
     def __init__(self, table_widget):
-        self.table_center_mirror = table_widget.tableWidget_center_mirror
-        self.table_iris = table_widget.tableWidget_iris
-        self.table_focuss = table_widget.tableWidget_focuss
+        self.table_center_mirror = getattr(table_widget, 'tableWidget_center_mirror', None)
+        self.table_iris = getattr(table_widget, 'tableWidget_iris', None)
+        self.table_focuss = getattr(table_widget, 'tableWidget_focuss', None)
 
         self.rows_center_mirror = {
             'center_x': 0,
             'center_y': 1,
-            'circle_radius':2,
+            'circle_radius': 2,
             'radius_ref': 3,
             'delta': 4,
         }
@@ -45,7 +96,8 @@ class SignalTable:
             'result_values': 0,
             'min': 1,
             'max': 2,
-            'status': 3
+            'status': 3,
+            'register': 4
         }
 
         self.rows_iris = {
@@ -58,7 +110,8 @@ class SignalTable:
             'result_values': 0,
             'min': 1,
             'max': 2,
-            'status': 3
+            'status': 3,
+            'register': 4
         }
 
         self.rows_focuss = {
@@ -71,8 +124,21 @@ class SignalTable:
             'result_values': 0,
             'min': 1,
             'max': 2,
-            'status': 3
+            'status': 3,
+            'register': 4
         }
+
+        # Khởi tạo sẵn các ô trống căn giữa cho cột Register (cột index 4) nếu chưa có item
+        for tbl in [self.table_center_mirror, self.table_iris, self.table_focuss]:
+            if tbl is not None:
+                if tbl.columnCount() < 5:
+                    tbl.setColumnCount(5)
+                for r in range(tbl.rowCount()):
+                    it = tbl.item(r, 4)
+                    if it is None:
+                        it = QtWidgets.QTableWidgetItem("")
+                        it.setTextAlignment(QtCore.Qt.AlignCenter)
+                        tbl.setItem(r, 4, it)
 
     def _get_table_and_maps(self, signal_name):
         name_lower = signal_name.lower()
@@ -92,7 +158,7 @@ class SignalTable:
         col = cols_map.get(column_name.lower())
         if row is not None and col is not None:
             item = table.item(row, col)
-            return item.text() if item else ''
+            return item.text().strip() if item and item.text() is not None else ''
         return None
 
     def set_value(self, signal_name, column_name, value):
@@ -106,7 +172,11 @@ class SignalTable:
             if not item:
                 item = QtWidgets.QTableWidgetItem()
                 table.setItem(row, col, item)
-            item.setText(str(value))
+            
+            if value is None or str(value).strip().lower() in ('none', 'null'):
+                item.setText("")
+            else:
+                item.setText(str(value))
             item.setTextAlignment(QtCore.Qt.AlignCenter)
             if value == "OK":
                 item.setBackground(QtGui.QColor(0, 255, 0))
@@ -399,6 +469,15 @@ class Process_Mirror_Device:
         self.CONFIG_CAMERA1 = {}
         self.connect_db = connect_db
         self.cursor = cursor
+        self.enable_send_data_plc = False
+        self.mirror_registers = {}
+        _ensure_mirror_config_columns(self.cursor, self.connect_db)
+
+        if hasattr(self.ui_mirror_tab, 'checkBox_enable_send_data_plc'):
+            self.ui_mirror_tab.checkBox_enable_send_data_plc.toggled.connect(
+                self.on_toggle_enable_send_plc
+            )
+
         self.timer_detect = QtCore.QTimer()
         self.timer_detect.timeout.connect(self.streaming_run_check)
         # ------------------------------------------------------------
@@ -543,6 +622,10 @@ class Process_Mirror_Device:
 
         )
 
+    def on_toggle_enable_send_plc(self, checked):
+        self.enable_send_data_plc = bool(checked)
+        _log.info("[Mirror] Trạng thái Enable Send Data to PLC: %s", checked)
+
     def run_check(self,raw_image_rgb):
         if raw_image_rgb is None and self.image is None:
             QMessageBox.warning(None, "Lỗi", "Chưa có ảnh để kiểm gương. Vui lòng chụp ảnh từ camera hoặc tải ảnh từ file trước.")
@@ -555,7 +638,7 @@ class Process_Mirror_Device:
         if raw_image_rgb is None and self.image is not None:
             raw_image_rgb = self.image
 
-        # try:
+
         self.get_value_from_table()
         obj        = KiemGuong(self.MIRROR_DATA_CAMERA1, self.CONFIG_CAMERA1)
         img, check, dict_data = obj.run(raw_image_rgb)
@@ -567,8 +650,8 @@ class Process_Mirror_Device:
         self.ui_mirror_tab.label_display_image.set_pixmap_image(scaled_pix)
         self.set_value(dict_data)
         self.check_all_status()
-        # except Exception:
-        #    print('[handle_result_mode_geji] KiemGuong.run failed')
+        self.send_results_to_plc(dict_data)
+
 
     def start_stream_detect(self):
         self.timer_detect.start(50)  # Chạy mỗi 50ms (~20 fps) để không quá tải
@@ -595,6 +678,7 @@ class Process_Mirror_Device:
             self.ui_mirror_tab.label_display_image.set_pixmap_image(scaled_pix)
             self.set_value(dict_data)
             self.check_all_status()
+            self.send_results_to_plc(dict_data)
         except Exception as e:
             print(f"Lỗi trong quá trình detect stream: {e}")
 
@@ -627,7 +711,129 @@ class Process_Mirror_Device:
         self.CONFIG_CAMERA1['radius_ref'] = self.sinal.to_number(self.sinal.get_value("radius_ref", "result_values"))
         self.CONFIG_CAMERA1['delta'] = self.sinal.to_number(self.sinal.get_value("delta", "result_values"))
 
+        # Thu thập cấu hình Register & Enable Send PLC
+        self.mirror_registers = {}
+        all_params = (
+            list(self.sinal.rows_center_mirror.keys()) +
+            list(self.sinal.rows_iris.keys()) +
+            list(self.sinal.rows_focuss.keys())
+        )
+        for param in all_params:
+            reg = self.sinal.get_value(param, 'register')
+            if reg and str(reg).strip():
+                self.mirror_registers[param] = str(reg).strip().upper()
+
+        if hasattr(self.ui_mirror_tab, 'checkBox_enable_send_data_plc'):
+            self.enable_send_data_plc = bool(self.ui_mirror_tab.checkBox_enable_send_data_plc.isChecked())
+
         return self.MIRROR_DATA_CAMERA1, self.CONFIG_CAMERA1
+
+
+    def get_plc_result_registers(self, dict_data=None) -> dict:
+        is_enabled = getattr(self, 'enable_send_data_plc', False)
+        ui = getattr(self, 'ui_mirror_tab', None)
+        if ui and hasattr(ui, 'checkBox_enable_send_data_plc'):
+            try:
+                is_enabled = bool(ui.checkBox_enable_send_data_plc.isChecked())
+            except Exception:
+                pass
+
+        if not is_enabled:
+            return {}
+
+        param_to_dict_key = {
+            'center_x': 'center_x',
+            'center_y': 'center_y',
+            'circle_radius': 'radius',
+            'delta': 'delta',
+            'iris_1': 'brightness_roi1',
+            'iris_2': 'brightness_roi2',
+            'iris_3': 'brightness_roi3',
+            'iris_4': 'brightness_roi4',
+            'focus_1': 'sharpness_roi1',
+            'focus_2': 'sharpness_roi2',
+            'focus_3': 'sharpness_roi3',
+            'focus_4': 'sharpness_roi4',
+        }
+
+        all_params = (
+            list(self.sinal.rows_center_mirror.keys()) +
+            list(self.sinal.rows_iris.keys()) +
+            list(self.sinal.rows_focuss.keys())
+        )
+
+        plc_results = {}
+        for param in all_params:
+            reg = None
+            if hasattr(self, 'mirror_registers') and self.mirror_registers:
+                reg = self.mirror_registers.get(param)
+            if not reg or not str(reg).strip():
+                try:
+                    reg = self.sinal.get_value(param, 'register')
+                except Exception:
+                    pass
+
+            if not reg or not str(reg).strip():
+                continue
+
+            reg_clean = str(reg).strip().upper()
+
+            # Lấy giá trị kết quả từ dict_data (nếu có) hoặc đọc từ cột Result Values trên bảng
+            val = None
+            if dict_data and isinstance(dict_data, dict):
+                d_key = param_to_dict_key.get(param)
+                if d_key and d_key in dict_data:
+                    val = dict_data[d_key]
+                elif param == 'radius_ref':
+                    val = self.CONFIG_CAMERA1.get('radius_ref')
+
+            if val is None:
+                try:
+                    val = self.sinal.get_value(param, 'result_values')
+                except Exception:
+                    pass
+
+            if val is not None and str(val).strip() not in ('', '-', '#N/A', 'None'):
+                try:
+                    if '.' in str(val):
+                        val_num = int(round(float(val)))
+                    else:
+                        val_num = int(val)
+                    plc_results[reg_clean] = val_num
+                except (ValueError, TypeError):
+                    pass
+
+        return plc_results
+
+
+    def send_results_to_plc(self, dict_data=None):
+        """Gửi các giá trị Result Values sang PLC nếu checkbox enable được tích."""
+        plc_results = self.get_plc_result_registers(dict_data)
+        if not plc_results:
+            return
+
+        driver = getattr(self.connect_db, 'driver_loader', None)
+        for reg, val in plc_results.items():
+            sent = False
+            if driver and hasattr(driver, 'write_plc'):
+                try:
+                    driver.write_plc(reg, val)
+                    sent = True
+                except Exception as e:
+                    _log.error("[Mirror] Lỗi gửi PLC %s = %s: %s", reg, val, e)
+            if not sent:
+                # Ghi simulation file fallback
+                try:
+                    from module_1.root_path import get_trigger_file_path
+                    fp = get_trigger_file_path(reg, for_writing=True)
+                    os.makedirs(os.path.dirname(fp), exist_ok=True)
+                    with open(fp, 'w', encoding='utf-8') as f:
+                        f.write(str(val))
+                    sent = True
+                except Exception:
+                    pass
+            if sent:
+                _log.info("[Mirror] Đã gửi thanh ghi %s = %s về PLC", reg, val)
 
 
     def set_value(self,dict_data):
@@ -685,6 +891,8 @@ class Process_Mirror_Device:
         self.item_code_id = item_code_id
         self.camera_name = camera_name
         camera_id = self.produce_mode_auto_id(item_code_id,camera_name)
+        _ensure_mirror_config_columns(self.cursor, self.connect_db)
+        reg_col = _get_register_column_name(self.cursor)
 
         from module_3.change_reason_dialog import ChangeReasonDialog
         from module_3.config_version_manager import save_snapshot
@@ -703,24 +911,29 @@ class Process_Mirror_Device:
 
         change_reason, is_golden = reason_dlg.get_reason_and_golden()
         
+        enable_send = 1 if hasattr(self.ui_mirror_tab, 'checkBox_enable_send_data_plc') and self.ui_mirror_tab.checkBox_enable_send_data_plc.isChecked() else 0
+
         self.cursor.execute("""
             DELETE FROM MIRROR_CONFIG WHERE camera_id = %s
         """, (camera_id,))
         for params in list(self.sinal.rows_center_mirror.keys()) + list(self.sinal.rows_iris.keys()) + list(self.sinal.rows_focuss.keys()):
             result_values = self.sinal.get_value(params, 'result_values')
-            min = self.sinal.get_value(params, 'min')
-            max = self.sinal.get_value(params, 'max')
+            min_val = self.sinal.get_value(params, 'min')
+            max_val = self.sinal.get_value(params, 'max')
             status = self.sinal.get_value(params, 'status')
-            self.cursor.execute("""
+            register_val = self.sinal.get_value(params, 'register')
+            self.cursor.execute(f"""
                 INSERT INTO MIRROR_CONFIG (
-                    parameter_name, result_value, min_value, max_value, status, camera_id
-                ) VALUES (%s, %s, %s, %s, %s, %s)
+                    parameter_name, result_value, min_value, max_value, status, `{reg_col}`, enable_send_data_plc, camera_id
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             """, (
                 params,
                 result_values if result_values else None,
-                min if min else None,
-                max if max else None,
+                min_val if min_val else None,
+                max_val if max_val else None,
                 status if status else None,
+                register_val if register_val else None,
+                enable_send,
                 camera_id
             ))
         self.connect_db.connection.commit()
@@ -774,16 +987,30 @@ class Process_Mirror_Device:
 
     def load_params(self,item_code_id,camera_name):
         camera_id = self.produce_mode_auto_id(item_code_id,camera_name)
-        self.cursor.execute("""
-            SELECT parameter_name,result_value,min_value,max_value,status FROM MIRROR_CONFIG WHERE camera_id = %s
+        _ensure_mirror_config_columns(self.cursor, self.connect_db)
+        reg_col = _get_register_column_name(self.cursor)
+
+        self.cursor.execute(f"""
+            SELECT parameter_name, result_value, min_value, max_value, status, `{reg_col}`, enable_send_data_plc 
+            FROM MIRROR_CONFIG WHERE camera_id = %s
         """, (camera_id,))
         rows = self.cursor.fetchall()
+        enable_plc_found = None
         for row in rows:
             signal_name = str(row[0]).lower()
-            for i, column_name in enumerate(self.sinal.columns_center_mirror.keys()):
-                value = row[i + 1]
-                if value is not None:
-                    self.sinal.set_value(signal_name, column_name, value)
+            col_keys = list(self.sinal.columns_center_mirror.keys())
+            # col_keys: ['result_values', 'min', 'max', 'status', 'register']
+            for i, column_name in enumerate(col_keys):
+                if i + 1 < len(row):
+                    value = row[i + 1]
+                    if value is not None:
+                        self.sinal.set_value(signal_name, column_name, value)
+            if len(row) > 6 and row[6] is not None:
+                enable_plc_found = bool(row[6])
+
+        if enable_plc_found is not None and hasattr(self.ui_mirror_tab, 'checkBox_enable_send_data_plc'):
+            self.ui_mirror_tab.checkBox_enable_send_data_plc.setChecked(enable_plc_found)
+            self.enable_send_data_plc = enable_plc_found
 
         self.connect_db.connection.commit()
         self.get_value_from_table() # Lấy giá trị lưu vào biến Dict trên Main Thread

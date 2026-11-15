@@ -42,6 +42,10 @@ class AutoLoggingProcess:
                 self.ui_logging.pushButton_config_history.setIcon(icon_h)
                 self.ui_logging.pushButton_config_history.setIconSize(QtCore.QSize(25, 25))
                 self.ui_logging.hlayout_item_code.addWidget(self.ui_logging.pushButton_config_history)
+
+        # Điều chỉnh kích thước ô trong bảng logging table để cân đối, dễ nhìn
+        if hasattr(self.ui_logging, 'tableWidget') and self.ui_logging.tableWidget is not None:
+            self._adjust_table_columns()
     
     def broswer_folder(self):
         folder_path = QtWidgets.QFileDialog.getExistingDirectory(
@@ -102,26 +106,89 @@ class AutoLoggingProcess:
             pass
 
     def _adjust_table_columns(self):
-        """Cấu hình lại độ rộng và chế độ hiển thị chuẩn cho 10 cột trong tableWidget."""
-        table = self.ui_logging.tableWidget
+        """Cấu hình lại độ rộng và chế độ hiển thị chuẩn cho 10 cột trong Logging Table để cân đối, đẹp mắt và không bị mất chữ."""
+        table = getattr(self.ui_logging, 'tableWidget', None)
+        if not table:
+            return
+
         if table.columnCount() < 10:
             table.setColumnCount(10)
-            
+
         header = table.horizontalHeader()
         header.setCascadingSectionResizes(False)
-        for i in range(table.columnCount()):
-            header.setSectionResizeMode(i, QtWidgets.QHeaderView.Interactive)
-            
-        table.setColumnWidth(0, 75)   # Join State
-        table.setColumnWidth(1, 320)  # Image Preview / Path
-        table.setColumnWidth(2, 130)  # Description
-        table.setColumnWidth(3, 110)  # Select Camera
-        table.setColumnWidth(4, 110)  # Select Model
-        table.setColumnWidth(5, 85)   # View Detection
-        table.setColumnWidth(6, 95)   # Register
-        table.setColumnWidth(7, 85)   # Value ON
-        table.setColumnWidth(8, 85)   # Value OFF
-        table.setColumnWidth(9, 90)   # Action (Save)
+        header.setStretchLastSection(False)
+        header.setHighlightSections(False)
+
+        # Tối ưu padding và font tiêu đề để tiêu đề các cột không bao giờ bị cắt chữ
+        header.setStyleSheet("""
+            QHeaderView::section {
+                background-color: #E2E8F0;
+                color: #475569;
+                font-weight: bold;
+                font-size: 11px;
+                text-transform: uppercase;
+                padding: 6px 6px;
+                border: none;
+                border-bottom: 1.5px solid #CBD5E1;
+                border-right: 1px solid #CBD5E1;
+            }
+            QHeaderView::section:hover {
+                background-color: #CBD5E1;
+                color: #1E293B;
+            }
+        """)
+
+        ROW_HEIGHT = 45
+        v_header = table.verticalHeader()
+        if v_header:
+            v_header.setDefaultSectionSize(ROW_HEIGHT)
+            v_header.setMinimumSectionSize(30)
+
+        for r in range(table.rowCount()):
+            table.setRowHeight(r, ROW_HEIGHT)
+
+        # Danh sách cấu hình độ rộng chuẩn (px) cho các cột cố định:
+        # Col 0: Join State     -> 105px (Vừa vặn chữ "JOIN STATE", checkbox căn giữa)
+        # Col 2: Description    -> 130px (Vừa vặn chữ "DESCRIPTION")
+        # Col 3: Select Camera  -> 135px (Vừa vặn chữ "SELECT CAMERA", ComboBox camera không bị che mũi tên)
+        # Col 4: Select Model   -> 130px (Vừa vặn chữ "SELECT MODEL", ComboBox model)
+        # Col 5: View Detection -> 140px (Vừa vặn chữ "VIEW DETECTION", nút "Detect" hiển thị trọn vẹn)
+        # Col 6: Register       -> 105px (Vừa vặn chữ "REGISTER" và tên thanh ghi PLC)
+        # Col 7: Value ON       -> 95px  (Vừa vặn chữ "VALUE ON")
+        # Col 8: Value OFF      -> 95px  (Vừa vặn chữ "VALUE OFF")
+        # Col 9: Action (Save)  -> 125px (Đủ không gian hiển thị đầy đủ nút "💾 Data Save", không bị cắt chữ)
+        
+        column_widths = {
+            0: 105,
+            2: 130,
+            3: 135,
+            4: 130,
+            5: 140,
+            6: 105,
+            7: 95,
+            8: 95,
+            9: 125,
+        }
+
+        for col_idx, width in column_widths.items():
+            header.setSectionResizeMode(col_idx, QtWidgets.QHeaderView.Interactive)
+            table.setColumnWidth(col_idx, width)
+
+        header.setSectionResizeMode(1, QtWidgets.QHeaderView.Interactive)
+        table.resizeColumnToContents(1)
+
+        font = table.font()
+        fm = QtGui.QFontMetrics(font)
+        max_path_width = 320
+        for r in range(table.rowCount()):
+            it = table.item(r, 1)
+            if it and it.text():
+                w = fm.horizontalAdvance(it.text()) + 32 
+                if w > max_path_width:
+                    max_path_width = w
+
+        calculated_w = max(max_path_width, table.columnWidth(1) + 20)
+        table.setColumnWidth(1, calculated_w)
 
     def get_row_data(self, row: int) -> dict:
         """Trích xuất dữ liệu của 1 dòng từ tableWidget."""

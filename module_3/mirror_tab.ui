@@ -1013,36 +1013,112 @@ QGroupBox::title {
              <property name="font">
               <font>
                <family>Segoe UI</family>
-               <pointsize>10</pointsize>
+               <pointsize>-1</pointsize>
               </font>
              </property>
              <property name="styleSheet">
-              <string notr="true">QTableWidget::item:selected {
-    background-color: #DCE8FF;
-    color: #1F2937;
+              <string notr="true">/* Khung tổng thể của bảng */
+QTableWidget {
+    background-color: #F8FAFC;
+    alternate-background-color: #F1F5F9;
+    color: #334155;
+    gridline-color: #E2E8F0;
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    font-size: 13px;
+    selection-background-color: #E2E8F0;
+    selection-color: #1E293B;
+    outline: 0;
 }
- 
+
+/* Từng ô dữ liệu bên trong bảng */
+QTableWidget::item {
+    padding: 4px 10px;
+    border-bottom: 1px solid #E2E8F0;
+}
+
+/* Hiệu ứng khi di chuột qua từng ô */
+QTableWidget::item:hover {
+    background-color: #EEF2F6;
+}
+
+/* Ô đang được chọn */
+QTableWidget::item:selected {
+    background-color: #E0E7FF;
+    color: #3730A3;
+    font-weight: bold;
+}
+
+/* Thanh tiêu đề cột (Header ngang) */
 QHeaderView::section {
-    background-color: #F1F4F9;
-    color: #374151;
-    padding: 8px;
+    background-color: #E2E8F0;
+    color: #475569;
+    font-weight: bold;
+    font-size: 12px;
+    text-transform: uppercase;
+    padding: 10px 12px;
     border: none;
-    border-right: 1px solid #E5E9F0;
-    border-bottom: 1px solid #D9DEE7;
-    font-weight: bold;
+    border-bottom: 1.5px solid #CBD5E1;
+    border-right: 1px solid #CBD5E1;
 }
- 
-/* Ô nhập khi nhấp đúp: rộng, chữ lớn, viền xanh rõ ràng */
-QTableWidget QLineEdit {
-    background-color: #FFFFFF;
-    color: #111827;
-    border: 2px solid #2563EB;
-    padding: 0px 6px;
-    font-size: 16px;
-    font-weight: bold;
-    selection-background-color: #2563EB;
-    selection-color: #FFFFFF;
-}</string>
+
+/* Hiệu ứng khi di chuột vào tiêu đề cột */
+QHeaderView::section:hover {
+    background-color: #CBD5E1;
+    color: #1E293B;
+}
+
+/* Góc trên bên trái giao giữa 2 thanh tiêu đề */
+QTableCornerButton::section {
+    background-color: #E2E8F0;
+    border: none;
+    border-bottom: 1.5px solid #CBD5E1;
+}
+
+/* Thanh cuộn dọc (Vertical Scrollbar) */
+QScrollBar:vertical {
+    background: #F1F5F9;
+    width: 8px;
+    margin: 0px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:vertical {
+    background: #CBD5E1;
+    min-height: 25px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #94A3B8;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+
+/* Thanh cuộn ngang (Horizontal Scrollbar) */
+QScrollBar:horizontal {
+    background: #F1F5F9;
+    height: 8px;
+    margin: 0px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:horizontal {
+    background: #CBD5E1;
+    min-width: 25px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background: #94A3B8;
+}
+
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    width: 0px;
+}
+</string>
              </property>
              <property name="alternatingRowColors">
               <bool>true</bool>
@@ -1175,10 +1251,13 @@ QTableWidget QLineEdit {
                 <bold>true</bold>
                </font>
               </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
+              </property>
              </column>
              <column>
               <property name="text">
-               <string>Min</string>
+               <string>Min Value</string>
               </property>
               <property name="font">
                <font>
@@ -1188,10 +1267,13 @@ QTableWidget QLineEdit {
                 <bold>true</bold>
                </font>
               </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
+              </property>
              </column>
              <column>
               <property name="text">
-               <string>Max</string>
+               <string>Max Value</string>
               </property>
               <property name="font">
                <font>
@@ -1200,6 +1282,9 @@ QTableWidget QLineEdit {
                 <weight>75</weight>
                 <bold>true</bold>
                </font>
+              </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
               </property>
              </column>
              <column>
@@ -1213,6 +1298,9 @@ QTableWidget QLineEdit {
                 <weight>75</weight>
                 <bold>true</bold>
                </font>
+              </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
               </property>
              </column>
              <column>
@@ -1235,6 +1323,14 @@ QTableWidget QLineEdit {
               <property name="text">
                <string>-</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -1242,6 +1338,14 @@ QTableWidget QLineEdit {
              <item row="0" column="1">
               <property name="text">
                <string>0</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1251,6 +1355,14 @@ QTableWidget QLineEdit {
               <property name="text">
                <string>0</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -1258,6 +1370,30 @@ QTableWidget QLineEdit {
              <item row="0" column="3">
               <property name="text">
                <string>#N/A</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
+              </property>
+             </item>
+             <item row="0" column="4">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1267,6 +1403,14 @@ QTableWidget QLineEdit {
               <property name="text">
                <string>-</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -1274,6 +1418,14 @@ QTableWidget QLineEdit {
              <item row="1" column="1">
               <property name="text">
                <string>0</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1283,6 +1435,14 @@ QTableWidget QLineEdit {
               <property name="text">
                <string>0</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -1290,6 +1450,30 @@ QTableWidget QLineEdit {
              <item row="1" column="3">
               <property name="text">
                <string>#N/A</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
+              </property>
+             </item>
+             <item row="1" column="4">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1299,6 +1483,14 @@ QTableWidget QLineEdit {
               <property name="text">
                <string>-</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -1306,6 +1498,14 @@ QTableWidget QLineEdit {
              <item row="2" column="1">
               <property name="text">
                <string>0</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1315,6 +1515,14 @@ QTableWidget QLineEdit {
               <property name="text">
                <string>0</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -1322,6 +1530,30 @@ QTableWidget QLineEdit {
              <item row="2" column="3">
               <property name="text">
                <string>#N/A</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
+              </property>
+             </item>
+             <item row="2" column="4">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1331,6 +1563,14 @@ QTableWidget QLineEdit {
               <property name="text">
                <string>342</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -1338,6 +1578,14 @@ QTableWidget QLineEdit {
              <item row="3" column="1">
               <property name="text">
                <string>-</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1347,6 +1595,14 @@ QTableWidget QLineEdit {
               <property name="text">
                <string>-</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -1354,6 +1610,30 @@ QTableWidget QLineEdit {
              <item row="3" column="3">
               <property name="text">
                <string>-</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
+              </property>
+             </item>
+             <item row="3" column="4">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1363,6 +1643,14 @@ QTableWidget QLineEdit {
               <property name="text">
                <string>30</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -1370,6 +1658,14 @@ QTableWidget QLineEdit {
              <item row="4" column="1">
               <property name="text">
                <string>-</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1379,6 +1675,14 @@ QTableWidget QLineEdit {
               <property name="text">
                <string>-</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -1386,6 +1690,30 @@ QTableWidget QLineEdit {
              <item row="4" column="3">
               <property name="text">
                <string>-</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
+              </property>
+             </item>
+             <item row="4" column="4">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1448,36 +1776,112 @@ QGroupBox::title {
              <property name="font">
               <font>
                <family>Segoe UI</family>
-               <pointsize>10</pointsize>
+               <pointsize>-1</pointsize>
               </font>
              </property>
              <property name="styleSheet">
-              <string notr="true">QTableWidget::item:selected {
-    background-color: #DCE8FF;
-    color: #1F2937;
+              <string notr="true">/* Khung tổng thể của bảng */
+QTableWidget {
+    background-color: #F8FAFC;
+    alternate-background-color: #F1F5F9;
+    color: #334155;
+    gridline-color: #E2E8F0;
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    font-size: 13px;
+    selection-background-color: #E2E8F0;
+    selection-color: #1E293B;
+    outline: 0;
 }
- 
+
+/* Từng ô dữ liệu bên trong bảng */
+QTableWidget::item {
+    padding: 4px 10px;
+    border-bottom: 1px solid #E2E8F0;
+}
+
+/* Hiệu ứng khi di chuột qua từng ô */
+QTableWidget::item:hover {
+    background-color: #EEF2F6;
+}
+
+/* Ô đang được chọn */
+QTableWidget::item:selected {
+    background-color: #E0E7FF;
+    color: #3730A3;
+    font-weight: bold;
+}
+
+/* Thanh tiêu đề cột (Header ngang) */
 QHeaderView::section {
-    background-color: #F1F4F9;
-    color: #374151;
-    padding: 8px;
+    background-color: #E2E8F0;
+    color: #475569;
+    font-weight: bold;
+    font-size: 12px;
+    text-transform: uppercase;
+    padding: 10px 12px;
     border: none;
-    border-right: 1px solid #E5E9F0;
-    border-bottom: 1px solid #D9DEE7;
-    font-weight: bold;
+    border-bottom: 1.5px solid #CBD5E1;
+    border-right: 1px solid #CBD5E1;
 }
- 
-/* Ô nhập khi nhấp đúp: rộng, chữ lớn, viền xanh rõ ràng */
-QTableWidget QLineEdit {
-    background-color: #FFFFFF;
-    color: #111827;
-    border: 2px solid #2563EB;
-    padding: 0px 6px;
-    font-size: 16px;
-    font-weight: bold;
-    selection-background-color: #2563EB;
-    selection-color: #FFFFFF;
-}</string>
+
+/* Hiệu ứng khi di chuột vào tiêu đề cột */
+QHeaderView::section:hover {
+    background-color: #CBD5E1;
+    color: #1E293B;
+}
+
+/* Góc trên bên trái giao giữa 2 thanh tiêu đề */
+QTableCornerButton::section {
+    background-color: #E2E8F0;
+    border: none;
+    border-bottom: 1.5px solid #CBD5E1;
+}
+
+/* Thanh cuộn dọc (Vertical Scrollbar) */
+QScrollBar:vertical {
+    background: #F1F5F9;
+    width: 8px;
+    margin: 0px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:vertical {
+    background: #CBD5E1;
+    min-height: 25px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #94A3B8;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+
+/* Thanh cuộn ngang (Horizontal Scrollbar) */
+QScrollBar:horizontal {
+    background: #F1F5F9;
+    height: 8px;
+    margin: 0px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:horizontal {
+    background: #CBD5E1;
+    min-width: 25px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background: #94A3B8;
+}
+
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    width: 0px;
+}
+</string>
              </property>
              <property name="alternatingRowColors">
               <bool>true</bool>
@@ -1597,7 +2001,7 @@ QTableWidget QLineEdit {
              </column>
              <column>
               <property name="text">
-               <string>Min</string>
+               <string>Min Value</string>
               </property>
               <property name="font">
                <font>
@@ -1610,7 +2014,7 @@ QTableWidget QLineEdit {
              </column>
              <column>
               <property name="text">
-               <string>Max</string>
+               <string>Max Value</string>
               </property>
               <property name="font">
                <font>
@@ -1651,6 +2055,14 @@ QTableWidget QLineEdit {
               <property name="text">
                <string>-</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -1658,6 +2070,14 @@ QTableWidget QLineEdit {
              <item row="0" column="1">
               <property name="text">
                <string>0</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1667,6 +2087,14 @@ QTableWidget QLineEdit {
               <property name="text">
                <string>0</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -1674,6 +2102,30 @@ QTableWidget QLineEdit {
              <item row="0" column="3">
               <property name="text">
                <string>#N/A</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
+              </property>
+             </item>
+             <item row="0" column="4">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1683,6 +2135,14 @@ QTableWidget QLineEdit {
               <property name="text">
                <string>-</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -1690,6 +2150,14 @@ QTableWidget QLineEdit {
              <item row="1" column="1">
               <property name="text">
                <string>0</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1699,6 +2167,14 @@ QTableWidget QLineEdit {
               <property name="text">
                <string>0</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -1706,6 +2182,30 @@ QTableWidget QLineEdit {
              <item row="1" column="3">
               <property name="text">
                <string>#N/A</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
+              </property>
+             </item>
+             <item row="1" column="4">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1715,6 +2215,14 @@ QTableWidget QLineEdit {
               <property name="text">
                <string>-</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -1722,6 +2230,14 @@ QTableWidget QLineEdit {
              <item row="2" column="1">
               <property name="text">
                <string>0</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1731,6 +2247,14 @@ QTableWidget QLineEdit {
               <property name="text">
                <string>0</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -1738,6 +2262,30 @@ QTableWidget QLineEdit {
              <item row="2" column="3">
               <property name="text">
                <string>#N/A</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
+              </property>
+             </item>
+             <item row="2" column="4">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1747,6 +2295,14 @@ QTableWidget QLineEdit {
               <property name="text">
                <string>-</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -1754,6 +2310,14 @@ QTableWidget QLineEdit {
              <item row="3" column="1">
               <property name="text">
                <string>0</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1763,6 +2327,14 @@ QTableWidget QLineEdit {
               <property name="text">
                <string>0</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -1770,6 +2342,30 @@ QTableWidget QLineEdit {
              <item row="3" column="3">
               <property name="text">
                <string>#N/A</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
+              </property>
+             </item>
+             <item row="3" column="4">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1832,36 +2428,112 @@ QGroupBox::title {
              <property name="font">
               <font>
                <family>Segoe UI</family>
-               <pointsize>10</pointsize>
+               <pointsize>-1</pointsize>
               </font>
              </property>
              <property name="styleSheet">
-              <string notr="true">QTableWidget::item:selected {
-    background-color: #DCE8FF;
-    color: #1F2937;
+              <string notr="true">/* Khung tổng thể của bảng */
+QTableWidget {
+    background-color: #F8FAFC;
+    alternate-background-color: #F1F5F9;
+    color: #334155;
+    gridline-color: #E2E8F0;
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    font-size: 13px;
+    selection-background-color: #E2E8F0;
+    selection-color: #1E293B;
+    outline: 0;
 }
- 
+
+/* Từng ô dữ liệu bên trong bảng */
+QTableWidget::item {
+    padding: 4px 10px;
+    border-bottom: 1px solid #E2E8F0;
+}
+
+/* Hiệu ứng khi di chuột qua từng ô */
+QTableWidget::item:hover {
+    background-color: #EEF2F6;
+}
+
+/* Ô đang được chọn */
+QTableWidget::item:selected {
+    background-color: #E0E7FF;
+    color: #3730A3;
+    font-weight: bold;
+}
+
+/* Thanh tiêu đề cột (Header ngang) */
 QHeaderView::section {
-    background-color: #F1F4F9;
-    color: #374151;
-    padding: 8px;
+    background-color: #E2E8F0;
+    color: #475569;
+    font-weight: bold;
+    font-size: 12px;
+    text-transform: uppercase;
+    padding: 10px 12px;
     border: none;
-    border-right: 1px solid #E5E9F0;
-    border-bottom: 1px solid #D9DEE7;
-    font-weight: bold;
+    border-bottom: 1.5px solid #CBD5E1;
+    border-right: 1px solid #CBD5E1;
 }
- 
-/* Ô nhập khi nhấp đúp: rộng, chữ lớn, viền xanh rõ ràng */
-QTableWidget QLineEdit {
-    background-color: #FFFFFF;
-    color: #111827;
-    border: 2px solid #2563EB;
-    padding: 0px 6px;
-    font-size: 16px;
-    font-weight: bold;
-    selection-background-color: #2563EB;
-    selection-color: #FFFFFF;
-}</string>
+
+/* Hiệu ứng khi di chuột vào tiêu đề cột */
+QHeaderView::section:hover {
+    background-color: #CBD5E1;
+    color: #1E293B;
+}
+
+/* Góc trên bên trái giao giữa 2 thanh tiêu đề */
+QTableCornerButton::section {
+    background-color: #E2E8F0;
+    border: none;
+    border-bottom: 1.5px solid #CBD5E1;
+}
+
+/* Thanh cuộn dọc (Vertical Scrollbar) */
+QScrollBar:vertical {
+    background: #F1F5F9;
+    width: 8px;
+    margin: 0px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:vertical {
+    background: #CBD5E1;
+    min-height: 25px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #94A3B8;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+
+/* Thanh cuộn ngang (Horizontal Scrollbar) */
+QScrollBar:horizontal {
+    background: #F1F5F9;
+    height: 8px;
+    margin: 0px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:horizontal {
+    background: #CBD5E1;
+    min-width: 25px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background: #94A3B8;
+}
+
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    width: 0px;
+}
+</string>
              </property>
              <property name="alternatingRowColors">
               <bool>true</bool>
@@ -1969,7 +2641,7 @@ QTableWidget QLineEdit {
              </column>
              <column>
               <property name="text">
-               <string>Min</string>
+               <string>Min Value</string>
               </property>
               <property name="font">
                <font>
@@ -1982,7 +2654,7 @@ QTableWidget QLineEdit {
              </column>
              <column>
               <property name="text">
-               <string>Max</string>
+               <string>Max Value</string>
               </property>
               <property name="font">
                <font>
@@ -2023,6 +2695,14 @@ QTableWidget QLineEdit {
               <property name="text">
                <string>-</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -2030,6 +2710,14 @@ QTableWidget QLineEdit {
              <item row="0" column="1">
               <property name="text">
                <string>0</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -2039,6 +2727,14 @@ QTableWidget QLineEdit {
               <property name="text">
                <string>0</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -2046,6 +2742,27 @@ QTableWidget QLineEdit {
              <item row="0" column="3">
               <property name="text">
                <string>#N/A</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
+              </property>
+             </item>
+             <item row="0" column="4">
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -2055,6 +2772,14 @@ QTableWidget QLineEdit {
               <property name="text">
                <string>-</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -2062,6 +2787,14 @@ QTableWidget QLineEdit {
              <item row="1" column="1">
               <property name="text">
                <string>0</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -2071,6 +2804,14 @@ QTableWidget QLineEdit {
               <property name="text">
                <string>0</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -2078,6 +2819,27 @@ QTableWidget QLineEdit {
              <item row="1" column="3">
               <property name="text">
                <string>#N/A</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
+              </property>
+             </item>
+             <item row="1" column="4">
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -2087,6 +2849,14 @@ QTableWidget QLineEdit {
               <property name="text">
                <string>-</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -2094,6 +2864,14 @@ QTableWidget QLineEdit {
              <item row="2" column="1">
               <property name="text">
                <string>0</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -2103,6 +2881,14 @@ QTableWidget QLineEdit {
               <property name="text">
                <string>0</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -2110,6 +2896,27 @@ QTableWidget QLineEdit {
              <item row="2" column="3">
               <property name="text">
                <string>#N/A</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
+              </property>
+             </item>
+             <item row="2" column="4">
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -2119,6 +2926,14 @@ QTableWidget QLineEdit {
               <property name="text">
                <string>-</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -2126,6 +2941,14 @@ QTableWidget QLineEdit {
              <item row="3" column="1">
               <property name="text">
                <string>0</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -2135,6 +2958,14 @@ QTableWidget QLineEdit {
               <property name="text">
                <string>0</string>
               </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
               </property>
@@ -2142,6 +2973,27 @@ QTableWidget QLineEdit {
              <item row="3" column="3">
               <property name="text">
                <string>#N/A</string>
+              </property>
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
+              </property>
+             </item>
+             <item row="3" column="4">
+              <property name="font">
+               <font>
+                <family>Segoe UI</family>
+                <pointsize>10</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>

@@ -908,10 +908,10 @@ QPushButton {
     border-radius: 6px;
 }
 QPushButton:hover {
-    background-color: rgba(0, 0, 0, 25);
+    background-color: rgba(0, 0, 0, 25);     /* nền hiện ra khi rê chuột */
 }
 QPushButton:pressed {
-    background-color: rgba(0, 0, 0, 50);
+    background-color: rgba(0, 0, 0, 50);     /* đậm hơn khi nhấn */
 }
 """
 

@@ -586,7 +586,6 @@ class Process_Model:
         self.parametes_model = None
         self.result_model = None
         self.process_image_func = None
-        
         self.is_unlocked = False
         self.camera_id = None
         self.camera_name = ""
@@ -596,8 +595,6 @@ class Process_Model:
         self.cursor = None
         self.connect_db = None
         self.active_tasks = {}
-        
-        # Inject standard properties into the generated UI object
         self.uic.processor = self
         self.uic.ui_child = None 
         self.uic.i_code = None
@@ -611,23 +608,13 @@ class Process_Model:
             self.uic.tableView.setModel(self.uic.model)
             self.uic.tableView.setContextMenuPolicy(Qt.CustomContextMenu)
             self.uic.tableView.customContextMenuRequested.connect(self.show_table_context_menu)
-            
-            # Cài đặt phong cách thiết kế đồng bộ đẹp mắt cho tableView
-            self._setup_table_view_style()
-
-            # Cài đặt Delegates mặc định
             self._setup_table_delegates()
-
-            # Định dạng toàn bộ ô và header
             self.format_all_table_items()
-
-            # Kích hoạt bộ điều khiển Slider thông minh cho các cột từ Qty đến Confidence
+            self._setup_column_widths()
             self.slider_controller = TableSliderController(self.uic.tableView, self.uic.model_column)
 
         self.uic.model.itemChanged.connect(self._on_table_item_changed)
         self.uic.is_unlocked = False
-
-        # Tích hợp nút Xem Lịch Sử Cấu Hình & Rollback vào toolbar groupBox_4
         if hasattr(self.uic, 'horizontalLayout') and hasattr(self.uic, 'groupBox_4'):
             if not hasattr(self.uic, 'pushButton_config_history'):
                 self.uic.pushButton_config_history = QtWidgets.QPushButton(self.uic.groupBox_4)
@@ -646,7 +633,6 @@ class Process_Model:
         self.set_ui_enabled(False)
 
     def _setup_table_view_style(self):
-        """Thiết lập phong cách đồ hoạ sang trọng, font chữ 11pt in đậm và căn giữa cho tableView."""
         if not hasattr(self.uic, 'tableView') or self.uic.tableView is None:
             return
         table = self.uic.tableView
@@ -663,52 +649,76 @@ class Process_Model:
         self._setup_column_widths()
 
     def _setup_column_widths(self):
-        """Cấu hình độ rộng chuyên nghiệp, cân đối cho từng cột trong tableView."""
+
         if not hasattr(self.uic, 'tableView') or self.uic.tableView is None:
             return
         table = self.uic.tableView
         header = table.horizontalHeader()
+        if not header:
+            return
 
-        col_widths = {
-            "Label Name": 140,
-            "Enabled [✓]": 90,
-            "OK [🟢]": 85,
-            "NG [🔴]": 85,
-            "Qty": 75,
-            "Min Width": 90,
-            "Max Width": 90,
-            "Min Height": 90,
-            "Max Height": 90,
-            "Register": 105,
-            "Value State": 85,
-            "Value OK": 85,
-            "Value NG": 85,
-            "Value": 75,
-            "Confidence": 95,
-        }
+        header.setCascadingSectionResizes(False)
+        header.setStretchLastSection(False)
+        header.setHighlightSections(False)
 
-        for i, col_name in enumerate(self.uic.model_column):
+        ROW_HEIGHT = 42
+        v_header = table.verticalHeader()
+        if v_header:
+            v_header.setDefaultSectionSize(ROW_HEIGHT)
+            v_header.setMinimumSectionSize(28)
+
+        if hasattr(self.uic, 'model') and self.uic.model is not None:
+            for r in range(self.uic.model.rowCount()):
+                table.setRowHeight(r, ROW_HEIGHT)
+
+        font_header = QtGui.QFont("Segoe UI", 11)
+        font_header.setBold(True)
+        fm_header = QtGui.QFontMetrics(font_header)
+
+        font_cell = QtGui.QFont("Segoe UI", 11)
+        font_cell.setBold(True)
+        fm_cell = QtGui.QFontMetrics(font_cell)
+        model_cols = getattr(self.uic, 'model_column', [])
+        for i, col_name in enumerate(model_cols):
             header.setSectionResizeMode(i, QtWidgets.QHeaderView.Interactive)
-            w = col_widths.get(col_name, 90)
-            table.setColumnWidth(i, w)
+
+            if col_name == "Label Name":
+
+                max_label_w = max(
+                    fm_header.horizontalAdvance("Label Name"),
+                    fm_header.horizontalAdvance("Label Name".upper())
+                ) + 40  
+
+                if hasattr(self.uic, 'model') and self.uic.model is not None:
+                    for r in range(self.uic.model.rowCount()):
+                        item = self.uic.model.item(r, i)
+                        if item and item.text():
+                            w = fm_cell.horizontalAdvance(item.text()) + 32 
+                            if w > max_label_w:
+                                max_label_w = w
+
+                table.setColumnWidth(i, max(130, max_label_w))
+            else:
+                text_w = max(
+                    fm_header.horizontalAdvance(col_name),
+                    fm_header.horizontalAdvance(col_name.upper())
+                )
+                col_w = text_w + 32 
+                table.setColumnWidth(i, col_w)
 
     def _setup_table_delegates(self):
-        """Cài đặt các delegates: Delegate mặc định font 11 Bold căn giữa, 
-        CheckboxDelegate cho cột tích chọn và RegisterDelegate cho cột Register."""
+
         if not hasattr(self.uic, 'tableView') or self.uic.tableView is None:
             return
         
-        # 1. Delegate mặc định cho toàn bộ các ô text: font 11 Bold, căn giữa
         centered_delegate = CenteredItemDelegate(self.uic.tableView)
         self.uic.tableView.setItemDelegate(centered_delegate)
 
-        # 2. Checkbox Delegate cho các cột Enabled, OK, NG
         checkbox_delegate = CheckboxDelegate(self.uic.tableView)
         for chk_col in [self.keys_mapping[1], self.keys_mapping[2], self.keys_mapping[3]]:
             if chk_col in self.uic.model_column:
                 self.uic.tableView.setItemDelegateForColumn(self.uic.model_column.index(chk_col), checkbox_delegate)
 
-        # 3. Register Delegate cho cột Register
         if "Register" in self.uic.model_column:
             self.uic.tableView.setItemDelegateForColumn(
                 self.uic.model_column.index("Register"),
@@ -716,7 +726,6 @@ class Process_Model:
             )
 
     def _format_table_headers(self):
-        """Định dạng font 11, in đậm và căn giữa cho tiêu đề cột (Horizontal Header)."""
         if not hasattr(self.uic, 'model') or self.uic.model is None:
             return
         font_header = QtGui.QFont("Segoe UI", 11)
@@ -729,7 +738,6 @@ class Process_Model:
                 h_item.setForeground(QtGui.QBrush(QtGui.QColor("#1F4E78")))
 
     def format_all_table_items(self):
-        """Đảm bảo tất cả các ô trong bảng và tiêu đề cột/hàng đều có font 11, in đậm và căn giữa."""
         if hasattr(self.uic, '_cached_model_config'):
             self.uic._cached_model_config = None
         if not hasattr(self.uic, 'model') or self.uic.model is None:
@@ -740,7 +748,7 @@ class Process_Model:
 
         model.blockSignals(True)
         try:
-            # 1. Định dạng Horizontal Header
+         
             for col in range(model.columnCount()):
                 h_item = model.horizontalHeaderItem(col)
                 if h_item:
@@ -748,7 +756,7 @@ class Process_Model:
                     h_item.setTextAlignment(Qt.AlignCenter)
                     h_item.setForeground(QtGui.QBrush(QtGui.QColor("#1F4E78")))
 
-            # 2. Định dạng các ô dữ liệu và Vertical Header
+    
             for row in range(model.rowCount()):
                 v_item = model.verticalHeaderItem(row)
                 if v_item:
@@ -786,7 +794,6 @@ class Process_Model:
                 item.setCheckState(Qt.Checked if is_chk else Qt.Unchecked)
             else:
                 val = values_dict.get(col_name)
-                # Nếu không có giá trị từ custom_values hoặc giá trị là 0 cho các cột cần mặc định khác 0
                 if val is None or str(val).strip() == "" or (str(val).strip() == "0" and col_name in (
                     "Max Width", "Max Height", "Qty", "Value State", "Value OK", "Value NG", "Value", "Confidence", "Min Width", "Min Height"
                 )):
@@ -1078,7 +1085,7 @@ class Process_Model:
                 # ─────────────────────────────────────────────────────────────
                 # PHÂN QUYỀN HỆ THỐNG:
                 # ─────────────────────────────────────────────────────────────
-                # 1. Trường hợp read_only: Mặc dù đúng pass nhưng đối tượng vẫn bị khóa
+                
                 if role == "read_only":
                     self.is_unlocked = False
                     self.set_ui_enabled(enabled=False, role="read_only")
@@ -1092,7 +1099,6 @@ class Process_Model:
                     )
                     return False
 
-                # 2. Trường hợp modify: Chỉ cho phép điều chỉnh bảng tableView và lưu bảng
                 elif role == "modify":
                     self.is_unlocked = True
                     self.set_ui_enabled(enabled=True, role="modify")

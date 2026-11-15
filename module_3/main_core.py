@@ -164,6 +164,7 @@ class UISignals(QObject):
     show_warning     = pyqtSignal(str, str)
     set_user_index   = pyqtSignal(object, object, str, str)
     load_mode_params = pyqtSignal(str, str)
+    update_mirror_ui = pyqtSignal(object, dict)
 
 
 # ---------------------------------------------------------------------------
@@ -259,6 +260,7 @@ class PLCHandler:
         self.signals.show_warning.connect(self._show_warning_slot)
         self.signals.set_user_index.connect(self._on_set_user_index)
         self.signals.load_mode_params.connect(self._on_load_mode_params)
+        self.signals.update_mirror_ui.connect(self._on_update_mirror_ui)
 
         self.worker_thread    = PLCWorkerModeAuto1(self)
         self.built_in_objects = {}
@@ -1183,6 +1185,14 @@ class PLCHandler:
     def _on_load_mode_params(self, mode_name: str, target_camera: str = ""):
         self._load_params_signals_mode(mode_name, target_camera)
 
+    def _on_update_mirror_ui(self, mirror_dev, dict_data):
+        try:
+            if mirror_dev and dict_data:
+                mirror_dev.set_value(dict_data)
+                mirror_dev.check_all_status()
+        except Exception as e:
+            _log.debug("Lỗi cập nhật giao diện Mirror: %s", e)
+
     def _load_params_signals_mode(self, mode_name: str = "", target_camera: str = ""):
         if not self.built_in_objects:
             return
@@ -2029,6 +2039,20 @@ class PLCHandler:
 
         result_img = img
         flag       = check
+
+        if mirror_dev:
+            self.signals.update_mirror_ui.emit(mirror_dev, dict_data)
+
+        list_register = {}
+        if mirror_dev and hasattr(mirror_dev, 'get_plc_result_registers'):
+            try:
+                mirror_plc_regs = mirror_dev.get_plc_result_registers(dict_data)
+                if mirror_plc_regs:
+                    _log.info('[handle_result_mode_geji][%s] Mirror result registers to PLC: %s', key, mirror_plc_regs)
+                    list_register.update(mirror_plc_regs)
+            except Exception as e_reg:
+                _log.error('[handle_result_mode_geji][%s] Lỗi lấy thanh ghi Mirror: %s', key, e_reg)
+
         try:
             with self._signal_rwlock.read():
                 reset_ok_sig = self._resolve_signal(key, 'component')
@@ -2039,33 +2063,28 @@ class PLCHandler:
             complete_sig = None
 
         plc_tasks = []
+
+        if list_register:
+            for m_reg, m_val in list_register.items():
+                plc_tasks.append((m_reg, m_val))
+
         if reset_ok_sig and reset_ok_sig.get('reg'):
             reg_target = str(reset_ok_sig['reg']).strip()
             if flag:
                 val_on = reset_ok_sig.get('on', 1)
-                try:
-                    plc_tasks.append((reg_target, int(val_on)))
-                except (ValueError, TypeError):
-                    plc_tasks.append((reg_target, 1))
+                plc_tasks.append((reg_target, int(val_on)))
             else:
                 val_off = reset_ok_sig.get('off')
                 if val_off is not None and str(val_off).strip() != "" and str(val_off).strip().lower() not in ('none', 'no value'):
-                    try:
-                        plc_tasks.append((reg_target, int(val_off)))
-                    except (ValueError, TypeError):
-                        pass
+                    plc_tasks.append((reg_target, int(val_off)))
 
         if complete_sig and complete_sig.get('reg'):
             val_comp = complete_sig.get('on', 1)
-            try:
-                plc_tasks.append((str(complete_sig['reg']).strip(), int(val_comp)))
-            except (ValueError, TypeError):
-                plc_tasks.append((str(complete_sig['reg']).strip(), 1))
-
+            plc_tasks.append((str(complete_sig['reg']).strip(), int(val_comp)))
+  
         if plc_tasks:
             self._dispatch_plc_writes(plc_tasks)
 
-        list_register = []
         elapsed       = (time.perf_counter() - start_time) * 1000
         self._reset_counter(key)
         display_mode = self.get_display_mode()

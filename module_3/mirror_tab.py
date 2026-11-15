@@ -572,34 +572,110 @@ class Ui_MainWindow(object):
         self.tableWidget_center_mirror = QtWidgets.QTableWidget(self.groupBox_3)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         self.tableWidget_center_mirror.setFont(font)
-        self.tableWidget_center_mirror.setStyleSheet("QTableWidget::item:selected {\n"
-"    background-color: #DCE8FF;\n"
-"    color: #1F2937;\n"
+        self.tableWidget_center_mirror.setStyleSheet("/* Khung tổng thể của bảng */\n"
+"QTableWidget {\n"
+"    background-color: #F8FAFC;\n"
+"    alternate-background-color: #F1F5F9;\n"
+"    color: #334155;\n"
+"    gridline-color: #E2E8F0;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 8px;\n"
+"    font-size: 13px;\n"
+"    selection-background-color: #E2E8F0;\n"
+"    selection-color: #1E293B;\n"
+"    outline: 0;\n"
 "}\n"
-" \n"
+"\n"
+"/* Từng ô dữ liệu bên trong bảng */\n"
+"QTableWidget::item {\n"
+"    padding: 4px 10px;\n"
+"    border-bottom: 1px solid #E2E8F0;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột qua từng ô */\n"
+"QTableWidget::item:hover {\n"
+"    background-color: #EEF2F6;\n"
+"}\n"
+"\n"
+"/* Ô đang được chọn */\n"
+"QTableWidget::item:selected {\n"
+"    background-color: #E0E7FF;\n"
+"    color: #3730A3;\n"
+"    font-weight: bold;\n"
+"}\n"
+"\n"
+"/* Thanh tiêu đề cột (Header ngang) */\n"
 "QHeaderView::section {\n"
-"    background-color: #F1F4F9;\n"
-"    color: #374151;\n"
-"    padding: 8px;\n"
+"    background-color: #E2E8F0;\n"
+"    color: #475569;\n"
+"    font-weight: bold;\n"
+"    font-size: 12px;\n"
+"    text-transform: uppercase;\n"
+"    padding: 10px 12px;\n"
 "    border: none;\n"
-"    border-right: 1px solid #E5E9F0;\n"
-"    border-bottom: 1px solid #D9DEE7;\n"
-"    font-weight: bold;\n"
+"    border-bottom: 1.5px solid #CBD5E1;\n"
+"    border-right: 1px solid #CBD5E1;\n"
 "}\n"
-" \n"
-"/* Ô nhập khi nhấp đúp: rộng, chữ lớn, viền xanh rõ ràng */\n"
-"QTableWidget QLineEdit {\n"
-"    background-color: #FFFFFF;\n"
-"    color: #111827;\n"
-"    border: 2px solid #2563EB;\n"
-"    padding: 0px 6px;\n"
-"    font-size: 16px;\n"
-"    font-weight: bold;\n"
-"    selection-background-color: #2563EB;\n"
-"    selection-color: #FFFFFF;\n"
-"}")
+"\n"
+"/* Hiệu ứng khi di chuột vào tiêu đề cột */\n"
+"QHeaderView::section:hover {\n"
+"    background-color: #CBD5E1;\n"
+"    color: #1E293B;\n"
+"}\n"
+"\n"
+"/* Góc trên bên trái giao giữa 2 thanh tiêu đề */\n"
+"QTableCornerButton::section {\n"
+"    background-color: #E2E8F0;\n"
+"    border: none;\n"
+"    border-bottom: 1.5px solid #CBD5E1;\n"
+"}\n"
+"\n"
+"/* Thanh cuộn dọc (Vertical Scrollbar) */\n"
+"QScrollBar:vertical {\n"
+"    background: #F1F5F9;\n"
+"    width: 8px;\n"
+"    margin: 0px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical {\n"
+"    background: #CBD5E1;\n"
+"    min-height: 25px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical:hover {\n"
+"    background: #94A3B8;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {\n"
+"    height: 0px;\n"
+"}\n"
+"\n"
+"/* Thanh cuộn ngang (Horizontal Scrollbar) */\n"
+"QScrollBar:horizontal {\n"
+"    background: #F1F5F9;\n"
+"    height: 8px;\n"
+"    margin: 0px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:horizontal {\n"
+"    background: #CBD5E1;\n"
+"    min-width: 25px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:horizontal:hover {\n"
+"    background: #94A3B8;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {\n"
+"    width: 0px;\n"
+"}\n"
+"")
         self.tableWidget_center_mirror.setAlternatingRowColors(True)
         self.tableWidget_center_mirror.setGridStyle(QtCore.Qt.DashDotLine)
         self.tableWidget_center_mirror.setObjectName("tableWidget_center_mirror")
@@ -651,6 +727,7 @@ class Ui_MainWindow(object):
         item.setFont(font)
         self.tableWidget_center_mirror.setVerticalHeaderItem(4, item)
         item = QtWidgets.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
@@ -659,6 +736,7 @@ class Ui_MainWindow(object):
         item.setFont(font)
         self.tableWidget_center_mirror.setHorizontalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
@@ -667,6 +745,7 @@ class Ui_MainWindow(object):
         item.setFont(font)
         self.tableWidget_center_mirror.setHorizontalHeaderItem(1, item)
         item = QtWidgets.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
@@ -675,6 +754,7 @@ class Ui_MainWindow(object):
         item.setFont(font)
         self.tableWidget_center_mirror.setHorizontalHeaderItem(2, item)
         item = QtWidgets.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
@@ -693,64 +773,229 @@ class Ui_MainWindow(object):
         self.tableWidget_center_mirror.setHorizontalHeaderItem(4, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setItem(0, 0, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setItem(0, 1, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setItem(0, 2, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setItem(0, 3, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
+        self.tableWidget_center_mirror.setItem(0, 4, item)
+        item = QtWidgets.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setItem(1, 0, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setItem(1, 1, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setItem(1, 2, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setItem(1, 3, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
+        self.tableWidget_center_mirror.setItem(1, 4, item)
+        item = QtWidgets.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setItem(2, 0, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setItem(2, 1, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setItem(2, 2, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setItem(2, 3, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
+        self.tableWidget_center_mirror.setItem(2, 4, item)
+        item = QtWidgets.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setItem(3, 0, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setItem(3, 1, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setItem(3, 2, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setItem(3, 3, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
+        self.tableWidget_center_mirror.setItem(3, 4, item)
+        item = QtWidgets.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setItem(4, 0, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setItem(4, 1, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setItem(4, 2, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_center_mirror.setItem(4, 3, item)
+        item = QtWidgets.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
+        self.tableWidget_center_mirror.setItem(4, 4, item)
         self.tableWidget_center_mirror.horizontalHeader().setCascadingSectionResizes(True)
         self.tableWidget_center_mirror.horizontalHeader().setDefaultSectionSize(165)
         self.tableWidget_center_mirror.horizontalHeader().setMinimumSectionSize(80)
@@ -796,34 +1041,110 @@ class Ui_MainWindow(object):
         self.tableWidget_iris = QtWidgets.QTableWidget(self.groupBox_4)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         self.tableWidget_iris.setFont(font)
-        self.tableWidget_iris.setStyleSheet("QTableWidget::item:selected {\n"
-"    background-color: #DCE8FF;\n"
-"    color: #1F2937;\n"
+        self.tableWidget_iris.setStyleSheet("/* Khung tổng thể của bảng */\n"
+"QTableWidget {\n"
+"    background-color: #F8FAFC;\n"
+"    alternate-background-color: #F1F5F9;\n"
+"    color: #334155;\n"
+"    gridline-color: #E2E8F0;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 8px;\n"
+"    font-size: 13px;\n"
+"    selection-background-color: #E2E8F0;\n"
+"    selection-color: #1E293B;\n"
+"    outline: 0;\n"
 "}\n"
-" \n"
+"\n"
+"/* Từng ô dữ liệu bên trong bảng */\n"
+"QTableWidget::item {\n"
+"    padding: 4px 10px;\n"
+"    border-bottom: 1px solid #E2E8F0;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột qua từng ô */\n"
+"QTableWidget::item:hover {\n"
+"    background-color: #EEF2F6;\n"
+"}\n"
+"\n"
+"/* Ô đang được chọn */\n"
+"QTableWidget::item:selected {\n"
+"    background-color: #E0E7FF;\n"
+"    color: #3730A3;\n"
+"    font-weight: bold;\n"
+"}\n"
+"\n"
+"/* Thanh tiêu đề cột (Header ngang) */\n"
 "QHeaderView::section {\n"
-"    background-color: #F1F4F9;\n"
-"    color: #374151;\n"
-"    padding: 8px;\n"
+"    background-color: #E2E8F0;\n"
+"    color: #475569;\n"
+"    font-weight: bold;\n"
+"    font-size: 12px;\n"
+"    text-transform: uppercase;\n"
+"    padding: 10px 12px;\n"
 "    border: none;\n"
-"    border-right: 1px solid #E5E9F0;\n"
-"    border-bottom: 1px solid #D9DEE7;\n"
-"    font-weight: bold;\n"
+"    border-bottom: 1.5px solid #CBD5E1;\n"
+"    border-right: 1px solid #CBD5E1;\n"
 "}\n"
-" \n"
-"/* Ô nhập khi nhấp đúp: rộng, chữ lớn, viền xanh rõ ràng */\n"
-"QTableWidget QLineEdit {\n"
-"    background-color: #FFFFFF;\n"
-"    color: #111827;\n"
-"    border: 2px solid #2563EB;\n"
-"    padding: 0px 6px;\n"
-"    font-size: 16px;\n"
-"    font-weight: bold;\n"
-"    selection-background-color: #2563EB;\n"
-"    selection-color: #FFFFFF;\n"
-"}")
+"\n"
+"/* Hiệu ứng khi di chuột vào tiêu đề cột */\n"
+"QHeaderView::section:hover {\n"
+"    background-color: #CBD5E1;\n"
+"    color: #1E293B;\n"
+"}\n"
+"\n"
+"/* Góc trên bên trái giao giữa 2 thanh tiêu đề */\n"
+"QTableCornerButton::section {\n"
+"    background-color: #E2E8F0;\n"
+"    border: none;\n"
+"    border-bottom: 1.5px solid #CBD5E1;\n"
+"}\n"
+"\n"
+"/* Thanh cuộn dọc (Vertical Scrollbar) */\n"
+"QScrollBar:vertical {\n"
+"    background: #F1F5F9;\n"
+"    width: 8px;\n"
+"    margin: 0px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical {\n"
+"    background: #CBD5E1;\n"
+"    min-height: 25px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical:hover {\n"
+"    background: #94A3B8;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {\n"
+"    height: 0px;\n"
+"}\n"
+"\n"
+"/* Thanh cuộn ngang (Horizontal Scrollbar) */\n"
+"QScrollBar:horizontal {\n"
+"    background: #F1F5F9;\n"
+"    height: 8px;\n"
+"    margin: 0px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:horizontal {\n"
+"    background: #CBD5E1;\n"
+"    min-width: 25px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:horizontal:hover {\n"
+"    background: #94A3B8;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {\n"
+"    width: 0px;\n"
+"}\n"
+"")
         self.tableWidget_iris.setAlternatingRowColors(True)
         self.tableWidget_iris.setGridStyle(QtCore.Qt.DashDotLine)
         self.tableWidget_iris.setObjectName("tableWidget_iris")
@@ -907,52 +1228,184 @@ class Ui_MainWindow(object):
         self.tableWidget_iris.setHorizontalHeaderItem(4, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_iris.setItem(0, 0, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_iris.setItem(0, 1, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_iris.setItem(0, 2, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_iris.setItem(0, 3, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
+        self.tableWidget_iris.setItem(0, 4, item)
+        item = QtWidgets.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_iris.setItem(1, 0, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_iris.setItem(1, 1, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_iris.setItem(1, 2, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_iris.setItem(1, 3, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
+        self.tableWidget_iris.setItem(1, 4, item)
+        item = QtWidgets.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_iris.setItem(2, 0, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_iris.setItem(2, 1, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_iris.setItem(2, 2, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_iris.setItem(2, 3, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
+        self.tableWidget_iris.setItem(2, 4, item)
+        item = QtWidgets.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_iris.setItem(3, 0, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_iris.setItem(3, 1, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_iris.setItem(3, 2, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_iris.setItem(3, 3, item)
+        item = QtWidgets.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
+        self.tableWidget_iris.setItem(3, 4, item)
         self.tableWidget_iris.horizontalHeader().setCascadingSectionResizes(True)
         self.tableWidget_iris.horizontalHeader().setDefaultSectionSize(165)
         self.tableWidget_iris.horizontalHeader().setMinimumSectionSize(80)
@@ -998,34 +1451,110 @@ class Ui_MainWindow(object):
         self.tableWidget_focuss = QtWidgets.QTableWidget(self.groupBox_5)
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setPointSize(-1)
         self.tableWidget_focuss.setFont(font)
-        self.tableWidget_focuss.setStyleSheet("QTableWidget::item:selected {\n"
-"    background-color: #DCE8FF;\n"
-"    color: #1F2937;\n"
+        self.tableWidget_focuss.setStyleSheet("/* Khung tổng thể của bảng */\n"
+"QTableWidget {\n"
+"    background-color: #F8FAFC;\n"
+"    alternate-background-color: #F1F5F9;\n"
+"    color: #334155;\n"
+"    gridline-color: #E2E8F0;\n"
+"    border: 1px solid #CBD5E1;\n"
+"    border-radius: 8px;\n"
+"    font-size: 13px;\n"
+"    selection-background-color: #E2E8F0;\n"
+"    selection-color: #1E293B;\n"
+"    outline: 0;\n"
 "}\n"
-" \n"
+"\n"
+"/* Từng ô dữ liệu bên trong bảng */\n"
+"QTableWidget::item {\n"
+"    padding: 4px 10px;\n"
+"    border-bottom: 1px solid #E2E8F0;\n"
+"}\n"
+"\n"
+"/* Hiệu ứng khi di chuột qua từng ô */\n"
+"QTableWidget::item:hover {\n"
+"    background-color: #EEF2F6;\n"
+"}\n"
+"\n"
+"/* Ô đang được chọn */\n"
+"QTableWidget::item:selected {\n"
+"    background-color: #E0E7FF;\n"
+"    color: #3730A3;\n"
+"    font-weight: bold;\n"
+"}\n"
+"\n"
+"/* Thanh tiêu đề cột (Header ngang) */\n"
 "QHeaderView::section {\n"
-"    background-color: #F1F4F9;\n"
-"    color: #374151;\n"
-"    padding: 8px;\n"
+"    background-color: #E2E8F0;\n"
+"    color: #475569;\n"
+"    font-weight: bold;\n"
+"    font-size: 12px;\n"
+"    text-transform: uppercase;\n"
+"    padding: 10px 12px;\n"
 "    border: none;\n"
-"    border-right: 1px solid #E5E9F0;\n"
-"    border-bottom: 1px solid #D9DEE7;\n"
-"    font-weight: bold;\n"
+"    border-bottom: 1.5px solid #CBD5E1;\n"
+"    border-right: 1px solid #CBD5E1;\n"
 "}\n"
-" \n"
-"/* Ô nhập khi nhấp đúp: rộng, chữ lớn, viền xanh rõ ràng */\n"
-"QTableWidget QLineEdit {\n"
-"    background-color: #FFFFFF;\n"
-"    color: #111827;\n"
-"    border: 2px solid #2563EB;\n"
-"    padding: 0px 6px;\n"
-"    font-size: 16px;\n"
-"    font-weight: bold;\n"
-"    selection-background-color: #2563EB;\n"
-"    selection-color: #FFFFFF;\n"
-"}")
+"\n"
+"/* Hiệu ứng khi di chuột vào tiêu đề cột */\n"
+"QHeaderView::section:hover {\n"
+"    background-color: #CBD5E1;\n"
+"    color: #1E293B;\n"
+"}\n"
+"\n"
+"/* Góc trên bên trái giao giữa 2 thanh tiêu đề */\n"
+"QTableCornerButton::section {\n"
+"    background-color: #E2E8F0;\n"
+"    border: none;\n"
+"    border-bottom: 1.5px solid #CBD5E1;\n"
+"}\n"
+"\n"
+"/* Thanh cuộn dọc (Vertical Scrollbar) */\n"
+"QScrollBar:vertical {\n"
+"    background: #F1F5F9;\n"
+"    width: 8px;\n"
+"    margin: 0px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical {\n"
+"    background: #CBD5E1;\n"
+"    min-height: 25px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical:hover {\n"
+"    background: #94A3B8;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {\n"
+"    height: 0px;\n"
+"}\n"
+"\n"
+"/* Thanh cuộn ngang (Horizontal Scrollbar) */\n"
+"QScrollBar:horizontal {\n"
+"    background: #F1F5F9;\n"
+"    height: 8px;\n"
+"    margin: 0px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:horizontal {\n"
+"    background: #CBD5E1;\n"
+"    min-width: 25px;\n"
+"    border-radius: 4px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:horizontal:hover {\n"
+"    background: #94A3B8;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {\n"
+"    width: 0px;\n"
+"}\n"
+"")
         self.tableWidget_focuss.setAlternatingRowColors(True)
         self.tableWidget_focuss.setGridStyle(QtCore.Qt.DashDotLine)
         self.tableWidget_focuss.setObjectName("tableWidget_focuss")
@@ -1105,52 +1634,184 @@ class Ui_MainWindow(object):
         self.tableWidget_focuss.setHorizontalHeaderItem(4, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_focuss.setItem(0, 0, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_focuss.setItem(0, 1, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_focuss.setItem(0, 2, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_focuss.setItem(0, 3, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
+        self.tableWidget_focuss.setItem(0, 4, item)
+        item = QtWidgets.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_focuss.setItem(1, 0, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_focuss.setItem(1, 1, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_focuss.setItem(1, 2, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_focuss.setItem(1, 3, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
+        self.tableWidget_focuss.setItem(1, 4, item)
+        item = QtWidgets.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_focuss.setItem(2, 0, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_focuss.setItem(2, 1, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_focuss.setItem(2, 2, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_focuss.setItem(2, 3, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
+        self.tableWidget_focuss.setItem(2, 4, item)
+        item = QtWidgets.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_focuss.setItem(3, 0, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_focuss.setItem(3, 1, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_focuss.setItem(3, 2, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
         self.tableWidget_focuss.setItem(3, 3, item)
+        item = QtWidgets.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
+        self.tableWidget_focuss.setItem(3, 4, item)
         self.tableWidget_focuss.horizontalHeader().setCascadingSectionResizes(True)
         self.tableWidget_focuss.horizontalHeader().setDefaultSectionSize(165)
         self.tableWidget_focuss.horizontalHeader().setMinimumSectionSize(80)
@@ -1337,9 +1998,9 @@ class Ui_MainWindow(object):
         item = self.tableWidget_center_mirror.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Result Values"))
         item = self.tableWidget_center_mirror.horizontalHeaderItem(1)
-        item.setText(_translate("MainWindow", "Min"))
+        item.setText(_translate("MainWindow", "Min Value"))
         item = self.tableWidget_center_mirror.horizontalHeaderItem(2)
-        item.setText(_translate("MainWindow", "Max"))
+        item.setText(_translate("MainWindow", "Max Value"))
         item = self.tableWidget_center_mirror.horizontalHeaderItem(3)
         item.setText(_translate("MainWindow", "Status"))
         item = self.tableWidget_center_mirror.horizontalHeaderItem(4)
@@ -1400,9 +2061,9 @@ class Ui_MainWindow(object):
         item = self.tableWidget_iris.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Result Values"))
         item = self.tableWidget_iris.horizontalHeaderItem(1)
-        item.setText(_translate("MainWindow", "Min"))
+        item.setText(_translate("MainWindow", "Min Value"))
         item = self.tableWidget_iris.horizontalHeaderItem(2)
-        item.setText(_translate("MainWindow", "Max"))
+        item.setText(_translate("MainWindow", "Max Value"))
         item = self.tableWidget_iris.horizontalHeaderItem(3)
         item.setText(_translate("MainWindow", "Status"))
         item = self.tableWidget_iris.horizontalHeaderItem(4)
@@ -1455,9 +2116,9 @@ class Ui_MainWindow(object):
         item = self.tableWidget_focuss.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Result Values"))
         item = self.tableWidget_focuss.horizontalHeaderItem(1)
-        item.setText(_translate("MainWindow", "Min"))
+        item.setText(_translate("MainWindow", "Min Value"))
         item = self.tableWidget_focuss.horizontalHeaderItem(2)
-        item.setText(_translate("MainWindow", "Max"))
+        item.setText(_translate("MainWindow", "Max Value"))
         item = self.tableWidget_focuss.horizontalHeaderItem(3)
         item.setText(_translate("MainWindow", "Status"))
         item = self.tableWidget_focuss.horizontalHeaderItem(4)
