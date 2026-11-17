@@ -168,12 +168,22 @@ class KeyenceClient:
         return 0.0, 0.0
 
     def connect(self):
+        self.close()
         _log.info(f'[+] Kết nối tới Keyence PLC {self.ip}:{self.port} qua pymcprotocol')
         for i in range(3):
             try:
-                self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                self.sock.settimeout(self.timeout)
-                self.sock.connect((self.ip, self.port))
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.settimeout(self.timeout)
+                # Kích hoạt TCP Keepalive để phát hiện sớm đứt cáp mạng
+                try:
+                    s.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                    if hasattr(socket, 'SIO_KEEPALIVE_VALS'):
+                        s.ioctl(socket.SIO_KEEPALIVE_VALS, (1, 2000, 1000))
+                except Exception:
+                    pass
+                s.connect((self.ip, self.port))
+                with self.locked:
+                    self.sock = s
                 _log.info(f"Connected to Keyence PLC ({self.mode} mode)")
                 return True
             except Exception as e:
@@ -227,11 +237,15 @@ class KeyenceClient:
 
 
     def close(self):
-        """Đóng kết nối"""
-        if self.sock:
-            self.sock.close()
-            self.sock = None
-            print("🔌 Disconnected from PLC")
+        """Đóng kết nối an toàn và giải phóng socket."""
+        with self.locked:
+            if self.sock:
+                try:
+                    self.sock.close()
+                except Exception:
+                    pass
+                self.sock = None
+                _log.info("🔌 Disconnected from Keyence PLC")
 
     def _send(self, data: bytes) -> bytes:
         """Gửi dữ liệu (binary)"""
@@ -327,33 +341,42 @@ class KeyenceClient:
     #     else:
     #         return self.write_dm_binary(addr, values)
 
-    def read_plc(self,data):
+    def read_plc(self, data):
         try:
             with self.locked:
+                if self.sock is None:
+                    return None
                 a = 'RD '
                 c = '\x0D'
-                d = a+ data +c
+                d = a + str(data) + c
                 datasend = d.encode("UTF-8")
                 self.sock.sendall(datasend)
-                data = self.sock.recv(1024)
-                datadeco = data.decode("UTF-8")
+                res = self.sock.recv(1024)
+                if not res:
+                    return None
+                datadeco = res.decode("UTF-8")
                 data1 = int(datadeco)
                 return data1
-        except:
-            pass
+        except Exception:
+            return None
 
-    def write_plc(self,register, data):
+    def write_plc(self, register, data):
         try:
             with self.locked:
+                if self.sock is None:
+                    return None
                 a = 'WR '
                 b = ' '
                 c = '\x0D'
-                d = a+ register + b + str(data) + c
-                datasend  = d.encode("UTF-8")
+                d = a + str(register) + b + str(data) + c
+                datasend = d.encode("UTF-8")
                 self.sock.sendall(datasend)
                 datares = self.sock.recv(1024)
-        except:
-            pass
+                if not datares:
+                    return None
+                return datares
+        except Exception:
+            return None
 
 
 

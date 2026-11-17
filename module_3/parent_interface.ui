@@ -24,7 +24,7 @@
     <normaloff>assert/icon/technology.png</normaloff>assert/icon/technology.png</iconset>
   </property>
   <property name="styleSheet">
-   <string notr="true">QMainWindow { background-color: #F1F5F9; }</string>
+   <string notr="true">QMainWindow { background-color: #B0B0B0; }</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_centralwidget">
@@ -64,7 +64,7 @@
         </property>
         <property name="styleSheet">
          <string notr="true">QFrame { 
-    background-color: #CBCBCB; 
+    background-color: #B0B0B0; 
     border: none; 
     border-radius: 6px; 
 }
@@ -139,7 +139,7 @@
         </property>
         <property name="styleSheet">
          <string notr="true">QFrame { 
-    background-color: #CBCBCB; 
+    background-color: #B0B0B0; 
     border: none; 
     border-radius: 6px; 
 }

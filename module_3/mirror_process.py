@@ -802,7 +802,7 @@ class Process_Mirror_Device:
                     plc_results[reg_clean] = val_num
                 except (ValueError, TypeError):
                     pass
-
+        print('plc_results',plc_results)                
         return plc_results
 
 

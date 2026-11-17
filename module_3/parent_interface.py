@@ -22,7 +22,7 @@ class Ui_MainWindow(object):
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("assert/icon/technology.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
-        MainWindow.setStyleSheet("QMainWindow { background-color: #F1F5F9; }")
+        MainWindow.setStyleSheet("QMainWindow { background-color: #B0B0B0; }")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout_centralwidget = QtWidgets.QVBoxLayout(self.centralwidget)
@@ -36,7 +36,7 @@ class Ui_MainWindow(object):
         self.frame.setMinimumSize(QtCore.QSize(0, 0))
         self.frame.setMaximumSize(QtCore.QSize(16777215, 80))
         self.frame.setStyleSheet("QFrame { \n"
-"    background-color: #CBCBCB; \n"
+"    background-color: #B0B0B0; \n"
 "    border: none; \n"
 "    border-radius: 6px; \n"
 "}\n"
@@ -73,7 +73,7 @@ class Ui_MainWindow(object):
         self.frame_3.setMinimumSize(QtCore.QSize(0, 0))
         self.frame_3.setMaximumSize(QtCore.QSize(16777215, 80))
         self.frame_3.setStyleSheet("QFrame { \n"
-"    background-color: #CBCBCB; \n"
+"    background-color: #B0B0B0; \n"
 "    border: none; \n"
 "    border-radius: 6px; \n"
 "}\n"

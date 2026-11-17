@@ -139,7 +139,8 @@ class Connect2Mysql:
                 user=self.username,
                 password=self.password,
                 port=int(self.port) if self.port else 3306,
-                use_pure=True
+                use_pure=True,
+                ssl_disabled=True
             )
             if self.connection.is_connected():
                 self.show_connection_success()
@@ -156,13 +157,38 @@ class Connect2Mysql:
         if filepath is None:
             filepath = get_mysql_config_path(for_writing=True)
         try:
-            with open(filepath, 'w') as f:
+            tmp_path = filepath + '.tmp'
+            bak_path = filepath + '.bak'
+
+            # 1. Ghi an toàn vào file tạm .tmp và ép ghi (fsync) xuống đĩa cứng để chống hỏng file khi sập nguồn
+            with open(tmp_path, 'w', encoding='utf-8') as f:
                 f.write(f"host={host}\n")
                 f.write(f"user={user}\n")
                 f.write(f"password={password}\n")
                 f.write(f"port={port}\n")
                 f.write(f"database={database}\n")
-            _log.info('Success to write mysql config to %s', filepath)
+                f.flush()
+                os.fsync(f.fileno())
+
+            # 2. Tạo bản sao lưu dự phòng .bak từ file hiện tại (nếu đang tồn tại và có dữ liệu)
+            if os.path.exists(filepath) and os.path.getsize(filepath) > 0:
+                try:
+                    import shutil
+                    shutil.copy2(filepath, bak_path)
+                except Exception:
+                    pass
+
+            # 3. Thay thế nguyên tử (atomic replace) - đảm bảo file không bao giờ bị 0-byte hay dở dang
+            os.replace(tmp_path, filepath)
+
+            # 4. Cập nhật luôn file sao lưu .bak bằng dữ liệu mới nhất
+            try:
+                import shutil
+                shutil.copy2(filepath, bak_path)
+            except Exception:
+                pass
+
+            _log.info('Success to write mysql config to %s and backup %s', filepath, bak_path)
             return True
         except Exception as e:
             _log.warning('Failed to write mysql config: %s', e)

@@ -23,17 +23,41 @@ class SocketClient:
             # _log.error('[ERROR] Cannot connect to PLC at {ip}:{port} -> {e}', ip, port, e)
             return False
 
+    def close(self):
+        """Đóng kết nối tới Mitsubishi PLC an toàn."""
+        with self.locked:
+            if hasattr(self, 'sock') and self.sock:
+                try:
+                    self.sock.close()
+                except Exception:
+                    pass
+                self.sock = None
+            if self.client:
+                try:
+                    if hasattr(self.client, 'close'):
+                        self.client.close()
+                except Exception:
+                    pass
+                self.client = None
+            _log.info("🔌 Disconnected from Mitsubishi PLC")
+
     def connect(self):
+        self.close()
         _log.info('[+] Kết nối tới Mitsubishi PLC qua pymcprotocol')
         if self.test_connection(self.ipv4, self.port):
             _log.info("✅ Socket connection to Mitsubishi PLC successful")
-            self.client = Type3E()
-            self.client.connect(self.ipv4, self.port)
-            _log.info("✅ pymcprotocol connected (ready for read/write)")
-            return True
+            try:
+                self.client = Type3E()
+                self.client.connect(self.ipv4, self.port)
+                _log.info("✅ pymcprotocol connected (ready for read/write)")
+                return True
+            except Exception as e:
+                _log.error("❌ pymcprotocol connect failed: %s", e)
+                self.client = None
+                return False
         else:
             _log.error("❌ Cannot connect to Mitsubishi PLC")
-            return True
+            return False
 
     
     def read_plc_log(self, register_trigger):

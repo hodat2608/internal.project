@@ -72,7 +72,7 @@ class Ui_MainWindow(object):
         font.setBold(True)
         font.setWeight(75)
         self.label_display_okng.setFont(font)
-        self.label_display_okng.setStyleSheet("QLabel { background-color:#EEFF4A; color:black; border:1px solid #1b5e20; border-radius:4px; }")
+        self.label_display_okng.setStyleSheet("QLabel { background-color:#868686; color:black; border:1px solid #1b5e20; border-radius:4px; }")
         self.label_display_okng.setFrameShape(QtWidgets.QFrame.Panel)
         self.label_display_okng.setFrameShadow(QtWidgets.QFrame.Raised)
         self.label_display_okng.setAlignment(QtCore.Qt.AlignCenter)

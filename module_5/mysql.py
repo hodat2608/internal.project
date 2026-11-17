@@ -12,6 +12,8 @@ from PyQt5.QtCore import Qt, QSize
 from PyQt5 import QtCore, QtGui, QtWidgets
 from module_1.table_db import *
 from module_2.main_core import core
+from app_logger.app_logger import get_logger as _get_logger
+_log = _get_logger('module_5.mysql')
 class MySQL_Core:
 
     def __init__(self,ui,main_core):
@@ -41,7 +43,7 @@ class MySQL_Core:
         layer = self.ui_connection_sql
         self.hostname    = layer.lineEdit_Host_name.text()
         self.username    = layer.lineEdit_UserName.text()
-        self.password    = '123456789' if layer.lineEdit_password.text() == '' else layer.lineEdit_password.text()
+        self.password    = layer.lineEdit_password.text() or '123456789'
         self.port        = layer.lineEdit_port.text()
         self.manual      = layer.radioButton_manual_login.isChecked()
         self.automatic   = layer.radioButton_automatic_login.isChecked()
@@ -74,7 +76,7 @@ class MySQL_Core:
         else:
             self.connection.rollback()
             QMessageBox.warning(None, "Lỗi", "Không thể kết nối, Hãy test kết nối đến MySQL ")
-
+        
     def connect_to_mysql(self):
 
         if not self.ui_connection_sql.lineEdit_Host_name.text():
@@ -83,9 +85,6 @@ class MySQL_Core:
         if not self.ui_connection_sql.lineEdit_UserName.text():
             QMessageBox.warning(None, "Lỗi", "Vui lòng nhập username!")
             return
-        if not self.ui_connection_sql.lineEdit_password.text():
-            QMessageBox.warning(None, "Lỗi", "Vui lòng nhập password!")
-            return
         if not self.ui_connection_sql.lineEdit_port.text():
             QMessageBox.warning(None, "Lỗi", "Vui lòng nhập port!")
             return
@@ -93,7 +92,7 @@ class MySQL_Core:
         layer = self.ui_connection_sql
         self.hostname    = layer.lineEdit_Host_name.text()
         self.username    = layer.lineEdit_UserName.text()
-        self.password    = layer.lineEdit_password.text()
+        self.password    = layer.lineEdit_password.text() or '123456789'
         self.port        = layer.lineEdit_port.text()
         self.manual      = layer.radioButton_manual_login.isChecked()
         self.automatic   = layer.radioButton_automatic_login.isChecked()
@@ -125,18 +124,13 @@ class MySQL_Core:
     def auto_mysql(self):
         if self.connection is not None:
             self.flag = True
-            if hasattr(self.ui_connection_sql, 'radioButton_user_manual_login'):
-                self.ui_connection_sql.radioButton_user_manual_login.setChecked(False)
         else:
             self.flag = False
-            if hasattr(self.ui_connection_sql, 'radioButton_user_manual_login'):
-                self.ui_connection_sql.radioButton_user_manual_login.setChecked(True)
             self.ui_connection_sql.lineEdit_Host_name.setEnabled(True)
             self.ui_connection_sql.lineEdit_UserName.setEnabled(True)
             self.ui_connection_sql.lineEdit_password.setEnabled(True)
             self.ui_connection_sql.lineEdit_port.setEnabled(True)
             self.ui_connection_sql.pushButton_test_connection.setEnabled(True)
-            QMessageBox.warning(None, "Lỗi", "Không thể kết nối đến MySQL.")
 
     @staticmethod
     def _update_badge(label, is_connected: bool, online_text: str, offline_text: str, online_state: str, offline_state: str, online_bg: str = "#DCFCE7", online_color: str = "#115E59", online_border: str = "#86EFAC"):
@@ -198,7 +192,52 @@ class MySQL_Core:
             )
 
     def load_mode_login(self):
-        if getattr(self.main_core, 'mode_init', 0):
+        # 1. Tự động nạp thông tin kết nối thực tế (Host, User, Password, Port) lên các ô nhập liệu giao diện
+        loaded_cfg = False
+        is_auto = True
+        try:
+            conn = getattr(self.main_core, 'connection', None) or self.connection
+            if conn and conn.is_connected():
+                cursor = conn.cursor()
+                cursor.execute("SELECT hostname, username, password, port, manual, automatic FROM `DATA_AUTO_LOGIN`.`INFOR` LIMIT 1")
+                row = cursor.fetchone()
+                cursor.close()
+                if row:
+                    h, u, p, port, manual, automatic = row[0], row[1], row[2], row[3], bool(row[4]), bool(row[5])
+                    if h: self.ui_connection_sql.lineEdit_Host_name.setText(str(h))
+                    if u: self.ui_connection_sql.lineEdit_UserName.setText(str(u))
+                    if p is not None: self.ui_connection_sql.lineEdit_password.setText(str(p))
+                    if port: self.ui_connection_sql.lineEdit_port.setText(str(port))
+                    is_auto = (not manual and automatic)
+                    loaded_cfg = True
+        except Exception as e:
+            _log.debug("Lỗi đọc cấu hình từ DB INFOR: %s", e)
+
+        # Nếu chưa nạp được từ DB (hoặc chưa kết nối), nạp trực tiếp từ file mysql_config.log / .bak
+        if not loaded_cfg:
+            try:
+                cfg = None
+                if hasattr(self.main_core, 'read_mysql_config'):
+                    cfg = self.main_core.read_mysql_config()
+                if not cfg:
+                    from module_2.main_core import core as CoreClass
+                    cfg = CoreClass.read_mysql_config(self.main_core if self.main_core else None)
+                if cfg:
+                    if cfg.get('host'):
+                        self.ui_connection_sql.lineEdit_Host_name.setText(str(cfg['host']))
+                    if cfg.get('user'):
+                        self.ui_connection_sql.lineEdit_UserName.setText(str(cfg['user']))
+                    if 'password' in cfg and cfg['password'] is not None:
+                        self.ui_connection_sql.lineEdit_password.setText(str(cfg['password']))
+                    if cfg.get('port'):
+                        self.ui_connection_sql.lineEdit_port.setText(str(cfg['port']))
+            except Exception as e:
+                _log.debug("Lỗi đọc cấu hình từ file log: %s", e)
+
+        if not self.ui_connection_sql.lineEdit_password.text():
+            self.ui_connection_sql.lineEdit_password.setText('123456789')
+
+        if is_auto:
             self.ui_connection_sql.radioButton_automatic_login.setChecked(True)
             self.ui_connection_sql.radioButton_manual_login.setChecked(False)
         else:

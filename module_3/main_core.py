@@ -391,9 +391,18 @@ class PLCHandler:
         if self.layer_core is None or self.layer_core.driver_loader is None:
             # _log.error("[PLCHandler] _safe_read_plc failed for register: %s", register)
             return None
+
+        if hasattr(self.layer_core, 'is_plc_connected') and not self.layer_core.is_plc_connected:
+            return None
+
         try:
-            return self.layer_core.driver_loader.read_plc(register)
+            val = self.layer_core.driver_loader.read_plc(register)
+            if val is None and hasattr(self.layer_core, 'notify_plc_communication_error'):
+                self.layer_core.notify_plc_communication_error()
+            return val
         except Exception:
+            if hasattr(self.layer_core, 'notify_plc_communication_error'):
+                self.layer_core.notify_plc_communication_error()
             # _log.exception("[PLCHandler] _safe_read_plc failed for register: %s", register)
             return None
 
@@ -416,9 +425,15 @@ class PLCHandler:
         if self.layer_core is None or self.layer_core.driver_loader is None:
             # _log.error("[PLCHandler] _safe_write_plc failed for register: %s", register)
             return None
+
+        if hasattr(self.layer_core, 'is_plc_connected') and not self.layer_core.is_plc_connected:
+            return None
+
         try:
             return self.layer_core.driver_loader.write_plc(register, value)
         except Exception:
+            if hasattr(self.layer_core, 'notify_plc_communication_error'):
+                self.layer_core.notify_plc_communication_error()
             # _log.exception("[PLCHandler] _safe_write_plc failed: register=%s value=%s", register, value)
             return None
 
@@ -706,52 +721,59 @@ class PLCHandler:
                                 model_proc = proc
                                 break
 
-            # Nếu có model_proc: kiểm tra active_tasks trong RAM
+            # NGUỒN 2: Nếu có model_proc: kiểm tra active_tasks trong RAM
+            tasks_loaded = False
             if model_proc:
-                active_tasks = getattr(model_proc, 'active_tasks', {})
-                if isinstance(active_tasks, dict) and active_tasks:
+                active_tasks = getattr(model_proc, 'active_tasks', None)
+                if isinstance(active_tasks, dict):
                     if key_model in active_tasks:
                         tasks_for_model = active_tasks[key_model]
+                        tasks_loaded = True
                     elif norm_target:
                         for km, tlist in active_tasks.items():
                             if _normalize_key_model(km) == norm_target:
                                 tasks_for_model = tlist
+                                tasks_loaded = True
                                 break
 
-                # Nếu active_tasks trong RAM đang rỗng, thử gọi load_task_calculator_config()
-                if not tasks_for_model and hasattr(model_proc, 'load_task_calculator_config'):
+                # Chỉ gọi load_task_calculator_config() nếu key_model CHƯA TỪNG ĐƯỢC LOAD
+                if not tasks_loaded and hasattr(model_proc, 'load_task_calculator_config'):
                     try:
                         model_proc.load_task_calculator_config()
-                        active_tasks = getattr(model_proc, 'active_tasks', {})
-                        if isinstance(active_tasks, dict) and active_tasks:
+                        active_tasks = getattr(model_proc, 'active_tasks', None)
+                        if isinstance(active_tasks, dict):
                             if key_model in active_tasks:
                                 tasks_for_model = active_tasks[key_model]
+                                tasks_loaded = True
                             elif norm_target:
                                 for km, tlist in active_tasks.items():
                                     if _normalize_key_model(km) == norm_target:
                                         tasks_for_model = tlist
+                                        tasks_loaded = True
                                         break
                     except Exception:
                         pass
 
             # NGUỒN 3: Từ class Process_Model.dict_active_tasks (bộ nhớ dùng chung toàn bộ các model)
-            if not tasks_for_model:
+            if not tasks_loaded:
                 try:
                     from module_3.handle_option_models import Process_Model
-                    class_tasks = getattr(Process_Model, 'dict_active_tasks', {})
-                    if isinstance(class_tasks, dict) and class_tasks:
+                    class_tasks = getattr(Process_Model, 'dict_active_tasks', None)
+                    if isinstance(class_tasks, dict):
                         if key_model in class_tasks:
                             tasks_for_model = class_tasks[key_model]
+                            tasks_loaded = True
                         elif norm_target:
                             for km, tlist in class_tasks.items():
                                 if _normalize_key_model(km) == norm_target:
                                     tasks_for_model = tlist
+                                    tasks_loaded = True
                                     break
                 except Exception:
                     pass
 
-            # NGUỒN 4: Truy vấn trực tiếp từ cơ sở dữ liệu nếu cả RAM lẫn cache chưa có
-            if not tasks_for_model:
+            # NGUỒN 4: Truy vấn trực tiếp từ cơ sở dữ liệu nếu cả RAM lẫn cache chưa từng load
+            if not tasks_loaded:
                 cursor = getattr(model_proc, 'cursor', None)
                 cam_id = None
                 mod_id = None
@@ -771,6 +793,10 @@ class PLCHandler:
                                 t['rules'] = get_task_rules(cursor, t['id'])
                                 if t.get('rules'):
                                     tasks_for_model.append(t)
+                        # Đánh dấu đã load và lưu vào RAM để lần sau không query lại CSDL
+                        tasks_loaded = True
+                        if model_proc and isinstance(getattr(model_proc, 'active_tasks', None), dict):
+                            model_proc.active_tasks[key_model] = tasks_for_model
                     except Exception:
                         pass
 
@@ -1850,24 +1876,40 @@ class PLCHandler:
             _log.info(f'* Restart New Single Frame')
 
         state_str = 'OK' if flag else 'NG'
+        image_format = pyuic.Image_format.currentText().strip() if hasattr(pyuic, 'Image_format') else 'PNG'
+
         chk_orig = pyuic.checkBox_OK_image_original if flag else pyuic.checkBox_NG_image_original
-        
-        if chk_orig.isChecked():
-            path_save = (pyuic.lineEdit_OK_image_original if flag else pyuic.lineEdit_NG_image_original).text().strip()
-            if path_save:
-                chk_det = pyuic.checkBox_OK_image_detected if flag else pyuic.checkBox_NG_image_detected
-                save_det = chk_det.isChecked()
-                image_format = pyuic.Image_format.currentText().strip() if hasattr(pyuic, 'Image_format') else 'PNG'
-                self.executor.submit(
-                    self._save_ng_image, 
-                    raw_image, 
-                    path_save, 
-                    key, 
-                    state_str, 
-                    result_img.copy() if save_det else None, 
-                    save_det,
-                    image_format
-                )
+        path_orig = (pyuic.lineEdit_OK_image_original if flag else pyuic.lineEdit_NG_image_original).text().strip()
+
+        chk_det = pyuic.checkBox_OK_image_detected if flag else pyuic.checkBox_NG_image_detected
+        path_det = (pyuic.lineEdit_OK_image_detected if flag else pyuic.lineEdit_NG_image_detected).text().strip()
+        if not path_det and path_orig:
+            path_det = path_orig
+
+        if chk_orig.isChecked() and path_orig and raw_image is not None:
+            self.executor.submit(
+                self._save_single_image,
+                raw_image,
+                path_orig,
+                key,
+                state_str,
+                'Original',
+                image_format,
+                False
+            )
+
+        if chk_det.isChecked() and path_det and result_img is not None:
+            save_in_sub = (path_det == path_orig and chk_orig.isChecked())
+            self.executor.submit(
+                self._save_single_image,
+                result_img.copy(),
+                path_det,
+                key,
+                state_str,
+                'Detected',
+                image_format,
+                save_in_sub
+            )
         elapsed = (time.perf_counter() - start_time) * 1000
         display_mode = self.get_display_mode()
         display_img = raw_image if display_mode == "Hide Bounding Boxes" else result_img
@@ -1965,25 +2007,41 @@ class PLCHandler:
                       key, current_count, len(all_registers), elapsed)
 
         state_str = 'OK' if flag else 'NG'
+        image_format = pyuic.Image_format.currentText().strip() if hasattr(pyuic, 'Image_format') else 'PNG'
+
         chk_orig = pyuic.checkBox_OK_image_original if flag else pyuic.checkBox_NG_image_original
-        
-        if chk_orig.isChecked():
-            path_save = (pyuic.lineEdit_OK_image_original if flag else pyuic.lineEdit_NG_image_original).text().strip()
-            if path_save:
-                chk_det = pyuic.checkBox_OK_image_detected if flag else pyuic.checkBox_NG_image_detected
-                save_det = chk_det.isChecked()
-                image_format = pyuic.Image_format.currentText().strip() if hasattr(pyuic, 'Image_format') else 'PNG'
-                
-                self.executor.submit(
-                    self._save_ng_image, 
-                    raw_image, 
-                    path_save, 
-                    key, 
-                    state_str, 
-                    result_img.copy() if save_det else None, 
-                    save_det,
-                    image_format
-                )
+        path_orig = (pyuic.lineEdit_OK_image_original if flag else pyuic.lineEdit_NG_image_original).text().strip()
+
+        chk_det = pyuic.checkBox_OK_image_detected if flag else pyuic.checkBox_NG_image_detected
+        path_det = (pyuic.lineEdit_OK_image_detected if flag else pyuic.lineEdit_NG_image_detected).text().strip()
+        if not path_det and path_orig:
+            path_det = path_orig
+
+        # Tích ô nào thì lưu ảnh vào ô đó độc lập, không xét điều kiện ràng buộc lẫn nhau
+        if chk_orig.isChecked() and path_orig and raw_image is not None:
+            self.executor.submit(
+                self._save_single_image,
+                raw_image,
+                path_orig,
+                key,
+                state_str,
+                'Original',
+                image_format,
+                False
+            )
+
+        if chk_det.isChecked() and path_det and result_img is not None:
+            save_in_sub = (path_det == path_orig and chk_orig.isChecked())
+            self.executor.submit(
+                self._save_single_image,
+                result_img.copy(),
+                path_det,
+                key,
+                state_str,
+                'Detected',
+                image_format,
+                save_in_sub
+            )
         
         display_mode = self.get_display_mode()
         display_img = raw_image if display_mode == "Hide Bounding Boxes" else result_img
@@ -2539,6 +2597,39 @@ class PLCHandler:
 
         except Exception:
             _log.exception('[%s] _save_ng_image failed (state=%s)', key, state)
+
+    def _save_single_image(self, image: np.ndarray, path_save_image: str,
+                           key: str, state: str, tag: str = '',
+                           image_format: str = 'PNG', save_in_subfolder: bool = False) -> None:
+        """
+        Lưu ảnh đơn lẻ (Original hoặc Detected) độc lập vào thư mục được chỉ định.
+        Không phụ thuộc lẫn nhau, tích ô nào thì lưu vào ô đó.
+        """
+        if not path_save_image or image is None:
+            return
+
+        try:
+            today = datetime.now().strftime('%Y-%m-%d')
+            folder = os.path.join(path_save_image, state, today)
+            if save_in_subfolder:
+                folder = os.path.join(folder, 'Image_Detect')
+            os.makedirs(folder, exist_ok=True)
+
+            fmt = (image_format or 'PNG').strip().lower()
+            ext = fmt if fmt in ['png', 'jpg', 'jpeg', 'bmp', 'tiff', 'tif', 'raw'] else 'png'
+            filename = f'{self.time_to_name_file_image()}.{ext}'
+            filepath = os.path.join(folder, filename)
+
+            bgr_image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+            if ext == 'raw':
+                bgr_image.tofile(filepath)
+            else:
+                cv2.imwrite(filepath, bgr_image)
+
+            _log.info('[%s] %s %s image saved: %s', key, state, tag, filepath)
+
+        except Exception:
+            _log.exception('[%s] _save_single_image failed (state=%s, tag=%s)', key, state, tag)
 
 #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 

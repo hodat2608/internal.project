@@ -18,6 +18,8 @@ from app_logger.app_logger import get_logger as _get_logger, open_log_window
 import subprocess,re
 from module_1.root_path import resource_path, get_mysql_config_path, get_trigger_file_path
 from module_1.table_db import _ADMIN_TABLES_SQL,TABLES_SQL_ITEM_CODE_SAVE,TABLES_SQL_DATA_IP_ADDRESS,TABLES_SQL_DATA_AUTO_LOGIN
+from module_2.plc_alert_ui import PLCWatchdogSignals, PLCAlertOverlay, PLCSuccessBanner
+from module_2.plc_watchdog import PLCWatchdogThread
 _log = _get_logger('module_2.main_core')
 
 PLC_COLLECT = {
@@ -61,6 +63,16 @@ class core:
         self.connection    = None
         self.driver_loader = None
 
+        self.is_plc_connected = False
+        self.plc_watchdog_thread = None
+        self.plc_signals = PLCWatchdogSignals()
+        self._plc_alert_overlay = None
+        self._plc_success_banner = None
+
+        self.plc_signals.connection_lost.connect(self._on_plc_connection_lost)
+        self.plc_signals.reconnect_attempt.connect(self._on_plc_reconnect_attempt)
+        self.plc_signals.connection_restored.connect(self._on_plc_connection_restored)
+
         self.plc_module                  = "KEYENCE"
         self.connection_port             = "Enthernet"
         self.ip_address_plc              = "192.168.0.10"
@@ -102,6 +114,87 @@ class core:
         self.reload_system_action_configs()
         _log.info("[core.__init__] DONE")
 
+    def _on_plc_connection_lost(self, module: str, ip: str, port: int, attempts: int):
+        """Slot xử lý khi mất kết nối PLC: hiển thị UI cảnh báo đẹp mắt, không khóa giao diện."""
+        try:
+            if self._plc_success_banner and self._plc_success_banner.isVisible():
+                self._plc_success_banner.close()
+            if self._plc_alert_overlay is None:
+                self._plc_alert_overlay = PLCAlertOverlay()
+            self._plc_alert_overlay.set_plc_info(module, ip, port, attempts)
+            self._plc_alert_overlay.show_alert()
+        except Exception as e:
+            _log.error("Error in _on_plc_connection_lost: %s", e)
+
+    def _on_plc_reconnect_attempt(self, attempts: int):
+        """Slot cập nhật số lần thử kết nối lại trên UI cảnh báo."""
+        try:
+            if self._plc_alert_overlay and self._plc_alert_overlay.isVisible():
+                self._plc_alert_overlay.update_attempts(attempts)
+        except Exception as e:
+            _log.debug("Error in _on_plc_reconnect_attempt: %s", e)
+
+    def _on_plc_connection_restored(self, module: str, ip: str, port: int):
+        """Slot xử lý khi khôi phục kết nối thành công: tắt cảnh báo, hiển thị banner thành công 5s."""
+        try:
+            if self._plc_alert_overlay and self._plc_alert_overlay.isVisible():
+                self._plc_alert_overlay.hide_alert()
+            if self._plc_success_banner is None:
+                self._plc_success_banner = PLCSuccessBanner()
+            self._plc_success_banner.show_success(module, ip, port, duration_ms=5000)
+        except Exception as e:
+            _log.error("Error in _on_plc_connection_restored: %s", e)
+
+    def start_plc_watchdog(self):
+        """Khởi động luồng giám sát kết nối PLC liên tục nếu đang ở chế độ kết nối PLC thật."""
+        if self.is_indirect_log_mode() or getattr(self, 'manual', 0) == 1:
+            return
+        if self.plc_watchdog_thread is None or not self.plc_watchdog_thread.isRunning():
+            self.plc_watchdog_thread = PLCWatchdogThread(self)
+            self.plc_watchdog_thread.is_connected = self.is_plc_connected
+            self.plc_watchdog_thread.start()
+            _log.info("PLC Watchdog Thread started successfully.")
+
+    def stop_plc_watchdog(self):
+        """Dừng luồng giám sát kết nối PLC."""
+        if self.plc_watchdog_thread is not None and self.plc_watchdog_thread.isRunning():
+            self.plc_watchdog_thread.stop()
+            self.plc_watchdog_thread = None
+            _log.info("PLC Watchdog Thread stopped.")
+
+    def notify_plc_communication_error(self):
+        """
+        Được gọi khi _safe_read_plc hoặc _safe_write_plc gặp lỗi socket với PLC thật.
+        Kích hoạt Watchdog xử lý mất kết nối ngay lập tức mà không cần đợi chu kỳ polling.
+        """
+        if self.is_indirect_log_mode() or getattr(self, 'manual', 0) == 1:
+            return
+
+        if self.plc_watchdog_thread is not None:
+            if not getattr(self, 'is_plc_connected', False):
+                return
+            self.plc_watchdog_thread.consecutive_errors += 1
+            if self.plc_watchdog_thread.consecutive_errors >= 2:
+                self.is_plc_connected = False
+                self.mode_init_plc = 0
+                self.plc_watchdog_thread.is_connected = False
+                self.plc_watchdog_thread.reconnect_attempts = 1
+                self.plc_watchdog_thread._cleanup_old_driver()
+                if hasattr(self, 'plc_signals'):
+                    module = getattr(self, 'plc_module', 'KEYENCE')
+                    ip = getattr(self, 'ip_address_plc', '')
+                    port = getattr(self, 'port_plc', 0)
+                    self.plc_signals.connection_lost.emit(module, str(ip), int(port), 1)
+        else:
+            self.is_plc_connected = False
+            self.mode_init_plc = 0
+            self.start_plc_watchdog()
+            if hasattr(self, 'plc_signals'):
+                module = getattr(self, 'plc_module', 'KEYENCE')
+                ip = getattr(self, 'ip_address_plc', '')
+                port = getattr(self, 'port_plc', 0)
+                self.plc_signals.connection_lost.emit(module, str(ip), int(port), 1)
+
     def start_monitoring(self):
         self.worker_thread.start()
         _log.info('Success to start monitoring')
@@ -111,6 +204,17 @@ class core:
         self.worker_thread.running = False
         self.worker_thread.quit()
         self.worker_thread.wait()
+        self.stop_plc_watchdog()
+        if hasattr(self, '_plc_alert_overlay') and self._plc_alert_overlay:
+            try:
+                self._plc_alert_overlay.close()
+            except Exception:
+                pass
+        if hasattr(self, '_plc_success_banner') and self._plc_success_banner:
+            try:
+                self._plc_success_banner.close()
+            except Exception:
+                pass
         if hasattr(self, 'pyuic6_instance') and self.pyuic6_instance:
             _log.info("Reloading program: Closing existing instance for item code: %s", self.item_code)
             self.pyuic6_instance.Close_window()
@@ -121,28 +225,52 @@ class core:
     def read_mysql_config(self, filepath=None):
         if filepath is None:
             filepath = get_mysql_config_path()
-        config = {}
+
+        def _parse_file(path):
+            if not os.path.exists(path) or os.path.getsize(path) == 0:
+                return None
+            for enc in ('utf-8', 'utf-8-sig', 'cp1252', 'latin-1'):
+                try:
+                    cfg = {}
+                    with open(path, 'r', encoding=enc) as f:
+                        for line in f:
+                            if '=' in line:
+                                key, value = line.strip().split('=', 1)
+                                cfg[key.strip()] = value.strip()
+                    if 'host' in cfg and 'user' in cfg:
+                        return cfg
+                except Exception:
+                    continue
+            return None
+
         try:
-            with open(filepath, 'r') as f:
-                for line in f:
-                    if '=' in line:
-                        key, value = line.strip().split('=', 1)
-                        config[key.strip()] = value.strip()
+            config = _parse_file(filepath)
+            if config is not None:
+                return config
+
+            # Nếu file chính bị rỗng hoặc lỗi, thử khôi phục từ .bak
+            bak_path = filepath + '.bak'
+            if os.path.exists(bak_path):
+                _log.warning("File cấu hình %s không hợp lệ. Đang tự động khôi phục từ backup %s", filepath, bak_path)
+                config_bak = _parse_file(bak_path)
+                if config_bak is not None:
+                    try:
+                        import shutil
+                        shutil.copy2(bak_path, filepath)
+                        _log.info("Khôi phục thành công file %s từ %s", filepath, bak_path)
+                    except Exception as copy_err:
+                        _log.debug("Lỗi copy file .bak sang .log: %s", copy_err)
+                    return config_bak
+
         except FileNotFoundError:
             _log.warning("Config file not found: %s", filepath)
             return None
         except Exception as e:
             _log.error("Error reading config file: %s", e)
             return None
-        return config
+        return None
 
-    def connect_mysql_from_log(self, filepath=None, retries=15, delay=1.5):
-        """
-        Kết nối MySQL từ file cấu hình với cơ chế Retry thông minh.
-        Khi khởi động cùng Windows (Startup), dịch vụ MySQL Server cần 3-10s để khởi tạo
-        và nạp bảng phân quyền (grant tables). Cơ chế này tự động chờ và thử lại,
-        tránh lỗi 1045 Access denied hoặc lỗi 2003 Can't connect.
-        """
+    def connect_mysql_from_log(self, filepath=None, retries=40, delay=1.5):
         if filepath is None:
             filepath = get_mysql_config_path()
         _log.info("[connect_mysql_from_log] Reading config from %s", filepath)
@@ -153,50 +281,241 @@ class core:
                 _log.info("[connect_mysql_from_log] Trying fallback config from %s", fallback_path)
                 config = self.read_mysql_config(fallback_path)
             if not config:
-                _log.info("[connect_mysql_from_log] No config found")
-                return None
+                _log.warning("[connect_mysql_from_log] No config found, using safe local defaults")
+                config = {'host': '127.0.0.1', 'user': 'root', 'password': '', 'port': 3306}
 
         host     = config.get('host', '127.0.0.1')
         user     = config.get('user', 'root')
         password = config.get('password', '')
         port     = int(config.get('port', 3306))
 
+        # Danh sách host dự phòng: tự động đảo giữa 127.0.0.1 và localhost (tránh race condition phân giải DNS khi Windows vừa boot)
+        candidate_hosts = [host]
+        if host in ('127.0.0.1', 'localhost'):
+            alt = 'localhost' if host == '127.0.0.1' else '127.0.0.1'
+            if alt not in candidate_hosts:
+                candidate_hosts.append(alt)
+
+        progress_dialog = None
+
         for attempt in range(1, retries + 1):
+            # Nếu lần 1 chưa được và là máy cục bộ: Thử kích hoạt dịch vụ MySQL80
+            if attempt in (2, 5) and any(h in ('127.0.0.1', 'localhost') for h in candidate_hosts):
+                try:
+                    import subprocess
+                    check_svc = subprocess.run(['sc.exe', 'query', 'MySQL80'], capture_output=True, text=True, timeout=3)
+                    if 'STOPPED' in check_svc.stdout:
+                        _log.info("[connect_mysql_from_log] Dịch vụ MySQL80 đang bị STOPPED! Đang gửi lệnh start...")
+                        subprocess.run(['sc.exe', 'start', 'MySQL80'], capture_output=True, text=True, timeout=5)
+                        subprocess.run(['net', 'start', 'MySQL80'], capture_output=True, text=True, timeout=5)
+                except Exception as svc_err:
+                    _log.debug("Lỗi kiểm tra service MySQL80: %s", svc_err)
+
+            # Hiển thị thanh tiến trình chờ từ lần thử thứ 2
+            if attempt == 2:
+                try:
+                    from PyQt5.QtWidgets import QApplication, QProgressDialog
+                    app = QApplication.instance()
+                    if app:
+                        progress_dialog = QProgressDialog(
+                            "Đang chờ khởi tạo dịch vụ MySQL Server (Đang phục hồi sau khi khởi động PC)...",
+                            None, 0, retries
+                        )
+                        progress_dialog.setWindowTitle("Khởi tạo MySQL Database")
+                        progress_dialog.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.CustomizeWindowHint | Qt.WindowTitleHint)
+                        progress_dialog.setMinimumWidth(500)
+                        progress_dialog.setCancelButton(None)
+                        progress_dialog.setValue(attempt)
+                        progress_dialog.show()
+                        app.processEvents()
+                except Exception:
+                    progress_dialog = None
+
+            if progress_dialog is not None:
+                try:
+                    progress_dialog.setValue(attempt)
+                    progress_dialog.setLabelText(
+                        f"Đang chờ dịch vụ MySQL Server sẵn sàng... (Lần thử {attempt}/{retries})\n"
+                        f"Hệ thống đang tự động phục hồi dữ liệu sau khi cấp lại nguồn điện."
+                    )
+                    from PyQt5.QtWidgets import QApplication
+                    QApplication.instance().processEvents()
+                except Exception:
+                    pass
+
+            # Thử kết nối qua từng candidate host (127.0.0.1 và localhost)
+            last_err = None
+            for h in candidate_hosts:
+                for ssl_opt in (True, False):
+                    try:
+                        conn_params = {
+                            'host': h,
+                            'user': user,
+                            'password': password,
+                            'port': port,
+                            'use_pure': True,
+                            'connection_timeout': 3
+                        }
+                        if ssl_opt:
+                            conn_params['ssl_disabled'] = True
+                        connection = mysql.connector.connect(**conn_params)
+                        if connection and connection.is_connected():
+                            _log.info('[connect_mysql_from_log] Success to connect mysql on attempt %d (host=%s, ssl_disabled=%s)', attempt, h, ssl_opt)
+                            if progress_dialog is not None:
+                                try:
+                                    progress_dialog.close()
+                                except Exception:
+                                    pass
+                            return connection
+                    except Exception as err:
+                        last_err = err
+                        continue
+
+            _log.warning('[connect_mysql_from_log] Attempt %d/%d failed: %s', attempt, retries, last_err)
+
+            # Kích hoạt tự động đăng nhập cứu hộ bằng pass mặc định (123456789) ngay từ lần 2 hoặc 4
+            if attempt in (2, 4, 10):
+                _log.info("[connect_mysql_from_log] Kích hoạt tự động đăng nhập cứu hộ (fallback pass 123456789)...")
+                fallback_conn = self.auto_login_fallback()
+                if fallback_conn and fallback_conn.is_connected():
+                    if progress_dialog is not None:
+                        try:
+                            progress_dialog.close()
+                        except Exception:
+                            pass
+                    return fallback_conn
+
+            if attempt < retries:
+                time.sleep(delay)
+            else:
+                _log.error('[connect_mysql_from_log] All %d attempts failed to connect to MySQL. Last error: %s', retries, last_err)
+                if progress_dialog is not None:
+                    try:
+                        progress_dialog.close()
+                    except Exception:
+                        pass
+                # Thử cứu hộ lần chót trước khi từ bỏ
+                return self.auto_login_fallback()
+
+        if progress_dialog is not None:
             try:
-                _log.info("[connect_mysql_from_log] Attempt %d/%d: Connecting to MySQL (%s:%s, user=%s)...",
-                          attempt, retries, host, port, user)
-                connection = mysql.connector.connect(
-                    host     = host,
-                    user     = user,
-                    password = password,
-                    port     = port,
-                    use_pure = True
-                )
-                if connection and connection.is_connected():
-                    _log.info('[connect_mysql_from_log] Success to connect mysql on attempt %d', attempt)
-                    return connection
-            except Exception as err:
-                _log.warning('[connect_mysql_from_log] Attempt %d/%d failed: %s', attempt, retries, err)
-                if attempt < retries:
-                    _log.info("[connect_mysql_from_log] Waiting %.1fs for MySQL service to become ready...", delay)
-                    time.sleep(delay)
-                else:
-                    _log.error('[connect_mysql_from_log] All %d attempts failed to connect to MySQL. Last error: %s', retries, err)
-                    return None
+                progress_dialog.close()
+            except Exception:
+                pass
+        return self.auto_login_fallback()
+
+    def auto_login_fallback(self):
+        """
+        Cơ chế tự động đăng nhập khẩn cấp tương tự module_5/mysql.py:
+        Tự động thử các tổ hợp kết nối chuẩn (127.0.0.1, localhost, pass 123456789, rỗng).
+        Khi kết nối thành công, tự động cập nhật DATA_AUTO_LOGIN.INFOR (chế độ Auto)
+        và ghi lại file mysql_config.log để các lần sau vào thẳng phần mềm mà không cần thao tác tay.
+        """
+        hosts = ['127.0.0.1', 'localhost']
+        passwords = ['123456789', '', 'root']
+        ports = [3306]
+
+        _log.info("[auto_login_fallback] Bắt đầu tự động quét kết nối MySQL cứu hộ (hardcode pass 123456789)...")
+
+        for h in hosts:
+            for p in passwords:
+                for port in ports:
+                    for ssl_disabled in (True, False):
+                        try:
+                            conn_params = {
+                                'host': h,
+                                'user': 'root',
+                                'password': p,
+                                'port': port,
+                                'use_pure': True,
+                                'connection_timeout': 2
+                            }
+                            if ssl_disabled:
+                                conn_params['ssl_disabled'] = True
+
+                            conn = mysql.connector.connect(**conn_params)
+                            if conn and conn.is_connected():
+                                _log.info("[auto_login_fallback] Tự động đăng nhập THÀNH CÔNG (host=%s, user=root, port=%d)!", h, port)
+                                
+                                # 1. Khởi tạo/cập nhật bảng DATA_AUTO_LOGIN.INFOR ở chế độ Auto
+                                try:
+                                    cur = conn.cursor()
+                                    cur.execute("CREATE DATABASE IF NOT EXISTS `DATA_AUTO_LOGIN`")
+                                    cur.execute("""
+                                        CREATE TABLE IF NOT EXISTS `DATA_AUTO_LOGIN`.`INFOR` (
+                                            id INT AUTO_INCREMENT PRIMARY KEY,
+                                            hostname VARCHAR(255),
+                                            username VARCHAR(255),
+                                            password VARCHAR(255),
+                                            port VARCHAR(255),
+                                            manual BOOLEAN DEFAULT FALSE,
+                                            automatic BOOLEAN DEFAULT FALSE,
+                                            credential BOOLEAN DEFAULT FALSE,
+                                            retry_attemps INT NOT NULL DEFAULT 0
+                                        )
+                                    """)
+                                    cur.execute("DELETE FROM `DATA_AUTO_LOGIN`.`INFOR`")
+                                    cur.execute("""
+                                        INSERT INTO `DATA_AUTO_LOGIN`.`INFOR` (
+                                            hostname, username, password, port, manual, automatic, retry_attemps
+                                        ) VALUES (%s, %s, %s, %s, %s, %s, %s)
+                                    """, (h, 'root', p, str(port), False, True, 0))
+                                    conn.commit()
+                                    cur.close()
+                                    _log.info("[auto_login_fallback] Đã tự động cập nhật CSDL DATA_AUTO_LOGIN sang chế độ Auto!")
+                                except Exception as db_err:
+                                    _log.warning("[auto_login_fallback] Lỗi ghi DB INFOR: %s", db_err)
+
+                                # 2. Tự động ghi lại file cấu hình bền vững
+                                try:
+                                    self.write_mysql_config(host=h, user='root', password=p, port=port, database='DATA_AUTO_LOGIN')
+                                    _log.info("[auto_login_fallback] Đã tự động ghi lại file cấu hình mysql_config.log!")
+                                except Exception as cfg_err:
+                                    _log.warning("[auto_login_fallback] Lỗi ghi file config: %s", cfg_err)
+
+                                return conn
+                        except Exception:
+                            continue
+
+        _log.warning("[auto_login_fallback] Không thể tự động kết nối qua các tổ hợp dự phòng.")
         return None
 
     def write_mysql_config(self, host, user, password, port, database, filepath=None):
         if filepath is None:
             filepath = get_mysql_config_path(for_writing=True)
         try:
-            with open(filepath, 'w') as f:
+            tmp_path = filepath + '.tmp'
+            bak_path = filepath + '.bak'
+
+            # 1. Ghi an toàn vào file tạm .tmp và ép ghi (fsync) xuống đĩa cứng để chống hỏng file khi sập nguồn
+            with open(tmp_path, 'w', encoding='utf-8') as f:
                 f.write(f"host={host}\n")
                 f.write(f"user={user}\n")
-                if password != "":
-                    f.write(f"password={password}\n")
+                f.write(f"password={password}\n")
                 f.write(f"port={port}\n")
                 f.write(f"database={database}\n")
-            _log.info('Success to write mysql config to %s', filepath)
+                f.flush()
+                os.fsync(f.fileno())
+
+            # 2. Tạo bản sao lưu dự phòng .bak từ file hiện tại (nếu đang tồn tại và có dữ liệu)
+            if os.path.exists(filepath) and os.path.getsize(filepath) > 0:
+                try:
+                    import shutil
+                    shutil.copy2(filepath, bak_path)
+                except Exception:
+                    pass
+
+            # 3. Thay thế nguyên tử (atomic replace) - đảm bảo file không bao giờ bị 0-byte hay dở dang
+            os.replace(tmp_path, filepath)
+
+            # 4. Cập nhật luôn file sao lưu .bak bằng dữ liệu mới nhất
+            try:
+                import shutil
+                shutil.copy2(filepath, bak_path)
+            except Exception:
+                pass
+
+            _log.info('Success to write mysql config to %s and backup %s', filepath, bak_path)
             return True
         except Exception as e:
             _log.warning('Failed to write mysql config: %s', e)
@@ -218,14 +537,34 @@ class core:
         cursor.close()
 
     def connect_to_mysql(self):
-        _log.info("[connect_to_mysql] Calling connect_mysql_from_log...")
-        connection = self.connect_mysql_from_log()
-        _log.info("[connect_to_mysql] connect_mysql_from_log returned: %s", connection)
-        if connection is None:
-            _log.info("[connect_to_mysql] Showing QMessageBox warning...")
-            QMessageBox.warning(None, "Lỗi", "Không thể kết nối đến MySQL, \nVui lòng kiểm tra lại thông tin đăng nhập.")
-            _log.info("[connect_to_mysql] QMessageBox closed.")
-            return None, 0
+        connection = None
+        while connection is None:
+            _log.info("[connect_to_mysql] Calling connect_mysql_from_log...")
+            connection = self.connect_mysql_from_log(retries=40, delay=1.5)
+            _log.info("[connect_to_mysql] connect_mysql_from_log returned: %s", connection)
+            if connection is not None:
+                break
+
+            # Tự động thực hiện cơ chế đăng nhập khẩn cấp (thay cho việc mở giao diện module_5/mysql.py bằng tay)
+            _log.info("[connect_to_mysql] connect_mysql_from_log thất bại, kích hoạt auto_login_fallback...")
+            connection = self.auto_login_fallback()
+            if connection is not None:
+                _log.info("[connect_to_mysql] auto_login_fallback thành công, bỏ qua hộp thoại chờ!")
+                break
+
+            _log.info("[connect_to_mysql] Showing retry question...")
+            reply = QMessageBox.question(
+                None,
+                "Không thể kết nối đến MySQL",
+                "Dịch vụ MySQL Server chưa phản hồi sau 60 giây chờ đợi.\n"
+                "(Có thể máy tính vừa bị ngắt điện đột ngột và dịch vụ MySQL vẫn đang phục hồi dữ liệu InnoDB).\n\n"
+                "Bạn có muốn tiếp tục chờ và thử kết nối lại không?",
+                QMessageBox.Retry | QMessageBox.Cancel,
+                QMessageBox.Retry
+            )
+            if reply != QMessageBox.Retry:
+                _log.warning("[connect_to_mysql] User cancelled connection retry.")
+                return None, 0
     
         _log.info("[connect_to_mysql] Creating default table...")
         try:
@@ -247,24 +586,34 @@ class core:
             cursor = connection.cursor()
             cursor.execute("SELECT * FROM `DATA_AUTO_LOGIN`.`INFOR`")
             result = cursor.fetchall()
-            cursor.close()
 
             if not result:
-                return connection, 0
+                # Nếu bảng chưa có cấu hình, tự động khởi tạo mặc định chế độ Auto để hệ thống luôn sẵn sàng chạy
+                cursor.execute("""
+                    INSERT IGNORE INTO `DATA_AUTO_LOGIN`.`INFOR` (
+                        hostname, username, password, port, manual, automatic, retry_attemps
+                    ) VALUES (%s, %s, %s, %s, 0, 1, 0)
+                """, ('127.0.0.1', 'root', '', '3306'))
+                connection.commit()
+                cursor.close()
+                _log.info("[connect_to_mysql] Tự động khởi tạo cấu hình Auto-login mặc định")
+                return connection, 1
 
             manual    = bool(result[0][5])
             automatic = bool(result[0][6])
+            cursor.close()
             
-            if not manual and automatic:
-                _log.info("[connect_to_mysql] Success to connect MySQL (Auto-login enabled)")
-                return connection, 1
-            else:
-                _log.info("[connect_to_mysql] Success to connect MySQL (Manual mode)")
+            # Chỉ khi người dùng chủ động tích chọn Manual (manual=True và automatic=False) mới vào chế độ Manual
+            if manual and not automatic:
+                _log.info("[connect_to_mysql] Kết nối MySQL thành công (Chế độ Manual theo thiết lập người dùng)")
                 return connection, 0
+            else:
+                _log.info("[connect_to_mysql] Kết nối MySQL thành công (Tự động kích hoạt chế độ Auto-login)")
+                return connection, 1
 
         except Exception as e:
             _log.error("Error in connect_to_mysql: %s", e)
-            return connection, 0
+            return connection, 1
 
         return connection, 0
 
@@ -341,19 +690,35 @@ class core:
                 plc_instance = plc_cls(ip_address_plc, port_plc)
                 self.driver_loader = plc_instance
                 self.mode_init_plc = 1
+                self.is_plc_connected = True
                 _log.info('PLC Simulation via Log Mode ACTIVE [indirect_from_log=True] for %s (%s:%s)', plc_module, ip_address_plc, port_plc)
             elif not manual and automatic:
                 # Chế độ kết nối trực tiếp đến PLC thật
                 plc_instance = plc_cls(ip_address_plc, port_plc)
-                if plc_instance.connect():
+                connected = False
+                try:
+                    connected = bool(plc_instance.connect())
+                except Exception as e_conn:
+                    _log.warning("Exception connecting real PLC: %s", e_conn)
+                    connected = False
+
+                if connected:
                     self.driver_loader = plc_instance
                     self.mode_init_plc = 1
+                    self.is_plc_connected = True
                     _log.info('Success to connect real PLC %s at %s:%s', plc_module, ip_address_plc, port_plc)
                 else:
+                    self.driver_loader = None
                     self.mode_init_plc = 0
-                    _log.warning('Failed to connect real PLC %s at %s:%s', plc_module, ip_address_plc, port_plc)
-                    QMessageBox.warning(None, "Warning", "Failed to connect PLC, Please check connection or switch to Log Mode")
+                    self.is_plc_connected = False
+                    _log.warning('Failed to connect real PLC %s at %s:%s on startup. Watchdog will auto-reconnect.', plc_module, ip_address_plc, port_plc)
+                    if hasattr(self, 'plc_signals'):
+                        self.plc_signals.connection_lost.emit(plc_module, str(ip_address_plc), int(port_plc), 1)
+
+                # Bắt đầu Watchdog theo dõi liên tục và tự động kết nối lại ngầm
+                self.start_plc_watchdog()
             else:
+                self.is_plc_connected = False
                 _log.warning('PLC connection disabled in settings (Manual mode active)')
 
         except Exception as e:
@@ -435,12 +800,19 @@ class core:
         if self.is_indirect_log_mode():
             return self._safe_read_plc_log(register)
 
-        if self.driver_loader is None:
+        if not getattr(self, 'is_plc_connected', True) or self.driver_loader is None:
             return None
         try:
-            return self.driver_loader.read_plc(register)
+            val = self.driver_loader.read_plc(register)
+            if val is None:
+                self.notify_plc_communication_error()
+            else:
+                if self.plc_watchdog_thread is not None:
+                    self.plc_watchdog_thread.consecutive_errors = 0
+            return val
         except Exception as e:
             _log.debug("_safe_read_plc exception on %s: %s", register, e)
+            self.notify_plc_communication_error()
             return None
 
     def _safe_write_plc(self, register: str, value):
@@ -459,13 +831,17 @@ class core:
         if self.is_indirect_log_mode():
             return self._safe_write_plc_log(register, value)
 
-        if self.driver_loader is None:
+        if not getattr(self, 'is_plc_connected', True) or self.driver_loader is None:
             return None
         try:
             val_to_write = int(val_str) if val_str.lstrip('-').isdigit() else val_str
-            return self.driver_loader.write_plc(register, val_to_write)
+            res = self.driver_loader.write_plc(register, val_to_write)
+            if self.plc_watchdog_thread is not None:
+                self.plc_watchdog_thread.consecutive_errors = 0
+            return res
         except Exception as e:
             _log.debug("_safe_write_plc exception on %s: %s", register, e)
+            self.notify_plc_communication_error()
             return None
 
     def _safe_read_plc_log(self, register: str):
