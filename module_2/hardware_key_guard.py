@@ -1,16 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-AI Vision Pro - Runtime USB Hardware Key Guard
-===============================================
-Module bảo vệ và giám sát định kỳ USB Hardware Key trong suốt quá trình vận hành ứng dụng.
-- Tần số quét định kỳ ngẫu nhiên từ 3 - 5 phút (180s - 300s).
-- Quét chạy trong luồng nền (Worker Thread) không gây lag hoặc giật khung hình camera.
-- Khi USB Key bị rút giữa chừng:
-    1. Kích hoạt hộp thoại cảnh báo Modal khẩn cấp.
-    2. Đếm ngược (120 giây) trước khi tự động đóng ứng dụng an toàn.
-    3. Cho phép người dùng cắm lại USB Key và bấm "Thử lại" để khôi phục vận hành mà không phải khởi động lại phần mềm.
-"""
-
 import random
 import os
 import sys
@@ -24,7 +12,6 @@ _log = _get_logger('module_2.hardware_key_guard')
 
 
 class HardwareKeyCheckWorker(QThread):
-    """Luồng phụ thực hiện quét thiết bị USB nhằm tránh làm đứng giao diện chính."""
     check_finished = pyqtSignal(bool)
 
     def __init__(self, main_core, parent=None):
@@ -33,7 +20,6 @@ class HardwareKeyCheckWorker(QThread):
 
     def run(self):
         try:
-            # Kiểm tra âm thầm không pop-up dialog
             is_valid = self.main_core.query_hardware_key(show_dialog=False)
         except Exception as e:
             _log.error("Lỗi khi quét USB Key trong luồng phụ: %s", e)
@@ -42,11 +28,6 @@ class HardwareKeyCheckWorker(QThread):
 
 
 class HardwareKeyAlertModal(QDialog):
-    """
-    Hộp thoại cảnh báo Modal nổi bật khi USB Hardware Key bị rút giữa chừng.
-    Bao gồm bộ đếm ngược tự động thoát và nút kiểm tra lại khóa.
-    """
-
     def __init__(self, main_core, parent=None, countdown_seconds=120):
         super().__init__(parent)
         self.main_core = main_core
@@ -248,6 +229,8 @@ class HardwareKeyGuard(QtCore.QObject):
         self.is_active = False
         self._is_checking = False
         self._alert_dialog = None
+        self.consecutive_failures = 0
+        self.max_consecutive_failures = 3  # Chống báo động giả: cần thất bại 3 lần liên tiếp (kèm retry)
 
         self._schedule_timer = QTimer(self)
         self._schedule_timer.setSingleShot(True)
@@ -300,13 +283,27 @@ class HardwareKeyGuard(QtCore.QObject):
             return
 
         if is_valid:
-            # _log.info("[HardwareKeyGuard] Quét định kỳ: USB Key HỢP LỆ.")
+            if self.consecutive_failures > 0:
+                _log.info("[HardwareKeyGuard] USB Key đã được nhận diện lại sau %d lần thử thất bại tạm thời.", self.consecutive_failures)
+            self.consecutive_failures = 0
             self.key_status_changed.emit(True)
             self._schedule_next()
         else:
-            _log.warning("[HardwareKeyGuard] CẢNH BÁO: USB Key ĐÃ BỊ RÚT RA hoặc không hợp lệ!")
-            self.key_status_changed.emit(False)
-            self._handle_key_disconnected()
+            self.consecutive_failures += 1
+            _log.warning(
+                "[HardwareKeyGuard] Quét USB Key không phát hiện (Lần thất bại: %d/%d)",
+                self.consecutive_failures, self.max_consecutive_failures
+            )
+            if self.consecutive_failures < self.max_consecutive_failures:
+                _log.info("[HardwareKeyGuard] Tự động thử lại kiểm tra USB Key sau 2 giây...")
+                self._schedule_timer.start(2000)
+            else:
+                _log.critical(
+                    "[HardwareKeyGuard] CẢNH BÁO: Đã xác nhận mất USB Key sau %d lần kiểm tra liên tiếp!",
+                    self.consecutive_failures
+                )
+                self.key_status_changed.emit(False)
+                self._handle_key_disconnected()
 
     def _handle_key_disconnected(self):
         """Xử lý sự kiện khóa USB bị rút giữa chừng."""
@@ -315,7 +312,6 @@ class HardwareKeyGuard(QtCore.QObject):
 
         _log.critical("[HardwareKeyGuard] Đang hiển thị hộp thoại cảnh báo mất khóa bản quyền.")
 
-        # Tạm dừng giám sát tín hiệu nền trong lúc chờ cắm lại khóa
         had_monitoring = False
         try:
             if hasattr(self.main_core, 'worker_thread') and self.main_core.worker_thread:
@@ -331,9 +327,9 @@ class HardwareKeyGuard(QtCore.QObject):
 
         if result == QDialog.Accepted:
             _log.info("[HardwareKeyGuard] Khóa USB đã được khôi phục. Tiếp tục chu trình định kỳ.")
+            self.consecutive_failures = 0
             self._alert_dialog = None
 
-            # Khôi phục lại giám sát tín hiệu nền
             if had_monitoring:
                 try:
                     self.main_core.start_monitoring()

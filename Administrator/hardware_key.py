@@ -26,17 +26,66 @@ Tối ưu hoá Script PowerShell (Parsing): Ở phiên bản cũ, việc dùng C
 def get_connected_usb_serials() -> list:
     """
     Quét tất cả USB đang cắm và tạo Hardware ID (HWID) bảo mật.
-    Sử dụng PowerShell kết hợp ConvertTo-Json để parse dữ liệu chính xác.
+    Sử dụng Windows Native API (cfgmgr32.dll) siêu nhanh (2ms), 
+    fallback sang PowerShell nếu cần.
     """
-    import json
     import hashlib
+    import ctypes
     import subprocess
 
     usb_list = []
+    salt = "AI_VISION_PRO_SECURE_SALT_"
+
+    # 1. Quét bằng Windows Native API (cfgmgr32.dll)
+    try:
+        cfgmgr32 = ctypes.windll.cfgmgr32
+        CM_GETIDLIST_FILTER_PRESENT = 0x00000100
+        CM_GETIDLIST_FILTER_ENUMERATOR = 0x00000001
+        CM_DRP_DEVICEDESC = 0x00000001
+        CM_DRP_FRIENDLYNAME = 0x0000000D
+        filter_flag = CM_GETIDLIST_FILTER_PRESENT | CM_GETIDLIST_FILTER_ENUMERATOR
+
+        for enumerator in ('USB', 'USBSTOR'):
+            buf_size = ctypes.c_ulong(0)
+            if cfgmgr32.CM_Get_Device_ID_List_SizeW(ctypes.byref(buf_size), enumerator, filter_flag) == 0:
+                if buf_size.value > 0:
+                    buf = ctypes.create_unicode_buffer(buf_size.value)
+                    if cfgmgr32.CM_Get_Device_ID_ListW(enumerator, buf, buf_size.value, filter_flag) == 0:
+                        raw = ''.join(buf[:])
+                        for dev_id in raw.split('\x00'):
+                            dev_str = dev_id.strip()
+                            if not dev_str or 'ROOT_HUB' in dev_str.upper():
+                                continue
+
+                            model = "USB Device"
+                            devnode = ctypes.c_ulong(0)
+                            if cfgmgr32.CM_Locate_DevNodeW(ctypes.byref(devnode), dev_str, 0) == 0:
+                                p_buf = ctypes.create_unicode_buffer(512)
+                                p_len = ctypes.c_ulong(ctypes.sizeof(p_buf))
+                                for prop in (CM_DRP_FRIENDLYNAME, CM_DRP_DEVICEDESC):
+                                    p_len.value = ctypes.sizeof(p_buf)
+                                    if cfgmgr32.CM_Get_DevNode_Registry_PropertyW(devnode, prop, None, ctypes.byref(p_buf), ctypes.byref(p_len), 0) == 0:
+                                        if p_buf.value:
+                                            model = p_buf.value
+                                            break
+
+                            secure_hash = hashlib.sha256((salt + dev_str).encode('utf-8')).hexdigest().upper()
+                            usb_list.append({
+                                "serial": secure_hash,
+                                "raw_serial": dev_str,
+                                "model": model
+                            })
+    except Exception as e_native:
+        print(f"Quét native USB gặp ngoại lệ: {e_native}")
+
+    if usb_list:
+        return usb_list
+
+    # 2. Fallback sang PowerShell
     try:
         cmd = (
             'powershell -Command "'
-            "Get-CimInstance Win32_PnPEntity | Where-Object { $_.PNPDeviceID -match '^USB' } | ForEach-Object { $serial = $_.PNPDeviceID.Split('\')[-1]; [PSCustomObject]@{ 'Device Name' = $_.Name; 'Serial Number' = $serial } } | ConvertTo-Csv -NoTypeInformation"
+            "Get-CimInstance Win32_PnPEntity | Where-Object { $_.PNPDeviceID -match '^USB' } | ForEach-Object { $serial = $_.PNPDeviceID.Split('\\')[-1]; [PSCustomObject]@{ 'Device Name' = $_.Name; 'Serial Number' = $serial } } | ConvertTo-Csv -NoTypeInformation"
             '"'
         )
         result = subprocess.run(cmd, capture_output=True, text=True, shell=True, timeout=10)
@@ -50,7 +99,6 @@ def get_connected_usb_serials() -> list:
                     pnp_and_serial = parts[1].strip()
                     if pnp_and_serial and "ROOT_HUB" not in pnp_and_serial:
                         raw_hwid = pnp_and_serial
-                        salt = "AI_VISION_PRO_SECURE_SALT_"
                         secure_hash = hashlib.sha256((salt + raw_hwid).encode('utf-8')).hexdigest().upper()
                         usb_list.append({
                             "serial": secure_hash,
@@ -58,7 +106,7 @@ def get_connected_usb_serials() -> list:
                             "model": model
                         })
     except Exception as e:
-        print(f"Lỗi khi quét USB bảo mật: {e}")
+        print(f"Lỗi khi quét USB bảo mật (PowerShell): {e}")
         
     return usb_list
 

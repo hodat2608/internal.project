@@ -174,7 +174,6 @@ class KeyenceClient:
             try:
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 s.settimeout(self.timeout)
-                # Kích hoạt TCP Keepalive để phát hiện sớm đứt cáp mạng
                 try:
                     s.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
                     if hasattr(socket, 'SIO_KEEPALIVE_VALS'):

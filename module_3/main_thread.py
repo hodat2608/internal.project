@@ -177,6 +177,18 @@ class Ui_MainWindow(object):
             self._setup_camera_interface(camera_id, camera_name, item_code_id,total_models,total_cameras, base_progress, step_progress)
             
         self.plc_handler.set_built_in_config(self.camera_manager.built_in_objects, self.camera_manager.built_in_mapping_mode)
+        if self.mode_init:
+            try:
+                from Administrator.user_db import is_watchdog_enabled
+                db_conn = getattr(self, 'connect_plc', None) or getattr(getattr(self, 'db_manager', None), 'connect_db', None)
+                if is_watchdog_enabled('camera', conn_or_cursor=db_conn):
+                    self.camera_manager.start_camera_watchdog()
+                    _log.info("[CameraWatchdog] Giám sát liên tục Camera đang BẬT theo cấu hình của Administrator.")
+                else:
+                    _log.info("[CameraWatchdog] Giám sát liên tục Camera bị TẮT theo cấu hình của Administrator.")
+            except Exception as e:
+                _log.debug("Lỗi kiểm tra is_watchdog_enabled('camera'): %s", e)
+                self.camera_manager.start_camera_watchdog()
         
     def get_num_models(self, camera_id):
         models = self.db_manager.get_models_for_camera(camera_id)
@@ -219,7 +231,7 @@ class Ui_MainWindow(object):
             if self.progress_callback:
                 self.progress_callback(base_progress + int(step_progress * 0.7), f"Đang kiểm tra kết nối Camera {camera_name} và PLC...")
             self.camera_manager.set_signals_device_camera(camera_name, dict_signals)
-            self.device = self.camera_manager.auto_initial_device(camera_id, camera_name, item_code_id, self.tabWidget_2, self.product_code_forms, dict_signals, progress_callback=self.progress_callback)
+            self.device = self.camera_manager.auto_initial_device(camera_id, camera_name, item_code_id, self.tabWidget_2, self.product_code_forms, dict_signals, progress_callback=self.progress_callback, device_tab_ui=_device_tab_ui)
             # --- update thông tin camera lên tab Camera Device ---
             _device_tab_ui.label_dev_name.setText(self.camera_manager.device_type if self.camera_manager.device_type else "#N/A")
             _device_tab_ui.label_PartNo.setText(self.camera_manager.PartNo if self.camera_manager.PartNo else "#N/A")
@@ -286,6 +298,8 @@ class Ui_MainWindow(object):
 
     def cleanup(self):
         _log.info("Cleaning up resources...")
+        if hasattr(self, 'camera_manager'):
+            self.camera_manager.stop_camera_watchdog()
         self.plc_handler.cleanup()
         _log.info("Cleanup completed")
 
@@ -309,6 +323,17 @@ class intermediate_layer:
     def show_window(self):
         self.MainWindow.showMaximized()
         self.raise_display_window()
+        def _raise_alert():
+            try:
+                if hasattr(self.ui, 'camera_manager'):
+                    overlay = getattr(self.ui.camera_manager, '_camera_alert_overlay', None)
+                    if overlay and overlay.isVisible():
+                        overlay.raise_()
+                        overlay.activateWindow()
+            except Exception:
+                pass
+        QtCore.QTimer.singleShot(500, _raise_alert)
+        QtCore.QTimer.singleShot(1200, _raise_alert)
 
     def raise_display_window(self):
         def _do_raise():

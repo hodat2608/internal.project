@@ -112,8 +112,21 @@ class PLCWatchdogThread(QtCore.QThread):
                 else:
                     # Đang ở trạng thái MẤT KẾT NỐI: Tự động thăm dò và thử kết nối lại
                     self.reconnect_attempts += 1
-                    if hasattr(self.core, 'plc_signals'):
-                        self.core.plc_signals.reconnect_attempt.emit(self.reconnect_attempts)
+                    if self.reconnect_attempts == 1:
+                        _log.warning("[PLCWatchdog] ⚠️ PLC %s (%s:%s) không có kết nối ngay từ đầu! Kích hoạt hiển thị cảnh báo...", module, ip, port)
+                        if hasattr(self.core, 'plc_signals'):
+                            self.core.plc_signals.connection_lost.emit(module, str(ip), int(port), 1)
+                    else:
+                        if hasattr(self.core, 'plc_signals'):
+                            self.core.plc_signals.reconnect_attempt.emit(self.reconnect_attempts)
+                            _log.warning("[PLCWatchdog] ⚠️ PLC %s (%s:%s) Kết nối gián đoạn! Kích hoạt hiển thị cảnh báo...", module, ip, port)
+
+                    # Đảm bảo Alert UI hiển thị nếu đang ngắt kết nối (trừ khi người dùng chủ động bấm Đóng để kiểm tra cài đặt)
+                    overlay = getattr(self.core, '_plc_alert_overlay', None)
+                    user_dismissed = getattr(overlay, 'user_dismissed', False)
+                    if (overlay is None or not overlay.isVisible()) and not user_dismissed:
+                        if hasattr(self.core, 'plc_signals'):
+                            self.core.plc_signals.connection_lost.emit(module, str(ip), int(port), self.reconnect_attempts)
 
                     # Thử kết nối TCP trước (timeout 1.0s)
                     can_connect_tcp = test_tcp_connection(ip, port, timeout=1.0)
@@ -131,6 +144,7 @@ class PLCWatchdogThread(QtCore.QThread):
                             # Khôi phục kết nối thành công!
                             self.core.driver_loader = new_client
                             self.core.is_plc_connected = True
+                            self.core.startup_plc_failed = False
                             self.core.mode_init_plc = 1
                             self.is_connected = True
                             self.consecutive_errors = 0

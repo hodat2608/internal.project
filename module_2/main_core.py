@@ -22,6 +22,11 @@ from module_2.plc_alert_ui import PLCWatchdogSignals, PLCAlertOverlay, PLCSucces
 from module_2.plc_watchdog import PLCWatchdogThread
 _log = _get_logger('module_2.main_core')
 
+try:
+    from module_3.task_calculator_db import _db_lock
+except Exception:
+    _db_lock = threading.RLock()
+
 PLC_COLLECT = {
     'KEYENCE'     : Keyence_Socket_Client,
     'OMRON'       : Omron_Socket_Client,
@@ -47,8 +52,9 @@ class CoreWorker(QThread):
 
 
 class core:
-    def __init__(self):
+    def __init__(self, progress_callback=None):
         _log.info("[core.__init__] START")
+        self.progress_callback = progress_callback
         self.dict_list_line   = {}
         self.mode_init        = 0
         self.mode_init_plc    = 0
@@ -64,6 +70,7 @@ class core:
         self.driver_loader = None
 
         self.is_plc_connected = False
+        self.startup_plc_failed = False
         self.plc_watchdog_thread = None
         self.plc_signals = PLCWatchdogSignals()
         self._plc_alert_overlay = None
@@ -88,8 +95,10 @@ class core:
         _log.info("[core.__init__] Creating CoreWorker...")
         self.worker_thread = CoreWorker(self)
         _log.info("[core.__init__] CoreWorker created. Connecting to MySQL...")
+        if self.progress_callback:
+            self.progress_callback("Đang kết nối cơ sở dữ liệu MySQL...", "Đang tự động phục hồi dịch vụ dữ liệu...", 15)
 
-        connect_result, mode_init = self.connect_to_mysql()
+        connect_result, mode_init = self.connect_to_mysql(progress_callback=self.progress_callback)
         _log.info("[core.__init__] connect_to_mysql done. connect_result=%s", connect_result)
         self.connection = connect_result
         self.mode_init  = mode_init
@@ -99,15 +108,21 @@ class core:
         else:
             _log.warning('Failed to initialize connections')
 
-
+        if self.progress_callback:
+            self.progress_callback("Đang nạp cấu hình giao tiếp PLC...", "Kiểm tra thông số Keyence Ethernet...", 50)
         _log.info("[core.__init__] init_plc_data...")
         self.init_plc_data()
         _log.info("[core.__init__] Connecting trigger signal...")
         self.worker_thread.trigger_detected.connect(self.open_pyuic6)
 
         self.count = 0
+        if self.progress_callback:
+            self.progress_callback("Đang nạp danh mục sản phẩm và Item Code...", "Đồng bộ danh sách sản phẩm...", 60)
         _log.info("[core.__init__] collect_dict_item...")
         self.collect_dict_item()
+
+        if self.progress_callback:
+            self.progress_callback("Đang cấu hình kịch bản tự động hóa...", "Nạp System Action Configs...", 70)
         _log.info("[core.__init__] reload_system_action_configs...")
         self.system_action_configs = {}
         self._action_cooldowns = {}
@@ -121,15 +136,81 @@ class core:
                 self._plc_success_banner.close()
             if self._plc_alert_overlay is None:
                 self._plc_alert_overlay = PLCAlertOverlay()
+                if hasattr(self._plc_alert_overlay, 'retry_requested'):
+                    self._plc_alert_overlay.retry_requested.connect(self._manual_reconnect_plc)
+
             self._plc_alert_overlay.set_plc_info(module, ip, port, attempts)
+
+            # Cập nhật thông báo nếu Watchdog đang TẮT theo cấu hình Admin
+            try:
+                from Administrator.user_db import is_watchdog_enabled
+                db_conn = getattr(self, 'cursor', None) or getattr(self, 'connection', None)
+                if not is_watchdog_enabled('plc', conn_or_cursor=db_conn):
+                    self._plc_alert_overlay.lbl_status.setText(
+                        "⚠️ Kết nối PLC thất bại! (Chế độ tự động quét ngầm đang TẮT theo cấu hình Admin)"
+                    )
+                    if hasattr(self._plc_alert_overlay, 'progress_bar'):
+                        self._plc_alert_overlay.progress_bar.setVisible(False)
+                else:
+                    if hasattr(self._plc_alert_overlay, 'progress_bar'):
+                        self._plc_alert_overlay.progress_bar.setVisible(True)
+            except Exception:
+                pass
+
             self._plc_alert_overlay.show_alert()
         except Exception as e:
             _log.error("Error in _on_plc_connection_lost: %s", e)
 
+    def _manual_reconnect_plc(self):
+        """Thử kết nối lại PLC theo yêu cầu thủ công của người dùng từ giao diện cảnh báo."""
+        ip = getattr(self, 'ip_address_plc', '')
+        port = getattr(self, 'port_plc', 0)
+        module = getattr(self, 'plc_module', 'KEYENCE')
+        if not ip or not port:
+            return
+
+        if self._plc_alert_overlay:
+            self._plc_alert_overlay.lbl_status.setText(f"🔄 Đang thử kết nối lại tới PLC {ip}:{port}...")
+
+        from module_2.plc_watchdog import test_tcp_connection
+        if test_tcp_connection(ip, port, timeout=1.5):
+            plc_cls = PLC_COLLECT.get(module, Keyence_Socket_Client)
+            new_client = plc_cls(ip, port)
+            connected = False
+            try:
+                connected = bool(new_client.connect())
+            except Exception as e:
+                _log.warning("Manual reconnect PLC exception: %s", e)
+
+            if connected:
+                self.driver_loader = new_client
+                self.is_plc_connected = True
+                self.mode_init_plc = 1
+                self.startup_plc_failed = False
+                _log.info("[PLC] ✅ Người dùng thử kết nối lại thành công tới %s (%s:%s)!", module, ip, port)
+                self._on_plc_connection_restored(module, ip, port)
+                return
+
+        _log.warning("[PLC] ❌ Người dùng thử kết nối lại thất bại tới %s (%s:%s)!", module, ip, port)
+        if self._plc_alert_overlay:
+            self._plc_alert_overlay.lbl_status.setText(f"❌ Không thể kết nối tới PLC tại {ip}:{port}! Vui lòng kiểm tra lại thiết bị.")
+
     def _on_plc_reconnect_attempt(self, attempts: int):
         """Slot cập nhật số lần thử kết nối lại trên UI cảnh báo."""
         try:
-            if self._plc_alert_overlay and self._plc_alert_overlay.isVisible():
+            if self._plc_alert_overlay is None:
+                self._plc_alert_overlay = PLCAlertOverlay()
+                if hasattr(self._plc_alert_overlay, 'retry_requested'):
+                    self._plc_alert_overlay.retry_requested.connect(self._manual_reconnect_plc)
+
+            user_dismissed = getattr(self._plc_alert_overlay, 'user_dismissed', False)
+            if not self._plc_alert_overlay.isVisible() and not user_dismissed:
+                module = getattr(self, 'plc_module', 'KEYENCE')
+                ip = getattr(self, 'ip_address_plc', '')
+                port = getattr(self, 'port_plc', 0)
+                self._plc_alert_overlay.set_plc_info(module, str(ip), int(port), attempts)
+                self._plc_alert_overlay.show_alert()
+            else:
                 self._plc_alert_overlay.update_attempts(attempts)
         except Exception as e:
             _log.debug("Error in _on_plc_reconnect_attempt: %s", e)
@@ -137,7 +218,8 @@ class core:
     def _on_plc_connection_restored(self, module: str, ip: str, port: int):
         """Slot xử lý khi khôi phục kết nối thành công: tắt cảnh báo, hiển thị banner thành công 5s."""
         try:
-            if self._plc_alert_overlay and self._plc_alert_overlay.isVisible():
+            self.startup_plc_failed = False
+            if self._plc_alert_overlay:
                 self._plc_alert_overlay.hide_alert()
             if self._plc_success_banner is None:
                 self._plc_success_banner = PLCSuccessBanner()
@@ -146,9 +228,19 @@ class core:
             _log.error("Error in _on_plc_connection_restored: %s", e)
 
     def start_plc_watchdog(self):
-        """Khởi động luồng giám sát kết nối PLC liên tục nếu đang ở chế độ kết nối PLC thật."""
+        """Khởi động luồng giám sát kết nối PLC liên tục nếu đang ở chế độ kết nối PLC thật và được Administrator cho phép."""
         if self.is_indirect_log_mode() or getattr(self, 'manual', 0) == 1:
             return
+
+        try:
+            from Administrator.user_db import is_watchdog_enabled
+            db_conn = getattr(self, 'cursor', None) or getattr(self, 'connection', None)
+            if not is_watchdog_enabled('plc', conn_or_cursor=db_conn):
+                _log.info("[PLC Watchdog] Bị TẮT theo cấu hình của Administrator.")
+                return
+        except Exception as e:
+            _log.debug("Lỗi kiểm tra is_watchdog_enabled('plc'): %s", e)
+
         if self.plc_watchdog_thread is None or not self.plc_watchdog_thread.isRunning():
             self.plc_watchdog_thread = PLCWatchdogThread(self)
             self.plc_watchdog_thread.is_connected = self.is_plc_connected
@@ -164,11 +256,19 @@ class core:
 
     def notify_plc_communication_error(self):
         """
-        Được gọi khi _safe_read_plc hoặc _safe_write_plc gặp lỗi socket với PLC thật.
-        Kích hoạt Watchdog xử lý mất kết nối ngay lập tức mà không cần đợi chu kỳ polling.
+        Được gọi khi _safe_read_plc hoặc _safe_write_plc gặp lỗi socket với PLC thật trong khi đang hoạt động.
+        Nếu chế độ giám sát liên tục PLC đang TẮT theo cấu hình Admin, bỏ qua không hiển thị cảnh báo gián đoạn giữa chừng.
         """
         if self.is_indirect_log_mode() or getattr(self, 'manual', 0) == 1:
             return
+
+        try:
+            from Administrator.user_db import is_watchdog_enabled
+            db_conn = getattr(self, 'cursor', None) or getattr(self, 'connection', None)
+            if not is_watchdog_enabled('plc', conn_or_cursor=db_conn):
+                return
+        except Exception:
+            pass
 
         if self.plc_watchdog_thread is not None:
             if not getattr(self, 'is_plc_connected', False):
@@ -189,11 +289,17 @@ class core:
             self.is_plc_connected = False
             self.mode_init_plc = 0
             self.start_plc_watchdog()
-            if hasattr(self, 'plc_signals'):
-                module = getattr(self, 'plc_module', 'KEYENCE')
-                ip = getattr(self, 'ip_address_plc', '')
-                port = getattr(self, 'port_plc', 0)
-                self.plc_signals.connection_lost.emit(module, str(ip), int(port), 1)
+            try:
+                from Administrator.user_db import is_watchdog_enabled
+                db_conn = getattr(self, 'cursor', None) or getattr(self, 'connection', None)
+                if is_watchdog_enabled('plc', conn_or_cursor=db_conn):
+                    if hasattr(self, 'plc_signals'):
+                        module = getattr(self, 'plc_module', 'KEYENCE')
+                        ip = getattr(self, 'ip_address_plc', '')
+                        port = getattr(self, 'port_plc', 0)
+                        self.plc_signals.connection_lost.emit(module, str(ip), int(port), 1)
+            except Exception:
+                pass
 
     def start_monitoring(self):
         self.worker_thread.start()
@@ -248,7 +354,6 @@ class core:
             if config is not None:
                 return config
 
-            # Nếu file chính bị rỗng hoặc lỗi, thử khôi phục từ .bak
             bak_path = filepath + '.bak'
             if os.path.exists(bak_path):
                 _log.warning("File cấu hình %s không hợp lệ. Đang tự động khôi phục từ backup %s", filepath, bak_path)
@@ -270,7 +375,7 @@ class core:
             return None
         return None
 
-    def connect_mysql_from_log(self, filepath=None, retries=40, delay=1.5):
+    def connect_mysql_from_log(self, filepath=None, retries=40, delay=1.5, progress_callback=None):
         if filepath is None:
             filepath = get_mysql_config_path()
         _log.info("[connect_mysql_from_log] Reading config from %s", filepath)
@@ -289,7 +394,6 @@ class core:
         password = config.get('password', '')
         port     = int(config.get('port', 3306))
 
-        # Danh sách host dự phòng: tự động đảo giữa 127.0.0.1 và localhost (tránh race condition phân giải DNS khi Windows vừa boot)
         candidate_hosts = [host]
         if host in ('127.0.0.1', 'localhost'):
             alt = 'localhost' if host == '127.0.0.1' else '127.0.0.1'
@@ -297,9 +401,10 @@ class core:
                 candidate_hosts.append(alt)
 
         progress_dialog = None
+        cb = progress_callback or getattr(self, 'progress_callback', None)
 
         for attempt in range(1, retries + 1):
-            # Nếu lần 1 chưa được và là máy cục bộ: Thử kích hoạt dịch vụ MySQL80
+
             if attempt in (2, 5) and any(h in ('127.0.0.1', 'localhost') for h in candidate_hosts):
                 try:
                     import subprocess
@@ -311,39 +416,45 @@ class core:
                 except Exception as svc_err:
                     _log.debug("Lỗi kiểm tra service MySQL80: %s", svc_err)
 
-            # Hiển thị thanh tiến trình chờ từ lần thử thứ 2
-            if attempt == 2:
-                try:
-                    from PyQt5.QtWidgets import QApplication, QProgressDialog
-                    app = QApplication.instance()
-                    if app:
-                        progress_dialog = QProgressDialog(
-                            "Đang chờ khởi tạo dịch vụ MySQL Server (Đang phục hồi sau khi khởi động PC)...",
-                            None, 0, retries
-                        )
-                        progress_dialog.setWindowTitle("Khởi tạo MySQL Database")
-                        progress_dialog.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.CustomizeWindowHint | Qt.WindowTitleHint)
-                        progress_dialog.setMinimumWidth(500)
-                        progress_dialog.setCancelButton(None)
+            if cb:
+                calc_pct = min(45, 15 + int(attempt * 0.75))
+                cb(
+                    f"Đang chờ dịch vụ MySQL Server sẵn sàng... ({attempt}/{retries})",
+                    "Hệ thống đang tự động phục hồi kết nối dữ liệu sau khi bật nguồn...",
+                    calc_pct
+                )
+            else:
+                if attempt == 2:
+                    try:
+                        from PyQt5.QtWidgets import QApplication, QProgressDialog
+                        app = QApplication.instance()
+                        if app:
+                            progress_dialog = QProgressDialog(
+                                "Đang chờ khởi tạo dịch vụ MySQL Server (Đang phục hồi sau khi khởi động PC)...",
+                                None, 0, retries
+                            )
+                            progress_dialog.setWindowTitle("Khởi tạo MySQL Database")
+                            progress_dialog.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.CustomizeWindowHint | Qt.WindowTitleHint)
+                            progress_dialog.setMinimumWidth(500)
+                            progress_dialog.setCancelButton(None)
+                            progress_dialog.setValue(attempt)
+                            progress_dialog.show()
+                            app.processEvents()
+                    except Exception:
+                        progress_dialog = None
+
+                if progress_dialog is not None:
+                    try:
                         progress_dialog.setValue(attempt)
-                        progress_dialog.show()
-                        app.processEvents()
-                except Exception:
-                    progress_dialog = None
+                        progress_dialog.setLabelText(
+                            f"Đang chờ dịch vụ MySQL Server sẵn sàng... (Lần thử {attempt}/{retries})\n"
+                            f"Hệ thống đang tự động phục hồi dữ liệu sau khi cấp lại nguồn điện."
+                        )
+                        from PyQt5.QtWidgets import QApplication
+                        QApplication.instance().processEvents()
+                    except Exception:
+                        pass
 
-            if progress_dialog is not None:
-                try:
-                    progress_dialog.setValue(attempt)
-                    progress_dialog.setLabelText(
-                        f"Đang chờ dịch vụ MySQL Server sẵn sàng... (Lần thử {attempt}/{retries})\n"
-                        f"Hệ thống đang tự động phục hồi dữ liệu sau khi cấp lại nguồn điện."
-                    )
-                    from PyQt5.QtWidgets import QApplication
-                    QApplication.instance().processEvents()
-                except Exception:
-                    pass
-
-            # Thử kết nối qua từng candidate host (127.0.0.1 và localhost)
             last_err = None
             for h in candidate_hosts:
                 for ssl_opt in (True, False):
@@ -361,6 +472,8 @@ class core:
                         connection = mysql.connector.connect(**conn_params)
                         if connection and connection.is_connected():
                             _log.info('[connect_mysql_from_log] Success to connect mysql on attempt %d (host=%s, ssl_disabled=%s)', attempt, h, ssl_opt)
+                            if cb:
+                                cb("Kết nối cơ sở dữ liệu MySQL thành công!", "Dịch vụ MySQL Server đã sẵn sàng hoạt động.", 45)
                             if progress_dialog is not None:
                                 try:
                                     progress_dialog.close()
@@ -373,7 +486,6 @@ class core:
 
             _log.warning('[connect_mysql_from_log] Attempt %d/%d failed: %s', attempt, retries, last_err)
 
-            # Kích hoạt tự động đăng nhập cứu hộ bằng pass mặc định (123456789) ngay từ lần 2 hoặc 4
             if attempt in (2, 4, 10):
                 _log.info("[connect_mysql_from_log] Kích hoạt tự động đăng nhập cứu hộ (fallback pass 123456789)...")
                 fallback_conn = self.auto_login_fallback()
@@ -394,7 +506,7 @@ class core:
                         progress_dialog.close()
                     except Exception:
                         pass
-                # Thử cứu hộ lần chót trước khi từ bỏ
+
                 return self.auto_login_fallback()
 
         if progress_dialog is not None:
@@ -437,7 +549,6 @@ class core:
                             if conn and conn.is_connected():
                                 _log.info("[auto_login_fallback] Tự động đăng nhập THÀNH CÔNG (host=%s, user=root, port=%d)!", h, port)
                                 
-                                # 1. Khởi tạo/cập nhật bảng DATA_AUTO_LOGIN.INFOR ở chế độ Auto
                                 try:
                                     cur = conn.cursor()
                                     cur.execute("CREATE DATABASE IF NOT EXISTS `DATA_AUTO_LOGIN`")
@@ -466,7 +577,6 @@ class core:
                                 except Exception as db_err:
                                     _log.warning("[auto_login_fallback] Lỗi ghi DB INFOR: %s", db_err)
 
-                                # 2. Tự động ghi lại file cấu hình bền vững
                                 try:
                                     self.write_mysql_config(host=h, user='root', password=p, port=port, database='DATA_AUTO_LOGIN')
                                     _log.info("[auto_login_fallback] Đã tự động ghi lại file cấu hình mysql_config.log!")
@@ -487,7 +597,6 @@ class core:
             tmp_path = filepath + '.tmp'
             bak_path = filepath + '.bak'
 
-            # 1. Ghi an toàn vào file tạm .tmp và ép ghi (fsync) xuống đĩa cứng để chống hỏng file khi sập nguồn
             with open(tmp_path, 'w', encoding='utf-8') as f:
                 f.write(f"host={host}\n")
                 f.write(f"user={user}\n")
@@ -497,7 +606,6 @@ class core:
                 f.flush()
                 os.fsync(f.fileno())
 
-            # 2. Tạo bản sao lưu dự phòng .bak từ file hiện tại (nếu đang tồn tại và có dữ liệu)
             if os.path.exists(filepath) and os.path.getsize(filepath) > 0:
                 try:
                     import shutil
@@ -505,10 +613,8 @@ class core:
                 except Exception:
                     pass
 
-            # 3. Thay thế nguyên tử (atomic replace) - đảm bảo file không bao giờ bị 0-byte hay dở dang
             os.replace(tmp_path, filepath)
 
-            # 4. Cập nhật luôn file sao lưu .bak bằng dữ liệu mới nhất
             try:
                 import shutil
                 shutil.copy2(filepath, bak_path)
@@ -533,19 +639,29 @@ class core:
                 date_time        DATETIME NOT NULL
             )
         """)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS `ITEM_CODE_SAVE`.`CAMERA_MODE_SAVE_DEFAULT` (
+                id               INT AUTO_INCREMENT PRIMARY KEY,
+                camera_key       VARCHAR(255) NOT NULL,
+                mode_key         VARCHAR(255) NOT NULL,
+                item_code        VARCHAR(255) DEFAULT '',
+                date_time        DATETIME NOT NULL,
+                UNIQUE KEY uq_camera_key (camera_key)
+            )
+        """)
         connection.commit()
         cursor.close()
 
-    def connect_to_mysql(self):
+    def connect_to_mysql(self, progress_callback=None):
+        cb = progress_callback or getattr(self, 'progress_callback', None)
         connection = None
         while connection is None:
             _log.info("[connect_to_mysql] Calling connect_mysql_from_log...")
-            connection = self.connect_mysql_from_log(retries=40, delay=1.5)
+            connection = self.connect_mysql_from_log(retries=40, delay=1.5, progress_callback=cb)
             _log.info("[connect_to_mysql] connect_mysql_from_log returned: %s", connection)
             if connection is not None:
                 break
 
-            # Tự động thực hiện cơ chế đăng nhập khẩn cấp (thay cho việc mở giao diện module_5/mysql.py bằng tay)
             _log.info("[connect_to_mysql] connect_mysql_from_log thất bại, kích hoạt auto_login_fallback...")
             connection = self.auto_login_fallback()
             if connection is not None:
@@ -588,7 +704,6 @@ class core:
             result = cursor.fetchall()
 
             if not result:
-                # Nếu bảng chưa có cấu hình, tự động khởi tạo mặc định chế độ Auto để hệ thống luôn sẵn sàng chạy
                 cursor.execute("""
                     INSERT IGNORE INTO `DATA_AUTO_LOGIN`.`INFOR` (
                         hostname, username, password, port, manual, automatic, retry_attemps
@@ -602,8 +717,7 @@ class core:
             manual    = bool(result[0][5])
             automatic = bool(result[0][6])
             cursor.close()
-            
-            # Chỉ khi người dùng chủ động tích chọn Manual (manual=True và automatic=False) mới vào chế độ Manual
+
             if manual and not automatic:
                 _log.info("[connect_to_mysql] Kết nối MySQL thành công (Chế độ Manual theo thiết lập người dùng)")
                 return connection, 0
@@ -706,16 +820,18 @@ class core:
                     self.driver_loader = plc_instance
                     self.mode_init_plc = 1
                     self.is_plc_connected = True
+                    self.startup_plc_failed = False
                     _log.info('Success to connect real PLC %s at %s:%s', plc_module, ip_address_plc, port_plc)
                 else:
                     self.driver_loader = None
                     self.mode_init_plc = 0
                     self.is_plc_connected = False
-                    _log.warning('Failed to connect real PLC %s at %s:%s on startup. Watchdog will auto-reconnect.', plc_module, ip_address_plc, port_plc)
+                    self.startup_plc_failed = True
+                    _log.warning('Failed to connect real PLC %s at %s:%s on startup. Triggering alert overlay.', plc_module, ip_address_plc, port_plc)
                     if hasattr(self, 'plc_signals'):
                         self.plc_signals.connection_lost.emit(plc_module, str(ip_address_plc), int(port_plc), 1)
 
-                # Bắt đầu Watchdog theo dõi liên tục và tự động kết nối lại ngầm
+                # Bắt đầu Watchdog theo dõi liên tục và tự động kết nối lại ngầm (nếu được Admin cho phép)
                 self.start_plc_watchdog()
             else:
                 self.is_plc_connected = False
@@ -727,24 +843,25 @@ class core:
     def collect_dict_item(self):
         if self.connection and self.mode_init:
             _log.info('Mode Automatic Login in MySQL (Optimized)')
-            try:
-                query_find_dbs = "SELECT TABLE_SCHEMA FROM information_schema.TABLES WHERE TABLE_NAME = 'ITEMS_CODE'"
-                self.cursor.execute(query_find_dbs)
-                databases = [row[0] for row in self.cursor.fetchall()]
+            with _db_lock:
+                try:
+                    query_find_dbs = "SELECT TABLE_SCHEMA FROM information_schema.TABLES WHERE TABLE_NAME = 'ITEMS_CODE'"
+                    self.cursor.execute(query_find_dbs)
+                    databases = [row[0] for row in self.cursor.fetchall()]
 
-                for name_line in databases:
-                    query_get_items = f"SELECT name_line_code, assign_register, value_bit_on, value_bit_off FROM {name_line}.ITEMS_CODE"
-                    self.cursor.execute(query_get_items)
-                    item_codes = self.cursor.fetchall()
+                    for name_line in databases:
+                        query_get_items = f"SELECT name_line_code, assign_register, value_bit_on, value_bit_off FROM {name_line}.ITEMS_CODE"
+                        self.cursor.execute(query_get_items)
+                        item_codes = self.cursor.fetchall()
 
-                    self.dict_list_line[name_line] = [
-                        {'item_code': row[0], 'register': row[1], 'value_bit_on': row[2], 'value_bit_off': row[3]} for row in item_codes
-                    ]
+                        self.dict_list_line[name_line] = [
+                            {'item_code': row[0], 'register': row[1], 'value_bit_on': row[2], 'value_bit_off': row[3]} for row in item_codes
+                        ]
 
-                self.reset_item_code_plc_latch()
-                _log.info("Successfully loaded items from %d databases", len(databases))
-            except Exception as e:
-                _log.error("Error in collect_dict_item: %s", e)
+                    self.reset_item_code_plc_latch()
+                    _log.info("Successfully loaded items from %d databases", len(databases))
+                except Exception as e:
+                    _log.error("Error in collect_dict_item: %s", e)
         else:
             _log.warning('Mode Manual Login or No Connection')
 
@@ -775,14 +892,15 @@ class core:
             return True
 
         try:
-            if self.connection and hasattr(self.connection, 'cursor'):
-                cursor = self.connection.cursor()
-                cursor.execute("SELECT direct_to_plc, indirect_from_log FROM `DATA_IP_ADDRESS`.`INFOR_ADDRESS` LIMIT 1")
-                row = cursor.fetchone()
-                cursor.close()
-                if row:
-                    direct_to_plc, indirect_from_log = bool(row[0]), bool(row[1])
-                    return indirect_from_log or (not direct_to_plc)
+            with _db_lock:
+                if self.connection and hasattr(self.connection, 'cursor'):
+                    cursor = self.connection.cursor()
+                    cursor.execute("SELECT direct_to_plc, indirect_from_log FROM `DATA_IP_ADDRESS`.`INFOR_ADDRESS` LIMIT 1")
+                    row = cursor.fetchone()
+                    cursor.close()
+                    if row:
+                        direct_to_plc, indirect_from_log = bool(row[0]), bool(row[1])
+                        return indirect_from_log or (not direct_to_plc)
         except Exception:
             pass
 
@@ -1066,37 +1184,39 @@ class core:
         if not self.connection:
             _log.info("No connection to MySQL in write_data_save_default")
             return
-        try:
-            cursor = self.connection.cursor()
-            cursor.execute("DELETE FROM `ITEM_CODE_SAVE`.`DATA_SAVE_DEFAULT`")
-            self.connection.commit()
-            cursor.execute(
-                "INSERT INTO `ITEM_CODE_SAVE`.`DATA_SAVE_DEFAULT` (date_time, name_item_code, name_line) VALUES (%s, %s, %s)",
-                (date_time, item_code, name_line)
-            )
-            self.connection.commit()
-            cursor.close()
-            _log.info('Success to write data save default: %s, %s', item_code, name_line)
-        except Exception as e:
-            _log.error("Error writing data save default: %s", e)
+        with _db_lock:
+            try:
+                cursor = self.connection.cursor()
+                cursor.execute("DELETE FROM `ITEM_CODE_SAVE`.`DATA_SAVE_DEFAULT`")
+                self.connection.commit()
+                cursor.execute(
+                    "INSERT INTO `ITEM_CODE_SAVE`.`DATA_SAVE_DEFAULT` (date_time, name_item_code, name_line) VALUES (%s, %s, %s)",
+                    (date_time, item_code, name_line)
+                )
+                self.connection.commit()
+                cursor.close()
+                _log.info('Success to write data save default: %s, %s', item_code, name_line)
+            except Exception as e:
+                _log.error("Error writing data save default: %s", e)
 
     def read_data_save_default(self):
         if not self.connection:
             _log.info("No connection to MySQL in read_data_save_default")
             return None
-        try:
-            cursor = self.connection.cursor()
-            cursor.execute("SELECT name_item_code, name_line, date_time FROM `ITEM_CODE_SAVE`.`DATA_SAVE_DEFAULT`")
-            result = cursor.fetchall()
-            cursor.close()
-            return result
-        except Exception as e:
-            _log.error("Error reading data save default: %s", e)
-            return None
+        with _db_lock:
+            try:
+                cursor = self.connection.cursor()
+                cursor.execute("SELECT name_item_code, name_line, date_time FROM `ITEM_CODE_SAVE`.`DATA_SAVE_DEFAULT`")
+                result = cursor.fetchall()
+                cursor.close()
+                return result
+            except Exception as e:
+                _log.error("Error reading data save default: %s", e)
+                return None
 
         
     def query_hardware_key(self, show_dialog=True):
-        if not self.connection:
+        if not self.connection and not getattr(self, '_hardware_key_cache', None):
             _log.warning("No database connection. Bypassing hardware key check to allow GUI configuration.")
             return True
         serial_hardware_key = self.get_serial_hardware_key()
@@ -1110,11 +1230,18 @@ class core:
             return False
         else:
             usb_list = self.get_connected_usb_serials()
+            registered_hashes = set()
+            for row in serial_hardware_key:
+                if row and row[0]:
+                    registered_hashes.add(str(row[0]).strip().upper())
+
             for usb in usb_list:
-                for i in range(len(serial_hardware_key)):
-                    if usb['serial'] == serial_hardware_key[i][0]:
-                        _log.info('Success to check hardware key')
-                        return True
+                s_exact = str(usb.get('serial', '')).strip().upper()
+                s_upper = str(usb.get('serial_upper', '')).strip().upper()
+                if s_exact in registered_hashes or s_upper in registered_hashes:
+                    _log.debug('Success to check hardware key: %s (%s)', usb.get('model'), usb.get('raw_serial'))
+                    return True
+
             if show_dialog:
                 QMessageBox.warning(
                     None,
@@ -1127,40 +1254,108 @@ class core:
         """Kiểm tra USB Hardware Key âm thầm, không hiển thị hộp thoại cảnh báo."""
         return self.query_hardware_key(show_dialog=False)
 
-
     def get_serial_hardware_key(self):
-        if not self.connection:
-            print("No database connection")
-            return
-        try:
-            cursor = self.connection.cursor(buffered=True)
-            cursor.execute("SELECT hash_code FROM ADMINISTRATOR.HARDWARE_KEY_CONFIG WHERE is_enabled = 1")
-            result = cursor.fetchall()
-            cursor.close()
-            return result
-        except Exception as e:
-            _log.error("Error reading hardware key: %s", e)
-            return None
+        """
+        Lấy danh sách mã băm hash_code của các USB Key hợp lệ đã đăng ký.
+        Có cơ chế Thread-safe (kết hợp cache lock và _db_lock toàn cục) và Cache trên RAM
+        để tránh xung đột kết nối MySQL giữa các luồng.
+        """
+        if not hasattr(self, '_hardware_key_cache'):
+            self._hardware_key_cache = None
+            self._hardware_key_cache_lock = threading.RLock()
 
+        with self._hardware_key_cache_lock:
+            if not self.connection:
+                if self._hardware_key_cache is not None:
+                    return self._hardware_key_cache
+                return None
+            with _db_lock:
+                try:
+                    cursor = self.connection.cursor(buffered=True)
+                    cursor.execute("SELECT hash_code FROM ADMINISTRATOR.HARDWARE_KEY_CONFIG WHERE is_enabled = 1")
+                    result = cursor.fetchall()
+                    cursor.close()
+                    if result:
+                        self._hardware_key_cache = result
+                    return result
+                except Exception as e:
+                    _log.warning("Lỗi truy vấn hardware key từ CSDL (dùng RAM cache nếu có): %s", e)
+                    if self._hardware_key_cache is not None:
+                        return self._hardware_key_cache
+                    return None
 
     def get_connected_usb_serials(self) -> list:
         """
         Quét tất cả USB đang cắm và tạo Hardware ID (HWID) bảo mật.
-        Sử dụng PowerShell để lấy danh sách thiết bị.
+        Sử dụng Windows Native API (cfgmgr32.dll) siêu nhanh (2ms), 
+        fallback sang PowerShell nếu cần.
         """
         import hashlib
+        import ctypes
         import subprocess
 
         usb_list = []
+        salt = "AI_VISION_PRO_SECURE_SALT_"
+
+        # 1. Quét bằng Windows Native API (cfgmgr32.dll) - Cực nhanh (~2ms), không tốn CPU, không timeout
+        try:
+            cfgmgr32 = ctypes.windll.cfgmgr32
+            CM_GETIDLIST_FILTER_PRESENT = 0x00000100
+            CM_GETIDLIST_FILTER_ENUMERATOR = 0x00000001
+            CM_DRP_DEVICEDESC = 0x00000001
+            CM_DRP_FRIENDLYNAME = 0x0000000D
+            filter_flag = CM_GETIDLIST_FILTER_PRESENT | CM_GETIDLIST_FILTER_ENUMERATOR
+
+            for enumerator in ('USB', 'USBSTOR'):
+                buf_size = ctypes.c_ulong(0)
+                if cfgmgr32.CM_Get_Device_ID_List_SizeW(ctypes.byref(buf_size), enumerator, filter_flag) == 0:
+                    if buf_size.value > 0:
+                        buf = ctypes.create_unicode_buffer(buf_size.value)
+                        if cfgmgr32.CM_Get_Device_ID_ListW(enumerator, buf, buf_size.value, filter_flag) == 0:
+                            raw = ''.join(buf[:])
+                            for dev_id in raw.split('\x00'):
+                                dev_str = dev_id.strip()
+                                if not dev_str or 'ROOT_HUB' in dev_str.upper():
+                                    continue
+
+                                # Lấy tên thiết bị (Friendly Name hoặc Device Description)
+                                model = "USB Device"
+                                devnode = ctypes.c_ulong(0)
+                                if cfgmgr32.CM_Locate_DevNodeW(ctypes.byref(devnode), dev_str, 0) == 0:
+                                    p_buf = ctypes.create_unicode_buffer(512)
+                                    p_len = ctypes.c_ulong(ctypes.sizeof(p_buf))
+                                    for prop in (CM_DRP_FRIENDLYNAME, CM_DRP_DEVICEDESC):
+                                        p_len.value = ctypes.sizeof(p_buf)
+                                        if cfgmgr32.CM_Get_DevNode_Registry_PropertyW(devnode, prop, None, ctypes.byref(p_buf), ctypes.byref(p_len), 0) == 0:
+                                            if p_buf.value:
+                                                model = p_buf.value
+                                                break
+
+                                # Tạo mã băm HWID chuẩn
+                                secure_hash = hashlib.sha256((salt + dev_str).encode('utf-8')).hexdigest().upper()
+                                secure_hash_upper = hashlib.sha256((salt + dev_str.upper()).encode('utf-8')).hexdigest().upper()
+                                usb_list.append({
+                                    "serial": secure_hash,
+                                    "serial_upper": secure_hash_upper,
+                                    "raw_serial": dev_str,
+                                    "model": model
+                                })
+        except Exception as e_native:
+            _log.debug("Quét USB qua native API gặp ngoại lệ: %s", e_native)
+
+        # 2. Nếu native API đã tìm thấy thiết bị thì trả về ngay
+        if usb_list:
+            return usb_list
+
+        # 3. Fallback sang PowerShell (nếu native không trả về kết quả)
         try:
             cmd = (
                 'powershell -Command "'
-                "Get-CimInstance Win32_PnPEntity | Where-Object { $_.PNPDeviceID -match '^USB' } | ForEach-Object { $serial = $_.PNPDeviceID.Split('\')[-1]; [PSCustomObject]@{ 'Device Name' = $_.Name; 'Serial Number' = $serial } } | ConvertTo-Csv -NoTypeInformation"
+                "Get-CimInstance Win32_PnPEntity | Where-Object { $_.PNPDeviceID -match '^USB' } | ForEach-Object { $serial = $_.PNPDeviceID.Split('\\')[-1]; [PSCustomObject]@{ 'Device Name' = $_.Name; 'Serial Number' = $serial } } | ConvertTo-Csv -NoTypeInformation"
                 '"'
             )
             result = subprocess.run(cmd, capture_output=True, text=True, shell=True, timeout=10)
             output = result.stdout.strip()
-            
             if output:
                 lines = output.strip().split('\n')
                 for line in lines[1:]:
@@ -1170,16 +1365,17 @@ class core:
                         pnp_and_serial = parts[1].strip()
                         if pnp_and_serial and "ROOT_HUB" not in pnp_and_serial:
                             raw_hwid = pnp_and_serial
-                            salt = "AI_VISION_PRO_SECURE_SALT_"
                             secure_hash = hashlib.sha256((salt + raw_hwid).encode('utf-8')).hexdigest().upper()
+                            secure_hash_upper = hashlib.sha256((salt + raw_hwid.upper()).encode('utf-8')).hexdigest().upper()
                             usb_list.append({
                                 "serial": secure_hash,
+                                "serial_upper": secure_hash_upper,
                                 "raw_serial": raw_hwid,
                                 "model": model
                             })
         except Exception as e:
-            _log.error("Lỗi khi quét USB bảo mật: %s", e)
-            
+            _log.error("Lỗi khi quét USB bảo mật (PowerShell fallback): %s", e)
+
         return usb_list
         
 

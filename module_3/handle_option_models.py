@@ -46,9 +46,9 @@ DEFAULT_ROW_VALUES: Final[dict[str, Any]] = {
     "Min Height": "1",        # Mặc định là 1
     "Max Height": "10000",    # Mặc định là 10000
     "Register": "",           # Không cố định auto DM, để trống cho người dùng tự do nhập các tiền tố (DM, MR, R, T, C)
-    "Value State": "1",       # Mặc định là 1
-    "Value OK": "1",          # Mặc định là 1
-    "Value NG": "1",          # Mặc định là 1
+    "Value State": "",        # Mặc định để trống (nếu không nhập thì không gửi)
+    "Value OK": "",           # Mặc định để trống (nếu không nhập thì không gửi)
+    "Value NG": "",           # Mặc định để trống (nếu không nhập thì không gửi)
     "Value": "1",             # Mặc định là 1 (tương thích ngược)
     "Confidence": "30",       # Mặc định là 30
 }
@@ -794,15 +794,19 @@ class Process_Model:
                 item.setCheckState(Qt.Checked if is_chk else Qt.Unchecked)
             else:
                 val = values_dict.get(col_name)
-                if val is None or str(val).strip() == "" or (str(val).strip() == "0" and col_name in (
-                    "Max Width", "Max Height", "Qty", "Value State", "Value OK", "Value NG", "Value", "Confidence", "Min Width", "Min Height"
+                if col_name in ("Value State", "Value OK", "Value NG"):
+                    if val is None or str(val).strip() == "" or str(val).strip().lower() in ('none', 'no value', 'null'):
+                        val_str = ""
+                    else:
+                        val_str = str(val).strip()
+                elif col_name == "Register":
+                    val_str = str(val).strip().upper() if val is not None else ""
+                elif val is None or str(val).strip() == "" or (str(val).strip() == "0" and col_name in (
+                    "Max Width", "Max Height", "Qty", "Confidence", "Min Width", "Min Height"
                 )):
                     val_str = str(DEFAULT_ROW_VALUES.get(col_name, "0"))
                 else:
                     val_str = str(val).strip()
-
-                if col_name == "Register":
-                    val_str = val_str.upper() if val_str else ""
 
                 item.setText(val_str)
             row_items.append(item)
@@ -969,17 +973,16 @@ class Process_Model:
             key_model = self.get_key_model()
             tasks_list = []
             for t in all_tasks:
-                if t.get('enabled'):
-                    t['rules'] = get_task_rules(self.cursor, t['id'])
-                    if t['rules']:
-                        tasks_list.append(t)
+                t['rules'] = get_task_rules(self.cursor, t['id'])
+                tasks_list.append(t)
             
             if not isinstance(self.active_tasks, dict):
                 self.active_tasks = {}
             self.active_tasks[key_model] = tasks_list
             Process_Model.dict_active_tasks[key_model] = tasks_list
-            _log.info("Loaded %d active geometric tasks for key_model=%s (camera_id=%s, model_id=%s)", 
-                      len(tasks_list), key_model, cam_id, mod_id)
+            active_count = sum(1 for t in tasks_list if t.get('enabled'))
+            _log.info("Loaded %d geometric tasks (active: %d, disabled: %d) for key_model=%s (camera_id=%s, model_id=%s)", 
+                      len(tasks_list), active_count, len(tasks_list) - active_count, key_model, cam_id, mod_id)
         except Exception as e:
             _log.error("Error loading task calculator config: %s", e)
 
@@ -1571,7 +1574,12 @@ class Process_Model:
                 """
 
                 for row_dict in list_insert:
-                    values = [row_dict.get(ui_col, None) for ui_col in COLUMN_MAPPING.keys()]
+                    values = []
+                    for ui_col in COLUMN_MAPPING.keys():
+                        v = row_dict.get(ui_col, None)
+                        if ui_col in ("Value State", "Value OK", "Value NG") and (v == "" or (v is not None and str(v).strip() == "")):
+                            v = None
+                        values.append(v)
                     values.append(model_id)
                     cursor.execute(sql, values)
 

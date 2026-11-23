@@ -349,17 +349,19 @@ class PLCHandler:
 
         # 2. Kiểm tra từ CSDL DATA_IP_ADDRESS.INFOR_ADDRESS nếu có db_manager hoặc connection
         try:
-            conn = getattr(self.layer_core, 'connection', None)
-            if conn and hasattr(conn, 'cursor') and callable(conn.cursor):
-                cursor = conn.cursor()
-                cursor.execute("SELECT direct_to_plc, indirect_from_log FROM DATA_IP_ADDRESS.INFOR_ADDRESS LIMIT 1")
-                row = cursor.fetchone()
-                cursor.close()
-                if row:
-                    direct_to_plc, indirect_from_log = bool(row[0]), bool(row[1])
-                    mode = indirect_from_log or (not direct_to_plc)
-                    self._cached_indirect_log_mode = mode
-                    return mode
+            from module_3.task_calculator_db import _db_lock
+            with _db_lock:
+                conn = getattr(self.layer_core, 'connection', None)
+                if conn and hasattr(conn, 'cursor') and callable(conn.cursor):
+                    cursor = conn.cursor()
+                    cursor.execute("SELECT direct_to_plc, indirect_from_log FROM DATA_IP_ADDRESS.INFOR_ADDRESS LIMIT 1")
+                    row = cursor.fetchone()
+                    cursor.close()
+                    if row:
+                        direct_to_plc, indirect_from_log = bool(row[0]), bool(row[1])
+                        mode = indirect_from_log or (not direct_to_plc)
+                        self._cached_indirect_log_mode = mode
+                        return mode
         except Exception:
             pass
 
@@ -377,7 +379,13 @@ class PLCHandler:
         """
         for reg, val in write_tasks:
             if reg and str(reg).strip():
-                self._safe_write_plc(str(reg).strip(), val)
+                if val is None or str(val).strip() == "" or str(val).strip().lower() in ('none', 'no value', 'null'):
+                    continue
+                try:
+                    write_val = int(val)
+                except (ValueError, TypeError):
+                    write_val = val
+                self._safe_write_plc(str(reg).strip(), write_val)
 
     def _safe_read_plc(self, register: str):
         """
@@ -612,8 +620,10 @@ class PLCHandler:
                     if not reg_str:
                         continue
 
+                    val_is_empty = (val is None or str(val).strip() == "" or str(val).strip().lower() in ('none', 'no value', 'null'))
+
                     try:
-                        val_num = int(val)
+                        val_num = int(val) if not val_is_empty else None
                     except (ValueError, TypeError):
                         val_num = val
 
@@ -622,18 +632,25 @@ class PLCHandler:
                     cfg_ok = self._cfg_registers_ok_values[key].get(reg_str)
 
                     is_this_ng = False
-                    if cfg_ng is not None and val_num == cfg_ng:
-                        is_this_ng = True
-                    elif cfg_ok is not None and val_num != cfg_ok:
-                        is_this_ng = True
-                    elif not is_shot_ok and (cfg_ok is None and cfg_ng is None):
-                        is_this_ng = True
+                    if val_is_empty:
+                        if not is_shot_ok:
+                            is_this_ng = True
+                    else:
+                        if cfg_ng is not None and val_num == cfg_ng:
+                            is_this_ng = True
+                        elif cfg_ok is not None and val_num != cfg_ok:
+                            is_this_ng = True
+                        elif not is_shot_ok and (cfg_ok is None and cfg_ng is None):
+                            is_this_ng = True
 
                     # NẾU THANH GHI NÀY ĐÃ TỪNG BỊ NG TRONG CHU KỲ NÀY:
                     if reg_str in self._ng_registers_store[key]:
                         if is_this_ng:
-                            # Cả 2 shot đều NG: cập nhật giá trị NG mới nhất
-                            self._register_store[key][reg_str] = val
+                            # Cả 2 shot đều NG: cập nhật giá trị NG mới nhất nếu có giá trị
+                            if not val_is_empty:
+                                self._register_store[key][reg_str] = val
+                            else:
+                                self._register_store[key].pop(reg_str, None)
                         else:
                             # ĐÃ BỊ NG Ở SHOT TRƯỚC, SHOT SAU TRẢ VỀ OK -> BẢO VỆ NG, TUYỆT ĐỐI KHÔNG GHI ĐÈ!
                             _log.warning(
@@ -646,7 +663,13 @@ class PLCHandler:
                         if is_this_ng:
                             self._ng_registers_store[key].add(reg_str)
                             _log.info("[%s] Ghi nhận NG cho thanh ghi %s = %s", key, reg_str, val)
-                        self._register_store[key][reg_str] = val
+                            if not val_is_empty:
+                                self._register_store[key][reg_str] = val
+                            else:
+                                self._register_store[key].pop(reg_str, None)
+                        else:
+                            if not val_is_empty:
+                                self._register_store[key][reg_str] = val
 
             elif isinstance(registers, (list, tuple, set)):
                 for r in registers:
@@ -789,10 +812,8 @@ class PLCHandler:
                         from module_3.task_calculator_db import get_tasks_by_camera, get_task_rules
                         all_db_tasks = get_tasks_by_camera(cursor, cam_id, mod_id)
                         for t in all_db_tasks:
-                            if t.get('enabled'):
-                                t['rules'] = get_task_rules(cursor, t['id'])
-                                if t.get('rules'):
-                                    tasks_for_model.append(t)
+                            t['rules'] = get_task_rules(cursor, t['id'])
+                            tasks_for_model.append(t)
                         # Đánh dấu đã load và lưu vào RAM để lần sau không query lại CSDL
                         tasks_loaded = True
                         if model_proc and isinstance(getattr(model_proc, 'active_tasks', None), dict):
@@ -800,14 +821,14 @@ class PLCHandler:
                     except Exception:
                         pass
 
-            # Đưa tất cả các task có assign_register hợp lệ vào danh sách cấu hình
+            # Đưa tất cả các task có assign_register hợp lệ vào danh sách cấu hình (kể cả bỏ tích kích hoạt)
             if tasks_for_model:
                 for t in tasks_for_model:
                     t_reg = str(t.get('assign_register') or '').strip()
                     if t_reg and t_reg.lower() not in ('none', 'no value') and any(c.isdigit() for c in t_reg):
-                        val_state = t.get('value_state', t.get('Value_State', 1))
-                        val_ok = t.get('value_ok', t.get('Value_OK', t.get('value_bit_on', 1)))
-                        val_ng = t.get('value_ng', t.get('Value_NG', t.get('value_bit_off', 0)))
+                        val_state = t.get('value_state', t.get('Value_State'))
+                        val_ok = t.get('value_ok', t.get('Value_OK', t.get('value_bit_on')))
+                        val_ng = t.get('value_ng', t.get('Value_NG', t.get('value_bit_off')))
                         final_cfg.append({
                             'label': f"Task:{t.get('task_name', '')}",
                             'register': t_reg,
@@ -815,7 +836,8 @@ class PLCHandler:
                             'value_ok': val_ok,
                             'value_ng': val_ng,
                             'value': val_state,
-                            'join': True,
+                            'join': bool(t.get('enabled', True)),
+                            'enabled': bool(t.get('enabled', True)),
                         })
 
                 _log.info("[%s] _extract_shot_cfg_rows for key_model=%s: đã tập hợp %d nhãn + %d tasks (tổng %d thanh ghi)",
@@ -830,6 +852,7 @@ class PLCHandler:
         Tích lũy các thanh ghi cấu hình cfg_rows theo key camera cho từng shot của chu kỳ.
         Có khử trùng lặp, lọc thanh ghi hợp lệ và an toàn luồng qua _get_register_lock(key).
         Đồng thời ghi nhận giá trị value_state, value_ok, value_ng của từng thanh ghi.
+        Nếu value_state để trống/None/không nhập gì, không gán giá trị mặc định để tránh gửi nhầm lên PLC.
         """
         if not cfg_rows:
             return
@@ -839,21 +862,45 @@ class PLCHandler:
                     reg = str(cfg.get('register') or '').strip()
                     if reg and reg.lower() not in ('none', 'no value') and any(c.isdigit() for c in reg):
                         self._cfg_registers_store[key].add(reg)
-                        val_state = cfg.get('value_state', cfg.get('value', 1))
-                        self._cfg_registers_values[key][reg] = val_state
+
+                        val_state = cfg.get('value_state')
+                        if val_state is None:
+                            val_state = cfg.get('Value_State')
+                        if val_state is None:
+                            val_state = cfg.get('value')
+
+                        # Kiểm tra xem có giá trị hợp lệ hay để trống
+                        has_val_state = False
+                        if val_state is not None:
+                            val_str = str(val_state).strip()
+                            if val_str != "" and val_str.lower() not in ('none', 'no value', 'null'):
+                                try:
+                                    self._cfg_registers_values[key][reg] = int(val_str)
+                                except (ValueError, TypeError):
+                                    self._cfg_registers_values[key][reg] = val_state
+                                has_val_state = True
+
+                        if not has_val_state:
+                            # Để trống, không nhập gì -> đánh dấu None
+                            self._cfg_registers_values[key][reg] = None
 
                         val_ok = cfg.get('value_ok', cfg.get('Value_OK'))
                         val_ng = cfg.get('value_ng', cfg.get('Value_NG'))
-                        if val_ok is not None and str(val_ok).strip() != "":
+                        if val_ok is not None and str(val_ok).strip() != "" and str(val_ok).strip().lower() not in ('none', 'no value', 'null'):
                             try:
                                 self._cfg_registers_ok_values[key][reg] = int(val_ok)
                             except (ValueError, TypeError):
                                 self._cfg_registers_ok_values[key][reg] = val_ok
-                        if val_ng is not None and str(val_ng).strip() != "":
+                        else:
+                            self._cfg_registers_ok_values[key][reg] = None
+
+                        if val_ng is not None and str(val_ng).strip() != "" and str(val_ng).strip().lower() not in ('none', 'no value', 'null'):
                             try:
                                 self._cfg_registers_ng_values[key][reg] = int(val_ng)
                             except (ValueError, TypeError):
                                 self._cfg_registers_ng_values[key][reg] = val_ng
+                        else:
+                            self._cfg_registers_ng_values[key][reg] = None
         _log.debug('[%s] Accumulated cfg registers (total: %s)',
                    key, len(self._cfg_registers_store[key]))
 
@@ -864,11 +911,13 @@ class PLCHandler:
             self._cfg_registers_store[key].clear()
         return regs
 
-    def _init_cfg_registers(self, key: str, cfg_rows: list = None, value: int = 1) -> set:
+    def _init_cfg_registers(self, key: str, cfg_rows: list = None, value: int = None) -> set:
         """
-        Ghi tất cả các thanh ghi cfg_rows đã tích lũy của camera 'key' lên giá trị trạng thái Value State (mặc định là 1).
+        Ghi tất cả các thanh ghi cfg_rows đã tích lũy của camera 'key' lên giá trị trạng thái Value State.
         Nếu có truyền cfg_rows trực tiếp (như ở single frame) thì tích lũy thêm trước khi pop và ghi.
         Đảm bảo định danh theo key camera, khử trùng lặp và an toàn luồng tuyệt đối.
+        QUY TẮC: Nếu cột value_state có giá trị -> gửi qua _safe_write_plc.
+                 Nếu cột value_state để trống (không nhập gì) -> TUYỆT ĐỐI KHÔNG GỬI (_safe_write_plc).
         """
         if cfg_rows:
             self._accumulate_cfg_registers(key, cfg_rows)
@@ -879,37 +928,262 @@ class PLCHandler:
             self._cfg_registers_store[key].clear()
             self._cfg_registers_values[key].clear()
 
-        for reg in regs_to_write:
-            target_val = reg_vals.get(reg, value)
-            self._safe_write_plc(reg, target_val)
+        written_pairs = []
+        for reg in sorted(regs_to_write):
+            target_val = reg_vals.get(reg)
 
-        if regs_to_write:
-            written_pairs = [f"{r}={reg_vals.get(r, value)}" for r in sorted(regs_to_write)]
+            # Nếu trong reg_vals là None (người dùng để trống trong cấu hình): TUYỆT ĐỐI KHÔNG GỬI
+            if reg in reg_vals and reg_vals[reg] is None:
+                _log.debug('[%s] Bỏ qua _safe_write_plc cho thanh ghi %s do value_state để trống trong cấu hình', key, reg)
+                continue
+
+            # Nếu reg chưa có trong reg_vals, kiểm tra tham số fallback 'value' (nếu có truyền)
+            if target_val is None:
+                if value is not None and str(value).strip() != "" and str(value).strip().lower() not in ('none', 'no value', 'null'):
+                    target_val = value
+                else:
+                    _log.debug('[%s] Bỏ qua _safe_write_plc cho thanh ghi %s do không có value_state hợp lệ', key, reg)
+                    continue
+
+            # Kiểm tra an toàn trước khi gửi PLC
+            val_str = str(target_val).strip()
+            if val_str == "" or val_str.lower() in ('none', 'no value', 'null'):
+                _log.debug('[%s] Bỏ qua _safe_write_plc cho thanh ghi %s do target_val rỗng', key, reg)
+                continue
+
+            try:
+                write_val = int(target_val)
+            except (ValueError, TypeError):
+                write_val = target_val
+
+            self._safe_write_plc(reg, write_val)
+            written_pairs.append(f"{reg}={write_val}")
+
+        if written_pairs:
             _log.info('[%s] Đã ghi tất cả thanh ghi thành phần của %s theo Value State: %s',
                       key, key.removeprefix('built-in-'), written_pairs)
-        return regs_to_write
+        return set(p.split('=')[0] for p in written_pairs)
 
     # -----------------------------------------------------------------------
-    # Built-in objects / config
+    # Built-in objects / config & Mode Persistence
     # -----------------------------------------------------------------------
+
+    def _get_db_connection(self):
+        """Lấy connection tới CSDL MySQL từ layer_core hoặc processor."""
+        if self.layer_core and getattr(self.layer_core, 'connection', None):
+            return self.layer_core.connection
+        if self.processor:
+            conn = getattr(self.processor, 'connect_plc', None)
+            if conn and getattr(conn, 'connection', None):
+                return conn.connection
+            db_m = getattr(self.processor, 'db_manager', None)
+            if db_m and getattr(db_m, 'connect_db', None):
+                c = getattr(db_m.connect_db, 'connection', None)
+                if c:
+                    return c
+        return None
+
+    def _normalize_camera_key(self, camera_key: str) -> str:
+        s = str(camera_key).strip()
+        clean = s.replace('built-in-camera-', '').replace('built-in-', '').replace('camera-', '')
+        return f'built-in-camera-{clean}'
+
+    def _get_mode_cache_path(self) -> str:
+        import os
+        log_dir = os.path.join(os.getcwd(), 'System_Logs')
+        os.makedirs(log_dir, exist_ok=True)
+        return os.path.join(log_dir, 'camera_mode_save_default.json')
+
+    def _save_camera_mode_local_cache(self, camera_key: str, mode_key: str, item_code: str, date_time: str):
+        try:
+            import json, os
+            cache_file = self._get_mode_cache_path()
+            data = {}
+            if os.path.exists(cache_file):
+                try:
+                    with open(cache_file, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                except Exception:
+                    data = {}
+            data[camera_key] = {
+                'mode_key': mode_key,
+                'item_code': item_code,
+                'date_time': date_time
+            }
+            with open(cache_file, 'w', encoding='utf-8') as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            _log.debug("Error saving camera mode local cache: %s", e)
+
+    def write_camera_mode_save_default(self, camera_key: str, mode_key: str):
+        if not camera_key or not mode_key:
+            return
+        norm_cam = self._normalize_camera_key(camera_key)
+        date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        item_code = getattr(self.processor, 'i_code', '') or ''
+
+        try:
+            from module_3.task_calculator_db import _db_lock, ensure_connection_alive
+            with _db_lock:
+                conn = self._get_db_connection()
+                if conn:
+                    try:
+                        ensure_connection_alive(conn)
+                        cursor = conn.cursor()
+                        global _camera_mode_table_ensured
+                        if '_camera_mode_table_ensured' not in globals() or not _camera_mode_table_ensured:
+                            cursor.execute("CREATE DATABASE IF NOT EXISTS `ITEM_CODE_SAVE`")
+                            cursor.execute("""
+                                CREATE TABLE IF NOT EXISTS `ITEM_CODE_SAVE`.`CAMERA_MODE_SAVE_DEFAULT` (
+                                    id               INT AUTO_INCREMENT PRIMARY KEY,
+                                    camera_key       VARCHAR(255) NOT NULL,
+                                    mode_key         VARCHAR(255) NOT NULL,
+                                    item_code        VARCHAR(255) DEFAULT '',
+                                    date_time        DATETIME NOT NULL,
+                                    UNIQUE KEY uq_camera_key (camera_key)
+                                )
+                            """)
+                            _camera_mode_table_ensured = True
+                        cursor.execute("""
+                            INSERT INTO `ITEM_CODE_SAVE`.`CAMERA_MODE_SAVE_DEFAULT` 
+                                (camera_key, mode_key, item_code, date_time)
+                            VALUES (%s, %s, %s, %s)
+                            ON DUPLICATE KEY UPDATE 
+                                mode_key = VALUES(mode_key),
+                                item_code = VALUES(item_code),
+                                date_time = VALUES(date_time)
+                        """, (norm_cam, str(mode_key), str(item_code), date_time))
+                        conn.commit()
+                        cursor.close()
+                        _log.info("[%s] Đã lưu mode_key kích lần cuối '%s' vào CSDL (Item: %s)", norm_cam, mode_key, item_code)
+                    except Exception as e:
+                        _log.error("Error writing camera mode save default to MySQL for %s: %s", norm_cam, e)
+                else:
+                    _log.warning("No database connection to save camera mode default for %s", norm_cam)
+        except Exception as e:
+            _log.error("write_camera_mode_save_default lock error for %s: %s", norm_cam, e)
+
+        self._save_camera_mode_local_cache(norm_cam, str(mode_key), str(item_code), date_time)
+
+    def read_camera_mode_save_default(self, camera_key: str = None):
+        """
+        Đọc mode_key của lần kick cuối cùng của từng camera từ CSDL MySQL (hoặc từ local cache).
+        Trả về: dict {camera_key: {'mode_key': str, 'item_code': str, 'date_time': str}}
+        hoặc nếu truyền camera_key cụ thể thì trả về dict info của camera đó (hoặc None).
+        """
+        results = {}
+        try:
+            from module_3.task_calculator_db import _db_lock, ensure_connection_alive
+            with _db_lock:
+                conn = self._get_db_connection()
+                if conn:
+                    try:
+                        ensure_connection_alive(conn)
+                        cursor = conn.cursor()
+                        global _camera_mode_table_ensured
+                        if '_camera_mode_table_ensured' not in globals() or not _camera_mode_table_ensured:
+                            cursor.execute("CREATE DATABASE IF NOT EXISTS `ITEM_CODE_SAVE`")
+                            cursor.execute("""
+                                CREATE TABLE IF NOT EXISTS `ITEM_CODE_SAVE`.`CAMERA_MODE_SAVE_DEFAULT` (
+                                    id               INT AUTO_INCREMENT PRIMARY KEY,
+                                    camera_key       VARCHAR(255) NOT NULL,
+                                    mode_key         VARCHAR(255) NOT NULL,
+                                    item_code        VARCHAR(255) DEFAULT '',
+                                    date_time        DATETIME NOT NULL,
+                                    UNIQUE KEY uq_camera_key (camera_key)
+                                )
+                            """)
+                            _camera_mode_table_ensured = True
+                        cursor.execute("SELECT camera_key, mode_key, item_code, date_time FROM `ITEM_CODE_SAVE`.`CAMERA_MODE_SAVE_DEFAULT`")
+                        rows = cursor.fetchall()
+                        cursor.close()
+                        for row in rows:
+                            c_key = self._normalize_camera_key(str(row[0]))
+                            results[c_key] = {
+                                'mode_key': str(row[1]),
+                                'item_code': str(row[2]) if row[2] else '',
+                                'date_time': str(row[3])
+                            }
+                    except Exception as e:
+                        _log.error("Error reading camera mode save default from MySQL: %s", e)
+        except Exception as e:
+            _log.error("read_camera_mode_save_default lock error: %s", e)
+
+        try:
+            import json, os
+            cache_file = self._get_mode_cache_path()
+            if os.path.exists(cache_file):
+                with open(cache_file, 'r', encoding='utf-8') as f:
+                    cache_data = json.load(f)
+                    for k, v in cache_data.items():
+                        c_key = self._normalize_camera_key(k)
+                        if c_key not in results and isinstance(v, dict):
+                            results[c_key] = v
+        except Exception as e:
+            _log.debug("Error reading camera mode local cache: %s", e)
+
+        if camera_key:
+            norm_key = self._normalize_camera_key(camera_key)
+            return results.get(norm_key)
+        return results
 
     def set_built_in_config(self, objects, mapping):
         self.built_in_objects = objects
         self.built_in_mapping_mode = mapping
+        saved_modes = self.read_camera_mode_save_default()
+        restored_cams = {}
+
         with self._mode_lock:
             for cam_key, cam_info in mapping.items():
+                norm_cam = self._normalize_camera_key(cam_key)
                 cam_auto_mode = cam_info.get('mapping', {}).get('automatic', {}).get('mapping_mode')
-                if cam_auto_mode and cam_key not in self.camera_modes:
-                    self.camera_modes[cam_key] = cam_auto_mode
-            if self.default_mode is None:
-                self.default_mode = next(
-                    (cam.get('mapping', {}).get('automatic', {}).get('mapping_mode')
-                     for cam in mapping.values()
-                     if cam.get('mapping', {}).get('automatic', {}).get('mapping_mode')),
-                    None
-                )
+                saved_info = saved_modes.get(norm_cam) if isinstance(saved_modes, dict) else None
+                saved_mode_key = saved_info.get('mode_key') if saved_info else None
+
+                modes_dict = {}
+                if self.processor and hasattr(self.processor, 'built_in_modes'):
+                    modes_dict = self.processor.built_in_modes.get(cam_key, {}).get('modes', {})
+
+                valid_mode = False
+                if saved_mode_key:
+                    if saved_mode_key in modes_dict:
+                        valid_mode = True
+                    elif any(item.get('mapping_mode') == saved_mode_key for item in cam_info.get('mapping', {}).values()):
+                        valid_mode = True
+
+                if valid_mode and saved_mode_key:
+                    self.camera_modes[cam_key] = saved_mode_key
+                    restored_cams[cam_key] = saved_mode_key
+                    _log.info(
+                        "[%s] Auto-restoring mode from last kick: '%s' (saved at %s, item: %s, fallback was '%s')",
+                        cam_key, saved_mode_key, saved_info.get('date_time'), saved_info.get('item_code'), cam_auto_mode
+                    )
+                else:
+                    if cam_auto_mode and cam_key not in self.camera_modes:
+                        self.camera_modes[cam_key] = cam_auto_mode
+                        _log.info("[%s] Sử dụng mode mặc định ban đầu: '%s'", cam_key, cam_auto_mode)
+
+            if self.default_mode is None and self.camera_modes:
+                self.default_mode = next(iter(self.camera_modes.values()), None)
+
         self._update_trigger_cache()
         self._set_mode_reg_process()
+        for cam_key, restored_mode in restored_cams.items():
+            try:
+                if hasattr(self, '_last_mode_plc_val') and isinstance(self._last_mode_plc_val, dict):
+                    modes_dict = self.processor.built_in_modes.get(cam_key, {}).get('modes', {})
+                    mode_val = modes_dict.get(restored_mode, {})
+                    reg = mode_val.get('register')
+                    val_on = mode_val.get('value_bit_on')
+                    if reg and val_on is not None:
+                        try:
+                            self._last_mode_plc_val[(cam_key, restored_mode, str(reg).strip())] = int(val_on)
+                        except (ValueError, TypeError):
+                            pass
+                self.load_user_set_selector_from_mode(target_camera=cam_key)
+                self.load_params_from_activated_mode(mode_name=restored_mode, target_camera=cam_key)
+            except Exception as e:
+                _log.error("Error restoring mode state on startup for %s (%s): %s", cam_key, restored_mode, e)
 
     def _update_counter_settings(self,automation_ui):
         if automation_ui:
@@ -1176,6 +1450,9 @@ class PLCHandler:
                             self.camera_modes[cam_key] = mode_key
                             self.default_mode = mode_key
 
+                        # Cơ chế lưu lại mode_key của lần kick cuối cùng của từng camera riêng
+                        self.write_camera_mode_save_default(cam_key, mode_key)
+
                         mode_name, _ = self._find_mode_mapping(cam_key, mode_key)
                         _log.info("[%s] Kích hoạt mode '%s' (mapping=%s) từ thanh ghi %s=%s",
                                   cam_key, mode_key, mode_name, register, current_value)
@@ -1233,70 +1510,73 @@ class PLCHandler:
             _log.warning("[PLCHandler] Cannot load params for mode %s: db_manager cursor is None", mode_name)
             return
 
-        targets = [target_camera] if target_camera else list(self.built_in_objects.keys())
-        for key in targets:
-            values = self.built_in_objects.get(key)
-            if not values:
-                continue
+        from module_3.task_calculator_db import _db_lock, ensure_connection_alive
+        with _db_lock:
+            ensure_connection_alive(cursor)
+            targets = [target_camera] if target_camera else list(self.built_in_objects.keys())
+            for key in targets:
+                values = self.built_in_objects.get(key)
+                if not values:
+                    continue
 
-            cam_mode = mode_name or self.camera_modes.get(key, self.default_mode)
-            if not cam_mode:
-                continue
+                cam_mode = mode_name or self.camera_modes.get(key, self.default_mode)
+                if not cam_mode:
+                    continue
 
-            automation_ui = values.get('automation_ui')
-            signals_processor = values.get('signals_processor') or getattr(automation_ui, 'signals_processor', None)
-            camera_id = values.get('camera_id') or getattr(automation_ui, 'camera_id', None)
-            item_code_id = values.get('item_code_id') or getattr(automation_ui, 'item_code_id', None)
-            models = values.get('models') or getattr(automation_ui, 'models', None)
+                automation_ui = values.get('automation_ui')
+                signals_processor = values.get('signals_processor') or getattr(automation_ui, 'signals_processor', None)
+                camera_id = values.get('camera_id') or getattr(automation_ui, 'camera_id', None)
+                item_code_id = values.get('item_code_id') or getattr(automation_ui, 'item_code_id', None)
+                models = values.get('models') or getattr(automation_ui, 'models', None)
 
-            if not signals_processor:
-                continue
+                if not signals_processor:
+                    continue
 
-            try:
-                # 1. Tải mapping thông số tín hiệu của mode từ Database
-                mode_auto_id = signals_processor.load_params_signals_from_gui_mapping_db(
-                    cursor, camera_id, mode_name=cam_mode, show_message=False
-                )
-                if mode_auto_id:
-                    if connect_db:
-                        num_models_str = str(len(models)) if models else "0"
-                        signals_processor.load_shotxmodel_from_db(
-                            cursor, connect_db, mode_auto_id, num_models_str
-                        )
-                    shot_complete, dict_shot = signals_processor.dict_shotxmodel()
-                    values['shot'] = dict_shot
-                    values['shot_complete'] = shot_complete
-                    _log.info("[%s] Tải thành công mode '%s': %s shots, mapping=%s", key, cam_mode, shot_complete, dict_shot)
-                else:
-                    _log.warning("[%s] Chế độ '%s' chưa được cấu hình tín hiệu trong CSDL cho camera_id=%s", key, cam_mode, camera_id)
-
-                # 2. Lưu bảng thông số tín hiệu an toàn vào dictionary 'signals'
-                if hasattr(signals_processor, 'get_table_params'):
-                    tbl_params = signals_processor.get_table_params()
-                    if tbl_params:
-                        if not isinstance(values.get('signals'), dict):
-                            values['signals'] = {}
-                        signals_dict = values['signals']
-
-                        if not isinstance(signals_dict.get(cam_mode), dict):
-                            signals_dict[cam_mode] = {}
-                        signals_dict[cam_mode]['values_signals'] = tbl_params
-                        _log.debug("[%s] Đã cập nhật bảng thông số tín hiệu cho mode '%s'", key, cam_mode)
-                    else:
-                        _log.warning("[%s] Bảng thông số tín hiệu (table_params) trống hoặc chưa cấu hình cho mode '%s'", key, cam_mode)
-
-                # 3. Kiểm tra Logger ban đầu
-                if hasattr(automation_ui, 'config_logger') and automation_ui.config_logger:
-                    item_code_text = automation_ui.comboBox_Itemcode.currentText() if hasattr(automation_ui, 'comboBox_Itemcode') else ""
-                    automation_ui.config_logger.check_initial_db(
-                        cursor,
-                        camera_id,
-                        item_code_id,
-                        cam_mode,
-                        item_code_text
+                try:
+                    # 1. Tải mapping thông số tín hiệu của mode từ Database
+                    mode_auto_id = signals_processor.load_params_signals_from_gui_mapping_db(
+                        cursor, camera_id, mode_name=cam_mode, show_message=False
                     )
-            except Exception as e:
-                _log.warning("[%s] Không thể tải đầy đủ thông số cho mode '%s' (camera_id=%s): %s", key, cam_mode, camera_id, e)
+                    if mode_auto_id:
+                        if connect_db:
+                            num_models_str = str(len(models)) if models else "0"
+                            signals_processor.load_shotxmodel_from_db(
+                                cursor, connect_db, mode_auto_id, num_models_str
+                            )
+                        shot_complete, dict_shot = signals_processor.dict_shotxmodel()
+                        values['shot'] = dict_shot
+                        values['shot_complete'] = shot_complete
+                        _log.info("[%s] Tải thành công mode '%s': %s shots, mapping=%s", key, cam_mode, shot_complete, dict_shot)
+                    else:
+                        _log.warning("[%s] Chế độ '%s' chưa được cấu hình tín hiệu trong CSDL cho camera_id=%s", key, cam_mode, camera_id)
+
+                    # 2. Lưu bảng thông số tín hiệu an toàn vào dictionary 'signals'
+                    if hasattr(signals_processor, 'get_table_params'):
+                        tbl_params = signals_processor.get_table_params()
+                        if tbl_params:
+                            if not isinstance(values.get('signals'), dict):
+                                values['signals'] = {}
+                            signals_dict = values['signals']
+
+                            if not isinstance(signals_dict.get(cam_mode), dict):
+                                signals_dict[cam_mode] = {}
+                            signals_dict[cam_mode]['values_signals'] = tbl_params
+                            _log.debug("[%s] Đã cập nhật bảng thông số tín hiệu cho mode '%s'", key, cam_mode)
+                        else:
+                            _log.warning("[%s] Bảng thông số tín hiệu (table_params) trống hoặc chưa cấu hình cho mode '%s'", key, cam_mode)
+
+                    # 3. Kiểm tra Logger ban đầu
+                    if hasattr(automation_ui, 'config_logger') and automation_ui.config_logger:
+                        item_code_text = automation_ui.comboBox_Itemcode.currentText() if hasattr(automation_ui, 'comboBox_Itemcode') else ""
+                        automation_ui.config_logger.check_initial_db(
+                            cursor,
+                            camera_id,
+                            item_code_id,
+                            cam_mode,
+                            item_code_text
+                        )
+                except Exception as e:
+                    _log.warning("[%s] Không thể tải đầy đủ thông số cho mode '%s' (camera_id=%s): %s", key, cam_mode, camera_id, e)
 
         # Cập nhật cache trigger và signal complete chỉ cho target_camera (hoặc tất cả nếu rỗng)
         self._update_trigger_cache(target_camera=target_camera if target_camera else None)
@@ -1615,6 +1895,9 @@ class PLCHandler:
             elif hasattr(self.processor, '_write_camera_signals_now'):
                 self.processor._write_camera_signals_now(plc_signals, status=False)
 
+        if hasattr(self.processor, 'notify_camera_disconnect'):
+            self.processor.notify_camera_disconnect(camera_name)
+
     def _ensure_camera_connected_status(self, key):
         """Khôi phục trạng thái ON (status=True) nếu camera trước đó từng bị lỗi nhưng nay đã chụp thành công."""
         if not self.processor:
@@ -1636,6 +1919,9 @@ class PLCHandler:
                 self.processor.set_camera_continuous_status(target_k, plc_signals, status=True)
             elif hasattr(self.processor, '_write_camera_signals_now'):
                 self.processor._write_camera_signals_now(plc_signals, status=True)
+
+        if hasattr(self.processor, 'notify_camera_connect'):
+            self.processor.notify_camera_connect(camera_name)
 
     def take_image(self, device, key, capture_cfg: dict):
         with self._signal_rwlock.read():
@@ -1672,6 +1958,7 @@ class PLCHandler:
             self.handle_camera_disconnect(key)
             return None
 
+        self._ensure_camera_connected_status(key)
         self._apply_signal_phase(capture_cfg, signals, 'post', ['gate', 'busy', 'ready'])
 
         return raw_image_rgb
@@ -1759,10 +2046,10 @@ class PLCHandler:
             shot_complete = values.get('shot_complete', 0)
             # Chỉ gửi Value State tại lần tổng hợp (shot cuối cùng của chu kỳ)
             if current_count >= shot_complete:
-                self._init_cfg_registers(key, value=1)
+                self._init_cfg_registers(key)
         elif is_single_frame:
             # Single frame là chu kỳ 1 shot -> gửi Value State trước khi chụp/chạy AI
-            self._init_cfg_registers(key, shot_cfg_rows, value=1)
+            self._init_cfg_registers(key, shot_cfg_rows)
 
         capture_cfg = self.snapshot_capture_config(automation_ui)
 
@@ -1824,10 +2111,12 @@ class PLCHandler:
                     _log.info('[%s] Registers to write (OK/NG): %s', key, all_registers)
                     if isinstance(all_registers, dict):
                         for reg, val in all_registers.items():
-                            plc_tasks.append((reg, val))
+                            if val is not None and str(val).strip() != "" and str(val).strip().lower() not in ('none', 'no value', 'null'):
+                                plc_tasks.append((reg, val))
                     else:
                         for reg in all_registers:
-                            plc_tasks.append((reg, 1))
+                            if reg and str(reg).strip():
+                                plc_tasks.append((reg, 1))
                 if is_all_ok and reset_sig:
                     _log.info(f'Send Reset Signal OK {reset_sig}')
                     plc_tasks.append((reset_sig.get('reg'), int(reset_sig.get('on', 1))))
@@ -1857,10 +2146,12 @@ class PLCHandler:
                 _log.info('[%s] Single frame registers to write (OK/NG): %s', key, list_register)
                 if isinstance(list_register, dict):
                     for reg, val in list_register.items():
-                        plc_tasks.append((reg, val))
+                        if val is not None and str(val).strip() != "" and str(val).strip().lower() not in ('none', 'no value', 'null'):
+                            plc_tasks.append((reg, val))
                 else:
                     for reg in list_register:
-                        plc_tasks.append((reg, 1))
+                        if reg and str(reg).strip():
+                            plc_tasks.append((reg, 1))
 
             if flag and reset_sig:
                 _log.info(f'Send Reset Signal OK {reset_sig}')
@@ -2310,7 +2601,7 @@ class PLCHandler:
                         continue
 
                     elapsed = (time.perf_counter() - start_time) * 1000
-                    self._init_cfg_registers(key, cfg_rows, 1)
+                    self._init_cfg_registers(key, cfg_rows)
                     try:
                         with self._signal_rwlock.read():
                             comp_sig  = self._resolve_signal(key, 'completed')
@@ -2326,10 +2617,12 @@ class PLCHandler:
                         _log.info('[%s] Logging registers to write (OK/NG): %s', key, list_register)
                         if isinstance(list_register, dict):
                             for reg_addr, reg_val in list_register.items():
-                                plc_tasks.append((reg_addr, reg_val))
+                                if reg_val is not None and str(reg_val).strip() != "" and str(reg_val).strip().lower() not in ('none', 'no value', 'null'):
+                                    plc_tasks.append((reg_addr, reg_val))
                         else:
                             for reg_addr in list_register:
-                                plc_tasks.append((reg_addr, 1))
+                                if reg_addr and str(reg_addr).strip():
+                                    plc_tasks.append((reg_addr, 1))
 
                     if flag and reset_sig:
                         _log.info('[%s] Send Reset Signal OK %s', key, reset_sig)
@@ -2733,6 +3026,15 @@ class CameraTabManager:
         self._continuous_signals_dict = {}
         self._continuous_signals_running = False
         self.status_signal_interval = 0.1
+        self.camera_configs = {}
+        self.camera_watchdog = None
+        from module_3.camera_alert_ui import CameraWatchdogSignals
+        self.camera_signals = CameraWatchdogSignals()
+        self._camera_alert_overlay = None
+        self._camera_success_banner = None
+        self.camera_signals.camera_lost.connect(self._on_camera_connection_lost)
+        self.camera_signals.reconnect_attempt.connect(self._on_camera_reconnect_attempt)
+        self.camera_signals.camera_restored.connect(self._on_camera_connection_restored)
         self.all_device_tabs = []
         self.all_mirror_tabs = []
         self.all_auto_log_tabs = []
@@ -3353,6 +3655,27 @@ class CameraTabManager:
                     _automation_ui.comboBox_mode_auto.currentText(),
                     _automation_ui.comboBox_Itemcode.currentText()
                 )
+            if show_message and hasattr(self, 'plc_handler') and self.plc_handler:
+                cam_key = f'built-in-camera-{camera_name}'
+                self.plc_handler.write_camera_mode_save_default(cam_key, mode_name)
+                
+        cam_key = f'built-in-camera-{camera_name}'
+        saved_mode_name = None
+        if hasattr(self, 'plc_handler') and self.plc_handler:
+            saved_info = self.plc_handler.read_camera_mode_save_default(cam_key)
+            if saved_info and saved_info.get('mode_key'):
+                saved_mode_name = saved_info.get('mode_key')
+
+        if saved_mode_name:
+            idx = _automation_ui.comboBox_mode_auto.findText(str(saved_mode_name))
+            if idx >= 0:
+                _automation_ui.comboBox_mode_auto.blockSignals(True)
+                _automation_ui.comboBox_mode_auto.setCurrentIndex(idx)
+                _automation_ui.comboBox_mode_auto.blockSignals(False)
+            else:
+                _automation_ui.comboBox_mode_auto.setCurrentText(str(saved_mode_name))
+            _log.info("[%s] Khởi tạo giao diện theo mode_key kích lần cuối: '%s'", cam_key, saved_mode_name)
+
         _on_load_mode(show_message=False)
         self.automation_ui.pushButton_load_params_from_mode.clicked.connect(lambda _: _on_load_mode(show_message=True))
         self.automation_ui.pushButton_apply_itemcode_assign.clicked.connect(lambda _: _signals_processor.save_register_name_line_code(self.db_manager.cursor, self.db_manager.connect_db))
@@ -3517,7 +3840,7 @@ class CameraTabManager:
 
         return self._mirror_tab_widget,dev
     
-    def auto_initial_device(self, camera_id, camera_name, item_code_id, tab_widget_2, product_code_forms, dict_signals, progress_callback=None):
+    def auto_initial_device(self, camera_id, camera_name, item_code_id, tab_widget_2, product_code_forms, dict_signals, progress_callback=None, device_tab_ui=None):
         driver = Process_Camera_Device(self.db_manager.connect_db, self.db_manager.cursor, self.automation_ui)
         device_type, serial, conn_type, ip_address = driver.query_camera_type(item_code_id, camera_name)
         device_launch = DICT_DEVICE_AUTO[device_type]
@@ -3538,6 +3861,27 @@ class CameraTabManager:
                 "Hãy thiết lập Program Signal Ready hoặc MODE_AUTO.",
                 camera_name
             )
+
+        # Đăng ký thông tin cấu hình camera vào bộ giám sát watchdog
+        if not hasattr(self, 'camera_configs'):
+            self.camera_configs = {}
+        self.camera_configs[str(camera_name)] = {
+            'camera_id': camera_id,
+            'camera_name': str(camera_name),
+            'key': f'built-in-camera-{camera_name}',
+            'item_code_id': item_code_id,
+            'device_type': device_type,
+            'serial': serial,
+            'conn_type': conn_type,
+            'ip_address': ip_address,
+            'identifier': identifier,
+            'conn_mode': conn_mode,
+            'device_launch': device_launch,
+            'plc_signals': plc_signals,
+            'device_tab_ui': device_tab_ui,
+            'PartNo': '#N/A'
+        }
+
         retry_interval = 1
         attempt = 0
 
@@ -3563,9 +3907,11 @@ class CameraTabManager:
                             pass
                     if model_name:
                         self.PartNo = str(model_name).strip()
+                        self.camera_configs[str(camera_name)]['PartNo'] = self.PartNo
                     
                     _log.info("[Camera %s] ✅ Kết nối thành công sau %s lần thử!", camera_name, attempt)
                     self.set_camera_continuous_status(camera_name, plc_signals, status=True)
+                    self.notify_camera_connect(camera_name)
                     return self.device
                     
                 except Exception as e:
@@ -3578,7 +3924,8 @@ class CameraTabManager:
                     if attempt == 3:
                         _log.error("[Camera %s] Kết nối thất bại sau %s lần thử!", camera_name, attempt)
                         self.set_camera_continuous_status(camera_name, plc_signals, status=False)
-                        return
+                        self.notify_camera_disconnect(camera_name)
+                        return None
             else:
                 _log.warning("[Camera %s] PLC Driver chưa sẵn sàng...", camera_name)
                 if progress_callback:
@@ -3586,7 +3933,109 @@ class CameraTabManager:
                 if attempt == 3:
                     _log.error("[Camera %s] PLC Driver chưa sẵn sàng sau %s lần thử!", camera_name, attempt)
                     self.set_camera_continuous_status(camera_name, plc_signals, status=False)
-                    return
+                    self.notify_camera_disconnect(camera_name)
+                    return None
+
+    def start_camera_watchdog(self, check_interval_ms: int = 1500):
+        """Khởi động luồng giám sát và tự động khôi phục kết nối Camera liên tục."""
+        try:
+            from Administrator.user_db import is_watchdog_enabled
+            db_conn = getattr(self, 'cursor', None) or getattr(self, 'connect_plc', None) or getattr(getattr(self, 'db_manager', None), 'connect_db', None)
+            if not is_watchdog_enabled('camera', conn_or_cursor=db_conn):
+                _log.info("[CameraTabManager] Camera Watchdog bị TẮT theo cấu hình của Administrator.")
+                return
+        except Exception as e:
+            _log.debug("Lỗi kiểm tra is_watchdog_enabled('camera'): %s", e)
+
+        if self.camera_watchdog is None or not self.camera_watchdog.isRunning():
+            from module_3.camera_watchdog import CameraWatchdogThread
+            self.camera_watchdog = CameraWatchdogThread(self, check_interval_ms=check_interval_ms)
+            if hasattr(self, '_initial_connected_cams'):
+                for cam in self._initial_connected_cams:
+                    self.camera_watchdog.notify_camera_connected(cam)
+            self.camera_watchdog.start()
+            _log.info("[CameraTabManager] Camera Watchdog Thread đã khởi động thành công.")
+
+    def stop_camera_watchdog(self):
+        """Dừng luồng giám sát Camera an toàn."""
+        if self.camera_watchdog is not None and self.camera_watchdog.isRunning():
+            self.camera_watchdog.stop()
+            self.camera_watchdog = None
+            _log.info("[CameraTabManager] Camera Watchdog Thread đã dừng.")
+
+    def notify_camera_disconnect(self, camera_name: str):
+        """Thông báo mất kết nối tới Camera Watchdog để kích hoạt reconnect ngay."""
+        if hasattr(self, 'camera_watchdog') and self.camera_watchdog and self.camera_watchdog.isRunning():
+            self.camera_watchdog.notify_camera_disconnected(camera_name)
+        else:
+            # Nếu watchdog chưa khởi động (ví dụ lỗi kết nối lúc khởi động phần mềm), lập tức phát tín hiệu hiển thị Alert UI
+            cam_cfg = getattr(self, 'camera_configs', {}).get(str(camera_name), {})
+            if hasattr(self, 'camera_signals'):
+                self.camera_signals.camera_lost.emit(
+                    str(camera_name),
+                    str(cam_cfg.get('device_type', 'Camera')),
+                    str(cam_cfg.get('identifier', 'N/A')),
+                    str(cam_cfg.get('conn_mode', 'N/A')),
+                    1
+                )
+
+    def notify_camera_connect(self, camera_name: str):
+        """Thông báo camera đã kết nối bình thường."""
+        if not hasattr(self, '_initial_connected_cams'):
+            self._initial_connected_cams = set()
+        self._initial_connected_cams.add(str(camera_name))
+        if hasattr(self, 'camera_watchdog') and self.camera_watchdog and self.camera_watchdog.isRunning():
+            self.camera_watchdog.notify_camera_connected(camera_name)
+
+    def _on_camera_connection_lost(self, camera_name: str, device_type: str, identifier: str, conn_mode: str, attempts: int):
+        """Slot xử lý khi mất kết nối Camera: hiển thị UI cảnh báo đẹp mắt, chỉ rõ camera nào bị lỗi."""
+        try:
+            if self._camera_success_banner and self._camera_success_banner.isVisible():
+                self._camera_success_banner.close()
+            if self._camera_alert_overlay is None:
+                from module_3.camera_alert_ui import CameraAlertOverlay
+                self._camera_alert_overlay = CameraAlertOverlay()
+            self._camera_alert_overlay.set_camera_info(camera_name, device_type, identifier, conn_mode, attempts)
+            self._camera_alert_overlay.show_alert()
+        except Exception as e:
+            _log.error("Error in _on_camera_connection_lost: %s", e)
+
+    def _on_camera_reconnect_attempt(self, camera_name: str, attempts: int):
+        """Slot cập nhật số lần thử kết nối lại trên UI cảnh báo."""
+        try:
+            if self._camera_alert_overlay is None:
+                from module_3.camera_alert_ui import CameraAlertOverlay
+                self._camera_alert_overlay = CameraAlertOverlay()
+
+            user_dismissed = getattr(self._camera_alert_overlay, 'user_dismissed', False)
+            if not self._camera_alert_overlay.isVisible() and not user_dismissed:
+                cam_cfg = getattr(self, 'camera_configs', {}).get(str(camera_name), {})
+                self._camera_alert_overlay.set_camera_info(
+                    camera_name,
+                    cam_cfg.get('device_type', 'Camera'),
+                    cam_cfg.get('identifier', 'N/A'),
+                    cam_cfg.get('conn_mode', 'N/A'),
+                    attempts
+                )
+                self._camera_alert_overlay.show_alert()
+            else:
+                self._camera_alert_overlay.update_attempts(camera_name, attempts)
+        except Exception as e:
+            _log.debug("Error in _on_camera_reconnect_attempt: %s", e)
+
+    def _on_camera_connection_restored(self, camera_name: str, device_type: str, identifier: str, conn_mode: str):
+        """Slot xử lý khi khôi phục kết nối thành công: ẩn cảnh báo, hiển thị banner thành công 5s."""
+        try:
+            if self._camera_alert_overlay:
+                has_remaining = self._camera_alert_overlay.remove_camera(camera_name)
+                if not has_remaining:
+                    self._camera_alert_overlay.hide_alert()
+            if self._camera_success_banner is None:
+                from module_3.camera_alert_ui import CameraSuccessBanner
+                self._camera_success_banner = CameraSuccessBanner()
+            self._camera_success_banner.show_success(camera_name, device_type, identifier, conn_mode, duration_ms=5000)
+        except Exception as e:
+            _log.error("Error in _on_camera_connection_restored: %s", e)
 
     def set_camera_continuous_status(self, camera_name, plc_signals, status=True):
         if not hasattr(self, '_continuous_signals_lock'):
@@ -3758,7 +4207,18 @@ class CameraTabManager:
         self._continuous_signals_running = False
 
     def cleanup_all_camera_plc_signals(self):
+        self.stop_camera_watchdog()
         self.stop_continuous_signals_worker()
+        if hasattr(self, '_camera_alert_overlay') and self._camera_alert_overlay:
+            try:
+                self._camera_alert_overlay.hide_alert()
+            except Exception:
+                pass
+        if hasattr(self, '_camera_success_banner') and self._camera_success_banner:
+            try:
+                self._camera_success_banner.close()
+            except Exception:
+                pass
 
         with getattr(self, '_continuous_signals_lock', threading.RLock()):
             snapshot = dict(getattr(self, '_continuous_signals_dict', {}))

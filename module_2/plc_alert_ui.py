@@ -23,7 +23,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal, QObject
 from PyQt5.QtWidgets import (
     QDialog, QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
-    QProgressBar, QGraphicsDropShadowEffect, QFrame, QApplication
+    QPushButton, QProgressBar, QGraphicsDropShadowEffect, QFrame, QApplication
 )
 from app_logger.app_logger import get_logger as _get_logger
 
@@ -43,10 +43,8 @@ class PLCWatchdogSignals(QObject):
 # Giao diện Cảnh báo Mất kết nối PLC (Warning UI)
 # ---------------------------------------------------------------------------
 class PLCAlertOverlay(QDialog):
-    """
-    Cửa sổ cảnh báo mất kết nối PLC nổi bật trên màn hình,
-    không chặn luồng (non-blocking, non-modal), có thể kéo di chuyển.
-    """
+    retry_requested = pyqtSignal()
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowFlags(
@@ -55,9 +53,10 @@ class PLCAlertOverlay(QDialog):
             Qt.Tool
         )
         self.setAttribute(Qt.WA_TranslucentBackground, True)
-        self.setMinimumSize(700, 500)
-        self.resize(720, 520)
+        self.setMinimumSize(720, 520)
+        self.resize(740, 540)
         self._drag_pos = None
+        self.user_dismissed = False
 
         self._setup_ui()
 
@@ -70,7 +69,7 @@ class PLCAlertOverlay(QDialog):
         self.card.setObjectName("alertCard")
         self.card.setStyleSheet("""
             QFrame#alertCard {
-                background-color: #0F172A;
+                background-color: #A7A7A7;
                 border: 2.5px solid #EF4444;
                 border-radius: 14px;
             }
@@ -113,7 +112,7 @@ class PLCAlertOverlay(QDialog):
 
         self.label_title = QLabel("CẢNH BÁO: MẤT KẾT NỐI TỚI PLC", self.card)
         self.label_title.setStyleSheet("""
-            color: #F87171;
+            color: #FF0000;
             font-size: 17px;
             font-weight: 800;
             font-family: 'Segoe UI', Arial, sans-serif;
@@ -123,7 +122,7 @@ class PLCAlertOverlay(QDialog):
 
         self.label_subtitle = QLabel("PLC COMMUNICATION LINK INTERRUPTED", self.card)
         self.label_subtitle.setStyleSheet("""
-            color: #94A3B8;
+            color: #FFD70B;
             font-size: 11px;
             font-weight: 600;
             letter-spacing: 1px;
@@ -131,6 +130,32 @@ class PLCAlertOverlay(QDialog):
         title_layout.addWidget(self.label_subtitle)
         header_layout.addLayout(title_layout)
         header_layout.addStretch()
+
+        # Nút đóng nhanh (✕) ở góc phải tiêu đề
+        self.btn_close = QPushButton("✕", self.card)
+        self.btn_close.setCursor(Qt.PointingHandCursor)
+        self.btn_close.setFixedSize(32, 32)
+        self.btn_close.setToolTip("Đóng cảnh báo để kiểm tra cài đặt (Hệ thống vẫn tự động kết nối lại ngầm)")
+        self.btn_close.setStyleSheet("""
+            QPushButton {
+                background-color: #1E293B;
+                color: #94A3B8;
+                border: 1px solid #334155;
+                border-radius: 16px;
+                font-size: 15px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #EF4444;
+                color: #FFFFFF;
+                border: 1px solid #DC2626;
+            }
+            QPushButton:pressed {
+                background-color: #B91C1C;
+            }
+        """)
+        self.btn_close.clicked.connect(self.dismiss)
+        header_layout.addWidget(self.btn_close)
 
         card_layout.addLayout(header_layout)
 
@@ -183,7 +208,7 @@ class PLCAlertOverlay(QDialog):
         status_row = QHBoxLayout()
         self.lbl_status = QLabel("🔄 Đang tự động kiểm tra và kết nối lại... (Lần thử: 1)", self.card)
         self.lbl_status.setStyleSheet("""
-            color: #FBBF24;
+            color: #FFD600;
             font-size: 12px;
             font-weight: bold;
             font-family: 'Segoe UI', Arial;
@@ -218,14 +243,78 @@ class PLCAlertOverlay(QDialog):
         )
         lbl_hint.setWordWrap(True)
         lbl_hint.setStyleSheet("""
-            color: #64748B;
+            color: #3F3F3F;
             font-size: 11px;
             font-style: italic;
             font-family: 'Segoe UI', Arial;
         """)
         card_layout.addWidget(lbl_hint)
 
+        # 5. Thanh nút thao tác bên dưới (Thử kết nối lại & Đóng cảnh báo)
+        bottom_bar = QHBoxLayout()
+        bottom_bar.setContentsMargins(0, 4, 0, 0)
+        bottom_bar.addStretch()
+
+        self.btn_retry = QPushButton("🔄  Thử kết nối lại ngay (Retry Now)", self.card)
+        self.btn_retry.setCursor(Qt.PointingHandCursor)
+        self.btn_retry.setFixedHeight(38)
+        self.btn_retry.setStyleSheet("""
+            QPushButton {
+                background-color: #2563EB;
+                color: #FFFFFF;
+                border: 1.5px solid #3B82F6;
+                border-radius: 8px;
+                padding: 6px 20px;
+                font-size: 13px;
+                font-weight: 700;
+                font-family: 'Segoe UI', Arial, sans-serif;
+            }
+            QPushButton:hover {
+                background-color: #1D4ED8;
+                border: 1.5px solid #60A5FA;
+            }
+            QPushButton:pressed {
+                background-color: #1E40AF;
+            }
+        """)
+        self.btn_retry.clicked.connect(self.retry_requested.emit)
+        bottom_bar.addWidget(self.btn_retry)
+        bottom_bar.addSpacing(12)
+
+        self.btn_dismiss = QPushButton("✕  Đóng cảnh báo (Tiếp tục kiểm tra cài đặt)", self.card)
+        self.btn_dismiss.setCursor(Qt.PointingHandCursor)
+        self.btn_dismiss.setFixedHeight(38)
+        self.btn_dismiss.setStyleSheet("""
+            QPushButton {
+                background-color: #1E293B;
+                color: #E2E8F0;
+                border: 1.5px solid #475569;
+                border-radius: 8px;
+                padding: 6px 22px;
+                font-size: 13px;
+                font-weight: 700;
+                font-family: 'Segoe UI', Arial, sans-serif;
+            }
+            QPushButton:hover {
+                background-color: #334155;
+                color: #FFFFFF;
+                border: 1.5px solid #94A3B8;
+            }
+            QPushButton:pressed {
+                background-color: #0F172A;
+            }
+        """)
+        self.btn_dismiss.clicked.connect(self.dismiss)
+        bottom_bar.addWidget(self.btn_dismiss)
+        bottom_bar.addStretch()
+        card_layout.addLayout(bottom_bar)
+
         outer_layout.addWidget(self.card)
+
+    def dismiss(self):
+        """Người dùng chủ động đóng cảnh báo để kiểm tra cài đặt. Watchdog PLC vẫn tiếp tục chạy ngầm."""
+        self.user_dismissed = True
+        self.hide()
 
     def set_plc_info(self, plc_module: str, ip: str, port: int, attempts: int = 1):
         """Cập nhật thông tin PLC và số lần thử kết nối lại."""
@@ -236,9 +325,15 @@ class PLCAlertOverlay(QDialog):
     def update_attempts(self, attempts: int):
         """Cập nhật số lần thử kết nối lại."""
         self.lbl_status.setText(f"🔄 Đang tự động kiểm tra và kết nối lại liên tục... (Lần thử: {attempts})")
+        if not self.isVisible() and not getattr(self, 'user_dismissed', False):
+            self.show_alert()
+        elif self.isVisible():
+            self.raise_()
+            self.activateWindow()
 
     def show_alert(self):
         """Hiển thị cảnh báo ở vị trí trung tâm cửa sổ đang hoạt động."""
+        self.user_dismissed = False
         self._center_on_screen_or_window()
         self.show()
         self.raise_()
@@ -246,6 +341,7 @@ class PLCAlertOverlay(QDialog):
 
     def hide_alert(self):
         """Ẩn cảnh báo khi đã kết nối lại thành công."""
+        self.user_dismissed = False
         self.hide()
 
     def _center_on_screen_or_window(self):

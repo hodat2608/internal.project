@@ -48,12 +48,24 @@ OPERATOR_DISPLAY_NAMES = {
     'INSIDE': 'Trong vùng (INSIDE)',
     'OUTSIDE': 'Ngoài vùng (OUTSIDE)',
     'OVERLAP': 'Giao cắt (OVERLAP)',
-    'DIST_<': 'Khoảng cách <',
-    'DIST_<=': 'Khoảng cách <=',
-    'DIST_>': 'Khoảng cách >',
-    'DIST_>=': 'Khoảng cách >=',
-    'DIST_==': 'Khoảng cách ==',
-    'DIST_!=': 'Khoảng cách !='
+    'DIST_X_<': 'Khoảng cách ngang (ΔX) <',
+    'DIST_X_<=': 'Khoảng cách ngang (ΔX) <=',
+    'DIST_X_>': 'Khoảng cách ngang (ΔX) >',
+    'DIST_X_>=': 'Khoảng cách ngang (ΔX) >=',
+    'DIST_X_==': 'Khoảng cách ngang (ΔX) ==',
+    'DIST_X_!=': 'Khoảng cách ngang (ΔX) !=',
+    'DIST_Y_<': 'Khoảng cách dọc (ΔY) <',
+    'DIST_Y_<=': 'Khoảng cách dọc (ΔY) <=',
+    'DIST_Y_>': 'Khoảng cách dọc (ΔY) >',
+    'DIST_Y_>=': 'Khoảng cách dọc (ΔY) >=',
+    'DIST_Y_==': 'Khoảng cách dọc (ΔY) ==',
+    'DIST_Y_!=': 'Khoảng cách dọc (ΔY) !=',
+    'DIST_<': 'Khoảng cách đường thẳng (Cạnh huyền) <',
+    'DIST_<=': 'Khoảng cách đường thẳng (Cạnh huyền) <=',
+    'DIST_>': 'Khoảng cách đường thẳng (Cạnh huyền) >',
+    'DIST_>=': 'Khoảng cách đường thẳng (Cạnh huyền) >=',
+    'DIST_==': 'Khoảng cách đường thẳng (Cạnh huyền) ==',
+    'DIST_!=': 'Khoảng cách đường thẳng (Cạnh huyền) !='
 }
 
 INSTANCE_SCOPE_DISPLAY_NAMES = {
@@ -84,7 +96,7 @@ class VisualBoxCanvas(QtWidgets.QWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setMinimumHeight(540)
+        self.setMinimumSize(1300, 560)
         self.setMouseTracking(True)
         
         self.label_1_name = "Đối Tượng 1 (Label A)"
@@ -114,6 +126,10 @@ class VisualBoxCanvas(QtWidgets.QWidget):
 
         self.resize_handle_size = 18.0
 
+    def wheelEvent(self, event):
+        # Cho phép sự kiện cuộn chuột chuyển tiếp lên QScrollArea bao ngoài một cách mượt mà
+        event.ignore()
+
     def resizeEvent(self, event):
         super().resizeEvent(event)
         self._clamp_boxes_to_bounds()
@@ -121,12 +137,15 @@ class VisualBoxCanvas(QtWidgets.QWidget):
     def _clamp_boxes_to_bounds(self):
         w = float(self.width())
         h = float(self.height())
+        if w < 500.0 or h < 350.0:
+            # Widget chưa có kích thước hiển thị thật trong layout, không ép co lại làm hỏng tọa độ
+            return
         for b_idx in (1, 2):
             r = self.box1_rect if b_idx == 1 else self.box2_rect
             bw = max(70.0, min(r.width(), w - 20.0))
             bh = max(50.0, min(r.height(), h - 20.0))
             bx = max(5.0, min(r.x(), w - bw - 5.0))
-            by = max(80.0, min(r.y(), h - bh - 5.0))
+            by = max(80.0, min(r.y(), h - bh - 42.0))
             if b_idx == 1:
                 self.box1_rect = QRectF(bx, by, bw, bh)
             else:
@@ -139,6 +158,12 @@ class VisualBoxCanvas(QtWidgets.QWidget):
 
     def set_box_geometry(self, box_idx: int, x: float, y: float, w: float, h: float):
         """Thiết lập chính xác tọa độ và kích thước cho box 1 hoặc box 2."""
+        req_w = float(x + w + 80.0)
+        req_h = float(y + h + 80.0)
+        if req_w > self.minimumWidth():
+            self.setMinimumWidth(int(req_w))
+        if req_h > self.minimumHeight():
+            self.setMinimumHeight(int(req_h))
         new_rect = QRectF(float(x), float(y), float(w), float(h))
         if box_idx == 1:
             self.box1_rect = new_rect
@@ -157,6 +182,7 @@ class VisualBoxCanvas(QtWidgets.QWidget):
 
     def reset_positions(self):
         """Khôi phục vị trí mặc định nằm cân đối hoặc theo khuôn mẫu Scope (bề cao rộng rãi)."""
+        self.setMinimumSize(1300, 560)
         w = max(500, self.width())
         h = max(520, self.height())
 
@@ -311,13 +337,22 @@ class VisualBoxCanvas(QtWidgets.QWidget):
             return float(rect.height())
         return 0.0
 
-    def _calculate_edge_distance(self, p1: QPointF, p2: QPointF, param1: str, param2: str) -> Tuple[float, str]:
+    def _calculate_edge_distance(self, p1: QPointF, p2: QPointF, param1: str, param2: str, operator_str: str = '') -> Tuple[float, str]:
         """
-        Tính khoảng cách giữa 2 điểm neo của 2 cạnh:
-        - Nếu cùng trục dọc (Y_MIN, Y_MAX): abs(p1.y - p2.y) (khoảng cách dọc ΔY)
-        - Nếu cùng trục ngang (X_MIN, X_MAX): abs(p1.x - p2.x) (khoảng cách ngang ΔX)
-        - Trường hợp chéo trục hoặc Center: Euclidean distance
+        Tính khoảng cách giữa 2 điểm neo:
+        - Nếu operator là DIST_X_...: abs(p1.x - p2.x) (khoảng cách ngang ΔX)
+        - Nếu operator là DIST_Y_...: abs(p1.y - p2.y) (khoảng cách dọc ΔY)
+        - Nếu operator là DIST_... (Cạnh huyền / Euclid): math.hypot(ΔX, ΔY)
+        - Fallback: nếu cùng trục Y -> ΔY, cùng trục X -> ΔX, khác -> Dist
         """
+        op = (operator_str or getattr(self, 'operator_str', '') or '').upper()
+        if op.startswith('DIST_X_'):
+            return abs(p1.x() - p2.x()), "ΔX"
+        elif op.startswith('DIST_Y_'):
+            return abs(p1.y() - p2.y()), "ΔY"
+        elif op.startswith('DIST_'):
+            return math.hypot(p1.x() - p2.x(), p1.y() - p2.y()), "Dist"
+
         p1_u = (param1 or '').upper()
         p2_u = (param2 or '').upper()
         is_y1 = p1_u in ('Y_MIN', 'TOP', 'Y_MAX', 'BOTTOM')
@@ -504,12 +539,12 @@ class VisualBoxCanvas(QtWidgets.QWidget):
             elif is_distance:
                 p1 = self._get_hotspot_point(self.box1_rect, self.selected_param_1)
                 p2 = self._get_hotspot_point(self.box2_rect, self.selected_param_2)
-                dist_val, _ = self._calculate_edge_distance(p1, p2, self.selected_param_1, self.selected_param_2)
+                dist_val, _ = self._calculate_edge_distance(p1, p2, self.selected_param_1, self.selected_param_2, self.operator_str)
                 try:
                     thresh = float(self.math_val)
                 except Exception:
                     thresh = 0.0
-                comp_op = self.operator_str.replace('DIST_', '')
+                comp_op = self.operator_str.replace('DIST_X_', '').replace('DIST_Y_', '').replace('DIST_', '')
                 if comp_op == '<': cond_matched = (dist_val < thresh)
                 elif comp_op == '<=': cond_matched = (dist_val <= thresh)
                 elif comp_op == '>': cond_matched = (dist_val > thresh)
@@ -633,17 +668,17 @@ class VisualBoxCanvas(QtWidgets.QWidget):
                 self._paint_top_status_badge(painter, w, status_text, pair_pass)
 
             elif is_distance:
-                # ── BÀI TOÁN KHOẢNG CÁCH GIỮA 2 CẠNH TÙY CHỌN ──
+                # ── BÀI TOÁN KHOẢNG CÁCH GIỮA 2 CẠNH TÙY CHỌN (NGANG ΔX, DỌC ΔY, ĐƯỜNG THẲNG EUCLID) ──
                 p1 = self._get_hotspot_point(self.box1_rect, self.selected_param_1)
                 p2 = self._get_hotspot_point(self.box2_rect, self.selected_param_2)
 
-                dist_val, dist_label = self._calculate_edge_distance(p1, p2, self.selected_param_1, self.selected_param_2)
+                dist_val, dist_label = self._calculate_edge_distance(p1, p2, self.selected_param_1, self.selected_param_2, self.operator_str)
                 try:
                     thresh = float(self.math_val)
                 except Exception:
                     thresh = 0.0
 
-                comp_op = self.operator_str.replace('DIST_', '')
+                comp_op = self.operator_str.replace('DIST_X_', '').replace('DIST_Y_', '').replace('DIST_', '')
                 if comp_op == '<': cond_matched = (dist_val < thresh)
                 elif comp_op == '<=': cond_matched = (dist_val <= thresh)
                 elif comp_op == '>': cond_matched = (dist_val > thresh)
@@ -655,29 +690,65 @@ class VisualBoxCanvas(QtWidgets.QWidget):
                 pair_pass = (not cond_matched) if (self.condition_true_result == 'NG') else cond_matched
                 line_color = QColor("#16a34a") if pair_pass else QColor("#dc2626")
 
-                # Vẽ đường nét đứt nối giữa tâm của 2 cạnh được chọn
+                # Vẽ đường đo kích thước theo đúng phương đã chọn
                 pen_line = QPen(line_color, 2, Qt.DashLine)
-                painter.setPen(pen_line)
-                painter.drawLine(p1, p2)
+                pen_guide = QPen(QColor(148, 163, 184, 180), 1, Qt.DotLine)  # Đường gióng mờ xám
 
+                if self.operator_str.startswith('DIST_X_'):
+                    # ── PHƯƠNG NGANG ΔX ──
+                    y_meas = p1.y()
+                    painter.setPen(pen_line)
+                    painter.drawLine(QPointF(p1.x(), y_meas), QPointF(p2.x(), y_meas))
+                    # 2 vạch chặn đứng ở 2 đầu
+                    pen_cap = QPen(line_color, 2.5)
+                    painter.setPen(pen_cap)
+                    painter.drawLine(QPointF(p1.x(), y_meas - 8), QPointF(p1.x(), y_meas + 8))
+                    painter.drawLine(QPointF(p2.x(), y_meas - 8), QPointF(p2.x(), y_meas + 8))
+                    # Đường gióng dọc từ p2 tới đường đo nếu p2.y khác y_meas
+                    if abs(p2.y() - y_meas) > 2:
+                        painter.setPen(pen_guide)
+                        painter.drawLine(QPointF(p2.x(), y_meas), p2)
+                    mid_p = QPointF((p1.x() + p2.x()) / 2, y_meas)
+
+                elif self.operator_str.startswith('DIST_Y_'):
+                    # ── PHƯƠNG DỌC ΔY ──
+                    x_meas = p1.x()
+                    painter.setPen(pen_line)
+                    painter.drawLine(QPointF(x_meas, p1.y()), QPointF(x_meas, p2.y()))
+                    # 2 vạch chặn ngang ở 2 đầu
+                    pen_cap = QPen(line_color, 2.5)
+                    painter.setPen(pen_cap)
+                    painter.drawLine(QPointF(x_meas - 8, p1.y()), QPointF(x_meas + 8, p1.y()))
+                    painter.drawLine(QPointF(x_meas - 8, p2.y()), QPointF(x_meas + 8, p2.y()))
+                    # Đường gióng ngang từ p2 tới đường đo nếu p2.x khác x_meas
+                    if abs(p2.x() - x_meas) > 2:
+                        painter.setPen(pen_guide)
+                        painter.drawLine(QPointF(x_meas, p2.y()), p2)
+                    mid_p = QPointF(x_meas, (p1.y() + p2.y()) / 2)
+
+                else:
+                    # ── ĐƯỜNG THẲNG / CẠNH HUYỀN (EUCLID) ──
+                    painter.setPen(pen_line)
+                    painter.drawLine(p1, p2)
+                    mid_p = QPointF((p1.x() + p2.x()) / 2, (p1.y() + p2.y()) / 2)
+
+                # Vẽ 2 chấm tròn điểm neo
+                painter.setPen(Qt.NoPen)
                 painter.setBrush(QBrush(line_color))
                 painter.drawEllipse(p1, 5, 5)
                 painter.drawEllipse(p2, 5, 5)
 
                 # Mini tag d = ... px nhỏ gọn hiển thị ngay cạnh nét đứt (không che lấp cạnh)
-                line_len = math.hypot(p1.x() - p2.x(), p1.y() - p2.y())
-                if line_len > 35:
-                    mid_p = QPointF((p1.x() + p2.x()) / 2, (p1.y() + p2.y()) / 2)
-                    d_txt = f"{dist_label}: {dist_val:.1f}px"
-                    painter.setFont(QFont("Segoe UI", 8, QFont.Bold))
-                    tw_m = max(56.0, float(len(d_txt) * 6.8 + 10))
-                    th_m = 18.0
-                    m_rect = QRectF(mid_p.x() - tw_m / 2, mid_p.y() - th_m / 2, tw_m, th_m)
-                    painter.setBrush(QBrush(QColor("#ffffff")))
-                    painter.setPen(QPen(line_color, 1.2))
-                    painter.drawRoundedRect(m_rect, 4, 4)
-                    painter.setPen(line_color)
-                    painter.drawText(m_rect, Qt.AlignCenter, d_txt)
+                d_txt = f"{dist_label}: {dist_val:.1f}px"
+                painter.setFont(QFont("Segoe UI", 8, QFont.Bold))
+                tw_m = max(58.0, float(len(d_txt) * 6.8 + 12))
+                th_m = 18.0
+                m_rect = QRectF(mid_p.x() - tw_m / 2, mid_p.y() - th_m / 2, tw_m, th_m)
+                painter.setBrush(QBrush(QColor("#ffffff")))
+                painter.setPen(QPen(line_color, 1.2))
+                painter.drawRoundedRect(m_rect, 4, 4)
+                painter.setPen(line_color)
+                painter.drawText(m_rect, Qt.AlignCenter, d_txt)
 
                 # Vẽ 2 box
                 boxes_to_draw = [2, 1] if self.front_box == 1 else [1, 2]
@@ -689,7 +760,13 @@ class VisualBoxCanvas(QtWidgets.QWidget):
 
                 # Badge trạng thái đầy đủ đưa lên phía trên, xa 2 box
                 res_txt = 'VALID (OK)' if pair_pass else 'VIOLATION (NG)'
-                status_text = f"DISTANCE [{self.selected_param_1} ➔ {self.selected_param_2}]: {dist_val:.1f}px {comp_op} {thresh:.1f}px  ➔  {res_txt}"
+                if self.operator_str.startswith('DIST_X_'):
+                    op_title = "DISTANCE X (ΔX)"
+                elif self.operator_str.startswith('DIST_Y_'):
+                    op_title = "DISTANCE Y (ΔY)"
+                else:
+                    op_title = "DISTANCE (EUCLID)"
+                status_text = f"{op_title} [{self.selected_param_1} ➔ {self.selected_param_2}]: {dist_val:.1f}px {comp_op} {thresh:.1f}px  ➔  {res_txt}"
                 self._paint_top_status_badge(painter, w, status_text, pair_pass)
 
             else:
@@ -783,7 +860,7 @@ class VisualBoxCanvas(QtWidgets.QWidget):
                 self._paint_top_status_badge(painter, w, status_text, pair_pass)
 
         # 4. HUD Banner hiển thị Pixel thời gian thực khi kéo to thu nhỏ hoặc di chuyển
-        self._paint_hud_banner(painter, w)
+        self._paint_hud_banner(painter, w, h)
 
         # 5. Viền định hình Viewport CAD (Không tô nền đè lên nội dung)
         painter.setBrush(Qt.NoBrush)
@@ -852,8 +929,8 @@ class VisualBoxCanvas(QtWidgets.QWidget):
         else:
             return "🖱️ Drag body to MOVE | Drag bottom-right (📐) to RESIZE | Click edge to SELECT PARAM"
 
-    def _paint_hud_banner(self, painter: QPainter, width: int):
-        """Hiển thị Banner thông số Pixel động cực kỳ rõ ràng trên đầu Canvas."""
+    def _paint_hud_banner(self, painter: QPainter, width: int, height: int):
+        """Hiển thị Banner thông số Pixel động và hướng dẫn thao tác nổi ở góc dưới đáy Canvas."""
         if self.active_action:
             action_type = self.active_action[0]
             box_idx = self.active_action[1]
@@ -884,14 +961,21 @@ class VisualBoxCanvas(QtWidgets.QWidget):
             hud_color = QColor("#475569")
             border_color = QColor("#cbd5e1")
 
-        painter.setFont(QFont("Segoe UI", 10, QFont.Bold))
-        bw = max(560.0, float(len(hud_text) * 7.5))
+        hud_font = QFont("Segoe UI", 9, QFont.Bold)
+        painter.setFont(hud_font)
+        fm = QtGui.QFontMetrics(hud_font)
+        text_w = fm.horizontalAdvance(hud_text) if hasattr(fm, 'horizontalAdvance') else fm.width(hud_text)
+        bw = float(text_w + 36.0)
         bh = 26.0
-        hud_x = max(162.0, (width - bw) / 2)
-        hud_rect = QRectF(hud_x, 8, bw, bh)
 
-        painter.setBrush(QBrush(QColor("#ffffff")))
-        painter.setPen(QPen(border_color, 1.5))
+        # Đặt banner nổi ở đáy Canvas để HOÀN TOÀN KHÔNG che lấp Top Status Badge (HUD phán định) và thước đo ở trên
+        hud_x = max(10.0, (width - bw) / 2.0)
+        hud_y = float(height - bh - 10.0)
+        hud_rect = QRectF(hud_x, hud_y, bw, bh)
+
+        # Nền trắng đổ bóng nhẹ, bo tròn thanh thoát
+        painter.setBrush(QBrush(QColor(255, 255, 255, 245)))
+        painter.setPen(QPen(border_color, 1.4))
         painter.drawRoundedRect(hud_rect, 6, 6)
 
         painter.setPen(hud_color)
@@ -1102,6 +1186,15 @@ class VisualBoxCanvas(QtWidgets.QWidget):
             if action_type == 'RESIZE':
                 new_w = max(70.0, self.initial_box_rect.width() + delta_x)
                 new_h = max(50.0, self.initial_box_rect.height() + delta_y)
+
+                # Tự động mở rộng Canvas khi kéo co giãn sát hoặc vượt mép phải / đáy
+                req_w = self.initial_box_rect.left() + new_w + 60.0
+                req_h = self.initial_box_rect.top() + new_h + 60.0
+                if req_w > self.width():
+                    self.setMinimumWidth(int(req_w + 100))
+                if req_h > self.height():
+                    self.setMinimumHeight(int(req_h + 100))
+
                 new_w = min(new_w, self.width() - self.initial_box_rect.left() - 5.0)
                 new_h = min(new_h, self.height() - self.initial_box_rect.top() - 5.0)
 
@@ -1121,8 +1214,17 @@ class VisualBoxCanvas(QtWidgets.QWidget):
                 new_y = self.initial_box_rect.y() + delta_y
                 curr_w = self.initial_box_rect.width()
                 curr_h = self.initial_box_rect.height()
+
+                # Tự động mở rộng Canvas khi kéo di chuyển box sát hoặc vượt mép phải / đáy
+                req_w = new_x + curr_w + 60.0
+                req_h = new_y + curr_h + 60.0
+                if req_w > self.width():
+                    self.setMinimumWidth(int(req_w + 100))
+                if req_h > self.height():
+                    self.setMinimumHeight(int(req_h + 100))
+
                 new_x = max(5.0, min(new_x, self.width() - curr_w - 5.0))
-                new_y = max(5.0, min(new_y, self.height() - curr_h - 5.0))
+                new_y = max(80.0, min(new_y, self.height() - curr_h - 42.0))
 
                 if box_idx == 1:
                     self.box1_rect.moveTopLeft(QPointF(new_x, new_y))
@@ -1317,8 +1419,9 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         self.rules_list: List[Dict[str, Any]] = list(rules_data) if rules_data else []
         self.available_labels = available_labels or []
         self.preselected_labels = preselected_labels or []
-        self.cursor = cursor
-        self.connection = connection
+        from module_3.config_version_manager import get_raw_mysql_connection, get_safe_cursor
+        self.connection = get_raw_mysql_connection(connection) or connection
+        self.cursor = get_safe_cursor(cursor, self.connection) or cursor
 
         if self.cursor and self.camera_id and self.model_id is not None:
             try:
@@ -1495,7 +1598,7 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         self.btn_reset_canvas.setFixedWidth(120)
         self.btn_reset_canvas.setFixedHeight(32)
         self.btn_reset_canvas.setStyleSheet(btn_reset_canvas_setStyleSheet)
-        self.btn_reset_canvas.clicked.connect(lambda: self.visual_canvas.reset_positions())
+        self.btn_reset_canvas.clicked.connect(self.on_reset_canvas_clicked)
         layout_label_select.addWidget(self.btn_reset_canvas)
         layout_label_select.addStretch()
 
@@ -1520,9 +1623,58 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         self.lbl_scope_hint.setWordWrap(True)
         vlayout_rule.addWidget(self.lbl_scope_hint)
 
-        # Widget Visual Canvas tương tác kéo thả & co giãn
+        # Widget Visual Canvas tương tác kéo thả & co giãn đặt trong QScrollArea chuyên dụng
         self.visual_canvas = VisualBoxCanvas()
-        vlayout_rule.addWidget(self.visual_canvas)
+
+        self.canvas_scroll = QtWidgets.QScrollArea()
+        self.canvas_scroll.setObjectName("canvasScrollArea")
+        self.canvas_scroll.setWidgetResizable(True)
+        self.canvas_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.canvas_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.canvas_scroll.setMinimumHeight(440)
+        self.canvas_scroll.setStyleSheet("""
+            QScrollArea#canvasScrollArea {
+                background-color: #ffffff;
+                border: 1.5px solid #cbd5e1;
+                border-radius: 6px;
+            }
+            QScrollBar:vertical {
+                background-color: #f8fafc;
+                width: 11px;
+                border-radius: 5px;
+                margin: 0px;
+            }
+            QScrollBar::handle:vertical {
+                background-color: #cbd5e1;
+                min-height: 25px;
+                border-radius: 5px;
+            }
+            QScrollBar::handle:vertical:hover {
+                background-color: #94a3b8;
+            }
+            QScrollBar::sub-line:vertical, QScrollBar::add-line:vertical {
+                height: 0px;
+            }
+            QScrollBar:horizontal {
+                background-color: #f8fafc;
+                height: 11px;
+                border-radius: 5px;
+                margin: 0px;
+            }
+            QScrollBar::handle:horizontal {
+                background-color: #cbd5e1;
+                min-width: 25px;
+                border-radius: 5px;
+            }
+            QScrollBar::handle:horizontal:hover {
+                background-color: #94a3b8;
+            }
+            QScrollBar::sub-line:horizontal, QScrollBar::add-line:horizontal {
+                width: 0px;
+            }
+        """)
+        self.canvas_scroll.setWidget(self.visual_canvas)
+        vlayout_rule.addWidget(self.canvas_scroll)
 
         # Thanh thiết lập biểu thức quy tắc (Rule Expression Builder - FlowLayout xếp gọn trên 1 hàng)
         expr_frame = QtWidgets.QFrame()
@@ -1557,8 +1709,9 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         lbl_op.setStyleSheet("font-weight: bold; color: #1e293b;")
         self.combo_operator = QtWidgets.QComboBox()
         self.combo_operator.setSizeAdjustPolicy(QtWidgets.QComboBox.AdjustToContents)
-        self.combo_operator.setMinimumWidth(140)
-        self.combo_operator.setMaximumWidth(180)
+        self.combo_operator.setMinimumWidth(160)
+        self.combo_operator.setMaximumWidth(240)
+        self.combo_operator.setMaxVisibleItems(10)
         for k, v in OPERATOR_DISPLAY_NAMES.items():
             self.combo_operator.addItem(v, k)
         box_op = _make_group_box(lbl_op, self.combo_operator)
@@ -1713,7 +1866,11 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         for cb in all_combos:
             view = QtWidgets.QListView()
             cb.setView(view)
-            view.setMinimumWidth(max(cb.minimumWidth(), 200))
+            cb.setMaxVisibleItems(10)
+            view.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+            view.setAutoScroll(True)
+            min_w = 340 if cb is self.combo_operator else max(cb.minimumWidth(), 200)
+            view.setMinimumWidth(min_w)
 
         for ed_cb in (self.combo_label_1, self.combo_label_2):
             le = ed_cb.lineEdit()
@@ -1722,6 +1879,7 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
 
         # KẾT NỐI SIGNALS
         self.visual_canvas.hotspot_clicked.connect(self.on_canvas_hotspot_clicked)
+        self.visual_canvas.box_geometry_changed.connect(self.on_box_geometry_changed)
         self.combo_label_1.currentTextChanged.connect(self.on_label_changed)
         self.combo_label_2.currentTextChanged.connect(self.on_label_changed)
         self.combo_instance_scope.currentIndexChanged.connect(self.on_scope_changed)
@@ -1740,11 +1898,32 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         self.table_rules.cellClicked.connect(self.on_rule_row_clicked)
         self.table_rules.itemSelectionChanged.connect(self.on_rule_selection_changed)
 
+    def on_reset_canvas_clicked(self):
+        """Khôi phục vị trí mặc định của 2 box và cuộn thanh cuộn canvas về gốc tọa độ (0, 0)."""
+        self.visual_canvas.reset_positions()
+        if hasattr(self, 'canvas_scroll'):
+            self.canvas_scroll.horizontalScrollBar().setValue(0)
+            self.canvas_scroll.verticalScrollBar().setValue(0)
+
+    def on_box_geometry_changed(self, box_idx: int, x: float, y: float, w: float, h: float):
+        """Cập nhật tọa độ 2 box thời gian thực vào Rule đang được chỉnh sửa để không bao giờ bị mất."""
+        if self._is_populating:
+            return
+        if self.editing_rule_index is not None and 0 <= self.editing_rule_index < len(self.rules_list):
+            rule = self.rules_list[self.editing_rule_index]
+            key = 'box1_rect' if box_idx == 1 else 'box2_rect'
+            rule[key] = f"{x:.1f},{y:.1f},{w:.1f},{h:.1f}"
+
     def showEvent(self, event):
         super().showEvent(event)
         if not hasattr(self, '_initial_canvas_positioned'):
             self._initial_canvas_positioned = True
-            QtCore.QTimer.singleShot(80, self.visual_canvas.reset_positions)
+            if self.rules_list:
+                # Nạp lại chính xác Rule đang chọn sau khi toàn bộ Layout và Canvas đã ổn định kích thước
+                cur_idx = self.editing_rule_index if self.editing_rule_index is not None else 0
+                QtCore.QTimer.singleShot(80, lambda: self.load_rule_into_editor(cur_idx))
+            else:
+                QtCore.QTimer.singleShot(80, self.visual_canvas.reset_positions)
 
     def _update_scope_hint(self, scope: str):
         """Hiển thị mô tả trực quan và ý nghĩa của Scope."""
@@ -2140,9 +2319,15 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
             val_f = 0.0
 
         # Xây dựng mô tả rule chuyên nghiệp
-        if op.startswith('DIST_'):
+        if op.startswith('DIST_X_'):
+            comp_op = op.replace('DIST_X_', '')
+            rule_desc = f"Khoảng cách ngang ΔX [{param1}({lbl1}) ➔ {param2}({lbl2})] {comp_op} {math_val}px ➔ {true_res}"
+        elif op.startswith('DIST_Y_'):
+            comp_op = op.replace('DIST_Y_', '')
+            rule_desc = f"Khoảng cách dọc ΔY [{param1}({lbl1}) ➔ {param2}({lbl2})] {comp_op} {math_val}px ➔ {true_res}"
+        elif op.startswith('DIST_'):
             comp_op = op.replace('DIST_', '')
-            rule_desc = f"Khoảng cách [{param1}({lbl1}) ➔ {param2}({lbl2})] {comp_op} {math_val}px ➔ {true_res}"
+            rule_desc = f"Khoảng cách đường thẳng [{param1}({lbl1}) ➔ {param2}({lbl2})] {comp_op} {math_val}px ➔ {true_res}"
         elif scope == 'ALL_A_IN_ONE_B':
             rule_desc = f"[N vs 1] Mọi {lbl1} {op} {lbl2} ➔ {true_res}"
         elif scope == 'ONE_A_IN_ANY_B':
@@ -2189,10 +2374,14 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         if not rule_obj:
             return
 
-        self.rules_list.append(rule_obj)
-        self.refresh_rules_table()
-        new_row = len(self.rules_list) - 1
-        self.table_rules.selectRow(new_row)
+        self._is_populating = True
+        try:
+            self.rules_list.append(rule_obj)
+            self.refresh_rules_table()
+            new_row = len(self.rules_list) - 1
+            self.table_rules.selectRow(new_row)
+        finally:
+            self._is_populating = False
         self.load_rule_into_editor(new_row)
 
     def update_current_rule(self):
@@ -2209,9 +2398,13 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         if old_id:
             rule_obj['id'] = old_id
 
-        self.rules_list[self.editing_rule_index] = rule_obj
-        self.refresh_rules_table()
-        self.table_rules.selectRow(self.editing_rule_index)
+        self._is_populating = True
+        try:
+            self.rules_list[self.editing_rule_index] = rule_obj
+            self.refresh_rules_table()
+            self.table_rules.selectRow(self.editing_rule_index)
+        finally:
+            self._is_populating = False
         self.load_rule_into_editor(self.editing_rule_index)
 
     def refresh_rules_table(self):
@@ -2250,7 +2443,15 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
             self.table_rules.setItem(row_idx, 3, item_lhs)
 
             rule_op = str(r.get('operator', ''))
-            if rule_op.startswith('DIST_'):
+            if rule_op.startswith('DIST_X_'):
+                comp_op = rule_op.replace('DIST_X_', '')
+                thresh_str = str(r.get('math_operand_val') or r.get('min_value', 0))
+                rhs_info = f"Khoảng cách ngang ΔX {comp_op} {thresh_str} px [{r.get('param_2', '')}]"
+            elif rule_op.startswith('DIST_Y_'):
+                comp_op = rule_op.replace('DIST_Y_', '')
+                thresh_str = str(r.get('math_operand_val') or r.get('min_value', 0))
+                rhs_info = f"Khoảng cách dọc ΔY {comp_op} {thresh_str} px [{r.get('param_2', '')}]"
+            elif rule_op.startswith('DIST_'):
                 comp_op = rule_op.replace('DIST_', '')
                 thresh_str = str(r.get('math_operand_val') or r.get('min_value', 0))
                 rhs_info = f"Khoảng cách {comp_op} {thresh_str} px [{r.get('param_2', '')}]"
@@ -2341,6 +2542,31 @@ class TaskRuleEditorDialog(QtWidgets.QDialog):
         from module_3.task_calculator_db import save_task_and_rules
         saved_id = save_task_and_rules(self.cursor, self.connection, task_data, self.rules_list)
         if saved_id:
+            try:
+                from module_3.handle_option_models import Process_Model
+                from _source.v5.v5 import _normalize_key_model
+                cam_num = str(self.camera_id).removeprefix("camera-").removeprefix("built-in-")
+                mod_num = str(self.model_id).removeprefix("model-")
+                key_model = (f"camera-{cam_num}", f"model-{mod_num}")
+                norm_target = _normalize_key_model(key_model)
+                if hasattr(Process_Model, 'dict_active_tasks') and isinstance(Process_Model.dict_active_tasks, dict):
+                    for km, tlist in Process_Model.dict_active_tasks.items():
+                        if _normalize_key_model(km) == norm_target and isinstance(tlist, list):
+                            found = False
+                            for mem_task in tlist:
+                                if mem_task.get('id') == saved_id:
+                                    mem_task.update(task_data)
+                                    mem_task['rules'] = self.rules_list
+                                    found = True
+                                    break
+                            if not found:
+                                new_t = dict(task_data)
+                                new_t['id'] = saved_id
+                                new_t['rules'] = self.rules_list
+                                tlist.append(new_t)
+            except Exception:
+                pass
+
             try:
                 save_snapshot(
                     cursor=self.cursor,

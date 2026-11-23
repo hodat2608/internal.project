@@ -55,16 +55,21 @@ class ConfigHistoryDialog(QtWidgets.QDialog):
         parent=None
     ):
         super().__init__(parent)
-        self.connection = connection
+        from module_3.config_version_manager import get_raw_mysql_connection, get_safe_cursor
+        self.raw_connection = get_raw_mysql_connection(connection)
+        self.connection = self.raw_connection or connection
+        self.cursor = get_safe_cursor(cursor, self.connection)
         self._own_cursor = False
-        if self.connection and hasattr(self.connection, 'cursor'):
+        if self.cursor is None and self.connection and hasattr(self.connection, 'cursor') and callable(self.connection.cursor):
             try:
                 self.cursor = self.connection.cursor(buffered=True)
                 self._own_cursor = True
             except Exception:
-                self.cursor = cursor
-        else:
-            self.cursor = cursor
+                try:
+                    self.cursor = self.connection.cursor()
+                    self._own_cursor = True
+                except Exception:
+                    self.cursor = cursor
 
         self.current_user = str(current_user or 'Unknown').strip()
         self.current_role = str(current_role or 'modify').strip().lower()

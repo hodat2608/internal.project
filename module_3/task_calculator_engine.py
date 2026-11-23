@@ -122,9 +122,13 @@ def parse_math_offset(offset_expr: str, ref_box: Optional[Dict[str, Any]]) -> fl
 
 
 def compare_values(lhs: float, op: str, rhs: float, min_val: float = 0.0, max_val: float = 0.0) -> bool:
-    """Thực hiện phép so sánh hai giá trị số học (hỗ trợ cả tiền tố DIST_)."""
+    """Thực hiện phép so sánh hai giá trị số học (hỗ trợ cả tiền tố DIST_, DIST_X_, DIST_Y_)."""
     op = (op or '<').strip()
-    if op.startswith('DIST_'):
+    if op.startswith('DIST_X_'):
+        op = op.replace('DIST_X_', '')
+    elif op.startswith('DIST_Y_'):
+        op = op.replace('DIST_Y_', '')
+    elif op.startswith('DIST_'):
         op = op.replace('DIST_', '')
     if op == '<':
         return lhs < rhs
@@ -255,19 +259,27 @@ def evaluate_single_pair(
         pt1 = get_param_point(box_1, param_1)
         pt2 = get_param_point(box_2, param_2)
 
-        p1_u = (param_1 or '').upper()
-        p2_u = (param_2 or '').upper()
-        is_y1 = p1_u in ('Y_MIN', 'YMIN', 'TOP', 'Y_MAX', 'YMAX', 'BOTTOM')
-        is_y2 = p2_u in ('Y_MIN', 'YMIN', 'TOP', 'Y_MAX', 'YMAX', 'BOTTOM')
-        is_x1 = p1_u in ('X_MIN', 'XMIN', 'LEFT', 'X_MAX', 'XMAX', 'RIGHT')
-        is_x2 = p2_u in ('X_MIN', 'XMIN', 'LEFT', 'X_MAX', 'XMAX', 'RIGHT')
-
-        if is_y1 and is_y2:
-            dist_val = abs(float(pt1[1]) - float(pt2[1]))
-        elif is_x1 and is_x2:
+        if operator.startswith('DIST_X_'):
             dist_val = abs(float(pt1[0]) - float(pt2[0]))
+            comp_op = operator.replace('DIST_X_', '')
+        elif operator.startswith('DIST_Y_'):
+            dist_val = abs(float(pt1[1]) - float(pt2[1]))
+            comp_op = operator.replace('DIST_Y_', '')
         else:
-            dist_val = float(np.hypot(float(pt1[0]) - float(pt2[0]), float(pt1[1]) - float(pt2[1])))
+            p1_u = (param_1 or '').upper()
+            p2_u = (param_2 or '').upper()
+            is_y1 = p1_u in ('Y_MIN', 'YMIN', 'TOP', 'Y_MAX', 'YMAX', 'BOTTOM')
+            is_y2 = p2_u in ('Y_MIN', 'YMIN', 'TOP', 'Y_MAX', 'YMAX', 'BOTTOM')
+            is_x1 = p1_u in ('X_MIN', 'XMIN', 'LEFT', 'X_MAX', 'XMAX', 'RIGHT')
+            is_x2 = p2_u in ('X_MIN', 'XMIN', 'LEFT', 'X_MAX', 'XMAX', 'RIGHT')
+
+            if is_y1 and is_y2:
+                dist_val = abs(float(pt1[1]) - float(pt2[1]))
+            elif is_x1 and is_x2:
+                dist_val = abs(float(pt1[0]) - float(pt2[0]))
+            else:
+                dist_val = float(np.hypot(float(pt1[0]) - float(pt2[0]), float(pt1[1]) - float(pt2[1])))
+            comp_op = operator.replace('DIST_', '')
 
         try:
             threshold = float(math_operand_val)
@@ -277,7 +289,6 @@ def evaluate_single_pair(
             except Exception:
                 threshold = 0.0
 
-        comp_op = operator.replace('DIST_', '')
         cond_matched = compare_values(dist_val, comp_op, threshold, min_val, max_val)
         if condition_true_result == 'NG':
             pair_pass = not cond_matched
@@ -390,10 +401,10 @@ def evaluate_task_calculator(
         logic_mode = task.get('logic_mode', 'ALL_PASS')
         rules = task.get('rules') or []
         assign_reg = (task.get('assign_register') or '').strip()
-        val_state = task.get('value_state', task.get('Value_State', 1))
-        val_ok = task.get('value_ok', task.get('Value_OK', task.get('value_bit_on', 1)))
-        val_ng = task.get('value_ng', task.get('Value_NG', task.get('value_bit_off', 0)))
-        val_on = task.get('value_bit_on', 1)
+        val_state = task.get('value_state', task.get('Value_State'))
+        val_ok = task.get('value_ok', task.get('Value_OK', task.get('value_bit_on')))
+        val_ng = task.get('value_ng', task.get('Value_NG', task.get('value_bit_off')))
+        val_on = task.get('value_bit_on')
 
         evaluated_rules = []
 
@@ -642,18 +653,46 @@ def evaluate_task_calculator(
                     # Đo khoảng cách / tọa độ giữa 2 điểm
                     pt1 = res.get('pt1') or get_param_point(box_1, param_1)
                     pt2 = res.get('pt2') or get_param_point(box_2, param_2)
-                    cv2.line(result_img, pt1, pt2, draw_color, 2, cv2.LINE_AA)
-                    cv2.circle(result_img, pt1, 5, draw_color, -1, cv2.LINE_AA)
-                    cv2.circle(result_img, pt2, 5, draw_color, -1, cv2.LINE_AA)
 
-                    mid_x = (pt1[0] + pt2[0]) // 2
-                    mid_y = (pt1[1] + pt2[1]) // 2
                     if res.get('is_distance'):
-                        comp_op = operator.replace('DIST_', '')
                         thresh = res.get('rhs_val', 0.0)
                         dist_v = res.get('lhs_val', 0.0)
-                        delta_str = f"Dist[{lbl_1}.{param_1}-{lbl_2}.{param_2}]: {dist_v:.1f}px {comp_op} {thresh:.1f}px ({'OK' if rule_pass else 'NG'})"
+                        if operator.startswith('DIST_X_'):
+                            comp_op = operator.replace('DIST_X_', '')
+                            delta_str = f"DistX[{lbl_1}.{param_1}-{lbl_2}.{param_2}]: {dist_v:.1f}px {comp_op} {thresh:.1f}px ({'OK' if rule_pass else 'NG'})"
+                            y_line = int(pt1[1])
+                            cv2.line(result_img, (pt1[0], y_line), (pt2[0], y_line), draw_color, 2, cv2.LINE_AA)
+                            cv2.line(result_img, (pt1[0], y_line - 6), (pt1[0], y_line + 6), draw_color, 2, cv2.LINE_AA)
+                            cv2.line(result_img, (pt2[0], y_line - 6), (pt2[0], y_line + 6), draw_color, 2, cv2.LINE_AA)
+                            if abs(pt2[1] - y_line) > 2:
+                                cv2.line(result_img, (pt2[0], y_line), pt2, (160, 160, 160), 1, cv2.LINE_AA)
+                            mid_x = (pt1[0] + pt2[0]) // 2
+                            mid_y = y_line
+                        elif operator.startswith('DIST_Y_'):
+                            comp_op = operator.replace('DIST_Y_', '')
+                            delta_str = f"DistY[{lbl_1}.{param_1}-{lbl_2}.{param_2}]: {dist_v:.1f}px {comp_op} {thresh:.1f}px ({'OK' if rule_pass else 'NG'})"
+                            x_line = int(pt1[0])
+                            cv2.line(result_img, (x_line, pt1[1]), (x_line, pt2[1]), draw_color, 2, cv2.LINE_AA)
+                            cv2.line(result_img, (x_line - 6, pt1[1]), (x_line + 6, pt1[1]), draw_color, 2, cv2.LINE_AA)
+                            cv2.line(result_img, (x_line - 6, pt2[1]), (x_line + 6, pt2[1]), draw_color, 2, cv2.LINE_AA)
+                            if abs(pt2[0] - x_line) > 2:
+                                cv2.line(result_img, (x_line, pt2[1]), pt2, (160, 160, 160), 1, cv2.LINE_AA)
+                            mid_x = x_line
+                            mid_y = (pt1[1] + pt2[1]) // 2
+                        else:
+                            comp_op = operator.replace('DIST_', '')
+                            delta_str = f"Dist[{lbl_1}.{param_1}-{lbl_2}.{param_2}]: {dist_v:.1f}px {comp_op} {thresh:.1f}px ({'OK' if rule_pass else 'NG'})"
+                            cv2.line(result_img, pt1, pt2, draw_color, 2, cv2.LINE_AA)
+                            mid_x = (pt1[0] + pt2[0]) // 2
+                            mid_y = (pt1[1] + pt2[1]) // 2
+                        cv2.circle(result_img, pt1, 5, draw_color, -1, cv2.LINE_AA)
+                        cv2.circle(result_img, pt2, 5, draw_color, -1, cv2.LINE_AA)
                     else:
+                        cv2.line(result_img, pt1, pt2, draw_color, 2, cv2.LINE_AA)
+                        cv2.circle(result_img, pt1, 5, draw_color, -1, cv2.LINE_AA)
+                        cv2.circle(result_img, pt2, 5, draw_color, -1, cv2.LINE_AA)
+                        mid_x = (pt1[0] + pt2[0]) // 2
+                        mid_y = (pt1[1] + pt2[1]) // 2
                         delta_str = f"Task[{task_name}] {delta:+.1f}px ({'OK' if rule_pass else 'NG'})"
                     (tw, th), _ = cv2.getTextSize(delta_str, cv2.FONT_HERSHEY_SIMPLEX, 0.45, 1)
                     cv2.rectangle(result_img, (mid_x - 2, mid_y - th - 4), (mid_x + tw + 2, mid_y + 2), (20, 20, 30), -1)
@@ -670,18 +709,35 @@ def evaluate_task_calculator(
         if not task_pass:
             all_tasks_pass = False
             if assign_reg:
-                plc_val = val_ng if ('value_ng' in task or 'Value_NG' in task or 'value_bit_off' in task) else val_on
+                # Lấy value_ng (nếu có thì gửi, không có thì không gửi)
+                v_ng = val_ng if val_ng is not None else val_on
+                plc_val = None
+                if v_ng is not None and str(v_ng).strip() != "" and str(v_ng).strip().lower() not in ('none', 'no value', 'null'):
+                    try:
+                        plc_val = int(v_ng)
+                    except (ValueError, TypeError):
+                        plc_val = v_ng
+
                 # BẢO VỆ NG: Xóa bỏ mọi giá trị OK đã thêm trước đó cho thanh ghi này nếu có task trước đó OK dùng chung thanh ghi
                 plc_registers_to_send = [(r, v) for r, v in plc_registers_to_send if str(r).strip() != assign_reg]
-                plc_registers_to_send.append((assign_reg, plc_val))
+                if plc_val is not None:
+                    plc_registers_to_send.append((assign_reg, plc_val))
                 _ng_task_registers.add(assign_reg)
                 _log.warning("Task '%s' (ID: %s) [NG] -> Trigger PLC Register %s = %s", task_name, task_id, assign_reg, plc_val)
         else:
-            if assign_reg and ('value_ok' in task or 'Value_OK' in task or 'value_bit_on' in task):
+            if assign_reg:
+                plc_val = None
+                if val_ok is not None and str(val_ok).strip() != "" and str(val_ok).strip().lower() not in ('none', 'no value', 'null'):
+                    try:
+                        plc_val = int(val_ok)
+                    except (ValueError, TypeError):
+                        plc_val = val_ok
+
                 # BẢO VỆ NG: Chỉ thêm giá trị OK nếu thanh ghi này chưa từng bị NG bởi bất kỳ task nào trước đó
                 if assign_reg not in _ng_task_registers:
                     if not any(str(r).strip() == assign_reg for r, _ in plc_registers_to_send):
-                        plc_registers_to_send.append((assign_reg, val_ok))
+                        if plc_val is not None:
+                            plc_registers_to_send.append((assign_reg, plc_val))
                 else:
                     _log.warning("Task '%s' (ID: %s) [OK] nhưng thanh ghi %s đã ghi nhận NG từ task khác -> Bảo vệ NG!", task_name, task_id, assign_reg)
 

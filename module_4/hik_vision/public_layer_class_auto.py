@@ -35,3 +35,22 @@ class Layer_Initial_Device_Auto(Initial_Device_Auto, QObject):
     def set_user_selector_class(self,user_index=None):
         print('-----------------------------------------------------')
         return self.set_user_selector(user_index=user_index)
+
+    def is_connected_class(self):
+        try:
+            op = getattr(self, 'obj_cam_operation', None)
+            if op is not None:
+                # obj_cam là đối tượng MvCamera thực tế trong CameraOperation
+                cam = getattr(op, 'obj_cam', None) or getattr(op, 'cam', None)
+                if cam is not None and getattr(cam, 'handle', None) is not None:
+                    if hasattr(cam, 'MV_CC_IsDeviceConnected'):
+                        return bool(cam.MV_CC_IsDeviceConnected())
+                if getattr(op, 'b_open_device', False):
+                    return True
+            cam = getattr(self, 'cam', None)
+            if cam is not None and getattr(cam, 'handle', None) is not None:
+                if hasattr(cam, 'MV_CC_IsDeviceConnected'):
+                    return bool(cam.MV_CC_IsDeviceConnected())
+        except Exception:
+            return False
+        return False

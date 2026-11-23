@@ -15,7 +15,8 @@ from Administrator.user_db import (
     hash_password, get_all_users, update_user_role, toggle_user_active,
     delete_user, get_user_count,
     get_system_config, set_system_config,
-    get_auto_start_setting, set_auto_start_setting
+    get_auto_start_setting, set_auto_start_setting,
+    get_watchdog_settings, set_watchdog_settings, is_watchdog_enabled
 )
 from Administrator.autostart_manager import (
     get_app_executable_path,
@@ -101,6 +102,7 @@ class AdminConfigWindow(QDialog):
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         self._build_ui()
         self._load_users()
+        self._load_watchdog_config()
         self._load_startup_config()
         self._load_general_settings()
 
@@ -196,7 +198,66 @@ class AdminConfigWindow(QDialog):
 
         main_layout.addWidget(grp_users)
 
-        # ── Group 3: Cấu hình tự động khởi động (System Startup & Boot Management) ──
+        # ── Group 3: Cấu hình kiểm tra kết nối liên tục (Continuous Connection Watchdog) ──
+        grp_watchdog = QGroupBox("🔍 Cấu hình kiểm tra kết nối liên tục toàn thời gian (Watchdog & Health Check)")
+        grp_watchdog.setFont(QFont("Segoe UI", 11, QFont.Bold))
+        watchdog_layout = QVBoxLayout(grp_watchdog)
+        watchdog_layout.setSpacing(10)
+
+        lbl_wd_desc = QLabel(
+            "ℹ️ Thiết lập bật/tắt tính năng kiểm tra kết nối định kỳ ngầm trong suốt thời gian phần mềm hoạt động.\n"
+            "Nếu bỏ chọn (không tích), hệ thống sẽ tắt luồng kiểm tra ngầm tương ứng, tránh cảnh báo lỗi gián đoạn."
+        )
+        lbl_wd_desc.setStyleSheet("color: #475569; font-size: 11px;")
+        watchdog_layout.addWidget(lbl_wd_desc)
+
+        # Khung chứa 3 Checkbox riêng biệt
+        wd_frame = QFrame()
+        wd_frame.setStyleSheet("QFrame { background-color: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 6px; padding: 10px; }")
+        wd_vbox = QVBoxLayout(wd_frame)
+        wd_vbox.setSpacing(10)
+
+        # Checkbox 1: Hardware Key Watchdog
+        self.chk_watchdog_hardware_key = QCheckBox("1. Kiểm tra liên tục khóa cứng USB (USB Hardware Key Watchdog Guard)")
+        self.chk_watchdog_hardware_key.setFont(QFont("Segoe UI", 10, QFont.Bold))
+        self.chk_watchdog_hardware_key.setStyleSheet("QCheckBox { color: #1E3A5F; spacing: 8px; } QCheckBox::indicator { width: 18px; height: 18px; }")
+        lbl_hw_desc = QLabel("   ↳ Quét định kỳ USB Hardware Key mỗi 3 - 5 phút. Nếu tắt, chỉ kiểm tra 1 lần duy nhất lúc mở phần mềm.")
+        lbl_hw_desc.setStyleSheet("color: #64748B; font-size: 11px; margin-bottom: 4px;")
+        wd_vbox.addWidget(self.chk_watchdog_hardware_key)
+        wd_vbox.addWidget(lbl_hw_desc)
+
+        # Checkbox 2: PLC Watchdog
+        self.chk_watchdog_plc = QCheckBox("2. Kiểm tra liên tục kết nối tới PLC (PLC Connection Watchdog & Auto-Reconnect)")
+        self.chk_watchdog_plc.setFont(QFont("Segoe UI", 10, QFont.Bold))
+        self.chk_watchdog_plc.setStyleSheet("QCheckBox { color: #1E3A5F; spacing: 8px; } QCheckBox::indicator { width: 18px; height: 18px; }")
+        lbl_plc_desc = QLabel("   ↳ Luồng ngầm gửi tín hiệu kiểm tra PLC liên tục. Nếu tắt, không tự động quét kết nối lại và không hiện alert popup.")
+        lbl_plc_desc.setStyleSheet("color: #64748B; font-size: 11px; margin-bottom: 4px;")
+        wd_vbox.addWidget(self.chk_watchdog_plc)
+        wd_vbox.addWidget(lbl_plc_desc)
+
+        # Checkbox 3: Camera Watchdog
+        self.chk_watchdog_camera = QCheckBox("3. Kiểm tra liên tục kết nối tới Camera (Camera Device Watchdog & Health Check)")
+        self.chk_watchdog_camera.setFont(QFont("Segoe UI", 10, QFont.Bold))
+        self.chk_watchdog_camera.setStyleSheet("QCheckBox { color: #1E3A5F; spacing: 8px; } QCheckBox::indicator { width: 18px; height: 18px; }")
+        lbl_cam_desc = QLabel("   ↳ Quét định kỳ kiểm tra heartbeat các camera công nghiệp. Nếu tắt, bỏ qua luồng cảnh báo gián đoạn kết nối camera.")
+        lbl_cam_desc.setStyleSheet("color: #64748B; font-size: 11px;")
+        wd_vbox.addWidget(self.chk_watchdog_camera)
+        wd_vbox.addWidget(lbl_cam_desc)
+
+        watchdog_layout.addWidget(wd_frame)
+
+        # Nút lưu cấu hình Watchdog
+        wd_btn_layout = QHBoxLayout()
+        btn_apply_watchdog = QPushButton("💾 Áp dụng & Lưu cấu hình kiểm tra kết nối (Apply & Save Watchdog)")
+        btn_apply_watchdog.setStyleSheet("QPushButton { background-color: #2563EB; color: white; font-weight: bold; padding: 7px 18px; border-radius: 4px; } QPushButton:hover { background-color: #1D4ED8; }")
+        btn_apply_watchdog.clicked.connect(self._apply_watchdog_config)
+        wd_btn_layout.addWidget(btn_apply_watchdog)
+        wd_btn_layout.addStretch()
+        watchdog_layout.addLayout(wd_btn_layout)
+
+        main_layout.addWidget(grp_watchdog)
+
+        # ── Group 4: Cấu hình tự động khởi động (System Startup & Boot Management) ──
         grp_startup = QGroupBox("🚀 Cấu hình khởi động hệ thống (System Startup & Boot Management)")
         grp_startup.setFont(QFont("Segoe UI", 11, QFont.Bold))
         startup_layout = QVBoxLayout(grp_startup)
@@ -456,6 +517,38 @@ class AdminConfigWindow(QDialog):
         if is_reg and cmd:
             msg += f"\nLệnh đăng ký: {cmd}"
         QMessageBox.information(self, "Kiểm tra trạng thái", msg)
+
+    # ─────────────────────────────────────────────
+    #  WATCHDOG & CONTINUOUS CONNECTION METHODS
+    # ─────────────────────────────────────────────
+    def _load_watchdog_config(self):
+        """Đọc và hiển thị trạng thái 3 checkbox watchdog từ database / local json"""
+        try:
+            settings = get_watchdog_settings(self.cursor)
+            self.chk_watchdog_hardware_key.setChecked(settings.get('hardware_key', True))
+            self.chk_watchdog_plc.setChecked(settings.get('plc', True))
+            self.chk_watchdog_camera.setChecked(settings.get('camera', True))
+        except Exception as e:
+            print(f"[AdminConfigWindow] Lỗi đọc cấu hình watchdog: {e}")
+
+    def _apply_watchdog_config(self):
+        """Lưu cấu hình 3 checkbox watchdog vào Database và local json"""
+        try:
+            hw = self.chk_watchdog_hardware_key.isChecked()
+            plc = self.chk_watchdog_plc.isChecked()
+            cam = self.chk_watchdog_camera.isChecked()
+            ok = set_watchdog_settings(self.cursor, self.connect_db, hardware_key=hw, plc=plc, camera=cam)
+
+            msg = (
+                "Đã lưu cấu hình kiểm tra kết nối liên tục thành công!\n\n"
+                f"1. Kiểm tra liên tục USB Hardware Key: {'BẬT (ON)' if hw else 'TẮT (OFF)'}\n"
+                f"2. Kiểm tra liên tục kết nối PLC: {'BẬT (ON)' if plc else 'TẮT (OFF)'}\n"
+                f"3. Kiểm tra liên tục kết nối Camera: {'BẬT (ON)' if cam else 'TẮT (OFF)'}\n\n"
+                "Thiết lập đã được lưu vào hệ thống và sẽ áp dụng ngay cho các luồng giám sát."
+            )
+            QMessageBox.information(self, "Cấu hình Watchdog", msg)
+        except Exception as e:
+            QMessageBox.critical(self, "Lỗi", f"Không thể lưu cấu hình kiểm tra kết nối: {e}")
 
     # ─────────────────────────────────────────────
     #  GENERAL SYSTEM SETTINGS METHODS

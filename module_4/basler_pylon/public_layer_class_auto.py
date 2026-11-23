@@ -29,3 +29,15 @@ class Layer_Initial_Device_Auto(Initial_Device_Auto, QObject):
     def set_user_selector_class(self,user_index=None):
         print('-----------------------------------------------------')
         return self.load_userset(user_selector=f'UserSet{user_index}')
+
+    def is_connected_class(self):
+        try:
+            if hasattr(self, 'camera') and self.camera is not None:
+                if hasattr(self.camera, 'IsCameraDeviceRemoved') and self.camera.IsCameraDeviceRemoved():
+                    return False
+                if hasattr(self.camera, 'IsOpen') and not self.camera.IsOpen():
+                    return False
+                return True
+        except Exception:
+            return False
+        return False

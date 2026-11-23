@@ -63,29 +63,138 @@ CREATE TABLE IF NOT EXISTS CONFIG_HISTORY (
 """
 
 
+def get_raw_mysql_connection(conn_or_cursor):
+    """
+    Trích xuất đối tượng MySQLConnection gốc từ bất kỳ đối tượng wrapper nào
+    (Connect2Mysql, core, DatabaseManager, MySQLCursor, hoặc raw MySQLConnection).
+    """
+    curr = conn_or_cursor
+    for _ in range(6):
+        if curr is None:
+            return None
+        if hasattr(curr, '_connection') and curr._connection is not None:
+            curr = curr._connection
+        elif hasattr(curr, 'connection') and curr.connection is not None:
+            curr = curr.connection
+        elif hasattr(curr, 'connect_db') and curr.connect_db is not None:
+            curr = curr.connect_db
+        else:
+            break
+    return curr
+
+
+def ensure_connection_alive(conn_or_cursor):
+    """Đảm bảo kết nối MySQL còn sống, tự động ping và reconnect nếu bị đứt kết nối."""
+    raw = get_raw_mysql_connection(conn_or_cursor)
+    if raw:
+        try:
+            if hasattr(raw, 'is_connected') and not raw.is_connected():
+                raw.ping(reconnect=True, attempts=3, delay=0.5)
+            elif hasattr(raw, 'ping'):
+                raw.ping(reconnect=True, attempts=1, delay=0)
+        except Exception:
+            try:
+                if hasattr(raw, 'reconnect'):
+                    raw.reconnect(attempts=3, delay=0.5)
+            except Exception:
+                pass
+
+
+def safe_commit(conn_or_cursor) -> bool:
+    """Thực hiện commit an toàn trên kết nối gốc hoặc wrapper có hỗ trợ."""
+    raw = get_raw_mysql_connection(conn_or_cursor)
+    if raw and hasattr(raw, 'commit') and callable(raw.commit):
+        try:
+            ensure_connection_alive(raw)
+            raw.commit()
+            return True
+        except Exception as e:
+            _log.warning("safe_commit on raw error: %s", e)
+    elif conn_or_cursor and hasattr(conn_or_cursor, 'commit') and callable(conn_or_cursor.commit):
+        try:
+            conn_or_cursor.commit()
+            return True
+        except Exception as e:
+            _log.warning("safe_commit fallback error: %s", e)
+    return False
+
+
+def safe_rollback(conn_or_cursor) -> bool:
+    """Thực hiện rollback an toàn trên kết nối gốc hoặc wrapper có hỗ trợ."""
+    raw = get_raw_mysql_connection(conn_or_cursor)
+    if raw and hasattr(raw, 'rollback') and callable(raw.rollback):
+        try:
+            raw.rollback()
+            return True
+        except Exception as e:
+            _log.warning("safe_rollback on raw error: %s", e)
+    elif conn_or_cursor and hasattr(conn_or_cursor, 'rollback') and callable(conn_or_cursor.rollback):
+        try:
+            conn_or_cursor.rollback()
+            return True
+        except Exception as e:
+            _log.warning("safe_rollback fallback error: %s", e)
+    return False
+
+
+def get_safe_cursor(cursor, conn_or_cursor=None):
+    """Đảm bảo trả về một con trỏ cursor hợp lệ để thực thi truy vấn."""
+    if cursor is not None and hasattr(cursor, 'execute') and callable(cursor.execute):
+        return cursor
+    raw = get_raw_mysql_connection(conn_or_cursor or cursor)
+    if raw and hasattr(raw, 'cursor') and callable(raw.cursor):
+        try:
+            return raw.cursor(buffered=True)
+        except Exception:
+            try:
+                return raw.cursor()
+            except Exception:
+                pass
+    if conn_or_cursor is not None:
+        if hasattr(conn_or_cursor, 'cursor'):
+            c = conn_or_cursor.cursor
+            if callable(c):
+                try:
+                    return c(buffered=True)
+                except Exception:
+                    try:
+                        return c()
+                    except Exception:
+                        pass
+            elif hasattr(c, 'execute') and callable(c.execute):
+                return c
+    return None
+
+
 def ensure_config_history_table(cursor, connection) -> bool:
     """Đảm bảo bảng CONFIG_HISTORY tồn tại."""
+    cur = get_safe_cursor(cursor, connection)
+    if cur is None:
+        _log.error("Lỗi khi tạo bảng CONFIG_HISTORY: Không tìm thấy cursor hợp lệ.")
+        return False
     try:
         try:
-            cursor.execute(SQL_CREATE_CONFIG_HISTORY)
-            if hasattr(cursor, 'fetchall'):
-                try: cursor.fetchall()
+            cur.execute(SQL_CREATE_CONFIG_HISTORY)
+            if hasattr(cur, 'fetchall'):
+                try: cur.fetchall()
                 except Exception: pass
         except Exception:
-            cursor.execute(SQL_CREATE_CONFIG_HISTORY_FALLBACK)
-            if hasattr(cursor, 'fetchall'):
-                try: cursor.fetchall()
+            cur.execute(SQL_CREATE_CONFIG_HISTORY_FALLBACK)
+            if hasattr(cur, 'fetchall'):
+                try: cur.fetchall()
                 except Exception: pass
-        if connection:
-            connection.commit()
+        safe_commit(connection)
         return True
     except Exception as e:
         _log.error("Lỗi khi tạo bảng CONFIG_HISTORY: %s", e)
         return False
 
 
-def _get_history_table_name(cursor) -> str:
+def _get_history_table_name(cursor, connection=None) -> str:
     """Xác định tên bảng lịch sử có prefix ADMINISTRATOR hay không."""
+    cur = get_safe_cursor(cursor, connection)
+    if cur is None:
+        return "CONFIG_HISTORY"
     candidates = [
         "`ADMINISTRATOR`.`CONFIG_HISTORY`",
         "`administrator`.`config_history`",
@@ -95,8 +204,8 @@ def _get_history_table_name(cursor) -> str:
     ]
     for cand in candidates:
         try:
-            cursor.execute(f"SELECT 1 FROM {cand} LIMIT 1")
-            cursor.fetchall()
+            cur.execute(f"SELECT 1 FROM {cand} LIMIT 1")
+            cur.fetchall()
             return cand
         except Exception:
             continue
@@ -442,30 +551,35 @@ def save_snapshot(
     Chụp toàn bộ cấu hình hiện tại, so sánh diff với bản trước đó và lưu vào CONFIG_HISTORY.
     Trả về ID bản ghi lịch sử mới tạo.
     """
-    ensure_config_history_table(cursor, connection)
-    table_name = _get_history_table_name(cursor)
+    cur = get_safe_cursor(cursor, connection)
+    if cur is None:
+        _log.error("save_snapshot: Không có con trỏ database hợp lệ.")
+        return 0
+
+    ensure_config_history_table(cur, connection)
+    table_name = _get_history_table_name(cur, connection)
 
     # 1. Trích xuất dữ liệu cấu hình mới nhất
     if custom_data is not None:
         new_data = custom_data
     else:
         if scope_category == 'MODEL_PARAMS' and model_id is not None:
-            new_data = capture_model_config(cursor, camera_id, model_id)
+            new_data = capture_model_config(cur, camera_id, model_id)
         elif scope_category == 'TASK_RULES' and camera_id and model_id is not None:
-            new_data = capture_task_calculator_config(cursor, camera_id, model_id)
+            new_data = capture_task_calculator_config(cur, camera_id, model_id)
         elif scope_category == 'PLC_SETTINGS' and camera_id:
-            new_data = capture_plc_settings_config(cursor, camera_id)
+            new_data = capture_plc_settings_config(cur, camera_id)
         elif scope_category == 'MODE_AUTO' and mode_id is not None:
-            new_data = capture_mode_auto_config(cursor, mode_id)
+            new_data = capture_mode_auto_config(cur, mode_id)
         elif scope_category == 'MIRROR_CONFIG' and camera_id:
-            new_data = capture_mirror_config(cursor, camera_id)
+            new_data = capture_mirror_config(cur, camera_id)
         elif scope_category == 'AUTO_LOGGING' and camera_id:
-            new_data = capture_auto_logging_config(cursor, camera_id)
+            new_data = capture_auto_logging_config(cur, camera_id)
         else:
-            new_data = capture_full_config(cursor, camera_id, model_id, mode_id)
+            new_data = capture_full_config(cur, camera_id, model_id, mode_id)
 
     # 2. Lấy bản cũ để tính diff
-    latest_rec = get_latest_snapshot(cursor, scope_category, camera_id, model_id, mode_id)
+    latest_rec = get_latest_snapshot(cur, scope_category, camera_id, model_id, mode_id)
     old_data = latest_rec.get('full_config', {}) if latest_rec else {}
 
     diff_list = compute_diff(old_data, new_data, scope_category)
@@ -498,16 +612,14 @@ def save_snapshot(
     )
 
     try:
-        cursor.execute(sql, params)
-        if connection:
-            connection.commit()
-        last_id = cursor.lastrowid
+        cur.execute(sql, params)
+        safe_commit(connection)
+        last_id = getattr(cur, 'lastrowid', 0)
         _log.info("Lưu Snapshot thành công #%s (Category: %s, User: %s, Diff count: %d)", last_id, scope_category, changed_by, len(diff_list))
         return last_id
     except Exception as e:
         _log.error("Lỗi khi lưu Snapshot: %s", e)
-        if connection:
-            connection.rollback()
+        safe_rollback(connection)
         return 0
 
 
@@ -566,11 +678,14 @@ def rollback_snapshot(cursor, connection, snapshot_id: int, performed_by: str) -
     Khôi phục 100% dữ liệu từ snapshot_id vào các bảng CSDL tương ứng.
     Tự động ghi 1 bản log Rollback sau khi hoàn tất.
     """
-    table_name = _get_history_table_name(cursor)
+    cur = get_safe_cursor(cursor, connection)
+    if cur is None:
+        return False, "Không có con trỏ database hợp lệ để thực hiện Rollback."
+    table_name = _get_history_table_name(cur, connection)
     try:
-        cursor.execute(f"SELECT * FROM {table_name} WHERE id = %s", (snapshot_id,))
-        desc = [d[0] for d in cursor.description] if cursor.description else []
-        row = cursor.fetchone()
+        cur.execute(f"SELECT * FROM {table_name} WHERE id = %s", (snapshot_id,))
+        desc = [d[0] for d in cur.description] if cur.description else []
+        row = cur.fetchone()
         if not row:
             return False, f"Không tìm thấy bản Snapshot #{snapshot_id}!"
 
@@ -597,10 +712,10 @@ def rollback_snapshot(cursor, connection, snapshot_id: int, performed_by: str) -
                     set_str = ", ".join([f"`{c}` = %s" for c in cols_to_update])
                     vals = [w[c] for c in cols_to_update]
                     vals.append(w_mid)
-                    cursor.execute(f"UPDATE WEIGHTS SET {set_str} WHERE model_id = %s", tuple(vals))
+                    cur.execute(f"UPDATE WEIGHTS SET {set_str} WHERE model_id = %s", tuple(vals))
 
         if 'parameterset' in cfg_data and model_id:
-            cursor.execute("DELETE FROM PARAMETERSET WHERE model_id = %s", (model_id,))
+            cur.execute("DELETE FROM PARAMETERSET WHERE model_id = %s", (model_id,))
             p_rows = cfg_data['parameterset']
             for p in p_rows:
                 cols = list(p.keys())
@@ -608,18 +723,18 @@ def rollback_snapshot(cursor, connection, snapshot_id: int, performed_by: str) -
                     col_str = ", ".join([f"`{c}`" for c in cols])
                     val_placeholders = ", ".join(["%s"] * len(cols))
                     vals = [p[c] for c in cols]
-                    cursor.execute(f"INSERT INTO PARAMETERSET ({col_str}) VALUES ({val_placeholders})", tuple(vals))
+                    cur.execute(f"INSERT INTO PARAMETERSET ({col_str}) VALUES ({val_placeholders})", tuple(vals))
 
         # ── 2. Khôi phục Task Calculator & Rules ──
         if 'tasks' in cfg_data and camera_id and model_id:
             from module_3.task_calculator_db import save_task_and_rules
             c_int = int(str(camera_id).lower().replace('camera-', '').replace('built-in-', '').strip()) if any(c.isdigit() for c in str(camera_id)) else 1
             # Xóa các task hiện tại của camera + model
-            cursor.execute("SELECT id FROM task_calculator WHERE camera_id = %s AND model_id = %s", (c_int, model_id))
-            old_task_ids = [r[0] for r in cursor.fetchall()]
+            cur.execute("SELECT id FROM task_calculator WHERE camera_id = %s AND model_id = %s", (c_int, model_id))
+            old_task_ids = [r[0] for r in cur.fetchall()]
             for otid in old_task_ids:
-                cursor.execute("DELETE FROM task_calculator_rules WHERE task_id = %s", (otid,))
-                cursor.execute("DELETE FROM task_calculator WHERE id = %s", (otid,))
+                cur.execute("DELETE FROM task_calculator_rules WHERE task_id = %s", (otid,))
+                cur.execute("DELETE FROM task_calculator WHERE id = %s", (otid,))
 
             for t_item in cfg_data['tasks']:
                 t_item_copy = copy.deepcopy(t_item)
@@ -627,93 +742,92 @@ def rollback_snapshot(cursor, connection, snapshot_id: int, performed_by: str) -
                 t_item_copy.pop('id', None)
                 t_item_copy['camera_id'] = c_int
                 t_item_copy['model_id'] = model_id
-                save_task_and_rules(cursor, connection, t_item_copy, rules_copy)
+                save_task_and_rules(cur, connection, t_item_copy, rules_copy)
 
         # ── 3. Khôi phục Mode Auto Signal & Shotxmodel ──
         if 'mode_auto_signal' in cfg_data and mode_id:
-            cursor.execute("DELETE FROM MODE_AUTO_SIGNAL WHERE mode_id = %s", (mode_id,))
+            cur.execute("DELETE FROM MODE_AUTO_SIGNAL WHERE mode_id = %s", (mode_id,))
             for s in cfg_data['mode_auto_signal']:
                 cols = list(s.keys())
                 if cols:
                     col_str = ", ".join([f"`{c}`" for c in cols])
                     placeholders = ", ".join(["%s"] * len(cols))
                     vals = [s[c] for c in cols]
-                    cursor.execute(f"INSERT INTO MODE_AUTO_SIGNAL ({col_str}) VALUES ({placeholders})", tuple(vals))
+                    cur.execute(f"INSERT INTO MODE_AUTO_SIGNAL ({col_str}) VALUES ({placeholders})", tuple(vals))
 
         if 'shotxmodel' in cfg_data and mode_id:
-            cursor.execute("DELETE FROM SHOTXMODEL WHERE mode_id = %s", (mode_id,))
+            cur.execute("DELETE FROM SHOTXMODEL WHERE mode_id = %s", (mode_id,))
             for sh in cfg_data['shotxmodel']:
                 cols = list(sh.keys())
                 if cols:
                     col_str = ", ".join([f"`{c}`" for c in cols])
                     placeholders = ", ".join(["%s"] * len(cols))
                     vals = [sh[c] for c in cols]
-                    cursor.execute(f"INSERT INTO SHOTXMODEL ({col_str}) VALUES ({placeholders})", tuple(vals))
+                    cur.execute(f"INSERT INTO SHOTXMODEL ({col_str}) VALUES ({placeholders})", tuple(vals))
 
         # ── 4. Khôi phục MIRROR_CONFIG ──
         if 'mirror_config' in cfg_data and camera_id:
             c_int = int(str(camera_id).lower().replace('camera-', '').replace('built-in-', '').strip()) if any(c.isdigit() for c in str(camera_id)) else 1
-            cursor.execute("DELETE FROM MIRROR_CONFIG WHERE camera_id = %s OR camera_id IN (SELECT id FROM NUMS_CAMERA WHERE nums_camera = %s)", (c_int, str(camera_id)))
+            cur.execute("DELETE FROM MIRROR_CONFIG WHERE camera_id = %s OR camera_id IN (SELECT id FROM NUMS_CAMERA WHERE nums_camera = %s)", (c_int, str(camera_id)))
             for m in cfg_data['mirror_config']:
                 cols = list(m.keys())
                 if cols:
                     col_str = ", ".join([f"`{c}`" for c in cols])
                     placeholders = ", ".join(["%s"] * len(cols))
                     vals = [m[c] for c in cols]
-                    cursor.execute(f"INSERT INTO MIRROR_CONFIG ({col_str}) VALUES ({placeholders})", tuple(vals))
+                    cur.execute(f"INSERT INTO MIRROR_CONFIG ({col_str}) VALUES ({placeholders})", tuple(vals))
 
         # ── 5. Khôi phục auto_logging ──
         if 'auto_logging' in cfg_data and camera_id:
             c_int = int(str(camera_id).lower().replace('camera-', '').replace('built-in-', '').strip()) if any(c.isdigit() for c in str(camera_id)) else 1
-            cursor.execute("DELETE FROM auto_logging WHERE camera_id = %s OR camera_id IN (SELECT id FROM NUMS_CAMERA WHERE nums_camera = %s)", (c_int, str(camera_id)))
+            cur.execute("DELETE FROM auto_logging WHERE camera_id = %s OR camera_id IN (SELECT id FROM NUMS_CAMERA WHERE nums_camera = %s)", (c_int, str(camera_id)))
             for a in cfg_data['auto_logging']:
                 cols = list(a.keys())
                 if cols:
                     col_str = ", ".join([f"`{c}`" for c in cols])
                     placeholders = ", ".join(["%s"] * len(cols))
                     vals = [a[c] for c in cols]
-                    cursor.execute(f"INSERT INTO auto_logging ({col_str}) VALUES ({placeholders})", tuple(vals))
+                    cur.execute(f"INSERT INTO auto_logging ({col_str}) VALUES ({placeholders})", tuple(vals))
 
         # ── 6. Khôi phục PLC Settings ──
         if ('signal_timing_config' in cfg_data or 'signal_transmission_and_reception' in cfg_data or 'counter_shot_setup' in cfg_data) and camera_id:
             c_int = int(str(camera_id).lower().replace('camera-', '').replace('built-in-', '').strip()) if any(c.isdigit() for c in str(camera_id)) else 1
             if 'signal_timing_config' in cfg_data and cfg_data['signal_timing_config']:
-                cursor.execute("DELETE FROM signal_timing_config WHERE camera_id = %s", (c_int,))
+                cur.execute("DELETE FROM signal_timing_config WHERE camera_id = %s", (c_int,))
                 for row_data in cfg_data['signal_timing_config']:
                     cols = list(row_data.keys())
                     if cols:
                         col_str = ", ".join([f"`{c}`" for c in cols])
                         placeholders = ", ".join(["%s"] * len(cols))
                         vals = [row_data[c] for c in cols]
-                        cursor.execute(f"INSERT INTO signal_timing_config ({col_str}) VALUES ({placeholders})", tuple(vals))
+                        cur.execute(f"INSERT INTO signal_timing_config ({col_str}) VALUES ({placeholders})", tuple(vals))
 
             if 'signal_transmission_and_reception' in cfg_data and cfg_data['signal_transmission_and_reception']:
-                cursor.execute("DELETE FROM signal_transmission_and_reception WHERE camera_id = %s", (c_int,))
+                cur.execute("DELETE FROM signal_transmission_and_reception WHERE camera_id = %s", (c_int,))
                 for row_data in cfg_data['signal_transmission_and_reception']:
                     cols = list(row_data.keys())
                     if cols:
                         col_str = ", ".join([f"`{c}`" for c in cols])
                         placeholders = ", ".join(["%s"] * len(cols))
                         vals = [row_data[c] for c in cols]
-                        cursor.execute(f"INSERT INTO signal_transmission_and_reception ({col_str}) VALUES ({placeholders})", tuple(vals))
+                        cur.execute(f"INSERT INTO signal_transmission_and_reception ({col_str}) VALUES ({placeholders})", tuple(vals))
 
             if 'counter_shot_setup' in cfg_data and cfg_data['counter_shot_setup']:
-                cursor.execute("DELETE FROM counter_shot_setup WHERE camera_id = %s", (c_int,))
+                cur.execute("DELETE FROM counter_shot_setup WHERE camera_id = %s", (c_int,))
                 for row_data in cfg_data['counter_shot_setup']:
                     cols = list(row_data.keys())
                     if cols:
                         col_str = ", ".join([f"`{c}`" for c in cols])
                         placeholders = ", ".join(["%s"] * len(cols))
                         vals = [row_data[c] for c in cols]
-                        cursor.execute(f"INSERT INTO counter_shot_setup ({col_str}) VALUES ({placeholders})", tuple(vals))
+                        cur.execute(f"INSERT INTO counter_shot_setup ({col_str}) VALUES ({placeholders})", tuple(vals))
 
-        if connection:
-            connection.commit()
+        safe_commit(connection)
 
         # Tự động ghi 1 log sự kiện Rollback
         rollback_reason = f"↺ Khôi phục về phiên bản #{snapshot_id} [{tag}]"
         save_snapshot(
-            cursor, connection,
+            cur, connection,
             scope_category=scope_cat,
             change_reason=rollback_reason,
             changed_by=performed_by,
@@ -728,8 +842,7 @@ def rollback_snapshot(cursor, connection, snapshot_id: int, performed_by: str) -
         return True, f"Khôi phục thành công toàn bộ cấu hình về phiên bản #{snapshot_id}!"
     except Exception as e:
         _log.error("Lỗi khi thực hiện Rollback: %s", e)
-        if connection:
-            connection.rollback()
+        safe_rollback(connection)
         return False, f"Lỗi khôi phục cơ sở dữ liệu: {e}"
 
 
@@ -739,11 +852,14 @@ def rollback_snapshot(cursor, connection, snapshot_id: int, performed_by: str) -
 
 def get_snapshot_by_id(cursor, snapshot_id: int) -> Optional[Dict[str, Any]]:
     """Lấy chi tiết 1 bản snapshot theo ID (bao gồm diff_list và full_config đã parse)."""
-    table_name = _get_history_table_name(cursor)
+    cur = get_safe_cursor(cursor)
+    if cur is None:
+        return None
+    table_name = _get_history_table_name(cur)
     try:
-        cursor.execute(f"SELECT * FROM {table_name} WHERE id = %s", (snapshot_id,))
-        desc = [d[0] for d in cursor.description] if cursor.description else []
-        row = cursor.fetchone()
+        cur.execute(f"SELECT * FROM {table_name} WHERE id = %s", (snapshot_id,))
+        desc = [d[0] for d in cur.description] if cur.description else []
+        row = cur.fetchone()
         if row:
             rec = dict(zip(desc, row))
             try:
@@ -769,7 +885,11 @@ def get_history_records(
     limit: int = 150
 ) -> List[Dict[str, Any]]:
     """Lấy danh sách các mốc thay đổi theo bộ lọc."""
-    table_name = _get_history_table_name(cursor)
+    cur = get_safe_cursor(cursor)
+    if cur is None:
+        _log.warning("get_history_records: Không có con trỏ database hợp lệ.")
+        return []
+    table_name = _get_history_table_name(cur)
     try:
         clauses = []
         params = []
@@ -800,9 +920,9 @@ def get_history_records(
         ORDER BY id DESC
         LIMIT {int(limit)}
         """
-        cursor.execute(sql, tuple(params))
-        desc = [d[0] for d in cursor.description] if cursor.description else []
-        rows = cursor.fetchall()
+        cur.execute(sql, tuple(params))
+        desc = [d[0] for d in cur.description] if cur.description else []
+        rows = cur.fetchall()
         results = []
         for r in rows:
             rec = dict(zip(desc, r))
@@ -829,20 +949,21 @@ def get_history_records(
 
 def toggle_golden_status(cursor, connection, snapshot_id: int) -> Tuple[bool, bool, str]:
     """Bật/tắt trạng thái Bản chuẩn (Golden) của 1 snapshot."""
-    table_name = _get_history_table_name(cursor)
+    cur = get_safe_cursor(cursor, connection)
+    if cur is None:
+        return False, False, "Không có con trỏ database hợp lệ."
+    table_name = _get_history_table_name(cur, connection)
     try:
-        cursor.execute(f"SELECT is_golden FROM {table_name} WHERE id = %s", (snapshot_id,))
-        row = cursor.fetchone()
+        cur.execute(f"SELECT is_golden FROM {table_name} WHERE id = %s", (snapshot_id,))
+        row = cur.fetchone()
         if not row:
             return False, False, "Không tìm thấy snapshot!"
         new_state = 0 if row[0] else 1
-        cursor.execute(f"UPDATE {table_name} SET is_golden = %s WHERE id = %s", (new_state, snapshot_id))
-        if connection:
-            connection.commit()
+        cur.execute(f"UPDATE {table_name} SET is_golden = %s WHERE id = %s", (new_state, snapshot_id))
+        safe_commit(connection)
         msg = "Đã đánh dấu là Bản Chuẩn (Golden Config)!" if new_state else "Đã bỏ đánh dấu Bản Chuẩn!"
         return True, bool(new_state), msg
     except Exception as e:
         _log.error("Lỗi toggle_golden_status: %s", e)
-        if connection:
-            connection.rollback()
+        safe_rollback(connection)
         return False, False, str(e)

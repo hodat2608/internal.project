@@ -33,6 +33,8 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QShortcut
 from module_2.home_main import Ui_MainWindow as MainWindowUI
 from module_2.main_core import core
 from module_2.main_thread import main_thread
+from module_2.single_instance import SingleInstanceManager
+from module_2.startup_splash import StartupSplashWindow
 from Administrator.hardware_key import open_hardware_key
 from app_logger.app_logger import get_logger as _get_logger, open_log_window
 
@@ -135,16 +137,22 @@ class VisionMainWindow(QMainWindow):
         self.main_thread = main_thread_instance
         self._connect_signals()
 
-        # Khởi động bộ giám sát định kỳ USB Hardware Key (3 - 5 phút quét 1 lần)
+        # Khởi động bộ giám sát định kỳ USB Hardware Key (3 - 5 phút quét 1 lần) nếu được Administrator cho phép
         try:
-            from module_2.hardware_key_guard import HardwareKeyGuard
-            self.hardware_key_guard = HardwareKeyGuard(
-                main_core=self.main_core,
-                parent_window=self,
-                min_interval_sec=180,  # 3 phút
-                max_interval_sec=300   # 5 phút
-            )
-            self.hardware_key_guard.start()
+            from Administrator.user_db import is_watchdog_enabled
+            db_conn = getattr(self.main_core, 'cursor', None) or getattr(self.main_core, 'connection', None)
+            if is_watchdog_enabled('hardware_key', conn_or_cursor=db_conn):
+                from module_2.hardware_key_guard import HardwareKeyGuard
+                self.hardware_key_guard = HardwareKeyGuard(
+                    main_core=self.main_core,
+                    parent_window=self,
+                    min_interval_sec=180,  # 3 phút
+                    max_interval_sec=300   # 5 phút
+                )
+                self.hardware_key_guard.start()
+                _log.info("HardwareKeyGuard đã được khởi động.")
+            else:
+                _log.info("[HardwareKeyGuard] Giám sát liên tục USB Key bị TẮT theo cấu hình của Administrator.")
         except Exception as e:
             _log.error("Lỗi khi khởi chạy HardwareKeyGuard: %s", e)
 
@@ -346,75 +354,186 @@ def run_application():
         show_fatal_error("QApplication Initialization", traceback.format_exc())
         return
 
-    # 3. Mở cửa sổ theo dõi log ứng dụng (nếu cấu hình)
+    # 3. KIỂM TRA ĐƠN PHIÊN BẢN (SINGLE INSTANCE CHECK):
+    # Tuyệt đối không cho phép chạy song song 2 phiên bản phần mềm.
+    # Nếu phát hiện đã có phiên bản đang chạy (hoặc đang khởi động), hiển thị cảnh báo và thoát ngay.
     try:
+        if SingleInstanceManager.is_already_running():
+            write_crash_log("STEP 1b: Duplicate instance detected! Prompting operator and exiting immediately.")
+            _log.warning("[SingleInstance] Phát hiện phần mềm đã đang chạy! Hiển thị cảnh báo và dừng tiến trình này.")
+            SingleInstanceManager.show_already_running_warning()
+            sys.exit(0)
+    except SystemExit:
+        raise
+    except Exception as e:
+        write_crash_log(f"STEP 1b WARNING (SingleInstance check error): {e}")
+
+    # 4. HIỂN THỊ MÀN HÌNH KHỞI ĐỘNG (STARTUP LOADING SPLASH SCREEN) NGAY LẬP TỨC
+    # Màn hình này cảnh báo rõ ràng cho công nhân vận hành: "Đang khởi tạo - KHÔNG ĐƯỢC CLICK LẠI ICON"
+    splash = None
+    single_mgr = None
+    window = None
+
+    try:
+        splash = StartupSplashWindow()
+        splash.show()
+        splash.update_status("Đang khởi tạo hệ thống kiểm tra...", "Đăng ký khóa đơn phiên bản (Single Instance)...", 5)
+
+        # Đăng ký Named Pipe Server để nhận tín hiệu kích hoạt nếu người dùng click icon sau này
+        single_mgr = SingleInstanceManager()
+
+        def _on_remote_activate(msg="ACTIVATE"):
+            _log.info("[SingleInstance] Nhận tín hiệu kích hoạt từ tiến trình thứ 2: %s", msg)
+            if splash and splash.isVisible():
+                splash.activate_splash()
+            elif window and window.isVisible():
+                window.showMaximized()
+                window.raise_()
+                window.activateWindow()
+
+        single_mgr.start_server(on_activate_callback=_on_remote_activate)
+    except Exception as e:
+        write_crash_log(f"STEP 1c WARNING (Splash / SingleInstance server error): {e}")
+
+    # 5. Mở cửa sổ theo dõi log ứng dụng (nếu cấu hình)
+    try:
+        if splash:
+            splash.update_status("Đang nạp cửa sổ nhật ký ứng dụng...", "Khởi tạo hệ thống logging...", 10)
         open_log_window()
         write_crash_log("STEP 2: open_log_window OK")
     except Exception:
         write_crash_log("STEP 2 WARNING (open_log_window):\n" + traceback.format_exc())
 
-    # 4. Khởi tạo tầng logic lõi Main Core
+    # 6. Khởi tạo tầng logic lõi Main Core (kèm callback cập nhật Splash trực tiếp)
     try:
-        main_core = core()
+        if splash:
+            splash.update_status("Đang kết nối cơ sở dữ liệu MySQL...", "Hệ thống đang tự động phục hồi dịch vụ dữ liệu...", 15)
+        progress_cb = splash.update_status if splash else None
+        main_core = core(progress_callback=progress_cb)
         write_crash_log("STEP 3: core() initialized OK")
     except BaseException as e:
+        if splash:
+            splash.close()
         show_fatal_error("Core Initialization", f"Type: {type(e).__name__}\n\n{traceback.format_exc()}")
         return
 
-    # 5. Xác thực Giấy phép (Hardware Key License) TRƯỚC KHI chạy luồng nền hoặc giao diện
+    # 7. Xác thực Giấy phép (Hardware Key License) TRƯỚC KHI chạy luồng nền hoặc giao diện
     try:
+        if splash:
+            splash.update_status("Đang xác thực bản quyền phần mềm...", "Kiểm tra USB Hardware Key...", 75)
         license_ok = check_license(main_core)
         if not license_ok:
             write_crash_log("STEP 4d: License verification denied or cancelled - exiting cleanly")
+            if splash:
+                splash.close()
             sys.exit(0)
         write_crash_log("STEP 4: License verified successfully")
+    except SystemExit:
+        if splash:
+            splash.close()
+        raise
     except Exception:
+        if splash:
+            splash.close()
         show_fatal_error("License Verification", traceback.format_exc())
         return
 
-    # 6. Khởi động luồng giám sát tín hiệu nền CoreWorker (CHỈ DUY NHẤT 1 LẦN)
+    # 8. Khởi động luồng giám sát tín hiệu nền CoreWorker (CHỈ DUY NHẤT 1 LẦN)
     try:
+        if splash:
+            splash.update_status("Đang khởi động giám sát tín hiệu nền...", "Kích hoạt luồng CoreWorker & Watchdog...", 82)
         main_core.start_monitoring()
         write_crash_log("STEP 5: CoreWorker monitoring started")
     except Exception:
+        if splash:
+            splash.close()
         show_fatal_error("start_monitoring", traceback.format_exc())
         return
 
-    # 7. Khởi tạo cửa sổ chính và giao diện
+    # 9. Khởi tạo cửa sổ chính và giao diện
     try:
+        if splash:
+            splash.update_status("Đang khởi tạo giao diện điều khiển...", "Chuẩn bị màn hình chính...", 88)
         window = VisionMainWindow()
         write_crash_log("STEP 6: VisionMainWindow created")
     except Exception:
+        if splash:
+            splash.close()
         show_fatal_error("VisionMainWindow Creation", traceback.format_exc())
         return
 
-    # 8. Khởi tạo MainThread xử lý logic & kết nối với giao diện
+    # 10. Khởi tạo MainThread xử lý logic & kết nối với giao diện
     try:
         main_thread_instance = main_thread(window.ui, main_core.connection, main_core)
         window.setup_app_components(main_core, main_thread_instance)
         write_crash_log("STEP 7: main_thread initialized and connected to UI")
     except Exception:
+        if splash:
+            splash.close()
         show_fatal_error("main_thread Setup", traceback.format_exc())
         return
 
-    # 9. Khởi tạo màn hình chờ động (radar) và cấu hình Pyuic5 / module_3
+    # 11. Khởi tạo màn hình chờ động (radar) và cấu hình Pyuic5 / module_3
     try:
+        if splash:
+            splash.update_status("Đang nạp cấu hình hiển thị và mô hình AI...", "Khởi tạo thiết bị đồ họa và Workspace...", 95)
         main_thread_instance.setup_home_screen(window.ui.graphicsView)
         main_thread_instance.init_Pyuic5()
         write_crash_log("STEP 8: Home screen animation and Pyuic5 initialized")
     except Exception:
+        if splash:
+            splash.close()
         show_fatal_error("init_Pyuic5 Setup", traceback.format_exc())
         return
 
-    # 10. Hiển thị cửa sổ chính ở trạng thái Maximized
+    # 12. Hoàn tất khởi động: Đóng Splash và hiển thị cửa sổ chính
     try:
-        window.showMaximized()
-        write_crash_log("STEP 9: MainWindow displayed maximized")
+        write_crash_log("STEP 9: Finishing splash and displaying MainWindow")
+        if splash:
+            splash.finish(window)
+        else:
+            window.showMaximized()
+        write_crash_log("STEP 9: MainWindow displayed maximized successfully")
+
+        # Đảm bảo nếu có cảnh báo lỗi kết nối PLC hoặc Camera lúc khởi động phần mềm,
+        # cửa sổ cảnh báo được hiển thị và nâng lên trên cùng sau khi MainWindow đã phóng to cực đại.
+        def _raise_startup_alerts():
+            try:
+                # 1. Hiển thị và nâng cảnh báo kết nối PLC nếu mất kết nối lúc khởi động
+                if getattr(main_core, 'startup_plc_failed', False):
+                    if getattr(main_core, '_plc_alert_overlay', None) is None:
+                        module = getattr(main_core, 'plc_module', 'KEYENCE')
+                        ip = getattr(main_core, 'ip_address_plc', '')
+                        port = getattr(main_core, 'port_plc', 0)
+                        main_core._on_plc_connection_lost(module, str(ip), int(port), 1)
+
+                    overlay = getattr(main_core, '_plc_alert_overlay', None)
+                    if overlay and not getattr(overlay, 'user_dismissed', False):
+                        overlay._center_on_screen_or_window()
+                        if not overlay.isVisible():
+                            overlay.show_alert()
+                        else:
+                            overlay.raise_()
+                            overlay.activateWindow()
+
+                # 2. Nâng cảnh báo kết nối Camera nếu có lỗi khởi động
+                if hasattr(main_thread_instance, 'camera_manager'):
+                    cam_overlay = getattr(main_thread_instance.camera_manager, '_camera_alert_overlay', None)
+                    if cam_overlay and cam_overlay.isVisible():
+                        cam_overlay.raise_()
+                        cam_overlay.activateWindow()
+            except Exception as e_overlay:
+                _log.debug("Lỗi nâng vị trí alert overlay sau showMaximized: %s", e_overlay)
+
+        QtCore.QTimer.singleShot(400, _raise_startup_alerts)
+        QtCore.QTimer.singleShot(1200, _raise_startup_alerts)
     except Exception:
+        if splash:
+            splash.close()
         show_fatal_error("showMaximized", traceback.format_exc())
         return
 
-    # 11. Bắt đầu vòng lặp sự kiện chính của Qt
+    # 13. Bắt đầu vòng lặp sự kiện chính của Qt
     write_crash_log("STEP 10: Entering Qt main event loop")
     sys.exit(app.exec_())
 

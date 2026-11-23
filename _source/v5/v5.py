@@ -24,6 +24,26 @@ def _normalize_key_model(k):
     return (f"camera-{cam_str}", f"model-{mod_str}")
  
 
+class InspectionItemList(list):
+    """
+    Danh sách kết quả kiểm định có cấu trúc (Phương án A),
+    kế thừa list và hỗ trợ cả method .add() để tương thích ngược 100%.
+    Tự động chống trùng lặp theo (type, label, text).
+    """
+    def append(self, item):
+        if isinstance(item, dict):
+            key = (item.get('type'), item.get('label'), item.get('text'))
+            for existing in self:
+                if isinstance(existing, dict) and (existing.get('type'), existing.get('label'), existing.get('text')) == key:
+                    return
+        elif item in self:
+            return
+        super().append(item)
+
+    def add(self, item):
+        self.append(item)
+
+
 def draw_detections(image_rgb: np.ndarray, draw_list: list, fail_labels) -> np.ndarray:
     # Tối ưu: Nếu không có detections và không có lỗi, trả về ngay ảnh gốc (tránh deep copy 15-35MB)
     if not fail_labels and not draw_list:
@@ -106,33 +126,39 @@ def draw_detections(image_rgb: np.ndarray, draw_list: list, fail_labels) -> np.n
     ok_count = 0
 
     if fail_labels:
-        for label in sorted(fail_labels):
-            lbl_str = str(label).strip()
-            is_ng = '*' in lbl_str.upper()
+        # Hỗ trợ cả danh sách dict có cấu trúc (Phương án A) và chuỗi string truyền thống (backward compatibility)
+        for item in fail_labels:
+            if isinstance(item, dict):
+                is_ng = bool(item.get('is_ng', item.get('status') == 'NG'))
+                status_str = "NG" if is_ng else "OK"
+                clean_text = str(item.get('text') or f"{item.get('label', '')} - sl: {item.get('count', 0)}")
+            else:
+                lbl_str = str(item).strip()
+                is_ng = '*' in lbl_str.upper() or lbl_str.upper().startswith('NG') or '(VI PHẠM)' in lbl_str.upper()
+                clean_text = lbl_str
+                while clean_text.startswith('*') or clean_text.startswith(' '):
+                    clean_text = clean_text.lstrip('*').strip()
 
-            clean_text = lbl_str
-            if clean_text.startswith('* '):
-                clean_text = clean_text[2:]
-            elif clean_text.startswith('*'):
-                clean_text = clean_text[1:]
+                if clean_text.startswith('NG : ') or clean_text.startswith('NG:'):
+                    clean_text = clean_text.split(':', 1)[1].strip()
+                elif clean_text.startswith('OK : ') or clean_text.startswith('OK:'):
+                    clean_text = clean_text.split(':', 1)[1].strip()
 
-            if clean_text.startswith('NG: '):
-                clean_text = clean_text[4:]
-            elif clean_text.startswith('OK: '):
-                clean_text = clean_text[4:]
+                status_str = "NG" if is_ng else "OK"
 
             if is_ng:
                 ng_count += 1
-                status_str = "NG"
             else:
                 ok_count += 1
-                status_str = "OK"
 
             processed_items.append({
                 'status': status_str,
                 'is_ng': is_ng,
                 'text': clean_text
             })
+
+        # Sắp xếp hiển thị: Các nhãn/Task NG đưa lên trước để người vận hành chú ý ngay, sau đó đến các nhãn OK
+        processed_items.sort(key=lambda x: (not x['is_ng'], x['text']))
 
     is_overall_ng = ng_count > 0
     overall_status_text = "NG" if is_overall_ng else "OK"
@@ -251,12 +277,24 @@ def _read_model_config(model, model_column: list, keys_mapping: list) -> list:
             return int(text(row, key))
         except ValueError:
             return default
- 
+
+    def to_int_or_none(row, key):
+        t = text(row, key)
+        if not t or t.lower() in ('none', 'no value', 'null'):
+            return None
+        try:
+            return int(t)
+        except (ValueError, TypeError):
+            return None
+
     rows = []
     for i in range(model.rowCount()):
-        val_state = to_int(i, "Value State", default=to_int(i, "Value", default=1))
-        val_ok    = to_int(i, "Value OK",    default=1)
-        val_ng    = to_int(i, "Value NG",    default=1)
+        raw_val_state = to_int_or_none(i, "Value State")
+        if raw_val_state is None and "Value State" not in col_indices:
+            raw_val_state = to_int_or_none(i, "Value")
+        val_state = raw_val_state
+        val_ok    = to_int_or_none(i, "Value OK")
+        val_ng    = to_int_or_none(i, "Value NG")
         rows.append({
             'label'       : text(i,    keys_mapping[0]),
             'join'        : checked(i, keys_mapping[1]),
@@ -420,7 +458,7 @@ class v5s:
 
         flag          = True
         list_register = {}
-        fail_labels   = set()
+        fail_labels   = InspectionItemList()
         ng_registers  = set()
 
         # ── Per-label OK / NG quantity check (Tối ưu: Counter O(1) lookup) ────
@@ -433,33 +471,101 @@ class v5s:
             if 'quantity' not in cfg:
                 continue
 
-            label    = cfg.get('label', '')
-            ok_count = name_counts.get(label, 0)
-            reg      = str(cfg.get('register') or '').strip()
+            label          = str(cfg.get('label') or '').strip()
+            detected_count = name_counts.get(label, 0)
+            reg            = str(cfg.get('register') or '').strip()
+
+            try:
+                target_qty = int(cfg.get('quantity', 0))
+            except (ValueError, TypeError):
+                target_qty = 0
+
+            is_ok_rule = bool(cfg.get('ok'))
+            is_ng_rule = bool(cfg.get('ng'))
 
             is_label_ng = False
-            if cfg.get('ok') and ok_count != cfg.get('quantity', 0):
-                is_label_ng = True
 
-            if cfg.get('ng') and ok_count > 0:
+            if is_ok_rule and not is_ng_rule:
+                # Tiêu chuẩn OK: Số lượng phát hiện bắt buộc phải bằng đúng target_qty
+                if detected_count != target_qty:
+                    is_label_ng = True
+            elif is_ng_rule and not is_ok_rule:
+                # Tiêu chuẩn NG (nhãn lỗi): Nếu phát hiện lớn hơn hoặc bằng target_qty là NG, nhỏ hơn target_qty là OK
+                ng_target = target_qty if target_qty > 0 else 1
+                if detected_count >= ng_target:
+                    is_label_ng = True
+            elif is_ok_rule and is_ng_rule:
+                # Nếu người dùng tích cả 2 cột OK và NG: Phán định NG ngay lập tức, không xét điều kiện gì nữa
                 is_label_ng = True
 
             if is_label_ng:
                 flag = False
-                fail_labels.add(f'* {label}')
+                fail_labels.append({
+                    'type': 'LABEL',
+                    'label': label,
+                    'status': 'NG',
+                    'is_ng': True,
+                    'count': detected_count,
+                    'target': target_qty,
+                    'text': f"{label} - sl: {detected_count}"
+                })
                 if reg and any(c.isdigit() for c in reg):
                     ng_registers.add(reg)
-                    list_register[reg] = cfg.get('value_ng', 1)
+                    v_ng = cfg.get('value_ng')
+                    if v_ng is None:
+                        v_ng = cfg.get('Value_NG')
+                    if v_ng is not None and str(v_ng).strip() != "" and str(v_ng).strip().lower() not in ('none', 'no value', 'null'):
+                        try:
+                            list_register[reg] = int(v_ng)
+                        except (ValueError, TypeError):
+                            list_register[reg] = v_ng
+                    else:
+                        list_register.pop(reg, None)
             else:
-                # Nhãn đạt điều kiện OK
+                # Nhãn đạt điều kiện OK -> Thêm vào fail_labels để HUD hiển thị Passed và danh sách xanh
+                if is_ok_rule or is_ng_rule:
+                    fail_labels.append({
+                        'type': 'LABEL',
+                        'label': label,
+                        'status': 'OK',
+                        'is_ng': False,
+                        'count': detected_count,
+                        'target': target_qty,
+                        'text': f"{label} - sl: {detected_count}"
+                    })
+
                 if reg and any(c.isdigit() for c in reg):
                     # BẢO VỆ NG: Nếu thanh ghi này đã từng bị NG bởi nhãn khác trước đó (cùng chung thanh ghi) -> TUYỆT ĐỐI KHÔNG GHI ĐÈ BẰNG VALUE OK!
                     if reg not in ng_registers:
-                        list_register[reg] = cfg.get('value_ok', 1)
+                        v_ok = cfg.get('value_ok')
+                        if v_ok is None:
+                            v_ok = cfg.get('Value_OK')
+                        if v_ok is not None and str(v_ok).strip() != "" and str(v_ok).strip().lower() not in ('none', 'no value', 'null'):
+                            try:
+                                list_register[reg] = int(v_ok)
+                            except (ValueError, TypeError):
+                                list_register[reg] = v_ok
 
-        # ── Đổi màu đỏ cho các box thuộc nhãn bị NG ──────────────────────────
+        # ── Trích xuất danh sách các nhãn chính xác bị lỗi NG để đổi màu đỏ ──
+        exact_ng_labels = {
+            item['label'] for item in fail_labels
+            if isinstance(item, dict) and item.get('is_ng') and item.get('type') == 'LABEL' and item.get('label')
+        }
+        # Hỗ trợ fallback nếu có item chuỗi string legacy
+        for x in fail_labels:
+            if isinstance(x, str) and ('*' in x or x.startswith('NG')):
+                s = str(x).strip()
+                if s.startswith('* Task:') or s.startswith('Task:'):
+                    continue
+                s_clean = s.lstrip('*').strip()
+                if s_clean.startswith(('NG :', 'NG:')):
+                    s_clean = s_clean.split(':', 1)[1].strip()
+                lbl_name = s_clean.split(' - sl:')[0].strip()
+                if lbl_name:
+                    exact_ng_labels.add(lbl_name)
+
         for d in draw_candidates:
-            if any(d['label'] in x for x in fail_labels if '*' in x):
+            if d.get('label') in exact_ng_labels:
                 d['color'] = COLOR_NG
 
         # ── Kiểm tra điều kiện Task Calculator đa nhãn theo key_model ─────────
@@ -485,10 +591,12 @@ class v5s:
             tasks_for_model = active_tasks_dict
 
         # QUAN TRỌNG: Thực thi Task Calculator TRƯỚC KHI vẽ HUD và tổng hợp toàn bộ lỗi vào fail_labels
-        if tasks_for_model:
+        # LỌC PHÁN ĐỊNH: Chỉ những task đang được BẬT KÍCH HOẠT (enabled == True) và có rules mới tham gia xử lý/phán định!
+        enabled_tasks = [t for t in tasks_for_model if t.get('enabled', True) and t.get('rules')]
+        if enabled_tasks:
             image, flag, list_register = self.evaluate_task_calculator(
                 image, draw_candidates, pyuic, flag, list_register,
-                tasks_config=tasks_for_model,
+                tasks_config=enabled_tasks,
                 key_model=key_model,
                 fail_labels=fail_labels,
                 ng_registers=ng_registers
@@ -498,6 +606,7 @@ class v5s:
         result_image_rgb = draw_detections(image, draw_candidates, fail_labels)
 
         # Chuẩn bị danh sách cfg_rows độc lập trả về cho main_core (không làm bẩn cache pyuic)
+        # TẤT CẢ các task có assign_register (kể cả không kích hoạt) đều được tập hợp để gửi biến trạng thái (_init_cfg_registers)
         final_cfg_rows = [dict(c) for c in cfg_rows if 'quantity' in c]
         if tasks_for_model:
             for t in tasks_for_model:
@@ -506,10 +615,12 @@ class v5s:
                     final_cfg_rows.append({
                         'label': f"Task:{t.get('task_name', '')}",
                         'register': t_reg,
-                        'value_state': t.get('value_state', t.get('Value_State', 1)),
-                        'value_ok': t.get('value_ok', t.get('Value_OK', t.get('value_bit_on', 1))),
-                        'value_ng': t.get('value_ng', t.get('Value_NG', t.get('value_bit_off', 0))),
-                        'join': True,
+                        'value_state': t.get('value_state', t.get('Value_State')),
+                        'value_ok': t.get('value_ok', t.get('Value_OK', t.get('value_bit_on'))),
+                        'value_ng': t.get('value_ng', t.get('Value_NG', t.get('value_bit_off'))),
+                        'value': t.get('value_state', t.get('Value_State')),
+                        'join': bool(t.get('enabled', True)),
+                        'enabled': bool(t.get('enabled', True)),
                     })
 
         return result_image_rgb, flag, list_register, LOGO_WATERMARK, final_cfg_rows
@@ -602,13 +713,25 @@ class v5s:
                                 is_task_ng = True
                                 break
 
+                val_valid = (val is not None and str(val).strip() != "" and str(val).strip().lower() not in ('none', 'no value', 'null'))
+
                 if is_task_ng:
                     ng_registers.add(reg_str)
-                    list_register[reg_str] = val
+                    if val_valid:
+                        try:
+                            list_register[reg_str] = int(val)
+                        except (ValueError, TypeError):
+                            list_register[reg_str] = val
+                    else:
+                        list_register.pop(reg_str, None)
                 else:
                     # Task OK: chỉ gán giá trị OK nếu thanh ghi này CHƯA TỪNG bị NG bởi bất kỳ label hay task nào!
                     if reg_str not in ng_registers:
-                        list_register[reg_str] = val
+                        if val_valid:
+                            try:
+                                list_register[reg_str] = int(val)
+                            except (ValueError, TypeError):
+                                list_register[reg_str] = val
 
             # Trích xuất toàn bộ hạng mục Task vi phạm đưa vào fail_labels để hiển thị lên HUD
             if fail_labels is not None and task_results:
@@ -633,10 +756,11 @@ class v5s:
                                 if reason:
                                     desc = f"{reason}"
                                 elif op.startswith('DIST_') or r.get('is_distance'):
-                                    comp_op = op.replace('DIST_', '')
+                                    comp_op = op.replace('DIST_X_', '').replace('DIST_Y_', '').replace('DIST_', '')
                                     d_val = r.get('lhs_val', 0.0) or 0.0
                                     thresh = r.get('rhs_val', 0.0) or 0.0
-                                    desc = f"{lbl1}.{p1}-{lbl2}.{p2}: {d_val:.1f}px {comp_op} {thresh:.1f}px"
+                                    pfx = "DistX" if op.startswith('DIST_X_') else ("DistY" if op.startswith('DIST_Y_') else "Dist")
+                                    desc = f"{pfx}[{lbl1}.{p1}-{lbl2}.{p2}]: {d_val:.1f}px {comp_op} {thresh:.1f}px"
                                 elif op in ('INSIDE', 'OUTSIDE', 'OVERLAP') or r.get('is_spatial'):
                                     desc = f"{lbl1} {op} {lbl2}"
                                 else:
@@ -647,11 +771,29 @@ class v5s:
                                     else:
                                         desc = f"{lbl1}.{p1} {op} {lbl2}.{p2}"
 
-                                fail_labels.add(f"* Task: {t_name} [{desc}]")
+                                fail_labels.append({
+                                    'type': 'TASK',
+                                    'label': t_name,
+                                    'status': 'NG',
+                                    'is_ng': True,
+                                    'text': f"Task: {t_name} [{desc}]"
+                                })
                         else:
-                            fail_labels.add(f"* Task: {t_name} (Vi phạm)")
+                            fail_labels.append({
+                                'type': 'TASK',
+                                'label': t_name,
+                                'status': 'NG',
+                                'is_ng': True,
+                                'text': f"Task: {t_name} (Vi phạm)"
+                            })
                     else:
-                        fail_labels.add(f"Task: {t_name} (OK)")
+                        fail_labels.append({
+                            'type': 'TASK',
+                            'label': t_name,
+                            'status': 'OK',
+                            'is_ng': False,
+                            'text': f"Task: {t_name} (OK)"
+                        })
 
         except Exception as e:
             print("Error in evaluate_task_calculator (v5):", e)

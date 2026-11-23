@@ -1748,6 +1748,28 @@ TaskRuleEditorDialog_Style = """
                 color: #ffffff;
                 font-weight: bold;
             }
+            QComboBox QAbstractItemView QScrollBar:vertical, QComboBox QListView QScrollBar:vertical {
+                background-color: #f1f5f9;
+                width: 10px;
+                border-radius: 5px;
+                margin: 0px;
+            }
+            QComboBox QAbstractItemView QScrollBar::handle:vertical, QComboBox QListView QScrollBar::handle:vertical {
+                background-color: #94a3b8;
+                min-height: 24px;
+                border-radius: 5px;
+            }
+            QComboBox QAbstractItemView QScrollBar::handle:vertical:hover, QComboBox QListView QScrollBar::handle:vertical:hover {
+                background-color: #64748b;
+            }
+            QComboBox QAbstractItemView QScrollBar::sub-line:vertical, QComboBox QAbstractItemView QScrollBar::add-line:vertical,
+            QComboBox QListView QScrollBar::sub-line:vertical, QComboBox QListView QScrollBar::add-line:vertical {
+                height: 0px;
+            }
+            QComboBox QAbstractItemView QScrollBar::add-page:vertical, QComboBox QAbstractItemView QScrollBar::sub-page:vertical,
+            QComboBox QListView QScrollBar::add-page:vertical, QComboBox QListView QScrollBar::sub-page:vertical {
+                background: none;
+            }
 
             /* CÁC NÚT THAO TÁC CƠ BẢN */
             QPushButton {
@@ -1966,6 +1988,26 @@ TaskRuleEditorDialog_Style_init_ui = """
                 height: 0px;
             }
             QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+                background: none;
+            }
+            QScrollBar:horizontal {
+                background-color: #f1f5f9;
+                height: 12px;
+                border-radius: 6px;
+                margin: 0px;
+            }
+            QScrollBar::handle:horizontal {
+                background-color: #cbd5e1;
+                min-width: 30px;
+                border-radius: 6px;
+            }
+            QScrollBar::handle:horizontal:hover {
+                background-color: #94a3b8;
+            }
+            QScrollBar::sub-line:horizontal, QScrollBar::add-line:horizontal {
+                width: 0px;
+            }
+            QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
                 background: none;
             }
         """

@@ -319,6 +319,16 @@ TABLES_SQL_ITEM_CODE_SAVE = [
         date_time        DATETIME NOT NULL
     )
 """,
+    """
+    CREATE TABLE IF NOT EXISTS ITEM_CODE_SAVE.CAMERA_MODE_SAVE_DEFAULT (
+        id               INT AUTO_INCREMENT PRIMARY KEY,
+        camera_key       VARCHAR(255) NOT NULL,
+        mode_key         VARCHAR(255) NOT NULL,
+        item_code        VARCHAR(255) DEFAULT '',
+        date_time        DATETIME NOT NULL,
+        UNIQUE KEY uq_camera_key (camera_key)
+    )
+""",
 ]
 
 _ADMIN_TABLES_SQL = [

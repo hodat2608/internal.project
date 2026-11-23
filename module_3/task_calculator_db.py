@@ -99,6 +99,35 @@ def ensure_connection_alive(conn_or_cursor):
                     raw.reconnect(attempts=3, delay=0.5)
             except Exception:
                 pass
+    return raw
+
+
+def get_active_cursor(conn_or_cursor):
+    """
+    Đảm bảo kết nối MySQL còn sống và trả về một cursor hợp lệ sẵn sàng thực thi truy vấn.
+    Nếu cursor cũ bị đóng hoặc mất kết nối, tự động tạo mới cursor từ connection.
+    """
+    raw = ensure_connection_alive(conn_or_cursor)
+    if hasattr(conn_or_cursor, 'execute') and not hasattr(conn_or_cursor, 'commit'):
+        if not getattr(conn_or_cursor, '_closed', False) and getattr(conn_or_cursor, '_connection', None) is not None:
+            try:
+                if hasattr(conn_or_cursor, 'fetchall'):
+                    try:
+                        conn_or_cursor.fetchall()
+                    except Exception:
+                        pass
+                return conn_or_cursor
+            except Exception:
+                pass
+    if raw and hasattr(raw, 'cursor'):
+        try:
+            return raw.cursor(buffered=True)
+        except Exception:
+            try:
+                return raw.cursor()
+            except Exception:
+                pass
+    return conn_or_cursor
 
 
 def safe_commit(conn):
@@ -210,40 +239,64 @@ def get_tasks_by_camera(cursor, camera_id: int, model_id: Optional[int] = None) 
                     m_str = str(model_id).lower().replace('model-', '').replace('model', '').strip()
                     m_id = int(m_str) if m_str.isdigit() else model_id
 
-                cursor.execute("SHOW COLUMNS FROM task_calculator LIKE 'value_state'")
-                has_val_state = bool(cursor.fetchone())
-                if not has_val_state:
-                    cursor.execute("SHOW COLUMNS FROM task_calculator LIKE 'Value_State'")
-                    has_val_state = bool(cursor.fetchone())
-                col_val_state = ", t.value_state" if has_val_state else ""
-
-                if m_id is not None:
-                    query = f"""
-                        SELECT t.id, t.camera_id, t.model_id, t.task_name, t.task_type, t.logic_mode, 
-                               t.action_on_fail, t.enabled, t.assign_register, t.value_bit_on, 
-                               t.value_bit_off, t.datetime,
-                               COUNT(r.id) AS rule_count{col_val_state}
-                        FROM task_calculator t
-                        LEFT JOIN task_calculator_rules r ON t.id = r.task_id
-                        WHERE t.camera_id = %s AND t.model_id = %s
-                        GROUP BY t.id
-                        ORDER BY t.id ASC
-                    """
-                    cursor.execute(query, (c_id, m_id))
-                else:
-                    query = f"""
-                        SELECT t.id, t.camera_id, t.model_id, t.task_name, t.task_type, t.logic_mode, 
-                               t.action_on_fail, t.enabled, t.assign_register, t.value_bit_on, 
-                               t.value_bit_off, t.datetime,
-                               COUNT(r.id) AS rule_count{col_val_state}
-                        FROM task_calculator t
-                        LEFT JOIN task_calculator_rules r ON t.id = r.task_id
-                        WHERE t.camera_id = %s
-                        GROUP BY t.id
-                        ORDER BY t.id ASC
-                    """
-                    cursor.execute(query, (c_id,))
-                rows = cursor.fetchall()
+                cur = get_active_cursor(cursor)
+                has_val_state = True
+                try:
+                    if m_id is not None:
+                        query = """
+                            SELECT t.id, t.camera_id, t.model_id, t.task_name, t.task_type, t.logic_mode, 
+                                   t.action_on_fail, t.enabled, t.assign_register, t.value_bit_on, 
+                                   t.value_bit_off, t.datetime,
+                                   COUNT(r.id) AS rule_count, t.value_state
+                            FROM task_calculator t
+                            LEFT JOIN task_calculator_rules r ON t.id = r.task_id
+                            WHERE t.camera_id = %s AND t.model_id = %s
+                            GROUP BY t.id
+                            ORDER BY t.id ASC
+                        """
+                        cur.execute(query, (c_id, m_id))
+                    else:
+                        query = """
+                            SELECT t.id, t.camera_id, t.model_id, t.task_name, t.task_type, t.logic_mode, 
+                                   t.action_on_fail, t.enabled, t.assign_register, t.value_bit_on, 
+                                   t.value_bit_off, t.datetime,
+                                   COUNT(r.id) AS rule_count, t.value_state
+                            FROM task_calculator t
+                            LEFT JOIN task_calculator_rules r ON t.id = r.task_id
+                            WHERE t.camera_id = %s
+                            GROUP BY t.id
+                            ORDER BY t.id ASC
+                        """
+                        cur.execute(query, (c_id,))
+                except Exception:
+                    has_val_state = False
+                    if m_id is not None:
+                        query = """
+                            SELECT t.id, t.camera_id, t.model_id, t.task_name, t.task_type, t.logic_mode, 
+                                   t.action_on_fail, t.enabled, t.assign_register, t.value_bit_on, 
+                                   t.value_bit_off, t.datetime,
+                                   COUNT(r.id) AS rule_count
+                            FROM task_calculator t
+                            LEFT JOIN task_calculator_rules r ON t.id = r.task_id
+                            WHERE t.camera_id = %s AND t.model_id = %s
+                            GROUP BY t.id
+                            ORDER BY t.id ASC
+                        """
+                        cur.execute(query, (c_id, m_id))
+                    else:
+                        query = """
+                            SELECT t.id, t.camera_id, t.model_id, t.task_name, t.task_type, t.logic_mode, 
+                                   t.action_on_fail, t.enabled, t.assign_register, t.value_bit_on, 
+                                   t.value_bit_off, t.datetime,
+                                   COUNT(r.id) AS rule_count
+                            FROM task_calculator t
+                            LEFT JOIN task_calculator_rules r ON t.id = r.task_id
+                            WHERE t.camera_id = %s
+                            GROUP BY t.id
+                            ORDER BY t.id ASC
+                        """
+                        cur.execute(query, (c_id,))
+                rows = cur.fetchall()
                 tasks = []
                 for r in rows:
                     v_state = r[13] if (has_val_state and len(r) > 13 and r[13] is not None) else 1
@@ -273,7 +326,12 @@ def get_tasks_by_camera(cursor, camera_id: int, model_id: Optional[int] = None) 
                 return tasks
             except Exception as e:
                 if attempt == 0:
-                    ensure_connection_alive(cursor)
+                    raw_c = ensure_connection_alive(cursor)
+                    if raw_c and hasattr(raw_c, 'cursor'):
+                        try:
+                            cursor = raw_c.cursor()
+                        except Exception:
+                            pass
                     continue
                 _log.error("Lỗi get_tasks_by_camera (camera_id=%s, model_id=%s): %s", camera_id, model_id, e)
                 return []
@@ -285,25 +343,31 @@ def get_task_by_id(cursor, task_id: int) -> Optional[Dict[str, Any]]:
     if not cursor:
         return None
     with _db_lock:
-        ensure_connection_alive(cursor)
+        cur = get_active_cursor(cursor)
         for attempt in range(2):
             try:
-                cursor.execute("SHOW COLUMNS FROM task_calculator LIKE 'value_state'")
-                has_val_state = bool(cursor.fetchone())
-                if not has_val_state:
-                    cursor.execute("SHOW COLUMNS FROM task_calculator LIKE 'Value_State'")
-                    has_val_state = bool(cursor.fetchone())
-                col_val_state = ", value_state" if has_val_state else ""
+                has_val_state = True
+                try:
+                    query = """
+                        SELECT id, camera_id, model_id, task_name, task_type, logic_mode, 
+                               action_on_fail, enabled, assign_register, value_bit_on, 
+                               value_bit_off, datetime, value_state
+                        FROM task_calculator
+                        WHERE id = %s
+                    """
+                    cur.execute(query, (task_id,))
+                except Exception:
+                    query = """
+                        SELECT id, camera_id, model_id, task_name, task_type, logic_mode, 
+                               action_on_fail, enabled, assign_register, value_bit_on, 
+                               value_bit_off, datetime
+                        FROM task_calculator
+                        WHERE id = %s
+                    """
+                    cur.execute(query, (task_id,))
+                    has_val_state = False
 
-                query = f"""
-                    SELECT id, camera_id, model_id, task_name, task_type, logic_mode, 
-                           action_on_fail, enabled, assign_register, value_bit_on, 
-                           value_bit_off, datetime{col_val_state}
-                    FROM task_calculator
-                    WHERE id = %s
-                """
-                cursor.execute(query, (task_id,))
-                r = cursor.fetchone()
+                r = cur.fetchone()
                 if not r:
                     return None
                 v_state = r[12] if (has_val_state and len(r) > 12 and r[12] is not None) else 1
@@ -331,7 +395,12 @@ def get_task_by_id(cursor, task_id: int) -> Optional[Dict[str, Any]]:
                 }
             except Exception as e:
                 if attempt == 0:
-                    ensure_connection_alive(cursor)
+                    raw_c = ensure_connection_alive(cursor)
+                    if raw_c and hasattr(raw_c, 'cursor'):
+                        try:
+                            cur = raw_c.cursor()
+                        except Exception:
+                            pass
                     continue
                 _log.error("Lỗi get_task_by_id (task_id=%s): %s", task_id, e)
                 return None
@@ -343,29 +412,34 @@ def get_task_rules(cursor, task_id: int) -> List[Dict[str, Any]]:
     if not cursor:
         return []
     with _db_lock:
-        ensure_connection_alive(cursor)
+        cur = get_active_cursor(cursor)
         for attempt in range(2):
             try:
-                cursor.execute("SHOW COLUMNS FROM task_calculator_rules LIKE 'instance_scope'")
-                has_scope = bool(cursor.fetchone())
-                scope_select = ", instance_scope" if has_scope else ""
+                try:
+                    query = """
+                        SELECT id, task_id, rule_name, label_1, param_1, instance_select_1,
+                               operator, target_type, label_2, param_2, instance_select_2,
+                               math_op, math_operand_type, math_operand_val, min_value, max_value,
+                               condition_true_result, enabled, description, instance_scope, box1_rect, box2_rect
+                        FROM task_calculator_rules
+                        WHERE task_id = %s
+                        ORDER BY id ASC
+                    """
+                    cur.execute(query, (task_id,))
+                except Exception:
+                    query = """
+                        SELECT id, task_id, rule_name, label_1, param_1, instance_select_1,
+                               operator, target_type, label_2, param_2, instance_select_2,
+                               math_op, math_operand_type, math_operand_val, min_value, max_value,
+                               condition_true_result, enabled, description
+                        FROM task_calculator_rules
+                        WHERE task_id = %s
+                        ORDER BY id ASC
+                    """
+                    cur.execute(query, (task_id,))
 
-                cursor.execute("SHOW COLUMNS FROM task_calculator_rules LIKE 'box1_rect'")
-                has_box_rect = bool(cursor.fetchone())
-                box_select = ", box1_rect, box2_rect" if has_box_rect else ""
-
-                query = f"""
-                    SELECT id, task_id, rule_name, label_1, param_1, instance_select_1,
-                           operator, target_type, label_2, param_2, instance_select_2,
-                           math_op, math_operand_type, math_operand_val, min_value, max_value,
-                           condition_true_result, enabled, description{scope_select}{box_select}
-                    FROM task_calculator_rules
-                    WHERE task_id = %s
-                    ORDER BY id ASC
-                """
-                cursor.execute(query, (task_id,))
-                rows = cursor.fetchall()
-                desc = [d[0] for d in cursor.description] if cursor.description else []
+                rows = cur.fetchall()
+                desc = [d[0] for d in cur.description] if cur.description else []
                 rules = []
                 for r in rows:
                     row_dict = dict(zip(desc, r))
@@ -396,7 +470,12 @@ def get_task_rules(cursor, task_id: int) -> List[Dict[str, Any]]:
                 return rules
             except Exception as e:
                 if attempt == 0:
-                    ensure_connection_alive(cursor)
+                    raw_c = ensure_connection_alive(cursor)
+                    if raw_c and hasattr(raw_c, 'cursor'):
+                        try:
+                            cur = raw_c.cursor()
+                        except Exception:
+                            pass
                     continue
                 _log.error("Lỗi get_task_rules (task_id=%s): %s", task_id, e)
                 return []
@@ -412,6 +491,7 @@ def save_task_and_rules(cursor, connection, task_data: Dict[str, Any], rules: Li
         return None
     with _db_lock:
         ensure_connection_alive(cursor)
+        cur = get_active_cursor(cursor)
         try:
             task_id = task_data.get('id')
             c_raw = task_data.get('camera_id', 1)
@@ -432,15 +512,15 @@ def save_task_and_rules(cursor, connection, task_data: Dict[str, Any], rules: Li
             value_bit_off = int(task_data.get('value_bit_off', task_data.get('value_ng', task_data.get('Value_NG', 0))))
 
             # Đảm bảo cột value_state tồn tại
-            cursor.execute("SHOW COLUMNS FROM task_calculator LIKE 'value_state'")
-            if not cursor.fetchone():
-                cursor.execute("SHOW COLUMNS FROM task_calculator LIKE 'Value_State'")
-                if not cursor.fetchone():
-                    cursor.execute("ALTER TABLE task_calculator ADD COLUMN value_state INT DEFAULT 1 AFTER assign_register")
+            cur.execute("SHOW COLUMNS FROM task_calculator LIKE 'value_state'")
+            if not cur.fetchone():
+                cur.execute("SHOW COLUMNS FROM task_calculator LIKE 'Value_State'")
+                if not cur.fetchone():
+                    cur.execute("ALTER TABLE task_calculator ADD COLUMN value_state INT DEFAULT 1 AFTER assign_register")
 
             if task_id:
                 # Update Task
-                cursor.execute("""
+                cur.execute("""
                     UPDATE task_calculator
                     SET task_name = %s, task_type = %s, logic_mode = %s, action_on_fail = %s,
                         enabled = %s, assign_register = %s, value_state = %s, value_bit_on = %s, value_bit_off = %s,
@@ -450,35 +530,35 @@ def save_task_and_rules(cursor, connection, task_data: Dict[str, Any], rules: Li
                       assign_register, val_state, value_bit_on, value_bit_off, model_id, task_id, camera_id))
                 
                 # Xóa các rules cũ để ghi lại danh sách mới
-                cursor.execute("DELETE FROM task_calculator_rules WHERE task_id = %s", (task_id,))
+                cur.execute("DELETE FROM task_calculator_rules WHERE task_id = %s", (task_id,))
             else:
                 # Insert Task
-                cursor.execute("""
+                cur.execute("""
                     INSERT INTO task_calculator
                     (camera_id, model_id, task_name, task_type, logic_mode, action_on_fail, enabled,
                      assign_register, value_state, value_bit_on, value_bit_off)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """, (camera_id, model_id, task_name, task_type, logic_mode, action_on_fail, enabled,
                       assign_register, val_state, value_bit_on, value_bit_off))
-                task_id = cursor.lastrowid
+                task_id = cur.lastrowid
 
             # Đảm bảo cột instance_scope tồn tại
-            cursor.execute("SHOW COLUMNS FROM task_calculator_rules LIKE 'instance_scope'")
-            if not cursor.fetchone():
-                cursor.execute("ALTER TABLE task_calculator_rules ADD COLUMN instance_scope VARCHAR(50) NOT NULL DEFAULT '1_VS_1' AFTER instance_select_1")
+            cur.execute("SHOW COLUMNS FROM task_calculator_rules LIKE 'instance_scope'")
+            if not cur.fetchone():
+                cur.execute("ALTER TABLE task_calculator_rules ADD COLUMN instance_scope VARCHAR(50) NOT NULL DEFAULT '1_VS_1' AFTER instance_select_1")
 
             # Đảm bảo cột box1_rect, box2_rect tồn tại
-            cursor.execute("SHOW COLUMNS FROM task_calculator_rules LIKE 'box1_rect'")
-            if not cursor.fetchone():
-                cursor.execute("ALTER TABLE task_calculator_rules ADD COLUMN box1_rect VARCHAR(100) DEFAULT ''")
+            cur.execute("SHOW COLUMNS FROM task_calculator_rules LIKE 'box1_rect'")
+            if not cur.fetchone():
+                cur.execute("ALTER TABLE task_calculator_rules ADD COLUMN box1_rect VARCHAR(100) DEFAULT ''")
 
-            cursor.execute("SHOW COLUMNS FROM task_calculator_rules LIKE 'box2_rect'")
-            if not cursor.fetchone():
-                cursor.execute("ALTER TABLE task_calculator_rules ADD COLUMN box2_rect VARCHAR(100) DEFAULT ''")
+            cur.execute("SHOW COLUMNS FROM task_calculator_rules LIKE 'box2_rect'")
+            if not cur.fetchone():
+                cur.execute("ALTER TABLE task_calculator_rules ADD COLUMN box2_rect VARCHAR(100) DEFAULT ''")
 
             # Insert các Rules
             for r in rules:
-                cursor.execute("""
+                cur.execute("""
                     INSERT INTO task_calculator_rules
                     (task_id, rule_name, label_1, param_1, instance_select_1, instance_scope,
                      operator, target_type, label_2, param_2, instance_select_2,
@@ -524,8 +604,9 @@ def delete_task(cursor, connection, task_id: int) -> bool:
         return False
     with _db_lock:
         ensure_connection_alive(cursor)
+        cur = get_active_cursor(cursor)
         try:
-            cursor.execute("DELETE FROM task_calculator WHERE id = %s", (task_id,))
+            cur.execute("DELETE FROM task_calculator WHERE id = %s", (task_id,))
             safe_commit(connection)
             _log.info("Deleted Task id=%s", task_id)
             return True
@@ -541,8 +622,9 @@ def toggle_task_enabled(cursor, connection, task_id: int, enabled: bool) -> bool
         return False
     with _db_lock:
         ensure_connection_alive(cursor)
+        cur = get_active_cursor(cursor)
         try:
-            cursor.execute("UPDATE task_calculator SET enabled = %s WHERE id = %s", (1 if enabled else 0, task_id))
+            cur.execute("UPDATE task_calculator SET enabled = %s WHERE id = %s", (1 if enabled else 0, task_id))
             safe_commit(connection)
             return True
         except Exception as e:
@@ -561,6 +643,7 @@ def get_available_labels_for_camera(cursor, camera_id: int, model_id: Optional[i
         return []
     with _db_lock:
         ensure_connection_alive(cursor)
+        cur = get_active_cursor(cursor)
         try:
             # Chuẩn hóa camera_id sang int nếu có thể
             c_id = None
@@ -583,7 +666,7 @@ def get_available_labels_for_camera(cursor, camera_id: int, model_id: Optional[i
                       AND (m.nums_model = %s OR m.id = %s)
                     ORDER BY p.Label_Name ASC
                 """
-                cursor.execute(query, (c_id, c_id, m_id, m_id))
+                cur.execute(query, (c_id, c_id, m_id, m_id))
             elif c_id is not None:
                 query = """
                     SELECT DISTINCT p.Label_Name
@@ -592,11 +675,11 @@ def get_available_labels_for_camera(cursor, camera_id: int, model_id: Optional[i
                     WHERE (m.camera_id = %s OR m.camera_id = (SELECT id FROM NUMS_CAMERA WHERE nums_camera = %s LIMIT 1))
                     ORDER BY p.Label_Name ASC
                 """
-                cursor.execute(query, (c_id, c_id))
+                cur.execute(query, (c_id, c_id))
             else:
                 return []
                 
-            rows = cursor.fetchall()
+            rows = cur.fetchall()
             labels = [r[0] for r in rows if r[0] and str(r[0]).strip()]
             return labels
         except Exception as e:

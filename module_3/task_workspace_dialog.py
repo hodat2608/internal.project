@@ -46,8 +46,9 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
                 self.model_id = int(m_str)
         self.camera_name = camera_name or f"Camera-{camera_id}"
         self.item_code = item_code or "N/A"
-        self.cursor = cursor
-        self.connection = connection
+        from module_3.config_version_manager import get_raw_mysql_connection, get_safe_cursor
+        self.connection = get_raw_mysql_connection(connection) or connection
+        self.cursor = get_safe_cursor(cursor, self.connection) or cursor
         self.tasks: List[Dict[str, Any]] = []
 
         self.setWindowTitle(f"Quản Lý Workspace Task - {self.camera_name} [Mã Hàng: {self.item_code}]")
@@ -234,6 +235,27 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
                 break
         active_count = sum(1 for t in self.tasks if t['enabled'])
         self.lbl_task_stats.setText(f"Tổng số: <b>{len(self.tasks)}</b> tasks | Đang kích hoạt: <font color='#16a34a'><b>{active_count}</b></font>")
+
+        # Đồng bộ ngay lập tức cờ enabled vào bộ nhớ RAM Process_Model.dict_active_tasks
+        try:
+            from module_3.handle_option_models import Process_Model
+            from _source.v5.v5 import _normalize_key_model
+            cam_str = str(self.camera_name) if getattr(self, 'camera_name', None) else ""
+            if not cam_str and getattr(self, 'camera_id', None):
+                cam_str = str(self.camera_id)
+            cam_num = cam_str.removeprefix("camera-").removeprefix("built-in-")
+            mod_num = str(self.model_id).removeprefix("model-")
+            key_model = (f"camera-{cam_num}", f"model-{mod_num}")
+            norm_target = _normalize_key_model(key_model)
+
+            if hasattr(Process_Model, 'dict_active_tasks') and isinstance(Process_Model.dict_active_tasks, dict):
+                for km, tlist in Process_Model.dict_active_tasks.items():
+                    if _normalize_key_model(km) == norm_target and isinstance(tlist, list):
+                        for mem_task in tlist:
+                            if mem_task.get('id') == task_id:
+                                mem_task['enabled'] = enabled
+        except Exception:
+            pass
 
     def add_task(self, preselected_labels: Optional[List[str]] = None):
         """Mở dialog tạo task mới."""
