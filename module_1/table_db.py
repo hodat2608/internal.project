@@ -228,12 +228,14 @@ TABLES = [
     CREATE TABLE IF NOT EXISTS task_calculator (
         id              INT AUTO_INCREMENT PRIMARY KEY,
         camera_id       INT NOT NULL,
+        model_id        INT NOT NULL DEFAULT 1,
         task_name       VARCHAR(255) NOT NULL,
         task_type       VARCHAR(50) NOT NULL DEFAULT 'RELATION_COORDINATE',
         logic_mode      VARCHAR(20) NOT NULL DEFAULT 'ALL_PASS',
         action_on_fail  VARCHAR(20) NOT NULL DEFAULT 'NG',
         enabled         TINYINT(1) NOT NULL DEFAULT 1,
         assign_register VARCHAR(255) DEFAULT '',
+        value_state     INT DEFAULT 1,
         value_bit_on    INT DEFAULT 1,
         value_bit_off   INT DEFAULT 0,
         datetime        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -248,6 +250,7 @@ TABLES = [
         label_1                 VARCHAR(255) NOT NULL,
         param_1                 VARCHAR(50) NOT NULL,
         instance_select_1       VARCHAR(50) NOT NULL DEFAULT 'BEST_CONF',
+        instance_scope          VARCHAR(50) NOT NULL DEFAULT '1_VS_1',
         operator                VARCHAR(20) NOT NULL,
         target_type             VARCHAR(50) NOT NULL DEFAULT 'LABEL',
         label_2                 VARCHAR(255),
@@ -261,6 +264,37 @@ TABLES = [
         condition_true_result   VARCHAR(10) NOT NULL DEFAULT 'NG',
         enabled                 TINYINT(1) NOT NULL DEFAULT 1,
         description             TEXT,
+        box1_rect               VARCHAR(100) DEFAULT '',
+        box2_rect               VARCHAR(100) DEFAULT '',
+        FOREIGN KEY (task_id) REFERENCES task_calculator(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS task_multishot_rules (
+        id                  INT AUTO_INCREMENT PRIMARY KEY,
+        task_id             INT NOT NULL,
+        target_label        VARCHAR(255) NOT NULL,
+        cycle_shots         INT NOT NULL DEFAULT 5,
+        aggregation_mode    VARCHAR(50) NOT NULL DEFAULT 'THRESHOLD_COUNT',
+        min_ng_shots        INT NOT NULL DEFAULT 2,
+        specific_shots      VARCHAR(255) DEFAULT '',
+        participating_shots VARCHAR(255) DEFAULT '',
+        roi_enabled         TINYINT(1) NOT NULL DEFAULT 0,
+        roi_mode            VARCHAR(50) NOT NULL DEFAULT 'IN_BOUNDS',
+        roi_boxes           TEXT,
+        timeout_reset_sec   DOUBLE NOT NULL DEFAULT 0.0,
+        description         TEXT,
+        FOREIGN KEY (task_id) REFERENCES task_calculator(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS task_roi_rules (
+        id                  INT AUTO_INCREMENT PRIMARY KEY,
+        task_id             INT NOT NULL,
+        zones_json          LONGTEXT NOT NULL,
+        default_target      VARCHAR(255) DEFAULT '',
+        action_mode         VARCHAR(50) DEFAULT 'DEFECT_FILTER',
+        description         TEXT,
         FOREIGN KEY (task_id) REFERENCES task_calculator(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     """,

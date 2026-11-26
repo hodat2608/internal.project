@@ -7,88 +7,27 @@ if ultralytics_path not in sys.path:
 
 from ultralytics import YOLO
 import numpy as np
-import cv2,time
-import threading
+import cv2
 from module_3.task_calculator_engine import evaluate_task_calculator as _eval_engine
 import torch
-from _source.v5.v5 import v5s, _read_model_config, get_model_config, COLOR_OK, COLOR_NG, draw_detections, _normalize_key_model, InspectionItemList
+from _source.v5.v5 import v5s, get_model_config, COLOR_OK, COLOR_NG, draw_detections, _normalize_key_model, InspectionItemList
 from module_3.handle_option_models import COLUMN_MAPPING
 from app_logger.app_logger import get_logger as _get_logger
-
+from collections import Counter
+from module_3.multishot_aggregation_engine import is_label_managed_by_multishot
+from module_3.multishot_aggregation_engine import evaluate_multishot_tasks
+from module_3.roi_zone_engine import evaluate_roi_zone_tasks
 _log = _get_logger('source.v8')
 
-# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-# [HARDCORE TẠM THỜI - ĐỐI ỨNG KHẨN CẤP CAMERA 1 - NHÃN 'mh_klk']
-# KHỐI 1: ĐỊNH NGHĨA BIẾN VÀ BỘ THEO DÕI CHU KỲ 5 ẢNH (CAMERA 1)
-# -------------------------------------------------------------------------------------------
-# Ghi chú cho User/Developer: Khi đã đưa cơ chế đa ảnh liên shot lên giao diện UI, hãy XÓA
-# toàn bộ KHỐI 1 này và KHỐI 2, KHỐI 3 trong hàm run_model bên dưới.
-#
-# Yêu cầu nghiệp vụ:
-# - Camera 1 chụp chu kỳ 5 ảnh liên tiếp cho 1 sản phẩm.
-# - Nếu trong chu kỳ 5 ảnh chỉ có 1 ảnh bị NG nhãn 'mh_klk' -> Coi như VẪN OK.
-# - Nếu có từ 2 ảnh trở lên trong 5 ảnh bị NG nhãn 'mh_klk' -> Phán định NG cho chu kỳ.
-# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-HARDCORE_TARGET_LABEL = 'mh_klk'
-HARDCORE_CYCLE_SHOTS = 5
-HARDCORE_NG_MIN_SHOTS = 2
-HARDCORE_TIMEOUT_RESET_SEC = 2
 
-_mh_klk_lock = threading.Lock()
-_MH_KLK_HARDCORE_STATE = {
-    'shot_index': 0,            # Số thứ tự shot hiện tại trong chu kỳ (1 -> 5)
-    'ng_shot_indices': set(),   # Tập các shot_index bị NG nhãn mh_klk trong chu kỳ hiện tại
-    'last_shot_time': 0.0,      # Timestamp lần gọi shot gần nhất
-    'cycle_ng_confirmed': False # Đã chốt NG chu kỳ hay chưa (khi đã có >= 2 shot NG)
-}
-
-def _is_hardcore_target_camera(camera, key_model) -> bool:
-    """Kiểm tra xem thiết bị hiện tại có phải là Camera 1 hay không."""
-    cam_str = str(camera or '').strip().lower()
-    km_cam = ""
-    if isinstance(key_model, (tuple, list)) and len(key_model) > 0:
-        km_cam = str(key_model[0] or '').strip().lower()
-    return (
-        cam_str in ('camera-1', 'camera_1', 'built-in-camera-1', '1') or
-        km_cam in ('camera-1', 'camera_1', 'built-in-camera-1', '1') or
-        cam_str.endswith('camera-1') or cam_str.endswith('camera_1') or
-        km_cam.endswith('camera-1') or km_cam.endswith('camera_1')
-    )
-# <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 LOGO_WATERMARK = "Detected by YOLO V8 Architecture"
 class v8s(v5s):
-    def __init__(self,model_path,device):
+    def __init__(self, model_path, device):
         self.model = YOLO(model_path, task='detect').to(device=device.split('-')[0])
         self.keys_mapping = list(COLUMN_MAPPING.keys())
-        self.params           = ['xmax', 'xmin', 'ymax', 'ymin']
 
     def run_model(self, image: np.ndarray, model_loader, pyuic, camera, key_model, *args, **kwargs):
-        # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        # [HARDCORE TẠM THỜI - ĐỐI ỨNG KHẨN CẤP CAMERA 1 - NHÃN 'mh_klk']
-        # KHỐI 2: CẬP NHẬT TIẾN TRÌNH SHOT (1/5 -> 5/5) CỦA CAMERA 1
-        # Ghi chú: Xóa khối này khi đưa tính năng lên giao diện UI.
-        # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        current_cam_1_shot = 0
-        if _is_hardcore_target_camera(camera, key_model):
-            with _mh_klk_lock:
-                now_ts = time.time()
-                # Tự động nhận diện chu kỳ mới: nếu cách shot trước > 4.0s HOẶC shot trước đã là shot 5
-                if (now_ts - _MH_KLK_HARDCORE_STATE['last_shot_time'] > HARDCORE_TIMEOUT_RESET_SEC) or \
-                   (_MH_KLK_HARDCORE_STATE['shot_index'] >= HARDCORE_CYCLE_SHOTS):
-                    _MH_KLK_HARDCORE_STATE['shot_index'] = 1
-                    _MH_KLK_HARDCORE_STATE['ng_shot_indices'].clear()
-                    _MH_KLK_HARDCORE_STATE['cycle_ng_confirmed'] = False
-                    _log.info("[HARDCORE mh_klk] Camera 1: Bắt đầu chu kỳ 5 ảnh mới (Shot 1/%d)", HARDCORE_CYCLE_SHOTS)
-                else:
-                    _MH_KLK_HARDCORE_STATE['shot_index'] += 1
-
-                _MH_KLK_HARDCORE_STATE['last_shot_time'] = now_ts
-                current_cam_1_shot = _MH_KLK_HARDCORE_STATE['shot_index']
-                _log.debug("[HARDCORE mh_klk] Camera 1 đang xử lý Shot %d/%d (Đã có %d ảnh NG 'mh_klk')",
-                           current_cam_1_shot, HARDCORE_CYCLE_SHOTS, len(_MH_KLK_HARDCORE_STATE['ng_shot_indices']))
-        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
         if len(image.shape) == 2:
             image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
 
@@ -155,141 +94,10 @@ class v8s(v5s):
         fail_labels   = InspectionItemList()
         ng_registers  = set()
 
-        from collections import Counter
+
         name_counts = Counter(valid_names)
 
-        for cfg in cfg_rows:
-            if not cfg.get('join'):
-                continue
-            if 'quantity' not in cfg:
-                continue
-
-            label          = str(cfg.get('label') or '').strip()
-            detected_count = name_counts.get(label, 0)
-            reg            = str(cfg.get('register') or '').strip()
-
-            try:
-                target_qty = int(cfg.get('quantity', 0))
-            except (ValueError, TypeError):
-                target_qty = 0
-
-            is_ok_rule = bool(cfg.get('ok'))
-            is_ng_rule = bool(cfg.get('ng'))
-
-            is_label_ng = False
-
-            if is_ok_rule and not is_ng_rule:
-                if detected_count != target_qty:
-                    is_label_ng = True
-            elif is_ng_rule and not is_ok_rule:
-                ng_target = target_qty if target_qty > 0 else 1
-                if detected_count >= ng_target:
-                    is_label_ng = True
-            elif is_ok_rule and is_ng_rule:
-                is_label_ng = True
-
-            # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            # [HARDCORE TẠM THỜI - ĐỐI ỨNG KHẨN CẤP CAMERA 1 - NHÃN 'mh_klk']
-            # KHỐI 3: PHÁN ĐỊNH RIÊNG CHO NHÃN 'mh_klk' TRÊN CAMERA 1 (CẦN >= 2 ẢNH MỚI BỊ NG)
-            # Ghi chú: Xóa khối này khi đưa tính năng lên giao diện UI.
-            # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            mh_klk_custom_label = None
-            if current_cam_1_shot > 0 and label.strip().lower() == HARDCORE_TARGET_LABEL.lower():
-                with _mh_klk_lock:
-                    single_shot_violation = is_label_ng
-
-                    if single_shot_violation:
-                        _MH_KLK_HARDCORE_STATE['ng_shot_indices'].add(current_cam_1_shot)
-
-                    total_ng_shots = len(_MH_KLK_HARDCORE_STATE['ng_shot_indices'])
-
-                    if total_ng_shots >= HARDCORE_NG_MIN_SHOTS or _MH_KLK_HARDCORE_STATE['cycle_ng_confirmed']:
-                        # Đã đạt từ 2 ảnh NG trở lên -> CHÍNH THỨC PHÁN ĐỊNH NG CHU KỲ
-                        _MH_KLK_HARDCORE_STATE['cycle_ng_confirmed'] = True
-                        is_label_ng = True
-                        mh_klk_custom_label = f'{label} - sl: {detected_count} ({total_ng_shots}/{HARDCORE_CYCLE_SHOTS} shot NG -> NG Cycle)'
-                        _log.warning("[HARDCORE mh_klk] Camera 1 Shot %d/%d: Phát hiện NG 'mh_klk' (Tổng: %d ảnh NG >= %d) -> CHÍNH THỨC PHÁN ĐỊNH NG!",
-                                     current_cam_1_shot, HARDCORE_CYCLE_SHOTS, total_ng_shots, HARDCORE_NG_MIN_SHOTS)
-                    else:
-                        # Chỉ có 1 ảnh bị NG (hoặc 0 ảnh) -> VẪN PHÁN ĐỊNH LÀ OK!
-                        is_label_ng = False
-                        if single_shot_violation:
-                            mh_klk_custom_label = f'{label} (Shot {current_cam_1_shot}/{HARDCORE_CYCLE_SHOTS} - 1 Shot NG still OK) - sl: {detected_count}'
-                            _log.info("[HARDCORE mh_klk] Camera 1 Shot %d/%d: Phát hiện NG 'mh_klk' lần 1 (1/%d ảnh) -> TẠM THỜI GIỮ OK (Cần >= 2 ảnh mới NG)",
-                                      current_cam_1_shot, HARDCORE_CYCLE_SHOTS, HARDCORE_CYCLE_SHOTS)
-            # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-            if is_label_ng:
-                flag = False
-                desc_text = mh_klk_custom_label or f"{label} - sl: {detected_count}"
-                fail_labels.append({
-                    'type': 'LABEL',
-                    'label': label,
-                    'status': 'NG',
-                    'is_ng': True,
-                    'count': detected_count,
-                    'target': target_qty,
-                    'text': desc_text
-                })
-                if reg and any(c.isdigit() for c in reg):
-                    ng_registers.add(reg)
-                    v_ng = cfg.get('value_ng')
-                    if v_ng is None:
-                        v_ng = cfg.get('Value_NG')
-                    if v_ng is not None and str(v_ng).strip() != "" and str(v_ng).strip().lower() not in ('none', 'no value', 'null'):
-                        try:
-                            list_register[reg] = int(v_ng)
-                        except (ValueError, TypeError):
-                            list_register[reg] = v_ng
-                    else:
-                        list_register.pop(reg, None)
-            else:
-                if mh_klk_custom_label or is_ok_rule or is_ng_rule:
-                    desc_text = mh_klk_custom_label or f"{label} - sl: {detected_count}"
-                    fail_labels.append({
-                        'type': 'LABEL',
-                        'label': label,
-                        'status': 'OK',
-                        'is_ng': False,
-                        'count': detected_count,
-                        'target': target_qty,
-                        'text': desc_text
-                    })
-
-                if reg and any(c.isdigit() for c in reg):
-                    # BẢO VỆ NG -> TUYỆT ĐỐI KHÔNG GHI ĐÈ BẰNG VALUE OK!
-                    if reg not in ng_registers:
-                        v_ok = cfg.get('value_ok')
-                        if v_ok is None:
-                            v_ok = cfg.get('Value_OK')
-                        if v_ok is not None and str(v_ok).strip() != "" and str(v_ok).strip().lower() not in ('none', 'no value', 'null'):
-                            try:
-                                list_register[reg] = int(v_ok)
-                            except (ValueError, TypeError):
-                                list_register[reg] = v_ok
-
-        # ── Trích xuất danh sách các nhãn chính xác bị lỗi NG để đổi màu đỏ ──
-        exact_ng_labels = {
-            item['label'] for item in fail_labels
-            if isinstance(item, dict) and item.get('is_ng') and item.get('type') == 'LABEL' and item.get('label')
-        }
-        # Hỗ trợ fallback nếu có item dạng chuỗi string legacy
-        for x in fail_labels:
-            if isinstance(x, str) and ('*' in x or x.startswith('NG')):
-                s = str(x).strip()
-                if s.startswith('* Task:') or s.startswith('Task:'):
-                    continue
-                s_clean = s.lstrip('*').strip()
-                if s_clean.startswith(('NG :', 'NG:')):
-                    s_clean = s_clean.split(':', 1)[1].strip()
-                lbl_name = s_clean.split(' - sl:')[0].strip()
-                if lbl_name:
-                    exact_ng_labels.add(lbl_name)
-
-        for d in draw_candidates:
-            if d.get('label') in exact_ng_labels:
-                d['color'] = COLOR_NG
-
+        # Lấy danh sách task được cấu hình cho model hiện tại
         processor = getattr(pyuic, 'processor', None)
         active_tasks_dict = getattr(processor, 'active_tasks', {}) if processor else {}
         if not isinstance(active_tasks_dict, dict) and hasattr(processor, 'dict_active_tasks'):
@@ -309,14 +117,106 @@ class v8s(v5s):
         elif isinstance(active_tasks_dict, list):
             tasks_for_model = active_tasks_dict
 
-        enabled_tasks = [t for t in tasks_for_model if t.get('enabled', True) and t.get('rules')]
+        for cfg in cfg_rows:
+            if not cfg.get('join'):
+                continue
+            if 'quantity' not in cfg:
+                continue
+
+            label          = str(cfg.get('label') or '').strip()
+            is_ok_rule     = bool(cfg.get('ok'))
+            is_ng_rule     = bool(cfg.get('ng'))
+
+            if is_label_managed_by_multishot(label, tasks_for_model):
+                if not is_ok_rule and not is_ng_rule:
+                    continue
+
+            detected_count = name_counts.get(label, 0)
+            reg            = str(cfg.get('register') or '').strip()
+
+            try:
+                target_qty = int(cfg.get('quantity', 0))
+            except (ValueError, TypeError):
+                target_qty = 0
+
+            is_label_ng = False
+
+            if is_ok_rule and not is_ng_rule:
+                if detected_count != target_qty:
+                    is_label_ng = True
+            elif is_ng_rule and not is_ok_rule:
+                ng_target = target_qty if target_qty > 0 else 1
+                if detected_count >= ng_target:
+                    is_label_ng = True
+            elif is_ok_rule and is_ng_rule:
+                is_label_ng = True
+
+            if is_label_ng:
+                flag = False
+                fail_labels.append({
+                    'type': 'LABEL',
+                    'label': label,
+                    'status': 'NG',
+                    'is_ng': True,
+                    'count': detected_count,
+                    'target': target_qty,
+                    'text': f"{label} - sl: {detected_count}"
+                })
+                if reg and any(c.isdigit() for c in reg):
+                    ng_registers.add(reg)
+                    v_ng = cfg.get('value_ng')
+                    if v_ng is None:
+                        v_ng = cfg.get('Value_NG')
+                    if v_ng is not None and str(v_ng).strip() != "" and str(v_ng).strip().lower() not in ('none', 'no value', 'null'):
+                        try:
+                            list_register[reg] = int(v_ng)
+                        except (ValueError, TypeError):
+                            list_register[reg] = v_ng
+                    else:
+                        list_register.pop(reg, None)
+            else:
+                if is_ok_rule or is_ng_rule:
+                    fail_labels.append({
+                        'type': 'LABEL',
+                        'label': label,
+                        'status': 'OK',
+                        'is_ng': False,
+                        'count': detected_count,
+                        'target': target_qty,
+                        'text': f"{label} - sl: {detected_count}"
+                    })
+
+                if reg and any(c.isdigit() for c in reg):
+                    # BẢO VỆ NG -> TUYỆT ĐỐI KHÔNG GHI ĐÈ BẰNG VALUE OK!
+                    if reg not in ng_registers:
+                        v_ok = cfg.get('value_ok')
+                        if v_ok is None:
+                            v_ok = cfg.get('Value_OK')
+                        if v_ok is not None and str(v_ok).strip() != "" and str(v_ok).strip().lower() not in ('none', 'no value', 'null'):
+                            try:
+                                list_register[reg] = int(v_ok)
+                            except (ValueError, TypeError):
+                                list_register[reg] = v_ok
+
+        exact_ng_labels = {
+            item['label'] for item in fail_labels
+            if isinstance(item, dict) and item.get('is_ng') and item.get('type') == 'LABEL' and item.get('label')
+        }
+
+        for d in draw_candidates:
+            if d.get('label') in exact_ng_labels:
+                d['color'] = COLOR_NG
+
+        enabled_tasks = [t for t in tasks_for_model if t.get('enabled', True) and (t.get('rules') or t.get('multishot_rule') or t.get('task_type') == 'MULTI_SHOT_AGGREGATION' or t.get('task_type') == 'ROI_ZONE_INSPECTION' or t.get('roi_rule'))]
         if enabled_tasks:
             image, flag, list_register = self.evaluate_task_calculator(
                 image, draw_candidates, pyuic, flag, list_register,
                 tasks_config=enabled_tasks,
                 key_model=key_model,
                 fail_labels=fail_labels,
-                ng_registers=ng_registers
+                ng_registers=ng_registers,
+                current_count=kwargs.get('current_count'),
+                shot_complete=kwargs.get('shot_complete')
             )
 
         result_image_rgb = draw_detections(image, draw_candidates, fail_labels)
@@ -396,21 +296,71 @@ class v8s(v5s):
                     'xmax': d['x2'],
                     'ymax': d['y2'],
                     'name': d['label'],
-                    'confidence': d.get('conf', 1.0)
+                    'confidence': d.get('conf', 1.0),
+                    '_orig_candidate': d
                 })
 
-            res_img, task_all_pass, task_results, plc_to_send = _eval_engine(
-                image_bgr=image_rgb,
-                valid_detections=valid_boxes,
-                tasks_config=tasks_config,
-                draw_overlay=True
-            )
+            geo_tasks = [t for t in tasks_config if t.get('task_type') not in ('MULTI_SHOT_AGGREGATION', 'ROI_ZONE_INSPECTION') and t.get('rules')]
+            multishot_tasks = [t for t in tasks_config if t.get('task_type') == 'MULTI_SHOT_AGGREGATION']
+            roi_tasks = [t for t in tasks_config if t.get('task_type') == 'ROI_ZONE_INSPECTION']
 
-            if res_img is not None:
-                image_rgb = res_img
+            task_results = []
+            plc_to_send = []
 
-            if not task_all_pass:
-                flag = False
+            # 1. Đánh giá Task Rule Calculator (Hình học đơn ảnh)
+            if geo_tasks:
+                res_img, task_all_pass, g_results, g_plc = _eval_engine(
+                    image_bgr=image_rgb,
+                    valid_detections=valid_boxes,
+                    tasks_config=geo_tasks,
+                    draw_overlay=True
+                )
+                if res_img is not None:
+                    image_rgb = res_img
+                if not task_all_pass:
+                    flag = False
+                if g_results:
+                    task_results.extend(g_results)
+                if g_plc:
+                    plc_to_send.extend(g_plc)
+
+            # 2. Đánh giá Cross-Shot Multi-Image Defect Aggregation (Chu kỳ đa shot)
+            if multishot_tasks:
+                res_img_ms, ms_all_pass, ms_results, ms_plc = evaluate_multishot_tasks(
+                    image_rgb=image_rgb,
+                    valid_detections=valid_boxes,
+                    multishot_tasks=multishot_tasks,
+                    key_model=key_model,
+                    current_count=kwargs.get('current_count'),
+                    shot_complete=kwargs.get('shot_complete'),
+                    draw_overlay=True
+                )
+                if res_img_ms is not None:
+                    image_rgb = res_img_ms
+                if not ms_all_pass:
+                    flag = False
+                if ms_results:
+                    task_results.extend(ms_results)
+                if ms_plc:
+                    plc_to_send.extend(ms_plc)
+
+            # 3. Đánh giá ROI Zone Inspector (Khoanh vùng ROI & Vùng che đa vùng cho Model)
+            if roi_tasks:
+                res_img_roi, roi_all_pass, roi_results, roi_plc = evaluate_roi_zone_tasks(
+                    image_rgb=image_rgb,
+                    valid_detections=valid_boxes,
+                    roi_tasks=roi_tasks,
+                    key_model=key_model,
+                    draw_overlay=True
+                )
+                if res_img_roi is not None:
+                    image_rgb = res_img_roi
+                if not roi_all_pass:
+                    flag = False
+                if roi_results:
+                    task_results.extend(roi_results)
+                if roi_plc:
+                    plc_to_send.extend(roi_plc)
 
             # Xử lý các thanh ghi trả về từ Task Calculator: BẢO VỆ NG THẮNG OK TUYỆT ĐỐI
             for reg, val in plc_to_send:
@@ -451,6 +401,18 @@ class v8s(v5s):
                 for t in task_results:
                     t_name = t.get('task_name') or f"Task-{t.get('task_id', '')}"
                     if not t.get('pass'):
+                        if t.get('task_type') == 'MULTI_SHOT_AGGREGATION':
+                            tgt = t.get('target_label')
+                            if tgt:
+                                for d in draw_candidates:
+                                    if d.get('label') == tgt:
+                                        d['color'] = COLOR_NG
+                        elif t.get('task_type') == 'ROI_ZONE_INSPECTION':
+                            for vb in valid_boxes:
+                                if vb.get('is_roi_violation'):
+                                    orig = vb.get('_orig_candidate')
+                                    if isinstance(orig, dict):
+                                        orig['color'] = COLOR_NG
                         failing_rules = [r for r in t.get('rules', []) if not r.get('pass')]
                         if failing_rules:
                             for r in failing_rules:
@@ -497,7 +459,7 @@ class v8s(v5s):
                                 'label': t_name,
                                 'status': 'NG',
                                 'is_ng': True,
-                                'text': f"Task: {t_name} (Vi phạm)"
+                                'text': t.get('desc') or t.get('text') or f"Task: {t_name} (Vi phạm)"
                             })
                     else:
                         fail_labels.append({
@@ -505,7 +467,7 @@ class v8s(v5s):
                             'label': t_name,
                             'status': 'OK',
                             'is_ng': False,
-                            'text': f"Task: {t_name} (OK)"
+                            'text': t.get('desc') or t.get('text') or f"Task: {t_name} (OK)"
                         })
 
         except Exception as e:

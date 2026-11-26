@@ -966,14 +966,25 @@ class Process_Model:
         if not self.cursor or not cam_id:
             return
         try:
-            from module_3.task_calculator_db import ensure_task_calculator_tables, get_tasks_by_camera, get_task_rules
+            from module_3.task_calculator_db import (
+                ensure_task_calculator_tables,
+                get_tasks_by_camera,
+                get_task_rules,
+                get_multishot_rule,
+                get_roi_rule
+            )
             ensure_task_calculator_tables(self.cursor, self.connect_db)
             all_tasks = get_tasks_by_camera(self.cursor, cam_id, mod_id)
             
             key_model = self.get_key_model()
             tasks_list = []
             for t in all_tasks:
-                t['rules'] = get_task_rules(self.cursor, t['id'])
+                if t.get('task_type') == 'MULTI_SHOT_AGGREGATION':
+                    t['multishot_rule'] = t.get('multishot_rule') or get_multishot_rule(self.cursor, t['id'])
+                elif t.get('task_type') == 'ROI_ZONE_INSPECTION':
+                    t['roi_rule'] = t.get('roi_rule') or get_roi_rule(self.cursor, t['id'])
+                else:
+                    t['rules'] = t.get('rules') or get_task_rules(self.cursor, t['id'])
                 tasks_list.append(t)
             
             if not isinstance(self.active_tasks, dict):

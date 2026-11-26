@@ -809,10 +809,20 @@ class PLCHandler:
                         cursor = db_manager.cursor
                 if cursor and cam_id:
                     try:
-                        from module_3.task_calculator_db import get_tasks_by_camera, get_task_rules
+                        from module_3.task_calculator_db import (
+                            get_tasks_by_camera,
+                            get_task_rules,
+                            get_multishot_rule,
+                            get_roi_rule
+                        )
                         all_db_tasks = get_tasks_by_camera(cursor, cam_id, mod_id)
                         for t in all_db_tasks:
-                            t['rules'] = get_task_rules(cursor, t['id'])
+                            if t.get('task_type') == 'MULTI_SHOT_AGGREGATION':
+                                t['multishot_rule'] = t.get('multishot_rule') or get_multishot_rule(cursor, t['id'])
+                            elif t.get('task_type') == 'ROI_ZONE_INSPECTION':
+                                t['roi_rule'] = t.get('roi_rule') or get_roi_rule(cursor, t['id'])
+                            else:
+                                t['rules'] = t.get('rules') or get_task_rules(cursor, t['id'])
                             tasks_for_model.append(t)
                         # Đánh dấu đã load và lưu vào RAM để lần sau không query lại CSDL
                         tasks_loaded = True
@@ -2075,8 +2085,12 @@ class PLCHandler:
             _log.error('[%s] process_image_func is missing for key_model=%s. Check model loading (e.g., YoloFactory result_model).', key, key_model)
             return
 
+        shot_complete = values.get('shot_complete', 0)
         try:
-            res_process = model_processor.process_image_func(raw_image, model_loader, pyuic, camera, key_model)
+            res_process = model_processor.process_image_func(
+                raw_image, model_loader, pyuic, camera, key_model,
+                current_count=current_count, shot_complete=shot_complete
+            )
             if len(res_process) >= 5:
                 result_img, flag, list_register, logo_text, cfg_rows = res_process[:5]
             else:
@@ -2256,12 +2270,16 @@ class PLCHandler:
         if raw_image is not None:
             raw_image = cv2.cvtColor(raw_image, cv2.COLOR_BGR2RGB)
 
+        shot_complete = values.get('shot_complete', 0)
         try:
             model_processor = self.processor.dict_processors.get(key_model)
             if not model_processor or not model_processor.process_image_func:
                 _log.error('[%s] process_image_func is missing for key_model=%s', key, key_model)
                 return
-            result_img, flag, list_register,logo_text = model_processor.process_image_func(raw_image, model_loader, pyuic, camera, key_model)
+            result_img, flag, list_register, logo_text, _ = model_processor.process_image_func(
+                raw_image, model_loader, pyuic, camera, key_model,
+                current_count=current_count, shot_complete=shot_complete
+            )
         except Exception:
             _log.exception('[%s] process_image_func failed at shot %s', key, current_count)
             return

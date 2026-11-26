@@ -350,15 +350,6 @@ class v5s:
             ).to(device=torch.device(device.split('-')[0]))
         )
 
-        self.list_jumper      = []
-        self.list_can_dien_cuc = []
-        self.positive_jumper  = {}
-        self.params           = ['xmax', 'xmin', 'ymax', 'ymin']
-
-        self.list_image_array :list[np.ndarray] = []
-
-
-
     def run_model(self, image: np.ndarray, model_loader, pyuic, camera, key_model, *args, **kwargs):
         """
         Chạy inference, lọc detection, vẽ kết quả và đánh giá pass/fail.
@@ -465,6 +456,28 @@ class v5s:
         from collections import Counter
         name_counts = Counter(valid_names)
 
+        # Lấy danh sách task được cấu hình cho model hiện tại
+        processor = getattr(pyuic, 'processor', None)
+        active_tasks_dict = getattr(processor, 'active_tasks', {}) if processor else {}
+        if not isinstance(active_tasks_dict, dict) and hasattr(processor, 'dict_active_tasks'):
+            active_tasks_dict = getattr(processor, 'dict_active_tasks', {})
+
+        tasks_for_model = []
+        if isinstance(active_tasks_dict, dict):
+            if key_model in active_tasks_dict:
+                tasks_for_model = active_tasks_dict[key_model]
+            else:
+                target_norm = _normalize_key_model(key_model)
+                if target_norm:
+                    for k, v in active_tasks_dict.items():
+                        if _normalize_key_model(k) == target_norm:
+                            tasks_for_model = v
+                            break
+        elif isinstance(active_tasks_dict, list):
+            tasks_for_model = active_tasks_dict
+
+        from module_3.multishot_aggregation_engine import is_label_managed_by_multishot
+
         for cfg in cfg_rows:
             if not cfg.get('join'):
                 continue
@@ -472,6 +485,16 @@ class v5s:
                 continue
 
             label          = str(cfg.get('label') or '').strip()
+            is_ok_rule     = bool(cfg.get('ok'))
+            is_ng_rule     = bool(cfg.get('ng'))
+
+            # Nếu nhãn này đang được quản lý bởi Cross-Shot Multi-Image Defect Aggregation:
+            # - Nếu bỏ tích ở cả cột OK và NG: Cross-Shot sẽ quản lý hoàn toàn (bỏ qua phán định đơn shot)
+            # - Nếu có tích ở cột OK hoặc cột NG: vừa phán định đơn shot thông thường, vừa phán định Cross-Shot (chỉ cần 1 trong 2 NG -> NG)
+            if is_label_managed_by_multishot(label, tasks_for_model):
+                if not is_ok_rule and not is_ng_rule:
+                    continue
+
             detected_count = name_counts.get(label, 0)
             reg            = str(cfg.get('register') or '').strip()
 
@@ -479,9 +502,6 @@ class v5s:
                 target_qty = int(cfg.get('quantity', 0))
             except (ValueError, TypeError):
                 target_qty = 0
-
-            is_ok_rule = bool(cfg.get('ok'))
-            is_ng_rule = bool(cfg.get('ng'))
 
             is_label_ng = False
 
@@ -551,55 +571,23 @@ class v5s:
             item['label'] for item in fail_labels
             if isinstance(item, dict) and item.get('is_ng') and item.get('type') == 'LABEL' and item.get('label')
         }
-        # Hỗ trợ fallback nếu có item chuỗi string legacy
-        for x in fail_labels:
-            if isinstance(x, str) and ('*' in x or x.startswith('NG')):
-                s = str(x).strip()
-                if s.startswith('* Task:') or s.startswith('Task:'):
-                    continue
-                s_clean = s.lstrip('*').strip()
-                if s_clean.startswith(('NG :', 'NG:')):
-                    s_clean = s_clean.split(':', 1)[1].strip()
-                lbl_name = s_clean.split(' - sl:')[0].strip()
-                if lbl_name:
-                    exact_ng_labels.add(lbl_name)
 
         for d in draw_candidates:
             if d.get('label') in exact_ng_labels:
                 d['color'] = COLOR_NG
 
         # ── Kiểm tra điều kiện Task Calculator đa nhãn theo key_model ─────────
-        processor = getattr(pyuic, 'processor', None)
-        active_tasks_dict = getattr(processor, 'active_tasks', {}) if processor else {}
-        if not isinstance(active_tasks_dict, dict) and hasattr(processor, 'dict_active_tasks'):
-            active_tasks_dict = getattr(processor, 'dict_active_tasks', {})
-
-        tasks_for_model = []
-        if isinstance(active_tasks_dict, dict):
-            # 1. So sánh trực tiếp key_model: ('camera-1', 'model-1')
-            if key_model in active_tasks_dict:
-                tasks_for_model = active_tasks_dict[key_model]
-            else:
-                # 2. So sánh chuẩn hoá tuple ('camera-X', 'model-Y')
-                target_norm = _normalize_key_model(key_model)
-                if target_norm:
-                    for k, v in active_tasks_dict.items():
-                        if _normalize_key_model(k) == target_norm:
-                            tasks_for_model = v
-                            break
-        elif isinstance(active_tasks_dict, list):
-            tasks_for_model = active_tasks_dict
-
-        # QUAN TRỌNG: Thực thi Task Calculator TRƯỚC KHI vẽ HUD và tổng hợp toàn bộ lỗi vào fail_labels
         # LỌC PHÁN ĐỊNH: Chỉ những task đang được BẬT KÍCH HOẠT (enabled == True) và có rules mới tham gia xử lý/phán định!
-        enabled_tasks = [t for t in tasks_for_model if t.get('enabled', True) and t.get('rules')]
+        enabled_tasks = [t for t in tasks_for_model if t.get('enabled', True) and (t.get('rules') or t.get('multishot_rule') or t.get('task_type') == 'MULTI_SHOT_AGGREGATION' or t.get('task_type') == 'ROI_ZONE_INSPECTION' or t.get('roi_rule'))]
         if enabled_tasks:
             image, flag, list_register = self.evaluate_task_calculator(
                 image, draw_candidates, pyuic, flag, list_register,
                 tasks_config=enabled_tasks,
                 key_model=key_model,
                 fail_labels=fail_labels,
-                ng_registers=ng_registers
+                ng_registers=ng_registers,
+                current_count=kwargs.get('current_count'),
+                shot_complete=kwargs.get('shot_complete')
             )
 
         # ── Chốt toàn bộ kết quả (nhãn + toán tử) rồi mới vẽ Bounding Boxes và HUD ──
@@ -683,21 +671,73 @@ class v5s:
                     'xmax': d['x2'],
                     'ymax': d['y2'],
                     'name': d['label'],
-                    'confidence': d.get('conf', 1.0)
+                    'confidence': d.get('conf', 1.0),
+                    '_orig_candidate': d
                 })
 
-            res_img, task_all_pass, task_results, plc_to_send = _eval_engine(
-                image_bgr=image_rgb,
-                valid_detections=valid_boxes,
-                tasks_config=tasks_config,
-                draw_overlay=True
-            )
+            geo_tasks = [t for t in tasks_config if t.get('task_type') not in ('MULTI_SHOT_AGGREGATION', 'ROI_ZONE_INSPECTION') and t.get('rules')]
+            multishot_tasks = [t for t in tasks_config if t.get('task_type') == 'MULTI_SHOT_AGGREGATION']
+            roi_tasks = [t for t in tasks_config if t.get('task_type') == 'ROI_ZONE_INSPECTION']
 
-            if res_img is not None:
-                image_rgb = res_img
+            task_results = []
+            plc_to_send = []
 
-            if not task_all_pass:
-                flag = False
+            # 1. Đánh giá Task Rule Calculator (Hình học đơn ảnh)
+            if geo_tasks:
+                res_img, task_all_pass, g_results, g_plc = _eval_engine(
+                    image_bgr=image_rgb,
+                    valid_detections=valid_boxes,
+                    tasks_config=geo_tasks,
+                    draw_overlay=True
+                )
+                if res_img is not None:
+                    image_rgb = res_img
+                if not task_all_pass:
+                    flag = False
+                if g_results:
+                    task_results.extend(g_results)
+                if g_plc:
+                    plc_to_send.extend(g_plc)
+
+            # 2. Đánh giá Cross-Shot Multi-Image Defect Aggregation (Chu kỳ đa shot)
+            if multishot_tasks:
+                from module_3.multishot_aggregation_engine import evaluate_multishot_tasks
+                res_img_ms, ms_all_pass, ms_results, ms_plc = evaluate_multishot_tasks(
+                    image_rgb=image_rgb,
+                    valid_detections=valid_boxes,
+                    multishot_tasks=multishot_tasks,
+                    key_model=key_model,
+                    current_count=kwargs.get('current_count'),
+                    shot_complete=kwargs.get('shot_complete'),
+                    draw_overlay=True
+                )
+                if res_img_ms is not None:
+                    image_rgb = res_img_ms
+                if not ms_all_pass:
+                    flag = False
+                if ms_results:
+                    task_results.extend(ms_results)
+                if ms_plc:
+                    plc_to_send.extend(ms_plc)
+
+            # 3. Đánh giá ROI Zone Inspector (Khoanh vùng ROI & Vùng che đa vùng cho Model)
+            if roi_tasks:
+                from module_3.roi_zone_engine import evaluate_roi_zone_tasks
+                res_img_roi, roi_all_pass, roi_results, roi_plc = evaluate_roi_zone_tasks(
+                    image_rgb=image_rgb,
+                    valid_detections=valid_boxes,
+                    roi_tasks=roi_tasks,
+                    key_model=key_model,
+                    draw_overlay=True
+                )
+                if res_img_roi is not None:
+                    image_rgb = res_img_roi
+                if not roi_all_pass:
+                    flag = False
+                if roi_results:
+                    task_results.extend(roi_results)
+                if roi_plc:
+                    plc_to_send.extend(roi_plc)
 
             # Xử lý các thanh ghi trả về từ Task Calculator: BẢO VỆ NG THẮNG OK TUYỆT ĐỐI
             for reg, val in plc_to_send:
@@ -738,6 +778,18 @@ class v5s:
                 for t in task_results:
                     t_name = t.get('task_name') or f"Task-{t.get('task_id', '')}"
                     if not t.get('pass'):
+                        if t.get('task_type') == 'MULTI_SHOT_AGGREGATION':
+                            tgt = t.get('target_label')
+                            if tgt:
+                                for d in draw_candidates:
+                                    if d.get('label') == tgt:
+                                        d['color'] = COLOR_NG
+                        elif t.get('task_type') == 'ROI_ZONE_INSPECTION':
+                            for vb in valid_boxes:
+                                if vb.get('is_roi_violation'):
+                                    orig = vb.get('_orig_candidate')
+                                    if isinstance(orig, dict):
+                                        orig['color'] = COLOR_NG
                         failing_rules = [r for r in t.get('rules', []) if not r.get('pass')]
                         if failing_rules:
                             for r in failing_rules:
@@ -784,7 +836,7 @@ class v5s:
                                 'label': t_name,
                                 'status': 'NG',
                                 'is_ng': True,
-                                'text': f"Task: {t_name} (Vi phạm)"
+                                'text': t.get('desc') or t.get('text') or f"Task: {t_name} (Vi phạm)"
                             })
                     else:
                         fail_labels.append({
@@ -792,7 +844,7 @@ class v5s:
                             'label': t_name,
                             'status': 'OK',
                             'is_ng': False,
-                            'text': f"Task: {t_name} (OK)"
+                            'text': t.get('desc') or t.get('text') or f"Task: {t_name} (OK)"
                         })
 
         except Exception as e:

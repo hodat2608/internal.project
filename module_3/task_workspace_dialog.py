@@ -19,12 +19,19 @@ from module_3.task_calculator_db import (
     get_tasks_by_camera,
     get_task_by_id,
     get_task_rules,
+    get_multishot_rule,
+    get_roi_rule,
+    save_roi_task_and_rule,
+    save_multishot_task_and_rule,
     delete_task,
     toggle_task_enabled,
     get_available_labels_for_camera,
     save_task_and_rules
 )
 from module_3.task_rule_editor_dialog import TaskRuleEditorDialog
+from module_3.task_type_selector_dialog import TaskTypeSelectorDialog
+from module_3.multishot_aggregation_dialog import MultiShotAggregationDialog
+from module_3.roi_zone_dialog import RoiZoneEditorDialog
 from module_2.StyleSheet import *
 _log = get_logger('module_3.task_workspace_dialog')
 
@@ -162,12 +169,59 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
             self.table_tasks.setItem(row_idx, 1, item_name)
 
             # Cột 2: Loại Task
-            item_type = QtWidgets.QTableWidgetItem(t['task_type'])
+            t_type = t.get('task_type', 'RELATION_COORDINATE')
+            if t_type == 'MULTI_SHOT_AGGREGATION':
+                type_display = "🔄 Multi-Shot (Liên Model)"
+            elif t_type == 'ROI_ZONE_INSPECTION':
+                type_display = f"🖼️ ROI Zone (Model {t.get('model_id', self.model_id)})"
+            else:
+                type_display = "📐 Rule Calculator"
+            item_type = QtWidgets.QTableWidgetItem(type_display)
             item_type.setTextAlignment(Qt.AlignCenter)
+            if t_type == 'MULTI_SHOT_AGGREGATION':
+                item_type.setForeground(QColor("#7c3aed"))
+            elif t_type == 'ROI_ZONE_INSPECTION':
+                item_type.setForeground(QColor("#0284c7"))
             self.table_tasks.setItem(row_idx, 2, item_type)
 
-            # Cột 3: Số Rules
-            item_rules = QtWidgets.QTableWidgetItem(f"{t['rule_count']} rules")
+            # Cột 3: Số Rules / Tóm tắt quy tắc
+            if t_type == 'MULTI_SHOT_AGGREGATION':
+                rule = t.get('multishot_rule') or {}
+                lbl = rule.get('target_label', '')
+                shots = rule.get('cycle_shots', 5)
+                min_ng = rule.get('min_ng_shots', 2)
+                mode = rule.get('aggregation_mode', 'THRESHOLD_COUNT')
+                p_shots = rule.get('participating_shots', '')
+                if mode == 'THRESHOLD_COUNT':
+                    r_desc = f"Chu kỳ {shots} (≥ {min_ng} NG)"
+                elif mode == 'SPECIFIC_SHOTS':
+                    r_desc = f"Chu kỳ {shots} (Shot: {rule.get('specific_shots', '')})"
+                else:
+                    r_desc = f"Chu kỳ {shots} (≥ {min_ng} liên tiếp)"
+                if p_shots:
+                    r_desc += f" [Shot {p_shots}]"
+                if lbl:
+                    r_desc = f"[{lbl}] {r_desc}"
+                item_rules = QtWidgets.QTableWidgetItem(r_desc)
+            elif t_type == 'ROI_ZONE_INSPECTION':
+                r_roi = t.get('roi_rule') or {}
+                zones = r_roi.get('zones', [])
+                n_ins = sum(1 for z in zones if str(z.get('zone_type', '')).upper() == 'INSPECTION')
+                n_mask = sum(1 for z in zones if str(z.get('zone_type', '')).upper() == 'EXCLUSION')
+                n_pres = sum(1 for z in zones if str(z.get('zone_type', '')).upper() == 'PRESENCE')
+                parts = []
+                if n_ins > 0:
+                    parts.append(f"{n_ins} Inspect")
+                if n_mask > 0:
+                    parts.append(f"{n_mask} Mask")
+                if n_pres > 0:
+                    parts.append(f"{n_pres} Presence")
+                z_desc = f"{len(zones)} vùng"
+                if parts:
+                    z_desc += f" [{', '.join(parts)}]"
+                item_rules = QtWidgets.QTableWidgetItem(z_desc)
+            else:
+                item_rules = QtWidgets.QTableWidgetItem(f"{t['rule_count']} rules")
             item_rules.setTextAlignment(Qt.AlignCenter)
             self.table_tasks.setItem(row_idx, 3, item_rules)
 
@@ -236,21 +290,18 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
         active_count = sum(1 for t in self.tasks if t['enabled'])
         self.lbl_task_stats.setText(f"Tổng số: <b>{len(self.tasks)}</b> tasks | Đang kích hoạt: <font color='#16a34a'><b>{active_count}</b></font>")
 
-        # Đồng bộ ngay lập tức cờ enabled vào bộ nhớ RAM Process_Model.dict_active_tasks
+        # Đồng bộ ngay lập tức cờ enabled vào bộ nhớ RAM Process_Model.dict_active_tasks cho TOÀN BỘ các tab Model của camera này
         try:
             from module_3.handle_option_models import Process_Model
-            from _source.v5.v5 import _normalize_key_model
             cam_str = str(self.camera_name) if getattr(self, 'camera_name', None) else ""
             if not cam_str and getattr(self, 'camera_id', None):
                 cam_str = str(self.camera_id)
-            cam_num = cam_str.removeprefix("camera-").removeprefix("built-in-")
-            mod_num = str(self.model_id).removeprefix("model-")
-            key_model = (f"camera-{cam_num}", f"model-{mod_num}")
-            norm_target = _normalize_key_model(key_model)
+            cam_num = cam_str.lower().replace("camera-", "").replace("built-in-", "").strip()
 
             if hasattr(Process_Model, 'dict_active_tasks') and isinstance(Process_Model.dict_active_tasks, dict):
                 for km, tlist in Process_Model.dict_active_tasks.items():
-                    if _normalize_key_model(km) == norm_target and isinstance(tlist, list):
+                    c_k = str(km[0] if isinstance(km, (tuple, list)) else km).lower().replace("camera-", "").replace("built-in-", "").strip()
+                    if c_k == cam_num and isinstance(tlist, list):
                         for mem_task in tlist:
                             if mem_task.get('id') == task_id:
                                 mem_task['enabled'] = enabled
@@ -258,40 +309,137 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
             pass
 
     def add_task(self, preselected_labels: Optional[List[str]] = None):
-        """Mở dialog tạo task mới."""
-        avail_labels = get_available_labels_for_camera(self.cursor, self.camera_id, self.model_id)
-        task_data = {
-            'id': None,
-            'camera_id': self.camera_id,
-            'model_id': self.model_id,
-            'task_name': 'Task Mới',
-            'task_type': 'RELATION_COORDINATE',
-            'logic_mode': 'ALL_PASS',
-            'action_on_fail': 'NG',
-            'enabled': True,
-            'assign_register': '',
-            'value_state': 1,
-            'Value_State': 1,
-            'value_bit_on': 1,
-            'value_ok': 1,
-            'Value_OK': 1,
-            'value_bit_off': 0,
-            'value_ng': 0,
-            'Value_NG': 0,
-        }
-        dlg = TaskRuleEditorDialog(
-            camera_id=self.camera_id,
-            model_id=self.model_id,
-            task_data=task_data,
-            rules_data=None,
-            available_labels=avail_labels,
-            preselected_labels=preselected_labels,
-            cursor=self.cursor,
-            connection=self.connection,
-            parent=self
-        )
-        if dlg.exec_() == QtWidgets.QDialog.Accepted:
-            self.load_tasks()
+        """Mở modal lựa chọn loại task, sau đó mở dialog tương ứng."""
+        selector = TaskTypeSelectorDialog(parent=self)
+        if selector.exec_() != QtWidgets.QDialog.Accepted:
+            return
+
+        selected_type = selector.selected_type
+
+        if selected_type == 'MULTI_SHOT_AGGREGATION':
+            # Option 3: Cross-Shot Multi-Image Defect Aggregation Dialog
+            # Lấy danh sách nhãn trên TOÀN BỘ các Model của Camera này (Liên Model)
+            avail_labels = get_available_labels_for_camera(self.cursor, self.camera_id, model_id=None)
+            default_label = preselected_labels[0] if (preselected_labels and len(preselected_labels) > 0) else (avail_labels[0] if avail_labels else '')
+            task_data = {
+                'id': None,
+                'camera_id': self.camera_id,
+                'model_id': 0,  # Camera-Wide Scope (Toàn bộ chu kỳ)
+                'task_name': f"MultiShot_{default_label or 'Defect'}",
+                'task_type': 'MULTI_SHOT_AGGREGATION',
+                'logic_mode': 'ALL_PASS',
+                'action_on_fail': 'NG',
+                'enabled': True,
+                'assign_register': '',
+                'value_state': 1,
+                'Value_State': 1,
+                'value_bit_on': 1,
+                'value_ok': 1,
+                'Value_OK': 1,
+                'value_bit_off': 0,
+                'value_ng': 0,
+                'Value_NG': 0,
+            }
+            rule_data = {
+                'target_label': default_label,
+                'cycle_shots': 5,
+                'aggregation_mode': 'THRESHOLD_COUNT',
+                'min_ng_shots': 2,
+                'specific_shots': '',
+                'participating_shots': '',
+                'roi_enabled': 0,
+                'roi_mode': 'IN_BOUNDS',
+                'roi_boxes': '',
+                'timeout_reset_sec': 0.0,
+                'description': ''
+            }
+            dlg = MultiShotAggregationDialog(
+                camera_id=self.camera_id,
+                model_id=0,
+                task_data=task_data,
+                rule_data=rule_data,
+                available_labels=avail_labels,
+                cursor=self.cursor,
+                connection=self.connection,
+                parent=self
+            )
+            if dlg.exec_() == QtWidgets.QDialog.Accepted:
+                self.load_tasks()
+        elif selected_type == 'ROI_ZONE_INSPECTION':
+            # Option 2: ROI Zone Inspector Dialog (Đơn Model Scope - Góc chụp riêng)
+            avail_labels = get_available_labels_for_camera(self.cursor, self.camera_id, self.model_id)
+            task_data = {
+                'id': None,
+                'camera_id': self.camera_id,
+                'model_id': self.model_id,
+                'task_name': f"ROI_Zone_Model_{self.model_id}",
+                'task_type': 'ROI_ZONE_INSPECTION',
+                'logic_mode': 'ALL_PASS',
+                'action_on_fail': 'NG',
+                'enabled': True,
+                'assign_register': '',
+                'value_state': 1,
+                'Value_State': 1,
+                'value_bit_on': 1,
+                'value_ok': 1,
+                'Value_OK': 1,
+                'value_bit_off': 0,
+                'value_ng': 0,
+                'Value_NG': 0,
+            }
+            rule_data = {
+                'zones': [],
+                'default_target': '',
+                'action_mode': 'DEFECT_FILTER',
+                'description': ''
+            }
+            dlg = RoiZoneEditorDialog(
+                camera_id=self.camera_id,
+                model_id=self.model_id,
+                task_data=task_data,
+                rule_data=rule_data,
+                available_labels=avail_labels,
+                cursor=self.cursor,
+                connection=self.connection,
+                parent=self
+            )
+            if dlg.exec_() == QtWidgets.QDialog.Accepted:
+                self.load_tasks()
+        else:
+            # Option 1: Task Rule Calculator Dialog
+            avail_labels = get_available_labels_for_camera(self.cursor, self.camera_id, self.model_id)
+            task_data = {
+                'id': None,
+                'camera_id': self.camera_id,
+                'model_id': self.model_id,
+                'task_name': 'Task Mới',
+                'task_type': 'RELATION_COORDINATE',
+                'logic_mode': 'ALL_PASS',
+                'action_on_fail': 'NG',
+                'enabled': True,
+                'assign_register': '',
+                'value_state': 1,
+                'Value_State': 1,
+                'value_bit_on': 1,
+                'value_ok': 1,
+                'Value_OK': 1,
+                'value_bit_off': 0,
+                'value_ng': 0,
+                'Value_NG': 0,
+            }
+            dlg = TaskRuleEditorDialog(
+                camera_id=self.camera_id,
+                model_id=self.model_id,
+                task_data=task_data,
+                rules_data=None,
+                available_labels=avail_labels,
+                preselected_labels=preselected_labels,
+                cursor=self.cursor,
+                connection=self.connection,
+                parent=self
+            )
+            if dlg.exec_() == QtWidgets.QDialog.Accepted:
+                self.load_tasks()
 
     def edit_selected_task(self):
         row = self.table_tasks.currentRow()
@@ -304,36 +452,84 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
             task_info = next((t for t in self.tasks if t['id'] == task_id), None)
         if not task_info:
             return
-        rules = get_task_rules(self.cursor, task_id)
-        target_model_id = task_info.get('model_id') or self.model_id
-        avail_labels = get_available_labels_for_camera(self.cursor, self.camera_id, target_model_id)
 
-        dlg = TaskRuleEditorDialog(
-            camera_id=self.camera_id,
-            model_id=target_model_id,
-            task_data=task_info,
-            rules_data=rules,
-            available_labels=avail_labels,
-            cursor=self.cursor,
-            connection=self.connection,
-            parent=self
-        )
-        if dlg.exec_() == QtWidgets.QDialog.Accepted:
-            self.load_tasks()
+        target_model_id = task_info.get('model_id') or self.model_id
+        t_type = task_info.get('task_type')
+
+        if t_type == 'MULTI_SHOT_AGGREGATION':
+            # Multi-Shot: Nhãn được lấy trên TOÀN BỘ các Model của Camera này
+            avail_labels = get_available_labels_for_camera(self.cursor, self.camera_id, model_id=None)
+            rule = task_info.get('multishot_rule')
+            if not rule:
+                rule = get_multishot_rule(self.cursor, task_id)
+            dlg = MultiShotAggregationDialog(
+                camera_id=self.camera_id,
+                model_id=target_model_id,
+                task_data=task_info,
+                rule_data=rule,
+                available_labels=avail_labels,
+                cursor=self.cursor,
+                connection=self.connection,
+                parent=self
+            )
+            if dlg.exec_() == QtWidgets.QDialog.Accepted:
+                self.load_tasks()
+        elif t_type == 'ROI_ZONE_INSPECTION':
+            # ROI Zone Inspector: Nhãn được lấy riêng cho Model này
+            avail_labels = get_available_labels_for_camera(self.cursor, self.camera_id, target_model_id)
+            rule = task_info.get('roi_rule')
+            if not rule:
+                rule = get_roi_rule(self.cursor, task_id)
+            dlg = RoiZoneEditorDialog(
+                camera_id=self.camera_id,
+                model_id=target_model_id,
+                task_data=task_info,
+                rule_data=rule,
+                available_labels=avail_labels,
+                cursor=self.cursor,
+                connection=self.connection,
+                parent=self
+            )
+            if dlg.exec_() == QtWidgets.QDialog.Accepted:
+                self.load_tasks()
+        else:
+            avail_labels = get_available_labels_for_camera(self.cursor, self.camera_id, target_model_id)
+            rules = get_task_rules(self.cursor, task_id)
+            dlg = TaskRuleEditorDialog(
+                camera_id=self.camera_id,
+                model_id=target_model_id,
+                task_data=task_info,
+                rules_data=rules,
+                available_labels=avail_labels,
+                cursor=self.cursor,
+                connection=self.connection,
+                parent=self
+            )
+            if dlg.exec_() == QtWidgets.QDialog.Accepted:
+                self.load_tasks()
 
     def clone_selected_task(self):
         row = self.table_tasks.currentRow()
         if 0 <= row < len(self.tasks):
             original = self.tasks[row]
             task_id = original['id']
-            rules = get_task_rules(self.cursor, task_id)
+            t_type = original.get('task_type', 'RELATION_COORDINATE')
 
             clone_data = dict(original)
             clone_data['id'] = None
             clone_data['model_id'] = self.model_id
             clone_data['task_name'] = f"{original['task_name']} (Bản sao)"
-            
-            saved_id = save_task_and_rules(self.cursor, self.connection, clone_data, rules)
+
+            if t_type == 'ROI_ZONE_INSPECTION':
+                rule = original.get('roi_rule') or get_roi_rule(self.cursor, task_id) or {}
+                saved_id = save_roi_task_and_rule(self.cursor, self.connection, clone_data, rule)
+            elif t_type == 'MULTI_SHOT_AGGREGATION':
+                rule = original.get('multishot_rule') or get_multishot_rule(self.cursor, task_id) or {}
+                saved_id = save_multishot_task_and_rule(self.cursor, self.connection, clone_data, rule)
+            else:
+                rules = get_task_rules(self.cursor, task_id)
+                saved_id = save_task_and_rules(self.cursor, self.connection, clone_data, rules)
+
             if saved_id:
                 QtWidgets.QMessageBox.information(self, "Nhân Bản Thành Công", f"Đã nhân bản Task mới: '{clone_data['task_name']}' (ID: {saved_id})")
                 self.load_tasks()
@@ -384,6 +580,24 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
             change_reason, is_golden = reason_dlg.get_reason_and_golden()
 
             if delete_task(self.cursor, self.connection, task_id):
+                try:
+                    from module_3.handle_option_models import Process_Model
+                    from module_3.multishot_aggregation_engine import reset_multishot_cycle
+                    cam_str = str(self.camera_name) if getattr(self, 'camera_name', None) else ""
+                    if not cam_str and getattr(self, 'camera_id', None):
+                        cam_str = str(self.camera_id)
+                    cam_num = cam_str.lower().replace("camera-", "").replace("built-in-", "").strip()
+
+                    reset_multishot_cycle(key_model=f"camera-{cam_num}", task_id=task_id)
+
+                    if hasattr(Process_Model, 'dict_active_tasks') and isinstance(Process_Model.dict_active_tasks, dict):
+                        for km, tlist in Process_Model.dict_active_tasks.items():
+                            c_k = str(km[0] if isinstance(km, (tuple, list)) else km).lower().replace("camera-", "").replace("built-in-", "").strip()
+                            if c_k == cam_num and isinstance(tlist, list):
+                                Process_Model.dict_active_tasks[km] = [m for m in tlist if m.get('id') != task_id]
+                except Exception:
+                    pass
+
                 try:
                     save_snapshot(
                         cursor=self.cursor,
