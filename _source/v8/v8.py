@@ -16,7 +16,7 @@ from app_logger.app_logger import get_logger as _get_logger
 from collections import Counter
 from module_3.multishot_aggregation_engine import is_label_managed_by_multishot
 from module_3.multishot_aggregation_engine import evaluate_multishot_tasks
-from module_3.roi_zone_engine import evaluate_roi_zone_tasks
+from module_3.roi_zone_engine import evaluate_roi_zone_tasks, apply_roi_spatial_filter
 _log = _get_logger('source.v8')
 
 
@@ -94,9 +94,6 @@ class v8s(v5s):
         fail_labels   = InspectionItemList()
         ng_registers  = set()
 
-
-        name_counts = Counter(valid_names)
-
         # Lấy danh sách task được cấu hình cho model hiện tại
         processor = getattr(pyuic, 'processor', None)
         active_tasks_dict = getattr(processor, 'active_tasks', {}) if processor else {}
@@ -116,6 +113,14 @@ class v8s(v5s):
                             break
         elif isinstance(active_tasks_dict, list):
             tasks_for_model = active_tasks_dict
+
+        # Áp dụng bộ lọc không gian ROI (EXCLUSION / INSPECTION / PRESENCE) trước khi phán định nhãn
+        img_h, img_w = image.shape[:2]
+        draw_candidates, effective_names = apply_roi_spatial_filter(
+            draw_candidates, tasks_for_model, img_w, img_h
+        )
+
+        name_counts = Counter(effective_names)
 
         for cfg in cfg_rows:
             if not cfg.get('join'):
@@ -204,6 +209,8 @@ class v8s(v5s):
         }
 
         for d in draw_candidates:
+            if d.get('is_excluded') or d.get('is_outside_roi'):
+                continue
             if d.get('label') in exact_ng_labels:
                 d['color'] = COLOR_NG
 
@@ -297,8 +304,12 @@ class v8s(v5s):
                     'ymax': d['y2'],
                     'name': d['label'],
                     'confidence': d.get('conf', 1.0),
+                    'is_excluded': d.get('is_excluded', False),
+                    'is_outside_roi': d.get('is_outside_roi', False),
                     '_orig_candidate': d
                 })
+
+            active_boxes = [b for b in valid_boxes if not b.get('is_excluded') and not b.get('is_outside_roi')]
 
             geo_tasks = [t for t in tasks_config if t.get('task_type') not in ('MULTI_SHOT_AGGREGATION', 'ROI_ZONE_INSPECTION') and t.get('rules')]
             multishot_tasks = [t for t in tasks_config if t.get('task_type') == 'MULTI_SHOT_AGGREGATION']
@@ -311,7 +322,7 @@ class v8s(v5s):
             if geo_tasks:
                 res_img, task_all_pass, g_results, g_plc = _eval_engine(
                     image_bgr=image_rgb,
-                    valid_detections=valid_boxes,
+                    valid_detections=active_boxes,
                     tasks_config=geo_tasks,
                     draw_overlay=True
                 )
@@ -328,7 +339,7 @@ class v8s(v5s):
             if multishot_tasks:
                 res_img_ms, ms_all_pass, ms_results, ms_plc = evaluate_multishot_tasks(
                     image_rgb=image_rgb,
-                    valid_detections=valid_boxes,
+                    valid_detections=active_boxes,
                     multishot_tasks=multishot_tasks,
                     key_model=key_model,
                     current_count=kwargs.get('current_count'),
@@ -363,38 +374,65 @@ class v8s(v5s):
                     plc_to_send.extend(roi_plc)
 
             # Xử lý các thanh ghi trả về từ Task Calculator: BẢO VỆ NG THẮNG OK TUYỆT ĐỐI
-            for reg, val in plc_to_send:
-                reg_str = str(reg or '').strip()
-                if not reg_str:
-                    continue
+            # NGUYÊN TẮC BẤT DI BẤT DỊCH TRONG VISION CÔNG NGHIỆP:
+            # 1. Nếu bất kỳ task nào (Hình học, Cross-Shot, ROI) hoặc label đơn shot trước đó bị NG trên thanh ghi:
+            #    -> Thanh ghi đó BẮT BUỘC là NG.
+            #    -> Thanh ghi đó BẮT BUỘC gán Value NG của task/label NG tương ứng.
+            #    -> TUYỆT ĐỐI KHÔNG BAO GIỜ bị ghi đè bởi Value OK của bất kỳ task nào khác!
+            # 2. Chỉ khi TẤT CẢ các task và label dùng chung thanh ghi đó đều OK:
+            #    -> Thanh ghi đó mới được gán Value OK.
 
-                is_task_ng = False
-                if task_results:
-                    for t in task_results:
-                        if str(t.get('assign_register') or '').strip() == reg_str:
-                            if not t.get('pass'):
-                                is_task_ng = True
-                                break
+            # Bước 1: Thu thập tất cả các task NG và giá trị NG tương ứng
+            ng_task_reg_values = {}
+            if task_results:
+                for t in task_results:
+                    reg_str = str(t.get('assign_register') or '').strip()
+                    if not reg_str:
+                        continue
+                    if not t.get('pass') or t.get('is_ng'):
+                        ng_registers.add(reg_str)
+                        v_ng = t.get('value_bit_off')
+                        if v_ng is None:
+                            v_ng = t.get('value_ng', t.get('Value_NG'))
+                        if v_ng is not None and str(v_ng).strip() != "" and str(v_ng).strip().lower() not in ('none', 'no value', 'null'):
+                            ng_task_reg_values[reg_str] = v_ng
+                        elif reg_str not in ng_task_reg_values:
+                            ng_task_reg_values[reg_str] = None
 
-                val_valid = (val is not None and str(val).strip() != "" and str(val).strip().lower() not in ('none', 'no value', 'null'))
+            # Bước 2: Thu thập các task OK (chỉ lưu cho thanh ghi CHƯA từng bị NG bởi bất kỳ label hay task nào)
+            ok_task_reg_values = {}
+            if task_results:
+                for t in task_results:
+                    reg_str = str(t.get('assign_register') or '').strip()
+                    if not reg_str:
+                        continue
+                    if t.get('pass') and not t.get('is_ng'):
+                        if reg_str not in ng_registers:
+                            v_ok = t.get('value_bit_on')
+                            if v_ok is None:
+                                v_ok = t.get('value_ok', t.get('Value_OK'))
+                            if v_ok is not None and str(v_ok).strip() != "" and str(v_ok).strip().lower() not in ('none', 'no value', 'null'):
+                                ok_task_reg_values[reg_str] = v_ok
 
-                if is_task_ng:
-                    ng_registers.add(reg_str)
-                    if val_valid:
+            # Bước 3: Gán giá trị OK (CHỈ khi thanh ghi không nằm trong ng_registers)
+            for reg_str, val in ok_task_reg_values.items():
+                if reg_str not in ng_registers:
+                    try:
+                        list_register[reg_str] = int(val)
+                    except (ValueError, TypeError):
+                        list_register[reg_str] = val
+
+            # Bước 4: Gán giá trị NG (ĐÈ BẸP mọi giá trị OK, bảo vệ NG tuyệt đối)
+            for reg_str in ng_registers:
+                if reg_str in ng_task_reg_values:
+                    val = ng_task_reg_values[reg_str]
+                    if val is not None and str(val).strip() != "" and str(val).strip().lower() not in ('none', 'no value', 'null'):
                         try:
                             list_register[reg_str] = int(val)
                         except (ValueError, TypeError):
                             list_register[reg_str] = val
                     else:
                         list_register.pop(reg_str, None)
-                else:
-                    # Task OK: chỉ gán giá trị OK nếu thanh ghi này CHƯA TỪNG bị NG bởi bất kỳ label hay task nào!
-                    if reg_str not in ng_registers:
-                        if val_valid:
-                            try:
-                                list_register[reg_str] = int(val)
-                            except (ValueError, TypeError):
-                                list_register[reg_str] = val
 
             # Trích xuất toàn bộ hạng mục Task vi phạm đưa vào fail_labels để hiển thị lên HUD
             if fail_labels is not None and task_results:

@@ -567,6 +567,16 @@ class PLCHandler:
                 self._cfg_registers_ok_values[key].clear()
             if hasattr(self, '_cfg_registers_ng_values'):
                 self._cfg_registers_ng_values[key].clear()
+            if hasattr(self, '_cfg_registers_ng_sets'):
+                self._cfg_registers_ng_sets[key].clear()
+            if hasattr(self, '_cfg_registers_ok_sets'):
+                self._cfg_registers_ok_sets[key].clear()
+            if hasattr(self, '_cfg_registers_ok_values'):
+                self._cfg_registers_ok_values[key].clear()
+            if hasattr(self, '_cfg_registers_ng_sets'):
+                self._cfg_registers_ng_sets[key].clear()
+            if hasattr(self, '_cfg_registers_ok_sets'):
+                self._cfg_registers_ok_sets[key].clear()
             if hasattr(self, '_ng_registers_store'):
                 self._ng_registers_store[key].clear()
             if hasattr(self, '_cycle_flags'):
@@ -630,17 +640,19 @@ class PLCHandler:
                     # Xác định xem giá trị này là NG hay OK theo cấu hình đã tích lũy
                     cfg_ng = self._cfg_registers_ng_values[key].get(reg_str)
                     cfg_ok = self._cfg_registers_ok_values[key].get(reg_str)
+                    ng_set = self._cfg_registers_ng_sets[key].get(reg_str, set()) if hasattr(self, '_cfg_registers_ng_sets') else set()
+                    ok_set = self._cfg_registers_ok_sets[key].get(reg_str, set()) if hasattr(self, '_cfg_registers_ok_sets') else set()
 
                     is_this_ng = False
                     if val_is_empty:
                         if not is_shot_ok:
                             is_this_ng = True
                     else:
-                        if cfg_ng is not None and val_num == cfg_ng:
+                        if (cfg_ng is not None and val_num == cfg_ng) or (val_num in ng_set):
                             is_this_ng = True
-                        elif cfg_ok is not None and val_num != cfg_ok:
+                        elif (cfg_ok is not None and val_num != cfg_ok) or (ok_set and val_num not in ok_set):
                             is_this_ng = True
-                        elif not is_shot_ok and (cfg_ok is None and cfg_ng is None):
+                        elif not is_shot_ok and (cfg_ok is None and cfg_ng is None and not ok_set and not ng_set):
                             is_this_ng = True
 
                     # NẾU THANH GHI NÀY ĐÃ TỪNG BỊ NG TRONG CHU KỲ NÀY:
@@ -697,6 +709,10 @@ class PLCHandler:
                 self._cfg_registers_ok_values[key].clear()
             if hasattr(self, '_cfg_registers_ng_values'):
                 self._cfg_registers_ng_values[key].clear()
+            if hasattr(self, '_cfg_registers_ng_sets'):
+                self._cfg_registers_ng_sets[key].clear()
+            if hasattr(self, '_cfg_registers_ok_sets'):
+                self._cfg_registers_ok_sets[key].clear()
         return registers
 
     def _extract_shot_cfg_rows(self, pyuic, key_model=None) -> list:
@@ -898,18 +914,26 @@ class PLCHandler:
                         val_ng = cfg.get('value_ng', cfg.get('Value_NG'))
                         if val_ok is not None and str(val_ok).strip() != "" and str(val_ok).strip().lower() not in ('none', 'no value', 'null'):
                             try:
-                                self._cfg_registers_ok_values[key][reg] = int(val_ok)
+                                v_ok_num = int(val_ok)
                             except (ValueError, TypeError):
-                                self._cfg_registers_ok_values[key][reg] = val_ok
-                        else:
+                                v_ok_num = val_ok
+                            self._cfg_registers_ok_values[key][reg] = v_ok_num
+                            if not hasattr(self, '_cfg_registers_ok_sets'):
+                                self._cfg_registers_ok_sets = defaultdict(lambda: defaultdict(set))
+                            self._cfg_registers_ok_sets[key][reg].add(v_ok_num)
+                        elif reg not in self._cfg_registers_ok_values[key]:
                             self._cfg_registers_ok_values[key][reg] = None
 
                         if val_ng is not None and str(val_ng).strip() != "" and str(val_ng).strip().lower() not in ('none', 'no value', 'null'):
                             try:
-                                self._cfg_registers_ng_values[key][reg] = int(val_ng)
+                                v_ng_num = int(val_ng)
                             except (ValueError, TypeError):
-                                self._cfg_registers_ng_values[key][reg] = val_ng
-                        else:
+                                v_ng_num = val_ng
+                            self._cfg_registers_ng_values[key][reg] = v_ng_num
+                            if not hasattr(self, '_cfg_registers_ng_sets'):
+                                self._cfg_registers_ng_sets = defaultdict(lambda: defaultdict(set))
+                            self._cfg_registers_ng_sets[key][reg].add(v_ng_num)
+                        elif reg not in self._cfg_registers_ng_values[key]:
                             self._cfg_registers_ng_values[key][reg] = None
         _log.debug('[%s] Accumulated cfg registers (total: %s)',
                    key, len(self._cfg_registers_store[key]))
@@ -2576,7 +2600,7 @@ class PLCHandler:
                     path = data_info['path_image']
                     model_loader = values.get('model_loader', {}).get(key_model)
                     pyuic = values.get('pyuic', {}).get(key_model)
-                    current_count = 1
+                    automation_ui = values.get('automation_ui')
 
                     if not os.path.exists(path):
                         _log.error('[%s] Đường dẫn không tồn tại: %s', key, path)
@@ -2590,13 +2614,42 @@ class PLCHandler:
                         _log.error('[%s] model_loader is None for key_model=%s', key, key_model)
                         continue
 
-                    _log.info('[%s] handle_auto_logging_process_image — processing image: %s (register=%s, value_on=%s)', key, path, register, plc_val)
+                    current_count = self.counter_shot(key, automation_ui)
+                    try:
+                        current_count = int(current_count)
+                    except (ValueError, TypeError):
+                        current_count = 1
+
+                    _log.info('[%s] Auto logging current count for: %s', key, current_count)
+
+                    shot_cfg_rows = self._extract_shot_cfg_rows(pyuic, key_model)
+                    is_cycle_frame = automation_ui.radioButton_cycle_frame.isChecked() if (automation_ui and hasattr(automation_ui, 'radioButton_cycle_frame')) else False
+                    is_single_frame = automation_ui.radioButton_single_frame.isChecked() if (automation_ui and hasattr(automation_ui, 'radioButton_single_frame')) else True
+
+                    shot_complete = values.get('shot_complete', 0)
+                    if not shot_complete and isinstance(values.get('shot'), dict):
+                        shot_complete = len(values.get('shot'))
+                    try:
+                        shot_complete = int(shot_complete)
+                    except (ValueError, TypeError):
+                        shot_complete = 0
+
+                    if is_cycle_frame:
+                        self._accumulate_cfg_registers(key, shot_cfg_rows)
+                        if current_count >= shot_complete:
+                            self._init_cfg_registers(key)
+                    elif is_single_frame:
+                        self._init_cfg_registers(key, shot_cfg_rows)
+
+                    _log.info('[%s] handle_auto_logging_process_image — processing image: %s (register=%s, value_on=%s, shot=%s/%s)', key, path, register, plc_val, current_count, shot_complete)
                     raw_image = cv2.imread(path)
                     if raw_image is None:
                         _log.error('[%s] cv2.imread returned None for: %s', key, path)
                         continue
 
                     raw_image = cv2.cvtColor(raw_image, cv2.COLOR_BGR2RGB)
+                    if not raw_image.flags['C_CONTIGUOUS']:
+                        raw_image = np.ascontiguousarray(raw_image)
 
                     model_processor = self.processor.dict_processors.get(key_model) if (self.processor and hasattr(self.processor, 'dict_processors')) else None
                     if not model_processor or not getattr(model_processor, 'process_image_func', None):
@@ -2608,51 +2661,98 @@ class PLCHandler:
                             continue
 
                     try:
-                        res_process = model_processor.process_image_func(raw_image, model_loader, pyuic, camera, key_model)
+                        res_process = model_processor.process_image_func(
+                            raw_image, model_loader, pyuic, camera, key_model,
+                            current_count=current_count, shot_complete=shot_complete
+                        )
                         if len(res_process) >= 5:
                             result_img, flag, list_register, logo_text, cfg_rows = res_process[:5]
                         else:
                             result_img, flag, list_register, logo_text = res_process[:4]
-                            cfg_rows = getattr(pyuic, '_cached_model_config', [])
+                            cfg_rows = shot_cfg_rows or getattr(pyuic, '_cached_model_config', [])
                     except Exception:
-                        _log.exception('[%s] process_image_func failed for logging image %s', key, path)
+                        _log.exception('[%s] process_image_func failed for logging image %s at shot %s', key, path, current_count)
                         continue
 
+                    if is_cycle_frame:
+                        if cfg_rows:
+                            self._accumulate_cfg_registers(key, cfg_rows)
+                        self._accumulate_registers(key, list_register or {}, is_shot_ok=bool(flag))
+
+                        if current_count >= shot_complete:
+                            all_registers = self._pop_registers(key)
+                            is_all_ok = self._pop_cycle_flag(key)
+
+                            try:
+                                with self._signal_rwlock.read():
+                                    comp_sig  = self._resolve_signal(key, 'completed')
+                                    reset_sig = self._resolve_signal(key, 'component')
+                            except KeyError:
+                                _log.exception('[%s] Missing complete/reset signal in dict_signal_complete', key)
+                                self._reset_counter(key)
+                                continue
+
+                            plc_tasks = []
+                            if all_registers:
+                                _log.info('[%s] Auto logging registers to write (OK/NG): %s', key, all_registers)
+                                if isinstance(all_registers, dict):
+                                    for reg_addr, reg_val in all_registers.items():
+                                        if reg_val is not None and str(reg_val).strip() != "" and str(reg_val).strip().lower() not in ('none', 'no value', 'null'):
+                                            plc_tasks.append((reg_addr, reg_val))
+                                else:
+                                    for reg_addr in all_registers:
+                                        if reg_addr and str(reg_addr).strip():
+                                            plc_tasks.append((reg_addr, 1))
+                            if is_all_ok and reset_sig:
+                                _log.info('[%s] Send Reset Signal OK %s', key, reset_sig)
+                                plc_tasks.append((reset_sig.get('reg'), int(reset_sig.get('on', 1))))
+
+                            if comp_sig:
+                                _log.info('[%s] Send Complete Signal %s', key, comp_sig)
+                                plc_tasks.append((comp_sig.get('reg'), int(comp_sig.get('on', 1))))
+
+                            if plc_tasks:
+                                self._dispatch_plc_writes(plc_tasks)
+                            self._reset_counter(key)
+                            _log.info('[%s] Complete Auto Logging Cycle Shot %s | registers written: %s', key, current_count, len(all_registers))
+                            _log.info(f'_____________COMPLETE AN AUTO LOGGING CYCLE FRAME FROM {key.upper()}_____________')
+                            _log.info(f'* Restart New Cycle')
+
+                    elif is_single_frame:
+                        try:
+                            with self._signal_rwlock.read():
+                                comp_sig  = self._resolve_signal(key, 'completed')
+                                reset_sig = self._resolve_signal(key, 'component')
+                        except KeyError:
+                            _log.exception('[handle_auto_logging][%s] Missing signal config in dict_signal_complete', key)
+                            comp_sig = None
+                            reset_sig = None
+
+                        plc_tasks = []
+                        if list_register:
+                            _log.info('[%s] Logging single frame registers to write (OK/NG): %s', key, list_register)
+                            if isinstance(list_register, dict):
+                                for reg_addr, reg_val in list_register.items():
+                                    if reg_val is not None and str(reg_val).strip() != "" and str(reg_val).strip().lower() not in ('none', 'no value', 'null'):
+                                        plc_tasks.append((reg_addr, reg_val))
+                            else:
+                                for reg_addr in list_register:
+                                    if reg_addr and str(reg_addr).strip():
+                                        plc_tasks.append((reg_addr, 1))
+
+                        if flag and reset_sig:
+                            _log.info('[%s] Send Reset Signal OK %s', key, reset_sig)
+                            plc_tasks.append((reset_sig.get('reg'), int(reset_sig.get('on', 1))))
+
+                        if comp_sig:
+                            _log.info('[%s] Send Complete Signal %s', key, comp_sig)
+                            plc_tasks.append((comp_sig.get('reg'), int(comp_sig.get('on', 1))))
+
+                        if plc_tasks:
+                            self._dispatch_plc_writes(plc_tasks)
+                        _log.info('[%s] Complete Auto Logging Single frame %s | registers written: %s', key, current_count, len(list_register or {}))
+
                     elapsed = (time.perf_counter() - start_time) * 1000
-                    self._init_cfg_registers(key, cfg_rows)
-                    try:
-                        with self._signal_rwlock.read():
-                            comp_sig  = self._resolve_signal(key, 'completed')
-                            reset_sig = self._resolve_signal(key, 'component')
-                    except KeyError:
-                        _log.exception('[handle_auto_logging][%s] Missing signal config in dict_signal_complete', key)
-                        comp_sig = None
-                        reset_sig = None
-
-                    plc_tasks = []
-    
-                    if list_register:
-                        _log.info('[%s] Logging registers to write (OK/NG): %s', key, list_register)
-                        if isinstance(list_register, dict):
-                            for reg_addr, reg_val in list_register.items():
-                                if reg_val is not None and str(reg_val).strip() != "" and str(reg_val).strip().lower() not in ('none', 'no value', 'null'):
-                                    plc_tasks.append((reg_addr, reg_val))
-                        else:
-                            for reg_addr in list_register:
-                                if reg_addr and str(reg_addr).strip():
-                                    plc_tasks.append((reg_addr, 1))
-
-                    if flag and reset_sig:
-                        _log.info('[%s] Send Reset Signal OK %s', key, reset_sig)
-                        plc_tasks.append((reset_sig.get('reg'), int(reset_sig.get('on', 1))))
-
-                    if comp_sig:
-                        _log.info('[%s] Send Complete Signal %s', key, comp_sig)
-                        plc_tasks.append((comp_sig.get('reg'), int(comp_sig.get('on', 1))))
-
-                    if plc_tasks:
-                        self._dispatch_plc_writes(plc_tasks)
-
                     display_mode = self.get_display_mode()
                     display_img = raw_image if display_mode == "Hide Bounding Boxes" else result_img
                     self.signals.update_display.emit(
@@ -3510,6 +3610,8 @@ class CameraTabManager:
                 progress_callback(cur_val, f"Đang gán giá trị (Model {model_index+1}/{total_m}) cho camera {camera_name}...")
         
             self.processor = Process_Model(ui_child)
+            self.processor.main_core = self
+            Process_Model.main_core = self
             self.processor.assign_values(model_number, camera_name, self.i_code)
             self.processor.collect_device()
             
@@ -3553,7 +3655,7 @@ class CameraTabManager:
         
     def _connect_model_signals(self, ui_child, processor):
         ui_child.pushButton_weight_pytorch.clicked.connect(lambda _: processor.browse_file())
-        ui_child.pushButton_weight_pytorch_2.clicked.connect(lambda _: processor.load_model())
+        ui_child.pushButton_weight_pytorch_2.clicked.connect(lambda _: self._on_reload_model_clicked(processor))
         ui_child.pushButton_save_data.clicked.connect(lambda _: processor.save_values_injection_safe(self.db_manager.cursor, self.db_manager.connect_db))
         ui_child.pushButton_edit_params.clicked.connect(lambda _: processor.toggle_lock(self.db_manager.cursor, self.db_manager.connect_db))
         ui_child.pushButton_load_parameters.clicked.connect(lambda _: processor.load_data_injection_safe())
@@ -3615,6 +3717,89 @@ class CameraTabManager:
         ui_child.comboBox_model_runtime.currentTextChanged.connect(_update_runtime_ui)
         processor._update_runtime_ui = _update_runtime_ui
         _update_runtime_ui()
+
+    def _on_reload_model_clicked(self, processor):
+        """Xử lý sự kiện khi bấm nút nạp model weight mới (pushButton_weight_pytorch_2)."""
+        processor.load_model()
+        self.update_model_loader_for_processor(processor)
+
+    def update_model_loader_for_processor(self, processor):
+        """
+        Cập nhật trực tiếp model_loader mới của processor vào:
+        1. self.dict_processors[key_model]
+        2. self.built_in_objects[key_cam]['model_loader'][key_model]
+        3. self.built_in_objects[key_cam]['path_instances'][key_model]
+        4. self.built_in_objects[key_cam]['pyuic'][key_model]
+        5. Đảm bảo plc_handler cũng nhận diện được model_loader mới ngay lập tức
+        6. Xóa cache cấu hình để lần detect tiếp theo dùng model và parameter mới
+        """
+        try:
+            cam_name = str(processor.camera_name)
+            model_num = str(processor.model_number)
+            
+            cam_prefix = cam_name if cam_name.startswith('camera-') else f'camera-{cam_name}'
+            model_prefix = f'model-{model_num}' if not str(model_num).startswith('model-') else str(model_num)
+            key_model = (cam_prefix, model_prefix)
+            
+            _log.info("[CameraTabManager] Đồng bộ model_loader mới: cam=%s, model=%s, key_model=%s", cam_name, model_num, key_model)
+            
+            # Cập nhật dict_processors
+            self.dict_processors[key_model] = processor
+            for k in list(self.dict_processors.keys()):
+                if isinstance(k, tuple) and len(k) == 2:
+                    if (cam_name in str(k[0])) and (str(model_num) in str(k[1])):
+                        self.dict_processors[k] = processor
+            
+            # Cập nhật built_in_objects
+            for cam_key, cam_data in self.built_in_objects.items():
+                if cam_key == f'built-in-camera-{cam_name}' or cam_key.endswith(f'camera-{cam_name}') or cam_key.endswith(f'-{cam_name}'):
+                    if 'model_loader' in cam_data and isinstance(cam_data['model_loader'], dict):
+                        cam_data['model_loader'][key_model] = processor.model_loader
+                        for km in list(cam_data['model_loader'].keys()):
+                            if isinstance(km, tuple) and len(km) == 2:
+                                if (cam_name in str(km[0])) and (str(model_num) in str(km[1])):
+                                    cam_data['model_loader'][km] = processor.model_loader
+                                    
+                    if 'path_instances' in cam_data and isinstance(cam_data['path_instances'], dict):
+                        cam_data['path_instances'][key_model] = processor.path_object
+                        for km in list(cam_data['path_instances'].keys()):
+                            if isinstance(km, tuple) and len(km) == 2:
+                                if (cam_name in str(km[0])) and (str(model_num) in str(km[1])):
+                                    cam_data['path_instances'][km] = processor.path_object
+                                    
+                    if 'pyuic' in cam_data and isinstance(cam_data['pyuic'], dict):
+                        cam_data['pyuic'][key_model] = processor.uic
+                        for km in list(cam_data['pyuic'].keys()):
+                            if isinstance(km, tuple) and len(km) == 2:
+                                if (cam_name in str(km[0])) and (str(model_num) in str(km[1])):
+                                    cam_data['pyuic'][km] = processor.uic
+                                    
+                    _log.info("[CameraTabManager] Đã cập nhật model_loader vào self.built_in_objects['%s']", cam_key)
+            
+            # Đồng bộ plc_handler nếu built_in_objects không cùng tham chiếu
+            if hasattr(self, 'plc_handler') and self.plc_handler:
+                if hasattr(self.plc_handler, 'built_in_objects') and self.plc_handler.built_in_objects is not self.built_in_objects:
+                    for cam_key, cam_data in self.plc_handler.built_in_objects.items():
+                        if cam_key == f'built-in-camera-{cam_name}' or cam_key.endswith(f'camera-{cam_name}') or cam_key.endswith(f'-{cam_name}'):
+                            if 'model_loader' in cam_data and isinstance(cam_data['model_loader'], dict):
+                                cam_data['model_loader'][key_model] = processor.model_loader
+                                for km in list(cam_data['model_loader'].keys()):
+                                    if isinstance(km, tuple) and len(km) == 2:
+                                        if (cam_name in str(km[0])) and (str(model_num) in str(km[1])):
+                                            cam_data['model_loader'][km] = processor.model_loader
+                            if 'path_instances' in cam_data and isinstance(cam_data['path_instances'], dict):
+                                cam_data['path_instances'][key_model] = processor.path_object
+                            if 'pyuic' in cam_data and isinstance(cam_data['pyuic'], dict):
+                                cam_data['pyuic'][key_model] = processor.uic
+                                
+            # Invalidate UI cached model config
+            if hasattr(processor, 'uic') and hasattr(processor.uic, '_cached_model_config'):
+                processor.uic._cached_model_config = None
+                
+            return True
+        except Exception as e:
+            _log.exception("[CameraTabManager] Lỗi update_model_loader_for_processor: %s", e)
+            return False
         
     def create_automation_interface(self, camera_id, camera_name, item_code_id, models, tab_widget_2, product_code_forms):
         _translate = QtCore.QCoreApplication.translate

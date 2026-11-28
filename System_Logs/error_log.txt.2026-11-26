@@ -1,0 +1,426 @@
+2026-11-26 08:23:46 [INFO] legion.module_2.startup_splash: [SplashProgress 5%] Đang khởi tạo hệ thống kiểm tra... | Đăng ký khóa đơn phiên bản (Single Instance)...
+2026-11-26 08:23:46 [INFO] legion.module_2.single_instance: [SingleInstance] Đã khởi động SingleInstance Server lắng nghe tại: VisionProInspector_SingleInstance_Pipe_v2
+2026-11-26 08:23:46 [INFO] legion.module_2.startup_splash: [SplashProgress 10%] Đang nạp cửa sổ nhật ký ứng dụng... | Khởi tạo hệ thống logging...
+2026-11-26 08:23:46 [INFO] legion.module_2.startup_splash: [SplashProgress 15%] Đang kết nối cơ sở dữ liệu MySQL... | Hệ thống đang tự động phục hồi dịch vụ dữ liệu...
+2026-11-26 08:23:46 [INFO] legion.module_2.main_core: [core.__init__] START
+2026-11-26 08:23:46 [INFO] legion.module_2.main_core: [core.__init__] Creating CoreWorker...
+2026-11-26 08:23:46 [INFO] legion.module_2.main_core: [core.__init__] CoreWorker created. Connecting to MySQL...
+2026-11-26 08:23:46 [INFO] legion.module_2.startup_splash: [SplashProgress 15%] Đang kết nối cơ sở dữ liệu MySQL... | Đang tự động phục hồi dịch vụ dữ liệu...
+2026-11-26 08:23:46 [INFO] legion.module_2.main_core: [connect_to_mysql] Calling connect_mysql_from_log...
+2026-11-26 08:23:46 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Reading config from C:\Users\VDM\AppData\Local\MBC_Vision_Inspector\mysql_config.log
+2026-11-26 08:23:46 [INFO] legion.module_2.startup_splash: [SplashProgress 15%] Đang chờ dịch vụ MySQL Server sẵn sàng... (1/40) | Hệ thống đang tự động phục hồi kết nối dữ liệu sau khi bật nguồn...
+2026-11-26 08:23:46 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Success to connect mysql on attempt 1 (host=127.0.0.1, ssl_disabled=True)
+2026-11-26 08:23:46 [INFO] legion.module_2.startup_splash: [SplashProgress 45%] Kết nối cơ sở dữ liệu MySQL thành công! | Dịch vụ MySQL Server đã sẵn sàng hoạt động.
+2026-11-26 08:23:46 [INFO] legion.module_2.main_core: [connect_to_mysql] connect_mysql_from_log returned: <mysql.connector.connection.MySQLConnection object at 0x000001F4313A48F0>
+2026-11-26 08:23:46 [INFO] legion.module_2.main_core: [connect_to_mysql] Creating default table...
+2026-11-26 08:23:46 [INFO] legion.module_2.main_core: [connect_to_mysql] Kết nối MySQL thành công (Chế độ Manual theo thiết lập người dùng)
+2026-11-26 08:23:46 [INFO] legion.module_2.main_core: [core.__init__] connect_to_mysql done. connect_result=<mysql.connector.connection.MySQLConnection object at 0x000001F4313A48F0>
+2026-11-26 08:23:46 [INFO] legion.module_2.main_core: Success to initialize connections
+2026-11-26 08:23:46 [INFO] legion.module_2.startup_splash: [SplashProgress 50%] Đang nạp cấu hình giao tiếp PLC... | Kiểm tra thông số Keyence Ethernet...
+2026-11-26 08:23:46 [INFO] legion.module_2.main_core: [core.__init__] init_plc_data...
+2026-11-26 08:23:46 [INFO] legion.module_2.main_core: PLC Simulation via Log Mode ACTIVE [indirect_from_log=True] for KEYENCE (192.168.42.37:8501)
+2026-11-26 08:23:46 [INFO] legion.module_2.main_core: [core.__init__] Connecting trigger signal...
+2026-11-26 08:23:46 [INFO] legion.module_2.startup_splash: [SplashProgress 60%] Đang nạp danh mục sản phẩm và Item Code... | Đồng bộ danh sách sản phẩm...
+2026-11-26 08:23:46 [INFO] legion.module_2.main_core: [core.__init__] collect_dict_item...
+2026-11-26 08:23:46 [WARNING] legion.module_2.main_core: Mode Manual Login or No Connection
+2026-11-26 08:23:46 [INFO] legion.module_2.startup_splash: [SplashProgress 70%] Đang cấu hình kịch bản tự động hóa... | Nạp System Action Configs...
+2026-11-26 08:23:46 [INFO] legion.module_2.main_core: [core.__init__] reload_system_action_configs...
+2026-11-26 08:23:46 [INFO] legion.module_2.main_core: System action configs reloaded successfully: ['RESTART', 'CLOSE']
+2026-11-26 08:23:46 [INFO] legion.module_2.main_core: [core.__init__] DONE
+2026-11-26 08:23:46 [INFO] legion.module_2.startup_splash: [SplashProgress 75%] Đang xác thực bản quyền phần mềm... | Kiểm tra USB Hardware Key...
+2026-11-26 08:23:46 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 08:23:46 [INFO] legion.module_2.startup_splash: [SplashProgress 82%] Đang khởi động giám sát tín hiệu nền... | Kích hoạt luồng CoreWorker & Watchdog...
+2026-11-26 08:23:46 [INFO] legion.module_2.main_core: Success to start monitoring
+2026-11-26 08:23:46 [INFO] legion.module_2.main_core: [CoreWorker] Running in thread: Dummy-1
+2026-11-26 08:23:46 [INFO] legion.module_2.startup_splash: [SplashProgress 88%] Đang khởi tạo giao diện điều khiển... | Chuẩn bị màn hình chính...
+2026-11-26 08:23:46 [INFO] legion.module_2.hardware_key_guard: HardwareKeyGuard đã khởi động. Tần số quét định kỳ: 180 - 300 giây (3-5 phút).
+2026-11-26 08:23:46 [INFO] legion.module_2.run: HardwareKeyGuard đã được khởi động.
+2026-11-26 08:23:46 [INFO] legion.module_2.startup_splash: [SplashProgress 95%] Đang nạp cấu hình hiển thị và mô hình AI... | Khởi tạo thiết bị đồ họa và Workspace...
+2026-11-26 08:23:47 [INFO] legion.module_2.startup_splash: [SplashProgress 100%] Khởi tạo hệ thống thành công! | Đang mở giao diện chính...
+2026-11-26 08:23:52 [INFO] legion.module_2.main_core: Success to write data save default: 50-E22AA-A, tbnq_plate_b
+2026-11-26 08:23:52 [INFO] legion.module_3.main_thread: Khởi động Legion Vision App - ItemCode: 50-E22AA-A
+2026-11-26 08:23:52 [INFO] legion.module_3.main_core: Select database: tbnq_plate_b
+2026-11-26 08:23:52 [INFO] legion.module_3.main_core: Get item code id: 50-E22AA-A
+2026-11-26 08:23:52 [INFO] legion.module_3.main_core: Get camera records for item code: 1
+2026-11-26 08:23:52 [INFO] legion.module_3.main_thread: Found 3 cameras for item code: 50-E22AA-A
+2026-11-26 08:23:52 [INFO] legion.module_3.main_core: Get models for camera: 1
+2026-11-26 08:23:52 [INFO] legion.module_3.main_core: Get models for camera: 2
+2026-11-26 08:23:52 [INFO] legion.module_3.main_core: Get models for camera: 3
+2026-11-26 08:23:52 [INFO] legion.module_3.main_thread: Setting up camera: 1 (ID: 1)
+2026-11-26 08:23:52 [INFO] legion.module_3.main_core: Get models for camera: 1
+2026-11-26 08:23:52 [INFO] legion.module_3.main_thread: Found 5 models for camera 1
+2026-11-26 08:23:52 [INFO] legion.module_3.handle_option_models: Loaded 3 geometric tasks (active: 1, disabled: 2) for key_model=('camera-1', 'model-1') (camera_id=1, model_id=1)
+2026-11-26 08:23:52 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\0f726c93_PLATE_B_CAMERA_1_MODEL_1_11_11_2026.pt' device='cuda:0-NVIDIA GeForce RTX 3080'
+2026-11-26 08:23:54 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 08:23:54 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 08:23:54 [INFO] legion.module_3.handle_option_models: Loaded 2 geometric tasks (active: 2, disabled: 0) for key_model=('camera-1', 'model-2') (camera_id=1, model_id=2)
+2026-11-26 08:23:54 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\24ba9f48_my_model_v8s.pt' device='cpu'
+2026-11-26 08:23:54 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 08:23:54 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 08:23:54 [INFO] legion.module_3.handle_option_models: Loaded 1 geometric tasks (active: 1, disabled: 0) for key_model=('camera-1', 'model-3') (camera_id=1, model_id=3)
+2026-11-26 08:23:54 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\806601d5_PLATE_B_CAMERA_1_MODEL_REST_15_11_2026.pt' device='cpu'
+2026-11-26 08:23:54 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 08:23:54 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 08:23:54 [INFO] legion.module_3.handle_option_models: Loaded 1 geometric tasks (active: 1, disabled: 0) for key_model=('camera-1', 'model-4') (camera_id=1, model_id=4)
+2026-11-26 08:23:54 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\806601d5_PLATE_B_CAMERA_1_MODEL_REST_15_11_2026.pt' device='cpu'
+2026-11-26 08:23:55 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 08:23:55 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 08:23:55 [INFO] legion.module_3.handle_option_models: Loaded 1 geometric tasks (active: 1, disabled: 0) for key_model=('camera-1', 'model-5') (camera_id=1, model_id=5)
+2026-11-26 08:23:55 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\806601d5_PLATE_B_CAMERA_1_MODEL_REST_15_11_2026.pt' device='cpu'
+2026-11-26 08:23:55 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 08:23:55 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 08:23:55 [INFO] legion.module_3.main_core: [built-in-camera-1] Khởi tạo giao diện theo mode_key kích lần cuối: 'Auto 1'
+2026-11-26 08:23:55 [INFO] legion.module_3.main_thread: Camera 1 initialization completed
+2026-11-26 08:23:55 [INFO] legion.module_3.main_thread: Setting up camera: 2 (ID: 2)
+2026-11-26 08:23:55 [INFO] legion.module_3.main_core: Get models for camera: 2
+2026-11-26 08:23:55 [INFO] legion.module_3.main_thread: Found 4 models for camera 2
+2026-11-26 08:23:55 [INFO] legion.module_3.handle_option_models: Loaded 1 geometric tasks (active: 1, disabled: 0) for key_model=('camera-2', 'model-1') (camera_id=2, model_id=1)
+2026-11-26 08:23:55 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\e5c699b6_PLATE_B_CAMERA_2_MODEL_1_10_11_2026.pt' device='cpu'
+2026-11-26 08:23:55 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 08:23:55 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 08:23:56 [INFO] legion.module_3.handle_option_models: Loaded 0 geometric tasks (active: 0, disabled: 0) for key_model=('camera-2', 'model-2') (camera_id=2, model_id=2)
+2026-11-26 08:23:56 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\e437da0e_PLATE_B_CAMERA_2_MODEL_2_10_11_2026.pt' device='cpu'
+2026-11-26 08:23:56 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 08:23:56 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 08:23:56 [INFO] legion.module_3.handle_option_models: Loaded 1 geometric tasks (active: 1, disabled: 0) for key_model=('camera-2', 'model-3') (camera_id=2, model_id=3)
+2026-11-26 08:23:56 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\0db96821_PLATE_B_CAMERA_2_MODEL_3_10_11_2026.pt' device='cpu'
+2026-11-26 08:23:56 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 08:23:56 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 08:23:56 [INFO] legion.module_3.handle_option_models: Loaded 1 geometric tasks (active: 1, disabled: 0) for key_model=('camera-2', 'model-4') (camera_id=2, model_id=4)
+2026-11-26 08:23:56 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\04e28068_PLATE_B_CAMERA_2_MODEL_4_10_11_2026.pt' device='cpu'
+2026-11-26 08:23:56 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 08:23:56 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 08:23:56 [INFO] legion.module_3.main_thread: Camera 2 initialization completed
+2026-11-26 08:23:56 [INFO] legion.module_3.main_thread: Setting up camera: 3 (ID: 3)
+2026-11-26 08:23:56 [INFO] legion.module_3.main_core: Get models for camera: 3
+2026-11-26 08:23:56 [INFO] legion.module_3.main_thread: Found 1 models for camera 3
+2026-11-26 08:23:57 [INFO] legion.module_3.handle_option_models: Loaded 0 geometric tasks (active: 0, disabled: 0) for key_model=('camera-3', 'model-1') (camera_id=3, model_id=1)
+2026-11-26 08:23:57 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\773dd82e_PLATE_B_CAMERA_3_MODEL_ALL_11_11_2026.pt' device='cpu'
+2026-11-26 08:23:57 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 08:23:57 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 08:23:57 [INFO] legion.module_3.main_thread: Camera 3 initialization completed
+2026-11-26 08:23:57 [INFO] legion.module_3.main_core: [built-in-camera-1] Auto-restoring mode from last kick: 'Auto 1' (saved at 2026-11-25 07:52:42, item: 50-E22AA-A, fallback was 'Auto 1')
+2026-11-26 08:23:57 [INFO] legion.module_3.main_core: [built-in-camera-2] Sử dụng mode mặc định ban đầu: 'Auto 1'
+2026-11-26 08:23:57 [INFO] legion.module_3.main_core: [built-in-camera-3] Sử dụng mode mặc định ban đầu: 'Auto 1'
+2026-11-26 08:23:57 [INFO] legion.module_3.main_core: [PLCHandler] Trigger cache updated (target_camera=ALL, count=3)
+2026-11-26 08:23:57 [INFO] legion.module_3.main_core: [PLCHandler] Updated dict_signal_complete (target_camera=ALL)
+2026-11-26 08:23:57 [ERROR] legion.module_3.main_core: [set_index_user] UserSet1 from Mode: Auto 1 in camera-1 failed
+Traceback (most recent call last):
+  File "C:\project_vision\intenal\module_3\main_core.py", line 1629, in set_index_user
+    device.stop_grabbing_array_class()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Layer_Initial_Device_Manual' object has no attribute 'stop_grabbing_array_class'. Did you mean: 'stop_grabbing_public_class'?
+2026-11-26 08:23:57 [WARNING] legion.module_3.main_core: [PLCHandler] WARN — Lỗi Camera: Không thể set user selector: camera=camera-1 mode=Auto 1
+2026-11-26 08:23:57 [INFO] legion.module_3.main_core: [built-in-camera-1] Tải thành công mode 'Auto 1': 5 shots, mapping={'1': '1', '2': '2', '3': '3', '4': '4', '5': '5'}
+2026-11-26 08:23:57 [DEBUG] legion.module_3.main_core: [built-in-camera-1] Đã cập nhật bảng thông số tín hiệu cho mode 'Auto 1'
+2026-11-26 08:23:57 [INFO] legion.module_3.main_core: [PLCHandler] Trigger cache updated (target_camera=built-in-camera-1, count=3)
+2026-11-26 08:23:57 [INFO] legion.module_3.main_core: [PLCHandler] Updated dict_signal_complete (target_camera=built-in-camera-1)
+2026-11-26 08:24:00 [INFO] legion.module_3.main_core: [PLCWorkerModeAuto1] Running in thread: Dummy-2
+2026-11-26 08:24:58 [INFO] legion.module_3.config_version_manager: Lưu Snapshot thành công #53 (Category: AUTO_LOGGING, User: __ADMIN__, Diff count: 1)
+2026-11-26 08:25:20 [INFO] legion.module_3.handle_option_models: Loaded 2 geometric tasks (active: 2, disabled: 0) for key_model=('camera-1', 'model-2') (camera_id=1, model_id=2)
+2026-11-26 08:26:00 [INFO] legion.module_3.task_calculator_db: Saved ROI Zone Task id=17 (1 zones) for camera_id=1, model_id=2 (Model-Specific Scope)
+2026-11-26 08:26:02 [INFO] legion.module_3.handle_option_models: Loaded 3 geometric tasks (active: 3, disabled: 0) for key_model=('camera-1', 'model-2') (camera_id=1, model_id=2)
+2026-11-26 08:26:47 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 08:30:57 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 08:35:22 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 08:39:47 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 08:43:29 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 08:48:22 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 08:53:04 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 08:56:40 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 09:00:03 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 09:04:20 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 09:08:10 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 09:12:40 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 09:14:26 [INFO] legion.module_3.task_calculator_db: Saved ROI Zone Task id=17 (1 zones) for camera_id=1, model_id=2 (Model-Specific Scope)
+2026-11-26 09:14:27 [INFO] legion.module_3.handle_option_models: Loaded 3 geometric tasks (active: 3, disabled: 0) for key_model=('camera-1', 'model-2') (camera_id=1, model_id=2)
+2026-11-26 09:14:53 [INFO] legion.module_3.handle_option_models: Loaded 3 geometric tasks (active: 3, disabled: 0) for key_model=('camera-1', 'model-2') (camera_id=1, model_id=2)
+2026-11-26 09:16:25 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 09:19:25 [INFO] legion.module_2.hardware_key_guard: HardwareKeyGuard đã dừng.
+2026-11-26 09:19:26 [INFO] legion.module_2.main_core: Stopping CoreWorker...
+2026-11-26 09:19:26 [INFO] legion.module_2.main_core: No instance of pyuic6_instance found to close
+2026-11-26 09:19:26 [INFO] legion.module_2.main_core: Success to stop monitoring
+2026-11-26 09:32:44 [INFO] legion.module_2.startup_splash: [SplashProgress 5%] Đang khởi tạo hệ thống kiểm tra... | Đăng ký khóa đơn phiên bản (Single Instance)...
+2026-11-26 09:32:44 [INFO] legion.module_2.single_instance: [SingleInstance] Đã khởi động SingleInstance Server lắng nghe tại: VisionProInspector_SingleInstance_Pipe_v2
+2026-11-26 09:32:44 [INFO] legion.module_2.startup_splash: [SplashProgress 10%] Đang nạp cửa sổ nhật ký ứng dụng... | Khởi tạo hệ thống logging...
+2026-11-26 09:32:44 [INFO] legion.module_2.startup_splash: [SplashProgress 15%] Đang kết nối cơ sở dữ liệu MySQL... | Hệ thống đang tự động phục hồi dịch vụ dữ liệu...
+2026-11-26 09:32:44 [INFO] legion.module_2.main_core: [core.__init__] START
+2026-11-26 09:32:44 [INFO] legion.module_2.main_core: [core.__init__] Creating CoreWorker...
+2026-11-26 09:32:44 [INFO] legion.module_2.main_core: [core.__init__] CoreWorker created. Connecting to MySQL...
+2026-11-26 09:32:44 [INFO] legion.module_2.startup_splash: [SplashProgress 15%] Đang kết nối cơ sở dữ liệu MySQL... | Đang tự động phục hồi dịch vụ dữ liệu...
+2026-11-26 09:32:44 [INFO] legion.module_2.main_core: [connect_to_mysql] Calling connect_mysql_from_log...
+2026-11-26 09:32:44 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Reading config from C:\Users\VDM\AppData\Local\MBC_Vision_Inspector\mysql_config.log
+2026-11-26 09:32:44 [INFO] legion.module_2.startup_splash: [SplashProgress 15%] Đang chờ dịch vụ MySQL Server sẵn sàng... (1/40) | Hệ thống đang tự động phục hồi kết nối dữ liệu sau khi bật nguồn...
+2026-11-26 09:32:45 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Success to connect mysql on attempt 1 (host=127.0.0.1, ssl_disabled=True)
+2026-11-26 09:32:45 [INFO] legion.module_2.startup_splash: [SplashProgress 45%] Kết nối cơ sở dữ liệu MySQL thành công! | Dịch vụ MySQL Server đã sẵn sàng hoạt động.
+2026-11-26 09:32:45 [INFO] legion.module_2.main_core: [connect_to_mysql] connect_mysql_from_log returned: <mysql.connector.connection.MySQLConnection object at 0x000002799A9B26C0>
+2026-11-26 09:32:45 [INFO] legion.module_2.main_core: [connect_to_mysql] Creating default table...
+2026-11-26 09:32:45 [INFO] legion.module_2.main_core: [connect_to_mysql] Kết nối MySQL thành công (Chế độ Manual theo thiết lập người dùng)
+2026-11-26 09:32:45 [INFO] legion.module_2.main_core: [core.__init__] connect_to_mysql done. connect_result=<mysql.connector.connection.MySQLConnection object at 0x000002799A9B26C0>
+2026-11-26 09:32:45 [INFO] legion.module_2.main_core: Success to initialize connections
+2026-11-26 09:32:45 [INFO] legion.module_2.startup_splash: [SplashProgress 50%] Đang nạp cấu hình giao tiếp PLC... | Kiểm tra thông số Keyence Ethernet...
+2026-11-26 09:32:45 [INFO] legion.module_2.main_core: [core.__init__] init_plc_data...
+2026-11-26 09:32:45 [INFO] legion.module_2.main_core: PLC Simulation via Log Mode ACTIVE [indirect_from_log=True] for KEYENCE (192.168.42.37:8501)
+2026-11-26 09:32:45 [INFO] legion.module_2.main_core: [core.__init__] Connecting trigger signal...
+2026-11-26 09:32:45 [INFO] legion.module_2.startup_splash: [SplashProgress 60%] Đang nạp danh mục sản phẩm và Item Code... | Đồng bộ danh sách sản phẩm...
+2026-11-26 09:32:45 [INFO] legion.module_2.main_core: [core.__init__] collect_dict_item...
+2026-11-26 09:32:45 [WARNING] legion.module_2.main_core: Mode Manual Login or No Connection
+2026-11-26 09:32:45 [INFO] legion.module_2.startup_splash: [SplashProgress 70%] Đang cấu hình kịch bản tự động hóa... | Nạp System Action Configs...
+2026-11-26 09:32:45 [INFO] legion.module_2.main_core: [core.__init__] reload_system_action_configs...
+2026-11-26 09:32:45 [INFO] legion.module_2.main_core: System action configs reloaded successfully: ['RESTART', 'CLOSE']
+2026-11-26 09:32:45 [INFO] legion.module_2.main_core: [core.__init__] DONE
+2026-11-26 09:32:45 [INFO] legion.module_2.startup_splash: [SplashProgress 75%] Đang xác thực bản quyền phần mềm... | Kiểm tra USB Hardware Key...
+2026-11-26 09:32:45 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 09:32:45 [INFO] legion.module_2.startup_splash: [SplashProgress 82%] Đang khởi động giám sát tín hiệu nền... | Kích hoạt luồng CoreWorker & Watchdog...
+2026-11-26 09:32:45 [INFO] legion.module_2.main_core: Success to start monitoring
+2026-11-26 09:32:45 [INFO] legion.module_2.main_core: [CoreWorker] Running in thread: Dummy-1
+2026-11-26 09:32:45 [INFO] legion.module_2.startup_splash: [SplashProgress 88%] Đang khởi tạo giao diện điều khiển... | Chuẩn bị màn hình chính...
+2026-11-26 09:32:45 [INFO] legion.module_2.hardware_key_guard: HardwareKeyGuard đã khởi động. Tần số quét định kỳ: 180 - 300 giây (3-5 phút).
+2026-11-26 09:32:45 [INFO] legion.module_2.run: HardwareKeyGuard đã được khởi động.
+2026-11-26 09:32:45 [INFO] legion.module_2.startup_splash: [SplashProgress 95%] Đang nạp cấu hình hiển thị và mô hình AI... | Khởi tạo thiết bị đồ họa và Workspace...
+2026-11-26 09:32:45 [INFO] legion.module_2.startup_splash: [SplashProgress 100%] Khởi tạo hệ thống thành công! | Đang mở giao diện chính...
+2026-11-26 09:34:33 [INFO] legion.module_2.main_core: Success to write data save default: 50-E22AA-A, tbnq_plate_b
+2026-11-26 09:34:33 [INFO] legion.module_3.main_thread: Khởi động Legion Vision App - ItemCode: 50-E22AA-A
+2026-11-26 09:34:33 [INFO] legion.module_3.main_core: Select database: tbnq_plate_b
+2026-11-26 09:34:33 [INFO] legion.module_3.main_core: Get item code id: 50-E22AA-A
+2026-11-26 09:34:33 [INFO] legion.module_3.main_core: Get camera records for item code: 1
+2026-11-26 09:34:33 [INFO] legion.module_3.main_thread: Found 3 cameras for item code: 50-E22AA-A
+2026-11-26 09:34:33 [INFO] legion.module_3.main_core: Get models for camera: 1
+2026-11-26 09:34:33 [INFO] legion.module_3.main_core: Get models for camera: 2
+2026-11-26 09:34:33 [INFO] legion.module_3.main_core: Get models for camera: 3
+2026-11-26 09:34:33 [INFO] legion.module_3.main_thread: Setting up camera: 1 (ID: 1)
+2026-11-26 09:34:33 [INFO] legion.module_3.main_core: Get models for camera: 1
+2026-11-26 09:34:33 [INFO] legion.module_3.main_thread: Found 5 models for camera 1
+2026-11-26 09:34:33 [INFO] legion.module_3.handle_option_models: Loaded 3 geometric tasks (active: 1, disabled: 2) for key_model=('camera-1', 'model-1') (camera_id=1, model_id=1)
+2026-11-26 09:34:33 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\0f726c93_PLATE_B_CAMERA_1_MODEL_1_11_11_2026.pt' device='cuda:0-NVIDIA GeForce RTX 3080'
+2026-11-26 09:34:35 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 09:34:35 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 09:34:35 [INFO] legion.module_3.handle_option_models: Loaded 3 geometric tasks (active: 3, disabled: 0) for key_model=('camera-1', 'model-2') (camera_id=1, model_id=2)
+2026-11-26 09:34:35 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\24ba9f48_my_model_v8s.pt' device='cpu'
+2026-11-26 09:34:35 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 09:34:35 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 09:34:35 [INFO] legion.module_3.handle_option_models: Loaded 1 geometric tasks (active: 1, disabled: 0) for key_model=('camera-1', 'model-3') (camera_id=1, model_id=3)
+2026-11-26 09:34:35 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\806601d5_PLATE_B_CAMERA_1_MODEL_REST_15_11_2026.pt' device='cpu'
+2026-11-26 09:34:35 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 09:34:35 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 09:34:35 [INFO] legion.module_3.handle_option_models: Loaded 1 geometric tasks (active: 1, disabled: 0) for key_model=('camera-1', 'model-4') (camera_id=1, model_id=4)
+2026-11-26 09:34:35 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\806601d5_PLATE_B_CAMERA_1_MODEL_REST_15_11_2026.pt' device='cpu'
+2026-11-26 09:34:35 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 09:34:35 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 09:34:35 [INFO] legion.module_3.handle_option_models: Loaded 1 geometric tasks (active: 1, disabled: 0) for key_model=('camera-1', 'model-5') (camera_id=1, model_id=5)
+2026-11-26 09:34:35 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\806601d5_PLATE_B_CAMERA_1_MODEL_REST_15_11_2026.pt' device='cpu'
+2026-11-26 09:34:35 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 09:34:35 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 09:34:36 [INFO] legion.module_3.main_core: [built-in-camera-1] Khởi tạo giao diện theo mode_key kích lần cuối: 'Auto 1'
+2026-11-26 09:34:36 [INFO] legion.module_3.main_thread: Camera 1 initialization completed
+2026-11-26 09:34:36 [INFO] legion.module_3.main_thread: Setting up camera: 2 (ID: 2)
+2026-11-26 09:34:36 [INFO] legion.module_3.main_core: Get models for camera: 2
+2026-11-26 09:34:36 [INFO] legion.module_3.main_thread: Found 4 models for camera 2
+2026-11-26 09:34:36 [INFO] legion.module_3.handle_option_models: Loaded 1 geometric tasks (active: 1, disabled: 0) for key_model=('camera-2', 'model-1') (camera_id=2, model_id=1)
+2026-11-26 09:34:36 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\e5c699b6_PLATE_B_CAMERA_2_MODEL_1_10_11_2026.pt' device='cpu'
+2026-11-26 09:34:36 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 09:34:36 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 09:34:36 [INFO] legion.module_3.handle_option_models: Loaded 0 geometric tasks (active: 0, disabled: 0) for key_model=('camera-2', 'model-2') (camera_id=2, model_id=2)
+2026-11-26 09:34:36 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\e437da0e_PLATE_B_CAMERA_2_MODEL_2_10_11_2026.pt' device='cpu'
+2026-11-26 09:34:36 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 09:34:36 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 09:34:36 [INFO] legion.module_3.handle_option_models: Loaded 1 geometric tasks (active: 1, disabled: 0) for key_model=('camera-2', 'model-3') (camera_id=2, model_id=3)
+2026-11-26 09:34:36 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\0db96821_PLATE_B_CAMERA_2_MODEL_3_10_11_2026.pt' device='cpu'
+2026-11-26 09:34:36 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 09:34:36 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 09:34:36 [INFO] legion.module_3.handle_option_models: Loaded 1 geometric tasks (active: 1, disabled: 0) for key_model=('camera-2', 'model-4') (camera_id=2, model_id=4)
+2026-11-26 09:34:36 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\04e28068_PLATE_B_CAMERA_2_MODEL_4_10_11_2026.pt' device='cpu'
+2026-11-26 09:34:37 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 09:34:37 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 09:34:37 [INFO] legion.module_3.main_thread: Camera 2 initialization completed
+2026-11-26 09:34:37 [INFO] legion.module_3.main_thread: Setting up camera: 3 (ID: 3)
+2026-11-26 09:34:37 [INFO] legion.module_3.main_core: Get models for camera: 3
+2026-11-26 09:34:37 [INFO] legion.module_3.main_thread: Found 1 models for camera 3
+2026-11-26 09:34:37 [INFO] legion.module_3.handle_option_models: Loaded 0 geometric tasks (active: 0, disabled: 0) for key_model=('camera-3', 'model-1') (camera_id=3, model_id=1)
+2026-11-26 09:34:37 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\773dd82e_PLATE_B_CAMERA_3_MODEL_ALL_11_11_2026.pt' device='cpu'
+2026-11-26 09:34:37 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 09:34:37 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 09:34:38 [INFO] legion.module_3.main_thread: Camera 3 initialization completed
+2026-11-26 09:34:38 [INFO] legion.module_3.main_core: [built-in-camera-1] Auto-restoring mode from last kick: 'Auto 1' (saved at 2026-11-25 07:52:42, item: 50-E22AA-A, fallback was 'Auto 1')
+2026-11-26 09:34:38 [INFO] legion.module_3.main_core: [built-in-camera-2] Sử dụng mode mặc định ban đầu: 'Auto 1'
+2026-11-26 09:34:38 [INFO] legion.module_3.main_core: [built-in-camera-3] Sử dụng mode mặc định ban đầu: 'Auto 1'
+2026-11-26 09:34:38 [INFO] legion.module_3.main_core: [PLCHandler] Trigger cache updated (target_camera=ALL, count=3)
+2026-11-26 09:34:38 [INFO] legion.module_3.main_core: [PLCHandler] Updated dict_signal_complete (target_camera=ALL)
+2026-11-26 09:34:38 [ERROR] legion.module_3.main_core: [set_index_user] UserSet1 from Mode: Auto 1 in camera-1 failed
+Traceback (most recent call last):
+  File "C:\project_vision\intenal\module_3\main_core.py", line 1629, in set_index_user
+    device.stop_grabbing_array_class()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Layer_Initial_Device_Manual' object has no attribute 'stop_grabbing_array_class'. Did you mean: 'stop_grabbing_public_class'?
+2026-11-26 09:34:38 [WARNING] legion.module_3.main_core: [PLCHandler] WARN — Lỗi Camera: Không thể set user selector: camera=camera-1 mode=Auto 1
+2026-11-26 09:34:38 [INFO] legion.module_3.main_core: [built-in-camera-1] Tải thành công mode 'Auto 1': 5 shots, mapping={'1': '1', '2': '2', '3': '3', '4': '4', '5': '5'}
+2026-11-26 09:34:38 [DEBUG] legion.module_3.main_core: [built-in-camera-1] Đã cập nhật bảng thông số tín hiệu cho mode 'Auto 1'
+2026-11-26 09:34:38 [INFO] legion.module_3.main_core: [PLCHandler] Trigger cache updated (target_camera=built-in-camera-1, count=3)
+2026-11-26 09:34:38 [INFO] legion.module_3.main_core: [PLCHandler] Updated dict_signal_complete (target_camera=built-in-camera-1)
+2026-11-26 09:34:43 [INFO] legion.module_3.main_core: [PLCWorkerModeAuto1] Running in thread: Dummy-2
+2026-11-26 09:35:46 [INFO] legion.module_3.task_calculator_db: Saved ROI Zone Task id=17 (1 zones) for camera_id=1, model_id=2 (Model-Specific Scope)
+2026-11-26 09:35:48 [INFO] legion.module_3.handle_option_models: Loaded 3 geometric tasks (active: 3, disabled: 0) for key_model=('camera-1', 'model-2') (camera_id=1, model_id=2)
+2026-11-26 09:36:30 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 09:39:58 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 09:43:43 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 09:48:37 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 09:51:40 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 09:56:24 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 10:00:54 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 10:04:48 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 10:09:18 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 10:14:14 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 10:18:56 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 10:22:37 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 10:27:35 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 10:32:35 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 10:36:26 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 10:39:37 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 10:43:22 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 10:47:24 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 10:51:27 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 10:56:10 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 11:00:26 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 11:03:40 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 11:08:18 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 11:12:48 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 11:17:31 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 11:21:04 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 11:25:40 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 11:30:40 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 11:34:24 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 11:38:23 [INFO] legion.module_3.task_calculator_db: Saved MultiShot Task id=16 (label=mh_klk, cycle=5, min_ng=2) for camera_id=1 (Camera-Wide Scope)
+2026-11-26 11:38:26 [INFO] legion.module_3.handle_option_models: Loaded 3 geometric tasks (active: 1, disabled: 2) for key_model=('camera-1', 'model-1') (camera_id=1, model_id=1)
+2026-11-26 11:38:31 [INFO] legion.module_3.handle_option_models: Loaded 3 geometric tasks (active: 3, disabled: 0) for key_model=('camera-1', 'model-2') (camera_id=1, model_id=2)
+2026-11-26 11:38:52 [INFO] legion.module_3.handle_option_models: Loaded 3 geometric tasks (active: 1, disabled: 2) for key_model=('camera-1', 'model-1') (camera_id=1, model_id=1)
+2026-11-26 11:38:58 [INFO] legion.module_3.task_calculator_db: Deleted Task id=17
+2026-11-26 11:39:02 [INFO] legion.module_3.handle_option_models: Loaded 2 geometric tasks (active: 2, disabled: 0) for key_model=('camera-1', 'model-2') (camera_id=1, model_id=2)
+2026-11-26 11:39:05 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 11:39:11 [INFO] legion.module_3.task_calculator_db: Saved MultiShot Task id=16 (label=mh_klk, cycle=5, min_ng=2) for camera_id=1 (Camera-Wide Scope)
+2026-11-26 11:39:12 [INFO] legion.module_3.handle_option_models: Loaded 1 geometric tasks (active: 1, disabled: 0) for key_model=('camera-1', 'model-4') (camera_id=1, model_id=4)
+2026-11-26 11:39:59 [INFO] legion.module_2.main_core: Stopping CoreWorker...
+2026-11-26 11:39:59 [INFO] legion.module_2.main_core: No instance of pyuic6_instance found to close
+2026-11-26 11:39:59 [INFO] legion.module_2.main_core: Success to stop monitoring
+2026-11-26 11:40:05 [INFO] legion.module_2.startup_splash: [SplashProgress 5%] Đang khởi tạo hệ thống kiểm tra... | Đăng ký khóa đơn phiên bản (Single Instance)...
+2026-11-26 11:40:05 [INFO] legion.module_2.single_instance: [SingleInstance] Đã khởi động SingleInstance Server lắng nghe tại: VisionProInspector_SingleInstance_Pipe_v2
+2026-11-26 11:40:05 [INFO] legion.module_2.startup_splash: [SplashProgress 10%] Đang nạp cửa sổ nhật ký ứng dụng... | Khởi tạo hệ thống logging...
+2026-11-26 11:40:05 [INFO] legion.module_2.startup_splash: [SplashProgress 15%] Đang kết nối cơ sở dữ liệu MySQL... | Hệ thống đang tự động phục hồi dịch vụ dữ liệu...
+2026-11-26 11:40:05 [INFO] legion.module_2.main_core: [core.__init__] START
+2026-11-26 11:40:05 [INFO] legion.module_2.main_core: [core.__init__] Creating CoreWorker...
+2026-11-26 11:40:05 [INFO] legion.module_2.main_core: [core.__init__] CoreWorker created. Connecting to MySQL...
+2026-11-26 11:40:05 [INFO] legion.module_2.startup_splash: [SplashProgress 15%] Đang kết nối cơ sở dữ liệu MySQL... | Đang tự động phục hồi dịch vụ dữ liệu...
+2026-11-26 11:40:05 [INFO] legion.module_2.main_core: [connect_to_mysql] Calling connect_mysql_from_log...
+2026-11-26 11:40:05 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Reading config from C:\Users\VDM\AppData\Local\MBC_Vision_Inspector\mysql_config.log
+2026-11-26 11:40:05 [INFO] legion.module_2.startup_splash: [SplashProgress 15%] Đang chờ dịch vụ MySQL Server sẵn sàng... (1/40) | Hệ thống đang tự động phục hồi kết nối dữ liệu sau khi bật nguồn...
+2026-11-26 11:40:06 [INFO] legion.module_2.main_core: [connect_mysql_from_log] Success to connect mysql on attempt 1 (host=127.0.0.1, ssl_disabled=True)
+2026-11-26 11:40:06 [INFO] legion.module_2.startup_splash: [SplashProgress 45%] Kết nối cơ sở dữ liệu MySQL thành công! | Dịch vụ MySQL Server đã sẵn sàng hoạt động.
+2026-11-26 11:40:06 [INFO] legion.module_2.main_core: [connect_to_mysql] connect_mysql_from_log returned: <mysql.connector.connection.MySQLConnection object at 0x0000014649638A10>
+2026-11-26 11:40:06 [INFO] legion.module_2.main_core: [connect_to_mysql] Creating default table...
+2026-11-26 11:40:06 [INFO] legion.module_2.main_core: [connect_to_mysql] Kết nối MySQL thành công (Chế độ Manual theo thiết lập người dùng)
+2026-11-26 11:40:06 [INFO] legion.module_2.main_core: [core.__init__] connect_to_mysql done. connect_result=<mysql.connector.connection.MySQLConnection object at 0x0000014649638A10>
+2026-11-26 11:40:06 [INFO] legion.module_2.main_core: Success to initialize connections
+2026-11-26 11:40:06 [INFO] legion.module_2.startup_splash: [SplashProgress 50%] Đang nạp cấu hình giao tiếp PLC... | Kiểm tra thông số Keyence Ethernet...
+2026-11-26 11:40:06 [INFO] legion.module_2.main_core: [core.__init__] init_plc_data...
+2026-11-26 11:40:06 [INFO] legion.module_2.main_core: PLC Simulation via Log Mode ACTIVE [indirect_from_log=True] for KEYENCE (192.168.42.37:8501)
+2026-11-26 11:40:06 [INFO] legion.module_2.main_core: [core.__init__] Connecting trigger signal...
+2026-11-26 11:40:06 [INFO] legion.module_2.startup_splash: [SplashProgress 60%] Đang nạp danh mục sản phẩm và Item Code... | Đồng bộ danh sách sản phẩm...
+2026-11-26 11:40:06 [INFO] legion.module_2.main_core: [core.__init__] collect_dict_item...
+2026-11-26 11:40:06 [WARNING] legion.module_2.main_core: Mode Manual Login or No Connection
+2026-11-26 11:40:06 [INFO] legion.module_2.startup_splash: [SplashProgress 70%] Đang cấu hình kịch bản tự động hóa... | Nạp System Action Configs...
+2026-11-26 11:40:06 [INFO] legion.module_2.main_core: [core.__init__] reload_system_action_configs...
+2026-11-26 11:40:06 [INFO] legion.module_2.main_core: System action configs reloaded successfully: ['RESTART', 'CLOSE']
+2026-11-26 11:40:06 [INFO] legion.module_2.main_core: [core.__init__] DONE
+2026-11-26 11:40:06 [INFO] legion.module_2.startup_splash: [SplashProgress 75%] Đang xác thực bản quyền phần mềm... | Kiểm tra USB Hardware Key...
+2026-11-26 11:40:06 [DEBUG] legion.module_2.main_core: Success to check hardware key: USB Composite Device (USB\VID_0B05&PID_18F3\9876543210)
+2026-11-26 11:40:06 [INFO] legion.module_2.startup_splash: [SplashProgress 82%] Đang khởi động giám sát tín hiệu nền... | Kích hoạt luồng CoreWorker & Watchdog...
+2026-11-26 11:40:06 [INFO] legion.module_2.main_core: Success to start monitoring
+2026-11-26 11:40:06 [INFO] legion.module_2.main_core: [CoreWorker] Running in thread: Dummy-1
+2026-11-26 11:40:06 [INFO] legion.module_2.startup_splash: [SplashProgress 88%] Đang khởi tạo giao diện điều khiển... | Chuẩn bị màn hình chính...
+2026-11-26 11:40:06 [INFO] legion.module_2.hardware_key_guard: HardwareKeyGuard đã khởi động. Tần số quét định kỳ: 180 - 300 giây (3-5 phút).
+2026-11-26 11:40:06 [INFO] legion.module_2.run: HardwareKeyGuard đã được khởi động.
+2026-11-26 11:40:06 [INFO] legion.module_2.startup_splash: [SplashProgress 95%] Đang nạp cấu hình hiển thị và mô hình AI... | Khởi tạo thiết bị đồ họa và Workspace...
+2026-11-26 11:40:06 [INFO] legion.module_2.startup_splash: [SplashProgress 100%] Khởi tạo hệ thống thành công! | Đang mở giao diện chính...
+2026-11-26 11:40:10 [INFO] legion.module_2.main_core: Success to write data save default: 50-E22AA-A, tbnq_plate_b
+2026-11-26 11:40:10 [INFO] legion.module_3.main_thread: Khởi động Legion Vision App - ItemCode: 50-E22AA-A
+2026-11-26 11:40:10 [INFO] legion.module_3.main_core: Select database: tbnq_plate_b
+2026-11-26 11:40:10 [INFO] legion.module_3.main_core: Get item code id: 50-E22AA-A
+2026-11-26 11:40:10 [INFO] legion.module_3.main_core: Get camera records for item code: 1
+2026-11-26 11:40:10 [INFO] legion.module_3.main_thread: Found 3 cameras for item code: 50-E22AA-A
+2026-11-26 11:40:10 [INFO] legion.module_3.main_core: Get models for camera: 1
+2026-11-26 11:40:10 [INFO] legion.module_3.main_core: Get models for camera: 2
+2026-11-26 11:40:10 [INFO] legion.module_3.main_core: Get models for camera: 3
+2026-11-26 11:40:10 [INFO] legion.module_3.main_thread: Setting up camera: 1 (ID: 1)
+2026-11-26 11:40:10 [INFO] legion.module_3.main_core: Get models for camera: 1
+2026-11-26 11:40:10 [INFO] legion.module_3.main_thread: Found 5 models for camera 1
+2026-11-26 11:40:10 [INFO] legion.module_3.handle_option_models: Loaded 3 geometric tasks (active: 1, disabled: 2) for key_model=('camera-1', 'model-1') (camera_id=1, model_id=1)
+2026-11-26 11:40:10 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\0f726c93_PLATE_B_CAMERA_1_MODEL_1_11_11_2026.pt' device='cuda:0-NVIDIA GeForce RTX 3080'
+2026-11-26 11:40:11 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 11:40:11 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 11:40:11 [INFO] legion.module_3.handle_option_models: Loaded 2 geometric tasks (active: 2, disabled: 0) for key_model=('camera-1', 'model-2') (camera_id=1, model_id=2)
+2026-11-26 11:40:11 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\24ba9f48_my_model_v8s.pt' device='cpu'
+2026-11-26 11:40:11 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 11:40:11 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 11:40:11 [INFO] legion.module_3.handle_option_models: Loaded 1 geometric tasks (active: 1, disabled: 0) for key_model=('camera-1', 'model-3') (camera_id=1, model_id=3)
+2026-11-26 11:40:11 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\806601d5_PLATE_B_CAMERA_1_MODEL_REST_15_11_2026.pt' device='cpu'
+2026-11-26 11:40:11 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 11:40:11 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 11:40:11 [INFO] legion.module_3.handle_option_models: Loaded 1 geometric tasks (active: 1, disabled: 0) for key_model=('camera-1', 'model-4') (camera_id=1, model_id=4)
+2026-11-26 11:40:11 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\806601d5_PLATE_B_CAMERA_1_MODEL_REST_15_11_2026.pt' device='cpu'
+2026-11-26 11:40:12 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 11:40:12 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 11:40:12 [INFO] legion.module_3.handle_option_models: Loaded 1 geometric tasks (active: 1, disabled: 0) for key_model=('camera-1', 'model-5') (camera_id=1, model_id=5)
+2026-11-26 11:40:12 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\806601d5_PLATE_B_CAMERA_1_MODEL_REST_15_11_2026.pt' device='cpu'
+2026-11-26 11:40:12 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 11:40:12 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 11:40:12 [INFO] legion.module_3.main_core: [built-in-camera-1] Khởi tạo giao diện theo mode_key kích lần cuối: 'Auto 1'
+2026-11-26 11:40:12 [INFO] legion.module_3.main_thread: Camera 1 initialization completed
+2026-11-26 11:40:12 [INFO] legion.module_3.main_thread: Setting up camera: 2 (ID: 2)
+2026-11-26 11:40:12 [INFO] legion.module_3.main_core: Get models for camera: 2
+2026-11-26 11:40:12 [INFO] legion.module_3.main_thread: Found 4 models for camera 2
+2026-11-26 11:40:12 [INFO] legion.module_3.handle_option_models: Loaded 1 geometric tasks (active: 1, disabled: 0) for key_model=('camera-2', 'model-1') (camera_id=2, model_id=1)
+2026-11-26 11:40:12 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\e5c699b6_PLATE_B_CAMERA_2_MODEL_1_10_11_2026.pt' device='cpu'
+2026-11-26 11:40:12 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 11:40:12 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 11:40:12 [INFO] legion.module_3.handle_option_models: Loaded 0 geometric tasks (active: 0, disabled: 0) for key_model=('camera-2', 'model-2') (camera_id=2, model_id=2)
+2026-11-26 11:40:12 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\e437da0e_PLATE_B_CAMERA_2_MODEL_2_10_11_2026.pt' device='cpu'
+2026-11-26 11:40:12 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 11:40:12 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 11:40:13 [INFO] legion.module_3.handle_option_models: Loaded 1 geometric tasks (active: 1, disabled: 0) for key_model=('camera-2', 'model-3') (camera_id=2, model_id=3)
+2026-11-26 11:40:13 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\0db96821_PLATE_B_CAMERA_2_MODEL_3_10_11_2026.pt' device='cpu'
+2026-11-26 11:40:13 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 11:40:13 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 11:40:13 [INFO] legion.module_3.handle_option_models: Loaded 1 geometric tasks (active: 1, disabled: 0) for key_model=('camera-2', 'model-4') (camera_id=2, model_id=4)
+2026-11-26 11:40:13 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\04e28068_PLATE_B_CAMERA_2_MODEL_4_10_11_2026.pt' device='cpu'
+2026-11-26 11:40:13 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 11:40:13 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 11:40:13 [INFO] legion.module_3.main_thread: Camera 2 initialization completed
+2026-11-26 11:40:13 [INFO] legion.module_3.main_thread: Setting up camera: 3 (ID: 3)
+2026-11-26 11:40:13 [INFO] legion.module_3.main_core: Get models for camera: 3
+2026-11-26 11:40:13 [INFO] legion.module_3.main_thread: Found 1 models for camera 3
+2026-11-26 11:40:13 [INFO] legion.module_3.handle_option_models: Loaded 0 geometric tasks (active: 0, disabled: 0) for key_model=('camera-3', 'model-1') (camera_id=3, model_id=1)
+2026-11-26 11:40:13 [INFO] legion.module_3.yolo_factory: YoloFactory.load_model source='Yolo V8' task='Normal Box' runtime='PyTorch' weight='c:\\project_vision\\intenal\\workspace_weights\\773dd82e_PLATE_B_CAMERA_3_MODEL_ALL_11_11_2026.pt' device='cpu'
+2026-11-26 11:40:13 [INFO] legion.module_3.yolo_factory: Load model Yolo V8 (Normal Box / PyTorch) successfully from weight_path
+2026-11-26 11:40:13 [INFO] legion.module_3.handle_option_models: Save parameter before load weight successfully
+2026-11-26 11:40:14 [INFO] legion.module_3.main_thread: Camera 3 initialization completed
+2026-11-26 11:40:14 [INFO] legion.module_3.main_core: [built-in-camera-1] Auto-restoring mode from last kick: 'Auto 1' (saved at 2026-11-25 07:52:42, item: 50-E22AA-A, fallback was 'Auto 1')
+2026-11-26 11:40:14 [INFO] legion.module_3.main_core: [built-in-camera-2] Sử dụng mode mặc định ban đầu: 'Auto 1'
+2026-11-26 11:40:14 [INFO] legion.module_3.main_core: [built-in-camera-3] Sử dụng mode mặc định ban đầu: 'Auto 1'
+2026-11-26 11:40:14 [INFO] legion.module_3.main_core: [PLCHandler] Trigger cache updated (target_camera=ALL, count=3)
+2026-11-26 11:40:14 [INFO] legion.module_3.main_core: [PLCHandler] Updated dict_signal_complete (target_camera=ALL)
+2026-11-26 11:40:14 [ERROR] legion.module_3.main_core: [set_index_user] UserSet1 from Mode: Auto 1 in camera-1 failed
+Traceback (most recent call last):
+  File "C:\project_vision\intenal\module_3\main_core.py", line 1629, in set_index_user
+    device.stop_grabbing_array_class()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Layer_Initial_Device_Manual' object has no attribute 'stop_grabbing_array_class'. Did you mean: 'stop_grabbing_public_class'?
+2026-11-26 11:40:14 [WARNING] legion.module_3.main_core: [PLCHandler] WARN — Lỗi Camera: Không thể set user selector: camera=camera-1 mode=Auto 1
+2026-11-26 11:40:14 [INFO] legion.module_3.main_core: [built-in-camera-1] Tải thành công mode 'Auto 1': 5 shots, mapping={'1': '1', '2': '2', '3': '3', '4': '4', '5': '5'}
+2026-11-26 11:40:14 [DEBUG] legion.module_3.main_core: [built-in-camera-1] Đã cập nhật bảng thông số tín hiệu cho mode 'Auto 1'
+2026-11-26 11:40:14 [INFO] legion.module_3.main_core: [PLCHandler] Trigger cache updated (target_camera=built-in-camera-1, count=3)
+2026-11-26 11:40:14 [INFO] legion.module_3.main_core: [PLCHandler] Updated dict_signal_complete (target_camera=built-in-camera-1)
+2026-11-26 11:40:16 [INFO] legion.module_3.main_core: [PLCWorkerModeAuto1] Running in thread: Dummy-2
+2026-11-26 11:40:46 [INFO] legion.module_3.handle_option_models: Loaded 3 geometric tasks (active: 1, disabled: 2) for key_model=('camera-1', 'model-1') (camera_id=1, model_id=1)
+2026-11-26 11:40:50 [INFO] legion.module_2.hardware_key_guard: HardwareKeyGuard đã dừng.
+2026-11-26 11:40:51 [INFO] legion.module_2.main_core: Stopping CoreWorker...
+2026-11-26 11:40:51 [INFO] legion.module_2.main_core: No instance of pyuic6_instance found to close
+2026-11-26 11:40:51 [INFO] legion.module_2.main_core: Success to stop monitoring

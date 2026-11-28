@@ -142,12 +142,22 @@ class MultiShotAggregationDialog(QtWidgets.QDialog):
         layout_rule = QtWidgets.QFormLayout(grp_rule)
         layout_rule.setSpacing(8)
 
-        # Số shot trong chu kỳ
+        # Số shot trong chu kỳ (Được khóa - Tự động đồng bộ từ SHOTXMODEL trong CSDL)
         self.spin_cycle_shots = QtWidgets.QSpinBox()
         self.spin_cycle_shots.setRange(1, 100)
         self.spin_cycle_shots.setValue(5)
+        self.spin_cycle_shots.setEnabled(False)
+        self.spin_cycle_shots.setToolTip("Số ảnh trong 1 chu kỳ được lấy tự động từ bảng SHOTXMODEL trong CSDL (Khóa cố định, không chỉnh sửa thủ công).")
+        self.spin_cycle_shots.setStyleSheet("""
+            QSpinBox:disabled {
+                background-color: #f1f5f9;
+                color: #334155;
+                font-weight: bold;
+                border: 1px solid #cbd5e1;
+            }
+        """)
         self.spin_cycle_shots.valueChanged.connect(self._on_cycle_shots_changed)
-        layout_rule.addRow("Số ảnh trong 1 chu kỳ:", self.spin_cycle_shots)
+        layout_rule.addRow("Số ảnh trong 1 chu kỳ (SHOTXMODEL):", self.spin_cycle_shots)
 
         # Chế độ phán định
         self.combo_agg_mode = QtWidgets.QComboBox()
@@ -161,7 +171,7 @@ class MultiShotAggregationDialog(QtWidgets.QDialog):
 
         # Sub-widget: Min NG Shots
         self.spin_min_ng_shots = QtWidgets.QSpinBox()
-        self.spin_min_ng_shots.setRange(1, 5)
+        self.spin_min_ng_shots.setRange(1, max(1, self.spin_cycle_shots.value()))
         self.spin_min_ng_shots.setValue(2)
         layout_rule.addRow("Ngưỡng số ảnh NG tối thiểu:", self.spin_min_ng_shots)
 
@@ -309,8 +319,12 @@ class MultiShotAggregationDialog(QtWidgets.QDialog):
             else:
                 self.combo_target_label.setEditText(target_lbl)
 
-        cycle_shots = int(self.rule_data.get('cycle_shots', 5))
+        # Lấy số shot chu kỳ tự động từ bảng SHOTXMODEL trong CSDL
+        from module_3.task_calculator_db import get_cycle_shots_from_shotxmodel
+        cycle_shots_db = get_cycle_shots_from_shotxmodel(self.cursor, self.camera_id) if self.cursor else 0
+        cycle_shots = cycle_shots_db if cycle_shots_db > 0 else int(self.rule_data.get('cycle_shots', 5) or 5)
         self.spin_cycle_shots.setValue(cycle_shots)
+        self.spin_min_ng_shots.setMaximum(cycle_shots)
 
         agg_mode = self.rule_data.get('aggregation_mode', 'THRESHOLD_COUNT')
         if agg_mode == 'SPECIFIC_SHOTS':

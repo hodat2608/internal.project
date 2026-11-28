@@ -23,7 +23,7 @@ import cv2
 import numpy as np
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtCore import Qt, QRectF, QPointF, QRect, QPoint
-from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QFont, QImage, QPixmap, QCursor
+from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QFont, QImage, QPixmap, QCursor, QPainterPath
 
 from app_logger.app_logger import get_logger
 from module_3.task_calculator_db import (
@@ -124,7 +124,10 @@ class MultiZoneCanvasWidget(QtWidgets.QWidget):
                         max(0.0, min(1.0, float(rect[3])))
                     ],
                     'target_label': str(z.get('target_label') or 'ALL'),
-                    'min_count': int(z.get('min_count', 1))
+                    'min_count': int(z.get('min_count', 1)),
+                    'follow_label_enabled': bool(z.get('follow_label_enabled', False)),
+                    'anchor_label': str(z.get('anchor_label') or ''),
+                    'follow_mode': str(z.get('follow_mode') or 'CENTER')
                 })
         self.selected_idx = 0 if self.zones else -1
         self.update()
@@ -135,7 +138,7 @@ class MultiZoneCanvasWidget(QtWidgets.QWidget):
         """Lấy danh sách các vùng ROI đã chuẩn hóa."""
         return self.zones
 
-    def add_new_zone(self, zone_type='INSPECTION', target_label='ALL', rect=None):
+    def add_new_zone(self, zone_type='INSPECTION', target_label='ALL', rect=None, follow_label_enabled=False, anchor_label='', follow_mode='CENTER'):
         """Thêm thủ công một vùng ROI mới."""
         if rect is None:
             rect = [0.15, 0.15, 0.55, 0.55]
@@ -145,7 +148,10 @@ class MultiZoneCanvasWidget(QtWidgets.QWidget):
             'zone_type': zone_type,
             'rect': rect,
             'target_label': target_label,
-            'min_count': 1 if zone_type == 'PRESENCE' else 0
+            'min_count': 1 if zone_type == 'PRESENCE' else 0,
+            'follow_label_enabled': follow_label_enabled,
+            'anchor_label': anchor_label,
+            'follow_mode': follow_mode
         }
         self.zones.append(new_z)
         self.selected_idx = len(self.zones) - 1
@@ -267,24 +273,62 @@ class MultiZoneCanvasWidget(QtWidgets.QWidget):
         painter.setBrush(Qt.NoBrush)
         painter.drawRect(draw_rect)
 
+        # =========================================================================
+        # HIỆU ỨNG LÀM ĐEN MỜ / HIGHLIGHT VÙNG ROI (DIMMING & HIGHLIGHT EFFECT)
+        # =========================================================================
+        # 1. Với các vùng INSPECTION & PRESENCE (Khu vực bắt lỗi / kiểm tra linh kiện):
+        #    -> Vùng NGOÀI các ROI này sẽ bị làm đen mờ (dimmed) để làm nổi bật (highlight) khu vực kiểm tra.
+        clear_rects = []
+        for z in self.zones:
+            z_type = z.get('zone_type', 'INSPECTION')
+            if z_type in ('INSPECTION', 'PRESENCE'):
+                clear_rects.append(self._norm_to_px(z['rect'], draw_rect))
+
+        # Nếu đang kéo chuột vẽ vùng mới (Drafting) và chưa phải EXCLUSION:
+        if self._interaction_mode == 'CREATING' and self._drag_start_pos and self._drag_current_pos:
+            x1 = min(self._drag_start_pos.x(), self._drag_current_pos.x())
+            y1 = min(self._drag_start_pos.y(), self._drag_current_pos.y())
+            w = abs(self._drag_start_pos.x() - self._drag_current_pos.x())
+            h = abs(self._drag_start_pos.y() - self._drag_current_pos.y())
+            clear_rects.append(QRect(x1, y1, w, h))
+
+        if clear_rects:
+            full_path = QPainterPath()
+            full_path.addRect(QRectF(draw_rect))
+            keep_clear_path = QPainterPath()
+            for r in clear_rects:
+                keep_clear_path.addRect(QRectF(r))
+            outside_dim_path = full_path.subtracted(keep_clear_path)
+            # Phủ lớp mờ đen bán trong suốt ngoài vùng kiểm tra (Highlight Spotlight)
+            painter.fillPath(outside_dim_path, QColor(0, 0, 0, 140))
+
+        # 2. Với vùng EXCLUSION (Vùng Che / Bỏ Qua Nhiễu):
+        #    -> Vùng BÊN TRONG ROI EXCLUSION sẽ bị làm đen mờ (che / mask), ngoài vùng giữ ảnh gốc
+        for z in self.zones:
+            if z.get('zone_type') == 'EXCLUSION':
+                ex_box = self._norm_to_px(z['rect'], draw_rect)
+                painter.fillRect(ex_box, QColor(0, 0, 0, 160))
+
         # Vẽ từng vùng ROI
         for idx, z in enumerate(self.zones):
             is_sel = (idx == self.selected_idx)
             z_type = z.get('zone_type', 'INSPECTION')
             q_box = self._norm_to_px(z['rect'], draw_rect)
+            is_follow = bool(z.get('follow_label_enabled', False))
+            anchor_lbl = str(z.get('anchor_label') or '')
 
             # Phối màu theo loại vùng
             if z_type == 'EXCLUSION':
                 border_color = QColor(239, 68, 68)   # Đỏ cam (Mask / Che nhiễu)
-                fill_color = QColor(239, 68, 68, 45)
+                fill_color = QColor(239, 68, 68, 30)
                 type_tag = "MASK (CHE)"
             elif z_type == 'PRESENCE':
                 border_color = QColor(59, 130, 246)  # Xanh dương (Hiện diện)
-                fill_color = QColor(59, 130, 246, 45)
+                fill_color = QColor(59, 130, 246, 30)
                 type_tag = f"HIỆN DIỆN (≥{z.get('min_count', 1)})"
             else:  # INSPECTION
                 border_color = QColor(16, 185, 129)  # Xanh ngọc (Kiểm tra lỗi)
-                fill_color = QColor(16, 185, 129, 45)
+                fill_color = QColor(16, 185, 129, 30)
                 type_tag = "KIỂM TRA"
 
             # Fill
@@ -298,8 +342,9 @@ class MultiZoneCanvasWidget(QtWidgets.QWidget):
             painter.setPen(pen)
             painter.drawRect(q_box)
 
-            # Badge tiêu đề vùng
-            badge_text = f"[{type_tag}] {z.get('name', '')} ({z.get('target_label', 'ALL')})"
+            # Badge tiêu đề vùng (hiển thị kèm icon bám nhãn 🎯 nếu kích hoạt)
+            follow_str = f" 🎯{anchor_lbl}" if is_follow and anchor_lbl else (" 🎯Follow" if is_follow else "")
+            badge_text = f"[{type_tag}{follow_str}] {z.get('name', '')} ({z.get('target_label', 'ALL')})"
             painter.setFont(QFont("Segoe UI", 8, QFont.Bold))
             fm = painter.fontMetrics()
             tw = fm.width(badge_text) + 12
@@ -315,6 +360,16 @@ class MultiZoneCanvasWidget(QtWidgets.QWidget):
 
             painter.setPen(QColor("#ffffff") if not is_sel else QColor("#0f172a"))
             painter.drawText(badge_rect, Qt.AlignCenter, badge_text)
+
+            # Nếu là vùng bám nhãn định vị: Vẽ biểu tượng tâm ngắm (crosshair target) ở tâm ROI
+            if is_follow:
+                mcx = q_box.center().x()
+                mcy = q_box.center().y()
+                painter.setPen(QPen(border_color if not is_sel else QColor(245, 158, 11), 1.5, Qt.DashLine))
+                painter.drawLine(mcx - 10, mcy, mcx + 10, mcy)
+                painter.drawLine(mcx, mcy - 10, mcx, mcy + 10)
+                painter.setBrush(Qt.NoBrush)
+                painter.drawEllipse(QPoint(mcx, mcy), 5, 5)
 
             # Nếu đang chọn: Vẽ 8 resize handles
             if is_sel:
@@ -484,7 +539,10 @@ class MultiZoneCanvasWidget(QtWidgets.QWidget):
                     'zone_type': 'INSPECTION',
                     'rect': [round(rx1, 4), round(ry1, 4), round(rx2, 4), round(ry2, 4)],
                     'target_label': 'ALL',
-                    'min_count': 0
+                    'min_count': 0,
+                    'follow_label_enabled': False,
+                    'anchor_label': '',
+                    'follow_mode': 'CENTER'
                 }
                 self.zones.append(new_zone)
                 self.selected_idx = len(self.zones) - 1
@@ -535,8 +593,8 @@ class RoiZoneEditorDialog(QtWidgets.QDialog):
         self.connection = connection
 
         self.setWindowTitle(f"🖼️ Cấu Hình Khoanh Vùng ROI & Vùng Che - Model {self.model_id}")
-        self.resize(1140, 750)
-        self.setMinimumSize(1020, 680)
+        self.resize(1300, 750)
+        self.setMinimumSize(1300, 750)
 
         self._updating_form = False
         self._init_ui()
@@ -713,8 +771,8 @@ class RoiZoneEditorDialog(QtWidgets.QDialog):
         layout_zd.setSpacing(8)
 
         # Bảng danh sách các vùng
-        self.table_zones = QtWidgets.QTableWidget(0, 4)
-        self.table_zones.setHorizontalHeaderLabels(["Tên Vùng", "Loại Vùng", "Nhãn", "Tọa Độ"])
+        self.table_zones = QtWidgets.QTableWidget(0, 5)
+        self.table_zones.setHorizontalHeaderLabels(["Tên Vùng", "Loại Vùng", "Nhãn Áp Dụng", "Bám Nhãn", "Tọa Độ"])
         self.table_zones.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
         self.table_zones.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.table_zones.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
@@ -748,6 +806,25 @@ class RoiZoneEditorDialog(QtWidgets.QDialog):
         self.spin_min_count.setValue(1)
         self.spin_min_count.valueChanged.connect(self._on_zone_field_changed)
         layout_zd.addRow("Số lượng tối thiểu:", self.spin_min_count)
+
+        # --- TÙY CHỌN: TỌA ĐỘ VÙNG ROI FOLLOW THEO TỌA ĐỘ NHÃN ĐƯỢC CHỌN ---
+        self.chk_follow_label = QtWidgets.QCheckBox("🎯 Bám theo nhãn định vị (ROI Follows Label)")
+        self.chk_follow_label.setStyleSheet("font-weight: 600; color: #0f172a;")
+        self.chk_follow_label.toggled.connect(self._on_follow_label_toggled)
+        layout_zd.addRow("Chế Độ Định Vị:", self.chk_follow_label)
+
+        self.combo_anchor_label = QtWidgets.QComboBox()
+        self.combo_anchor_label.setEditable(True)
+        for lbl in self.available_labels:
+            self.combo_anchor_label.addItem(lbl)
+        self.combo_anchor_label.currentTextChanged.connect(self._on_zone_field_changed)
+        layout_zd.addRow("Nhãn Định Vị (Anchor):", self.combo_anchor_label)
+
+        self.combo_follow_mode = QtWidgets.QComboBox()
+        self.combo_follow_mode.addItem("Tâm nhãn (Giữ kích thước ROI vẽ)", "CENTER")
+        self.combo_follow_mode.addItem("Khớp khung Bounding Box của nhãn", "BBOX")
+        self.combo_follow_mode.currentIndexChanged.connect(self._on_zone_field_changed)
+        layout_zd.addRow("Kiểu Bám Tọa Độ:", self.combo_follow_mode)
 
         self.lbl_zone_hint = QtWidgets.QLabel()
         self.lbl_zone_hint.setWordWrap(True)
@@ -886,7 +963,10 @@ class RoiZoneEditorDialog(QtWidgets.QDialog):
                 'zone_type': 'INSPECTION',
                 'rect': [0.1, 0.1, 0.6, 0.6],
                 'target_label': 'ALL',
-                'min_count': 0
+                'min_count': 0,
+                'follow_label_enabled': False,
+                'anchor_label': self.available_labels[0] if self.available_labels else '',
+                'follow_mode': 'CENTER'
             }]
         self.canvas.set_zones(zones)
         self._updating_form = False
@@ -903,6 +983,12 @@ class RoiZoneEditorDialog(QtWidgets.QDialog):
             item_name = QtWidgets.QTableWidgetItem(z.get('name', ''))
             item_type = QtWidgets.QTableWidgetItem(z.get('zone_type', 'INSPECTION'))
             item_lbl = QtWidgets.QTableWidgetItem(z.get('target_label', 'ALL'))
+
+            is_follow = bool(z.get('follow_label_enabled', False))
+            anchor = str(z.get('anchor_label') or '')
+            follow_text = f"🎯 {anchor}" if is_follow and anchor else ("🎯 Có" if is_follow else "— Cố định")
+            item_follow = QtWidgets.QTableWidgetItem(follow_text)
+
             rect = z.get('rect', [0, 0, 1, 1])
             coord_str = f"[{rect[0]:.2f}, {rect[1]:.2f}, {rect[2]:.2f}, {rect[3]:.2f}]"
             item_coord = QtWidgets.QTableWidgetItem(coord_str)
@@ -910,7 +996,8 @@ class RoiZoneEditorDialog(QtWidgets.QDialog):
             self.table_zones.setItem(row, 0, item_name)
             self.table_zones.setItem(row, 1, item_type)
             self.table_zones.setItem(row, 2, item_lbl)
-            self.table_zones.setItem(row, 3, item_coord)
+            self.table_zones.setItem(row, 3, item_follow)
+            self.table_zones.setItem(row, 4, item_coord)
 
         if 0 <= self.canvas.selected_idx < len(zones):
             self.table_zones.selectRow(self.canvas.selected_idx)
@@ -927,6 +1014,9 @@ class RoiZoneEditorDialog(QtWidgets.QDialog):
             self.combo_zone_type.setEnabled(False)
             self.combo_zone_label.setEnabled(False)
             self.spin_min_count.setEnabled(False)
+            self.chk_follow_label.setEnabled(False)
+            self.combo_anchor_label.setEnabled(False)
+            self.combo_follow_mode.setEnabled(False)
             self.txt_zone_name.setText("")
             self.lbl_zone_hint.setText("Chưa chọn vùng ROI nào. Hãy kéo chuột trên canvas để vẽ vùng mới hoặc bấm chọn một vùng.")
             return
@@ -936,6 +1026,7 @@ class RoiZoneEditorDialog(QtWidgets.QDialog):
         self.txt_zone_name.setEnabled(True)
         self.combo_zone_type.setEnabled(True)
         self.combo_zone_label.setEnabled(True)
+        self.chk_follow_label.setEnabled(True)
 
         self.txt_zone_name.setText(z.get('name', ''))
 
@@ -957,23 +1048,54 @@ class RoiZoneEditorDialog(QtWidgets.QDialog):
 
         # Min Count
         self.spin_min_count.setValue(int(z.get('min_count', 1)))
-        self._on_zone_type_changed(self.combo_zone_type.currentIndex())
 
+        # Follow Label
+        is_follow = bool(z.get('follow_label_enabled', False))
+        self.chk_follow_label.setChecked(is_follow)
+        self.combo_anchor_label.setEnabled(is_follow)
+        self.combo_follow_mode.setEnabled(is_follow)
+
+        anchor_lbl = str(z.get('anchor_label') or '')
+        if not anchor_lbl and self.available_labels:
+            anchor_lbl = self.available_labels[0]
+        idx_anchor = self.combo_anchor_label.findText(anchor_lbl)
+        if idx_anchor >= 0:
+            self.combo_anchor_label.setCurrentIndex(idx_anchor)
+        else:
+            self.combo_anchor_label.setEditText(anchor_lbl)
+
+        f_mode = str(z.get('follow_mode') or 'CENTER').upper()
+        idx_mode = self.combo_follow_mode.findData(f_mode)
+        if idx_mode >= 0:
+            self.combo_follow_mode.setCurrentIndex(idx_mode)
+        else:
+            self.combo_follow_mode.setCurrentIndex(0)
+
+        self._on_zone_type_changed(self.combo_zone_type.currentIndex())
         self._updating_form = False
 
+    def _on_follow_label_toggled(self, checked: bool):
+        self.combo_anchor_label.setEnabled(checked)
+        self.combo_follow_mode.setEnabled(checked)
+        if not self._updating_form:
+            self._on_zone_field_changed()
+
     def _on_zone_type_changed(self, idx: int):
+        is_follow = self.chk_follow_label.isChecked()
+        anchor_text = f" (🎯 Bám nhãn '{self.combo_anchor_label.currentText().strip()}')" if is_follow else ""
+
         if idx == 0:  # INSPECTION
             self.spin_min_count.setEnabled(False)
             self.lbl_zone_hint.setStyleSheet("background-color: #f8fafc; border-left: 3px solid #10b981; color: #334155; padding: 6px 8px; font-size: 11px;")
-            self.lbl_zone_hint.setText("👉 <b>🟢 Vùng Kiểm Tra Bắt Lỗi (Inspection):</b> Bất kỳ phế phẩm nào xuất hiện bên trong vùng này sẽ kích hoạt lỗi <b>NG</b>.")
+            self.lbl_zone_hint.setText(f"👉 <b>🟢 Vùng Kiểm Tra Bắt Lỗi (Inspection){anchor_text}:</b> Vùng này được highlight sáng rõ (ngoài vùng bị làm đen mờ). Bất kỳ phế phẩm nào xuất hiện bên trong sẽ kích hoạt lỗi <b>NG</b>.")
         elif idx == 1:  # EXCLUSION
             self.spin_min_count.setEnabled(False)
             self.lbl_zone_hint.setStyleSheet("background-color: #f8fafc; border-left: 3px solid #ef4444; color: #334155; padding: 6px 8px; font-size: 11px;")
-            self.lbl_zone_hint.setText("👉 <b>🔴 Vùng Che Bỏ Qua (Mask):</b> Mọi phế phẩm phát hiện trong vùng này sẽ bị <b>bỏ qua (Mask)</b> để triệt tiêu bóng lóa, logo kim loại hoặc mép khuôn.")
+            self.lbl_zone_hint.setText(f"👉 <b>🔴 Vùng Che Bỏ Qua (Mask){anchor_text}:</b> Vùng này bị làm đen mờ (che). Mọi phế phẩm phát hiện bên trong vùng này sẽ bị <b>bỏ qua (Mask)</b> để triệt tiêu bóng lóa hoặc mép khuôn.")
         else:  # PRESENCE
             self.spin_min_count.setEnabled(True)
             self.lbl_zone_hint.setStyleSheet("background-color: #f8fafc; border-left: 3px solid #3b82f6; color: #334155; padding: 6px 8px; font-size: 11px;")
-            self.lbl_zone_hint.setText("👉 <b>🔵 Vùng Hiện Diện Linh Kiện (Presence):</b> Bắt buộc phải có linh kiện xuất hiện bên trong vùng (≥ số lượng tối thiểu). Nếu thiếu sẽ bị phán định <b>NG</b>.")
+            self.lbl_zone_hint.setText(f"👉 <b>🔵 Vùng Hiện Diện Linh Kiện (Presence){anchor_text}:</b> Vùng này được highlight sáng rõ. Bắt buộc phải có linh kiện xuất hiện bên trong (≥ số lượng tối thiểu), nếu thiếu sẽ phán định <b>NG</b>.")
 
         if not self._updating_form:
             self._on_zone_field_changed()
@@ -1003,6 +1125,10 @@ class RoiZoneEditorDialog(QtWidgets.QDialog):
 
             z['min_count'] = self.spin_min_count.value()
 
+            z['follow_label_enabled'] = self.chk_follow_label.isChecked()
+            z['anchor_label'] = self.combo_anchor_label.currentText().strip()
+            z['follow_mode'] = self.combo_follow_mode.currentData() or 'CENTER'
+
             self.canvas.update()
             self._refresh_zones_table()
 
@@ -1013,11 +1139,13 @@ class RoiZoneEditorDialog(QtWidgets.QDialog):
     def _on_canvas_zones_changed(self):
         self._refresh_zones_table()
         if 0 <= self.canvas.selected_idx < len(self.canvas.get_zones()):
-            rect = self.canvas.get_zones()[self.canvas.selected_idx]['rect']
+            z = self.canvas.get_zones()[self.canvas.selected_idx]
+            rect = z['rect']
+            follow_info = f" | 🎯 Bám nhãn: '{z.get('anchor_label')}'" if z.get('follow_label_enabled') else " | 📌 Tọa độ cố định"
             self.lbl_canvas_status.setText(
-                f"🎯 Đang chọn: {self.canvas.get_zones()[self.canvas.selected_idx]['name']} "
+                f"🎯 Đang chọn: {z['name']} "
                 f"| Tọa độ: X1={rect[0]:.3f}, Y1={rect[1]:.3f}, X2={rect[2]:.3f}, Y2={rect[3]:.3f} "
-                f"(Kích thước: {((rect[2]-rect[0])*100):.1f}% x {((rect[3]-rect[1])*100):.1f}%)"
+                f"(Kích thước: {((rect[2]-rect[0])*100):.1f}% x {((rect[3]-rect[1])*100):.1f}%){follow_info}"
             )
 
     def _on_table_zone_selection_changed(self):

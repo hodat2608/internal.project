@@ -25,6 +25,8 @@ _log = get_logger('module_3.multishot_aggregation_engine')
 _CYCLE_LOCK = threading.RLock()
 # Cấu trúc lưu trữ trạng thái chu kỳ: (camera_key, task_id) -> state_dict
 _MULTISHOT_CYCLE_STATES: Dict[Tuple[str, int], Dict[str, Any]] = {}
+# Quản lý chu kỳ cấp Camera để đồng bộ khóa thanh ghi NG xuyên suốt chu kỳ: camera_key -> {'last_shot': int, 'ng_registers': set()}
+_MULTISHOT_CAM_CYCLES: Dict[str, Dict[str, Any]] = {}
 
 
 def _normalize_cam_key(key_model) -> str:
@@ -44,6 +46,7 @@ def reset_multishot_cycle(key_model=None, task_id: Optional[int] = None):
     with _CYCLE_LOCK:
         if key_model is None and task_id is None:
             _MULTISHOT_CYCLE_STATES.clear()
+            _MULTISHOT_CAM_CYCLES.clear()
             _log.info("Reset all multishot cycle states.")
             return
 
@@ -54,6 +57,8 @@ def reset_multishot_cycle(key_model=None, task_id: Optional[int] = None):
                 keys_to_del.append((k_cam, k_tid))
         for k in keys_to_del:
             _MULTISHOT_CYCLE_STATES.pop(k, None)
+        if cam_key and task_id is None:
+            _MULTISHOT_CAM_CYCLES.pop(cam_key, None)
 
 
 def is_label_managed_by_multishot(label: str, multishot_tasks: List[Dict[str, Any]]) -> bool:
@@ -126,6 +131,19 @@ def evaluate_multishot_tasks(
     task_results = []
     plc_to_send = []
 
+    # 1. Quản lý chu kỳ cấp Camera để đồng bộ hóa thanh ghi NG xuyên suốt các Shot
+    with _CYCLE_LOCK:
+        cam_cycle = _MULTISHOT_CAM_CYCLES.setdefault(cam_key, {'last_shot': 0, 'ng_registers': set()})
+        if current_count is not None:
+            try:
+                c_shot_cam = int(current_count)
+            except (ValueError, TypeError):
+                c_shot_cam = 1
+            if (c_shot_cam == 1 and cam_cycle['last_shot'] != 1) or (c_shot_cam < cam_cycle['last_shot']):
+                cam_cycle['ng_registers'].clear()
+                _log.info("[%s] Bắt đầu chu kỳ đa shot mới theo counter (Shot %d)", cam_key, c_shot_cam)
+            cam_cycle['last_shot'] = c_shot_cam
+
     # Sao chép ảnh để vẽ nếu cần
     annotated_img = image_rgb.copy() if draw_overlay else image_rgb
 
@@ -171,8 +189,8 @@ def evaluate_multishot_tasks(
                 except (ValueError, TypeError):
                     c_shot = 1
 
-                # Tự động nhận diện chu kỳ mới khi current_count == 1 hoặc khi count quay vòng (c_shot <= last_shot_index)
-                if c_shot == 1 or c_shot <= state.get('last_shot_index', 0):
+                # Tự động nhận diện chu kỳ mới khi current_count == 1 (từ shot trước > 1) hoặc khi count quay vòng (c_shot < last_shot_index)
+                if (c_shot == 1 and state.get('last_shot_index', 0) != 1) or (c_shot < state.get('last_shot_index', 0)):
                     state['ng_shot_indices'].clear()
                     state['cycle_ng_confirmed'] = False
                     _log.info("[%s - %s] Bắt đầu chu kỳ mới theo counter (Shot %d/%d)",
@@ -187,6 +205,8 @@ def evaluate_multishot_tasks(
                     current_shot = 1
                     state['ng_shot_indices'].clear()
                     state['cycle_ng_confirmed'] = False
+                    with _CYCLE_LOCK:
+                        cam_cycle['ng_registers'].clear()
                 else:
                     current_shot = last + 1
                 state['last_shot_index'] = current_shot
@@ -228,6 +248,10 @@ def evaluate_multishot_tasks(
                     is_cycle_ng = True
                     state['cycle_ng_confirmed'] = True
 
+            assign_reg = str(t.get('assign_register') or '').strip()
+            if is_cycle_ng and assign_reg:
+                cam_cycle['ng_registers'].add(assign_reg)
+
         # Đánh giá kết quả Task
         task_pass = not is_cycle_ng
         if not task_pass:
@@ -246,15 +270,28 @@ def evaluate_multishot_tasks(
         else:
             desc_text = f"{title_str} Shot {current_shot}/{cycle_shots} | Defect: 0 NG"
 
-        # 5. Xử lý thanh ghi PLC (ĐỒNG BỘ HOÀN TOÀN VỚI TASK RULE CALCULATOR)
-        assign_reg = str(t.get('assign_register') or '').strip()
+        # 5. Xử lý thanh ghi PLC: BẢO VỆ NG THẮNG OK TUYỆT ĐỐI (ĐỒNG BỘ HOÀN TOÀN)
         val_state = t.get('value_state', 1)
         val_ok = t.get('value_bit_on', t.get('value_ok', 1))
         val_ng = t.get('value_bit_off', t.get('value_ng', 0))
 
         if assign_reg:
-            val_to_send = val_ng if is_cycle_ng else val_ok
-            plc_to_send.append((assign_reg, val_to_send))
+            if is_cycle_ng:
+                # Task này NG: gửi Value NG và lập tức xóa bỏ mọi Value OK đã thêm trước đó trong lượt chạy này cho thanh ghi này
+                plc_to_send = [(r, v) for r, v in plc_to_send if str(r).strip() != assign_reg]
+                plc_to_send.append((assign_reg, val_ng))
+            else:
+                # Task này OK: TUYỆT ĐỐI CHỈ gửi Value OK nếu thanh ghi này CHƯA TỪNG bị NG trong chu kỳ này!
+                with _CYCLE_LOCK:
+                    reg_is_ng = (assign_reg in cam_cycle.get('ng_registers', set()))
+                if not reg_is_ng:
+                    if not any(str(r).strip() == assign_reg for r, _ in plc_to_send):
+                        plc_to_send.append((assign_reg, val_ok))
+                else:
+                    _log.warning(
+                        "[%s] BẢO VỆ NG: Task '%s' [OK] nhưng thanh ghi %s đã chốt NG chu kỳ từ task khác -> Tuyệt đối không gửi Value OK!",
+                        cam_key, task_name, assign_reg
+                    )
 
         task_results.append({
             'task_id': task_id,

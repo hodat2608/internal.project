@@ -1,7 +1,12 @@
 {
   "built-in-camera-1": {
-    "mode_key": "Auto 1",
+    "mode_key": "Auto 3",
     "item_code": "50-E22AA-A",
-    "date_time": "2026-11-25 07:52:42"
+    "date_time": "2026-11-27 17:00:17"
+  },
+  "built-in-camera-3": {
+    "mode_key": "Auto 3",
+    "item_code": "50-E22AA-A",
+    "date_time": "2026-11-28 14:56:55"
   }
 }

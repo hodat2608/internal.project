@@ -1106,3 +1106,64 @@ def get_available_labels_for_camera(cursor, camera_id: int, model_id: Optional[i
         except Exception as e:
             _log.error("Lỗi khi lấy danh sách nhãn của camera_id=%s, model_id=%s: %s", camera_id, model_id, e)
             return []
+
+
+def get_cycle_shots_from_shotxmodel(cursor, camera_id: Any) -> int:
+    """
+    Lấy chính xác số lượng shot (ảnh) trong 1 chu kỳ từ bảng SHOTXMODEL (module_1/table_db.py).
+    Tìm kiếm theo DEFAULT_MODE_AUTO và MODE_AUTO tương ứng với camera_id.
+    """
+    if not cursor:
+        return 5
+    with _db_lock:
+        ensure_connection_alive(cursor)
+        cur = get_active_cursor(cursor)
+        try:
+            c_str = str(camera_id).lower().replace('camera-', '').replace('built-in-', '').strip()
+            c_id = int(c_str) if c_str.isdigit() else 1
+
+            # 1. Tìm mode từ DEFAULT_MODE_AUTO và MODE_AUTO
+            cur.execute("""
+                SELECT COUNT(*), COALESCE(MAX(s.shot), 0)
+                FROM SHOTXMODEL s
+                JOIN MODE_AUTO m ON s.mode_id = m.id
+                JOIN DEFAULT_MODE_AUTO d ON m.mode_name = d.mode_name AND m.camera_id = d.camera_id
+                WHERE m.camera_id = %s
+            """, (c_id,))
+            row = cur.fetchone()
+            if row and (row[0] > 0 or row[1] > 0):
+                return max(int(row[0]), int(row[1]))
+
+            # 2. Nếu không có DEFAULT_MODE_AUTO, lấy mode đầu tiên trong MODE_AUTO của camera
+            cur.execute("""
+                SELECT COUNT(*), COALESCE(MAX(s.shot), 0)
+                FROM SHOTXMODEL s
+                WHERE s.mode_id = (
+                    SELECT id FROM MODE_AUTO WHERE camera_id = %s ORDER BY id ASC LIMIT 1
+                )
+            """, (c_id,))
+            row = cur.fetchone()
+            if row and (row[0] > 0 or row[1] > 0):
+                return max(int(row[0]), int(row[1]))
+
+            # 3. Quét toàn bộ SHOTXMODEL liên kết với camera_id qua MODE_AUTO
+            cur.execute("""
+                SELECT COUNT(*), COALESCE(MAX(s.shot), 0)
+                FROM SHOTXMODEL s
+                JOIN MODE_AUTO m ON s.mode_id = m.id
+                WHERE m.camera_id = %s
+            """, (c_id,))
+            row = cur.fetchone()
+            if row and (row[0] > 0 or row[1] > 0):
+                return max(int(row[0]), int(row[1]))
+
+            # 4. Fallback chung: Quét toàn bộ SHOTXMODEL hiện có
+            cur.execute("SELECT COUNT(*), COALESCE(MAX(shot), 0) FROM SHOTXMODEL")
+            row = cur.fetchone()
+            if row and (row[0] > 0 or row[1] > 0):
+                return max(int(row[0]), int(row[1]))
+
+        except Exception as e:
+            _log.warning("Không thể đọc số shot từ SHOTXMODEL (camera_id=%s): %s", camera_id, e)
+
+        return 5

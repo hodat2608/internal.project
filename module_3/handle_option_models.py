@@ -572,11 +572,13 @@ class TableSliderController(QtCore.QObject):
 
 class Process_Model:
     dict_active_tasks = {}
+    main_core = None
 
     def __init__(self,uic):
         self.model = None
         self.file_path = None
         self.uic = uic
+        self.main_core = None
         self.list_layer = []
         self.list_layer_save = []
         self.keys_mapping = list(COLUMN_MAPPING.keys())
@@ -1313,6 +1315,19 @@ class Process_Model:
         _log.info("Save parameter before load weight successfully")
         return self.list_layer
 
+    def sync_model_to_main_core(self):
+        """Đồng bộ trực tiếp model_loader, path_object mới nạp vào main_core / CameraTabManager / built_in_objects."""
+        try:
+            main_mgr = self.main_core or Process_Model.main_core
+            if main_mgr and hasattr(main_mgr, 'update_model_loader_for_processor'):
+                return main_mgr.update_model_loader_for_processor(self)
+            else:
+                _log.warning("Process_Model.sync_model_to_main_core: Chưa có tham chiếu main_core/CameraTabManager.")
+                return False
+        except Exception as e:
+            _log.exception("Process_Model.sync_model_to_main_core failed: %s", e)
+            return False
+
     def load_model(self):
         weight_input = self.uic.lineEdit_weight_pytorch.text().strip()
         if not weight_input:
@@ -1347,9 +1362,35 @@ class Process_Model:
                 
             self.populateTable()
             _log.info(f"Load model {source_model} successfully")
+
+            weight_filename = os.path.basename(self.file_path) if self.file_path else os.path.basename(weight_input)
+            if hasattr(self.uic, 'groupBox_table') and weight_filename:
+                self.uic.groupBox_table.setTitle(f"Model List / Parameters [🟡 {weight_filename}]")
+
+            if hasattr(self.uic, '_cached_model_config'):
+                self.uic._cached_model_config = None
+
+            # Cập nhật ngay lập tức model_loader mới vào hệ thống (CameraTabManager / built_in_objects)
+            self.sync_model_to_main_core()
+
+            if torch.cuda.is_available():
+                try:
+                    torch.cuda.empty_cache()
+                except Exception:
+                    pass
+            import gc
+            gc.collect()
+
+            QMessageBox.information(
+                None,
+                "Thành Công",
+                f"Đã load thành công model:\n{weight_filename}\n\n"
+                f"Model mới đã được nạp trực tiếp vào hệ thống"
+            )
         else:
-            if factory_result.get("error_msg"):
-                _log.warning(factory_result.get("error_msg"))
+            error_msg = factory_result.get("error_msg", "Không rõ nguyên nhân.")
+            _log.warning(f"Lỗi tải model: {error_msg}")
+            QMessageBox.critical(None, "Lỗi Tải Model", f"Không thể tải model:\n{error_msg}")
             return
         
     def populateTable(self):
@@ -1614,6 +1655,11 @@ class Process_Model:
             except Exception as e_snap:
                 _log.error("Không thể ghi snapshot MODEL_PARAMS: %s", e_snap)
 
+            if hasattr(self.uic, 'groupBox_table'):
+                w_name = weight_filename_for_db or (os.path.basename(self.file_path) if self.file_path else "")
+                if w_name:
+                    self.uic.groupBox_table.setTitle(f"Model List / Parameters [🟢 {w_name}]")
+
             _log.info("Save parameter successfully")
             QMessageBox.information(None, "Thành công", "Lưu thông số và ghi nhận lịch sử thay đổi thành công!")
 
@@ -1796,6 +1842,9 @@ class Process_Model:
                     self.result_model = factory_result.get("result_model")
                     # Liên kết logic xử lý image inference vào self.process_image_func
                     self.use_model()
+                    weight_filename = os.path.basename(weight_path) if weight_path else ""
+                    if hasattr(self.uic, 'groupBox_table') and weight_filename:
+                        self.uic.groupBox_table.setTitle(f"Model List / Parameters [🟢 {weight_filename}]")
                 else:
                     if factory_result.get("error_msg"):
                         _log.warning(factory_result.get("error_msg"))

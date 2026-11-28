@@ -26,7 +26,8 @@ from module_3.task_calculator_db import (
     delete_task,
     toggle_task_enabled,
     get_available_labels_for_camera,
-    save_task_and_rules
+    save_task_and_rules,
+    get_cycle_shots_from_shotxmodel
 )
 from module_3.task_rule_editor_dialog import TaskRuleEditorDialog
 from module_3.task_type_selector_dialog import TaskTypeSelectorDialog
@@ -188,7 +189,8 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
             if t_type == 'MULTI_SHOT_AGGREGATION':
                 rule = t.get('multishot_rule') or {}
                 lbl = rule.get('target_label', '')
-                shots = rule.get('cycle_shots', 5)
+                cycle_shots_db = get_cycle_shots_from_shotxmodel(self.cursor, self.camera_id) if self.cursor else 0
+                shots = cycle_shots_db if cycle_shots_db > 0 else int(rule.get('cycle_shots', 5) or 5)
                 min_ng = rule.get('min_ng_shots', 2)
                 mode = rule.get('aggregation_mode', 'THRESHOLD_COUNT')
                 p_shots = rule.get('participating_shots', '')
@@ -340,11 +342,12 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
                 'value_ng': 0,
                 'Value_NG': 0,
             }
+            cycle_shots_db = get_cycle_shots_from_shotxmodel(self.cursor, self.camera_id)
             rule_data = {
                 'target_label': default_label,
-                'cycle_shots': 5,
+                'cycle_shots': cycle_shots_db,
                 'aggregation_mode': 'THRESHOLD_COUNT',
-                'min_ng_shots': 2,
+                'min_ng_shots': min(2, cycle_shots_db),
                 'specific_shots': '',
                 'participating_shots': '',
                 'roi_enabled': 0,
@@ -462,6 +465,11 @@ class TaskWorkspaceDialog(QtWidgets.QDialog):
             rule = task_info.get('multishot_rule')
             if not rule:
                 rule = get_multishot_rule(self.cursor, task_id)
+            if not rule:
+                rule = {}
+            cycle_shots_db = get_cycle_shots_from_shotxmodel(self.cursor, self.camera_id)
+            if cycle_shots_db > 0:
+                rule['cycle_shots'] = cycle_shots_db
             dlg = MultiShotAggregationDialog(
                 camera_id=self.camera_id,
                 model_id=target_model_id,
